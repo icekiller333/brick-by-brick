@@ -83,71 +83,99 @@
       #chips{ position:absolute; z-index:29; top:calc(70px + var(--safe-t)); left:calc(10px + var(--safe-l)); display:flex; flex-direction:column; gap:6px; align-items:flex-start; pointer-events:none; }
       .tag{ background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s); padding:3px 8px; font-weight:800; font-size:11px; letter-spacing:.08em; white-space:nowrap; }
       #chip-sc{ background:var(--clay); color:#fff; }
+      #chip-hand{ background:#8f2a22; color:#fff; }
+      #chip-hand.urgent{ background:#d42a1e; animation:promptPulse .45s ease-in-out infinite alternate; }
+      #chip-sway{ background:#5a4fb0; color:#fff; }
       #wind-arrow{ display:inline-block; transition:transform .4s ease; }
 
-      /* Streak badge — the heartbeat of the screen */
-      #streak{ position:absolute; z-index:29; top:calc(66px + var(--safe-t)); right:calc(12px + var(--safe-r)); pointer-events:none; text-align:center;
-        background:var(--gold); color:#221407; border:3px solid var(--line); box-shadow:var(--shadow-s); padding:4px 12px 5px; transform-origin:100% 0;
-        transition:background .25s ease, transform .15s ease; }
-      #streak .st-lab{ display:block; font-weight:800; font-size:9px; letter-spacing:.18em; }
-      #streak .st-x{ display:block; font-family:'Archivo Black',sans-serif; font-size:28px; line-height:1; }
-      #streak .st-pay{ display:block; font-weight:800; font-size:9.5px; letter-spacing:.06em; opacity:.85; }
-      #streak.warm{ background:#ffa22e; }
-      #streak.hot{ background:#e2541e; color:#fff; box-shadow:3px 3px 0 var(--shadowc), 0 0 18px 5px rgba(255,120,30,.6); }
-      #streak.maxed{ background:linear-gradient(180deg,#fff,#ffd94d 40%,#f5b921); animation:comboMax .9s ease-in-out infinite; }
-      #streak.break{ background:var(--bad); color:#fff; animation:comboBreak .5s ease forwards; }
-      @keyframes comboMax{ 0%,100%{ box-shadow:3px 3px 0 var(--shadowc), 0 0 0 0 rgba(255,217,77,0) } 50%{ box-shadow:3px 3px 0 var(--shadowc), 0 0 24px 9px rgba(255,217,77,.9) } }
+      /* Streak badge — a dark plaque with a fill meter toward the cap */
+      #streak{ position:absolute; z-index:29; top:calc(66px + var(--safe-t)); right:calc(12px + var(--safe-r)); pointer-events:none; text-align:center; min-width:92px;
+        background:#2a190b; color:#ffd94d; border:3px solid #f5b921; border-radius:6px; box-shadow:0 4px 0 #000; padding:5px 12px 6px; transform-origin:100% 0;
+        transition:background .25s ease, border-color .25s ease, transform .15s ease; }
+      #streak .st-lab{ display:block; font-weight:800; font-size:9px; letter-spacing:.22em; color:#f5b921; }
+      #streak .st-x{ display:block; font-family:'Archivo Black',sans-serif; font-size:30px; line-height:1.05; text-shadow:0 2px 0 #000; }
+      #streak .st-bar{ display:block; height:7px; margin:4px 0 3px; border-radius:4px; background:rgba(255,255,255,.16); overflow:hidden; }
+      #streak .st-bar b{ display:block; height:100%; width:0; border-radius:4px; background:linear-gradient(90deg,#ffd94d,#ff9a2e); transition:width .25s ease; }
+      #streak .st-pay{ display:block; font-weight:800; font-size:9.5px; letter-spacing:.08em; color:#fff3d1; opacity:.9; }
+      #streak.warm{ border-color:#ffa22e; }
+      #streak.hot{ border-color:#ff6a2a; box-shadow:0 4px 0 #000, 0 0 16px 4px rgba(255,110,30,.55); }
+      #streak.hot .st-x{ color:#fff; } #streak.hot .st-bar b{ background:linear-gradient(90deg,#ff9a2e,#ff4a1e); }
+      #streak.maxed{ background:linear-gradient(180deg,#fff7c9,#ffd94d 45%,#f5b921); border-color:#fff; color:#221407; animation:comboMax .9s ease-in-out infinite; }
+      #streak.maxed .st-lab, #streak.maxed .st-pay{ color:#221407; } #streak.maxed .st-x{ text-shadow:none; }
+      #streak.maxed .st-bar{ background:rgba(34,20,7,.25); } #streak.maxed .st-bar b{ background:#221407; }
+      #streak.break{ background:var(--bad); border-color:#fff; color:#fff; animation:comboBreak .5s ease forwards; }
+      #streak.break .st-lab, #streak.break .st-pay{ color:#fff; }
+      @keyframes comboMax{ 0%,100%{ box-shadow:0 4px 0 #000, 0 0 0 0 rgba(255,217,77,0) } 50%{ box-shadow:0 4px 0 #000, 0 0 24px 9px rgba(255,217,77,.9) } }
       @keyframes comboBreak{ 0%{ transform:rotate(0) scale(1.15) } 30%{ transform:rotate(-8deg) scale(1.08) } 60%{ transform:rotate(6deg) scale(.95) } 100%{ transform:rotate(0) scale(.7); opacity:0 } }
 
+
       /* Context prompt above the dock */
-      #prompt{ position:absolute; z-index:28; left:50%; transform:translateX(-50%); bottom:calc(134px + var(--safe-b)); pointer-events:none;
+      #prompt{ position:absolute; z-index:28; left:50%; transform:translateX(-50%); bottom:calc(166px + var(--safe-b)); pointer-events:none;
         background:rgba(34,20,7,.82); color:#fdf3df; font-weight:800; font-size:12.5px; letter-spacing:.04em; padding:6px 12px; border-radius:999px;
         white-space:nowrap; max-width:92vw; overflow:hidden; text-overflow:ellipsis; transition:opacity .25s ease; }
       #prompt.urgent{ background:#d42a1e; animation:promptPulse .45s ease-in-out infinite alternate; }
       @keyframes promptPulse{ from{ transform:translateX(-50%) scale(1) } to{ transform:translateX(-50%) scale(1.06) } }
 
-      /* ---------- DOCK: kiln + brick tray ---------- */
+      /* ---------- DOCK: a little kiln building you hold + a storage building the bricks fly into ---------- */
       #dock{ position:absolute; z-index:30; bottom:calc(12px + var(--safe-b)); left:calc(12px + var(--safe-l)); right:calc(12px + var(--safe-r));
         display:flex; align-items:flex-end; gap:10px; pointer-events:none; }
       #dock > *{ pointer-events:auto; }
       #app.hand-r #dock{ flex-direction:row-reverse; }
-      #kiln{ position:relative; flex:none; width:104px; height:104px; border-radius:50%; padding:0; border:4px solid var(--line);
-        background:radial-gradient(circle at 50% 38%, #e0704a, #c2502c 55%, #8e3418); color:#fff; box-shadow:5px 5px 0 var(--shadowc);
-        touch-action:none; transition:transform .08s ease, box-shadow .08s ease, filter .2s ease; }
-      #kiln svg.ring{ position:absolute; inset:-4px; width:calc(100% + 8px); height:calc(100% + 8px); transform:rotate(-90deg); pointer-events:none; }
-      #kiln .rk-bg{ fill:none; stroke:rgba(0,0,0,.25); stroke-width:7; }
-      #kiln .rk-fg{ fill:none; stroke:#ffd94d; stroke-width:7; stroke-linecap:round; transition:stroke .2s ease; }
-      #kiln .k-lab{ position:relative; display:block; font-family:'Archivo Black',sans-serif; font-size:15px; letter-spacing:.04em; text-shadow:0 2px 0 rgba(0,0,0,.35); line-height:1.05; }
-      #kiln .k-sub{ position:relative; display:block; font-weight:800; font-size:9px; letter-spacing:.14em; opacity:.9; margin-top:3px; }
-      #kiln .k-mouth{ position:absolute; left:50%; bottom:13px; width:34px; height:12px; margin-left:-17px; border-radius:12px 12px 3px 3px; background:#2b1206; box-shadow:inset 0 0 0 2px rgba(0,0,0,.3); transition:background .2s ease, box-shadow .2s ease; }
-      #kiln.held{ transform:translate(3px,3px) scale(.97); box-shadow:2px 2px 0 var(--shadowc), 0 0 0 0 rgba(255,140,40,.0); filter:brightness(1.12); }
-      #kiln.held .k-mouth{ background:#ffb02e; box-shadow:0 0 14px 6px rgba(255,140,40,.85), inset 0 0 6px #fff3c4; }
-      #kiln.held .rk-fg{ stroke:#fff3a6; }
-      #kiln.idle-glow .k-mouth{ background:#7a2a0c; }
+      #kiln{ --ks:104px; position:relative; flex:none; width:calc(var(--ks) * 1.15); height:var(--ks); padding:0; border:0; background:none; color:#fff; border-radius:16px;
+        touch-action:none; transition:transform .08s ease, filter .2s ease; -webkit-tap-highlight-color:transparent; }
+      #kiln .k-art{ position:absolute; left:0; bottom:0; width:100%; height:100%; overflow:visible; pointer-events:none; filter:drop-shadow(4px 4px 0 var(--shadowc)); }
+      #kiln .k-fire{ opacity:.3; transition:opacity .15s ease; } #kiln .k-fire2{ opacity:0; transition:opacity .15s ease; }
+      #kiln.held .k-fire{ opacity:1; animation:fireFlick .18s ease-in-out infinite alternate; transform-origin:60px 96px; }
+      #kiln.held .k-fire2{ opacity:1; animation:fireFlick .13s ease-in-out infinite alternate; transform-origin:60px 96px; }
+      @keyframes fireFlick{ from{ transform:scale(1,.9) } to{ transform:scale(1.08,1.12) } }
+      #kiln .k-smoke{ fill:#fff; opacity:0; }
+      #kiln.held .k-smoke{ animation:smokeUp 1.3s ease-out infinite; }
+      #kiln.held .k-smoke.s2{ animation-delay:.45s; } #kiln.held .k-smoke.s3{ animation-delay:.9s; }
+      @keyframes smokeUp{ 0%{ opacity:.0; transform:translate(0,6px) scale(.5) } 20%{ opacity:.85 } 100%{ opacity:0; transform:translate(10px,-34px) scale(1.7) } }
+      #kiln .k-sign{ position:absolute; left:50%; top:25%; transform:translateX(-50%); text-align:center; pointer-events:none; line-height:1; }
+      #kiln .k-lab{ display:block; font-family:'Archivo Black',sans-serif; font-size:15px; letter-spacing:.06em; text-shadow:0 2px 0 rgba(0,0,0,.45); }
+      #kiln .k-sub{ display:block; font-weight:800; font-size:8.5px; letter-spacing:.16em; margin-top:3px; text-shadow:0 1px 0 rgba(0,0,0,.5); opacity:.95; }
+      #kiln .k-gauge{ position:absolute; left:50%; top:calc(var(--ks) * -0.5); width:48px; height:48px; margin-left:-24px; border-radius:50%; background:var(--panel);
+        border:3px solid var(--line); box-shadow:var(--shadow-s); pointer-events:none; }
+      #kiln .k-gauge svg{ position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); }
+      #kiln .rk-bg{ fill:none; stroke:rgba(0,0,0,.18); stroke-width:6; }
+      #kiln .rk-fg{ fill:none; stroke:#e0704a; stroke-width:6; stroke-linecap:round; }
+      #kiln .k-gbrick{ position:absolute; left:50%; top:50%; width:16px; height:9px; margin:-4.5px 0 0 -8px; background:var(--clay); border:2px solid var(--line); }
+      #kiln.held .rk-fg{ stroke:#ffb02e; }
+      #kiln.held{ transform:translate(2px,2px) scale(.98); filter:brightness(1.1); }
+      #kiln.gauge-pop .k-gauge{ animation:gaugePop .35s cubic-bezier(.3,1.6,.5,1); }
+      @keyframes gaugePop{ 0%{ transform:scale(1) } 40%{ transform:scale(1.28) } 100%{ transform:scale(1) } }
       #kiln.nudge{ animation:kilnNudge .9s ease-in-out infinite; }
-      @keyframes kilnNudge{ 0%,100%{ box-shadow:5px 5px 0 var(--shadowc), 0 0 0 0 rgba(245,185,33,0) } 50%{ box-shadow:5px 5px 0 var(--shadowc), 0 0 0 9px rgba(245,185,33,.75) } }
-      #tray{ flex:0 1 auto; min-width:132px; max-width:340px; display:flex; flex-direction:column; gap:5px; padding:7px 9px 8px; }
-      #app.hand-r #tray{ align-items:flex-end; }
-      #tray .tr-top{ display:flex; align-items:baseline; gap:6px; font-weight:800; font-size:10px; letter-spacing:.14em; }
-      #tray-count{ font-family:'Archivo Black',sans-serif; font-size:20px; letter-spacing:0; line-height:1; }
-      #tray-list{ display:flex; gap:5px; align-items:flex-end; min-height:24px; }
-      #app.hand-r #tray-list{ flex-direction:row-reverse; }
-      .tb{ position:relative; width:34px; height:19px; flex:none; border:2px solid rgba(20,10,4,.7);
+      @keyframes kilnNudge{ 0%,100%{ filter:drop-shadow(0 0 0 rgba(245,185,33,0)) } 50%{ filter:drop-shadow(0 0 12px rgba(245,185,33,.95)) } }
+      #tray{ position:relative; flex:0 1 auto; width:178px; min-width:150px; padding-top:30px; }
+      #tray .t-roof{ position:absolute; left:-6px; right:-6px; top:0; width:calc(100% + 12px); height:38px; overflow:visible; pointer-events:none; filter:drop-shadow(3px 3px 0 var(--shadowc)); }
+      #tray .t-sign{ position:absolute; left:50%; top:13px; transform:translateX(-50%); display:flex; align-items:baseline; gap:6px; color:#fff; z-index:2;
+        font-weight:800; font-size:9px; letter-spacing:.16em; text-shadow:0 1px 0 rgba(0,0,0,.55); white-space:nowrap; pointer-events:none; }
+      #tray-count{ font-family:'Archivo Black',sans-serif; font-size:19px; letter-spacing:0; line-height:1; }
+      #tray .t-bay{ position:relative; border:4px solid var(--line); background:linear-gradient(180deg,#2b1810,#4a2f1c); padding:8px 8px 10px; min-height:62px;
+        box-shadow:var(--shadow-s), inset 0 -6px 0 #8a7358; }
+      #tray.thunk{ animation:thunk .22s ease-out; transform-origin:50% 100%; }
+      @keyframes thunk{ 0%{ transform:scaleY(.94) } 100%{ transform:none } }
+      #tray-list{ display:flex; flex-wrap:wrap-reverse; gap:6px 4px; align-content:flex-start; min-height:22px; }
+      .tb{ position:relative; width:30px; height:17px; flex:none; border:2px solid rgba(20,10,4,.7);
         box-shadow:inset 0 -3px 0 rgba(0,0,0,.2), inset 0 2px 0 rgba(255,255,255,.25); }
+      .tb.pend{ visibility:hidden; }
+      .tb.fly{ position:absolute; left:0; top:0; z-index:41; pointer-events:none; will-change:transform; }
       .tb.new{ animation:tbIn .3s cubic-bezier(.3,1.6,.5,1); }
       .tb::after{ content:""; position:absolute; left:50%; top:0; bottom:0; width:2px; background:rgba(0,0,0,.22); }
       .tb.first{ outline:3px solid var(--gold-d); outline-offset:1px; }
       .tb.t-gold{ background:linear-gradient(180deg,#ffe27a,#f5b921 55%,#d99a06) !important; }
       .tb.t-hot{ background:linear-gradient(180deg,#ffc04d,#e2541e) !important; animation:hotGlow .5s ease-in-out infinite alternate; }
+      .tb.t-glass{ background:linear-gradient(180deg,#e6fbff,#8fd9f0 60%,#5bb7d6) !important; box-shadow:inset 0 -3px 0 rgba(0,0,0,.12), 0 0 8px rgba(143,217,240,.8); }
       .tb.t-lead{ background:linear-gradient(180deg,#6b707a,#33363f) !important; }
-      .tb .fuse{ position:absolute; left:-2px; right:-2px; bottom:-7px; height:4px; background:rgba(0,0,0,.25); }
+      .tb .fuse{ position:absolute; left:-2px; right:-2px; bottom:-6px; height:3px; background:rgba(0,0,0,.35); }
       .tb .fuse i{ display:block; height:100%; background:#ff5a1f; }
       .tb.urgent{ animation:hotGlow .2s ease-in-out infinite alternate, tbShake .15s linear infinite; }
       @keyframes tbShake{ 0%,100%{ translate:0 0 } 25%{ translate:-1.5px 0 } 75%{ translate:1.5px 0 } }
       @keyframes hotGlow{ from{ filter:brightness(1) } to{ filter:brightness(1.3) } }
       @keyframes tbIn{ from{ transform:translateY(-14px) scale(.6); opacity:0 } to{ transform:none; opacity:1 } }
-      .tb-more{ font-weight:800; font-size:11px; color:var(--muted); align-self:center; }
-      .tb.empty{ background:transparent !important; border:2px dashed var(--muted); box-shadow:none; animation:none; }
+      .tb-more{ font-weight:800; font-size:11px; color:#d9c7a4; align-self:center; }
+      .tb.empty{ background:transparent !important; border:2px dashed #8a7358; box-shadow:none; animation:none; }
       .tb.empty::after{ display:none; }
       .ember{ position:absolute; width:6px; height:6px; border-radius:50%; z-index:42; pointer-events:none;
         background:radial-gradient(circle, #fff6c2, #ffa22e 55%, rgba(226,84,30,0) 72%); }
@@ -156,16 +184,22 @@
       .pop-text{ position:absolute; z-index:44; pointer-events:none; white-space:nowrap; font-family:'Archivo Black', sans-serif; color:#fff;
         -webkit-text-stroke:1.5px #221407; text-shadow:2px 2px 0 #221407; transform:translate(-50%,-50%); }
       .pop-text.gold{ color:#ffd94d; } .pop-text.green{ color:#8ff0a4; } .pop-text.red{ color:#ff6b5b; } .pop-text.white{ color:#fff; }
-      .coin{ position:absolute; width:15px; height:15px; border-radius:50%; z-index:41; pointer-events:none; left:0; top:0;
-        background:radial-gradient(circle at 35% 35%, #fff2a8, var(--gold) 60%, var(--gold-d)); border:2px solid #7a5200; will-change:transform; }
+      .vbubble{ position:absolute; left:0; top:0; z-index:43; max-width:190px; pointer-events:none; background:#fffaf0; color:#221407; border:3px solid #221407; box-shadow:3px 3px 0 #221407;
+        padding:6px 9px; font-weight:800; font-size:12.5px; line-height:1.25; will-change:transform; }
+      .vbubble::after{ content:""; position:absolute; left:50%; bottom:-8px; width:10px; height:10px; margin-left:-5px; background:#fffaf0; border:3px solid #221407; border-top:0; border-left:0; transform:rotate(45deg); }
+      .coin{ position:absolute; width:18px; height:18px; border-radius:50%; z-index:41; pointer-events:none; left:0; top:0; will-change:transform;
+        background:radial-gradient(circle at 35% 30%, #fffbd0 0 14%, #ffd94d 16% 55%, #e0a30a 58%); border:2px solid #7a5200;
+        box-shadow:inset 0 0 0 2px rgba(255,255,255,.35), 0 0 8px 2px rgba(255,217,77,.65); }
+      .coin-glint{ position:absolute; width:30px; height:30px; margin:-15px 0 0 -15px; border-radius:50%; z-index:42; pointer-events:none;
+        background:radial-gradient(circle, #fff 0 20%, rgba(255,230,120,.8) 40%, rgba(255,217,77,0) 70%); }
       .confetti{ position:absolute; width:8px; height:12px; z-index:41; pointer-events:none; left:0; top:0; }
 
       /* ---------- Toast / banner / reveal ---------- */
       #toast{ position:absolute; left:50%; z-index:46; transform:translate(-50%,-14px); max-width:min(88vw,420px); text-align:center; pointer-events:none;
-        bottom:calc(180px + var(--safe-b)); background:var(--ink); color:var(--paper); border:3px solid var(--line); box-shadow:var(--shadow-s);
+        bottom:calc(208px + var(--safe-b)); background:var(--ink); color:var(--paper); border:3px solid var(--line); box-shadow:var(--shadow-s);
         padding:9px 14px; font-weight:700; font-size:14px; opacity:0; transition:opacity .3s ease, transform .3s ease; }
       #toast.show{ opacity:1; transform:translate(-50%,0); }
-      @media (max-height:560px){ #toast{ bottom:calc(132px + var(--safe-b)); } }
+      @media (max-height:560px){ #toast{ bottom:calc(162px + var(--safe-b)); } }
       #banner{ position:absolute; left:0; right:0; top:34%; z-index:45; pointer-events:none; text-align:center; background:var(--ink); color:var(--paper);
         border-top:3px solid var(--gold); border-bottom:3px solid var(--gold); padding:8px; transform:translateX(-110%); }
       #banner.show{ animation:bannerSweep 2.2s cubic-bezier(.2,.9,.2,1) forwards; }
@@ -184,6 +218,11 @@
       .hr-brick::after{ content:""; position:absolute; left:50%; top:0; bottom:0; width:3px; background:rgba(0,0,0,.3); }
       .hr-brick.hot{ background:linear-gradient(180deg,#ffb02e,#e2541e 72%); box-shadow:0 0 16px 5px rgba(255,120,30,.7); animation:hotGlow .6s ease-in-out infinite alternate; }
       .hr-brick.lead{ background:linear-gradient(180deg,#62676f,#33363f 75%); }
+      .hr-brick.glass{ background:linear-gradient(180deg,#e6fbff,#8fd9f0 60%,#5bb7d6); box-shadow:0 0 16px 5px rgba(120,220,255,.6); }
+      .hr-brick.icon{ width:70px; height:48px; border:none; background:none; box-shadow:none; }
+      .hr-brick.icon::after{ display:none; }
+      .hr-brick.icon svg{ display:block; margin:0 auto; }
+      .hr-brick.tremor{ color:var(--ink); animation:windWobble .5s ease-in-out infinite; }
       .hr-brick.wind{ background:var(--clay); animation:windWobble 1s ease-in-out infinite; }
       .hr-brick.wind::before{ content:""; position:absolute; right:calc(100% + 4px); top:3px; bottom:3px; width:30px; opacity:.6; background:repeating-linear-gradient(180deg, var(--line) 0 3px, transparent 3px 7px); }
       @keyframes windWobble{ 0%,100%{ transform:translateX(-6px) rotate(-4deg) } 50%{ transform:translateX(6px) rotate(4deg) } }
@@ -275,6 +314,38 @@
       @keyframes beginPulse{ 0%,100%{ box-shadow:var(--shadow), 0 0 0 0 rgba(245,185,33,0) } 50%{ box-shadow:var(--shadow), 0 0 0 8px rgba(245,185,33,.65) } }
       .start-how{ font-size:12.5px; font-weight:800; color:#fff; margin:16px 0 0; text-shadow:0 1px 0 #221407; opacity:.95; }
       .start-how b{ color:#ffd94d; }
+
+      /* loading: a little wall builds itself under a rising sun */
+      #ov-loading{ overflow:hidden; }
+      .ld-sun{ position:absolute; left:50%; bottom:-70px; width:340px; height:340px; margin-left:-170px; border-radius:50%;
+        background:radial-gradient(circle, #fff6c8 0 30%, rgba(255,214,102,.75) 45%, rgba(255,214,102,0) 70%); animation:ldSun 1.6s ease-out both; }
+      @keyframes ldSun{ from{ transform:translateY(120px) scale(.7); opacity:0 } to{ transform:none; opacity:1 } }
+      .ld-wall{ position:relative; display:flex; flex-direction:column-reverse; align-items:center; gap:3px; margin-bottom:18px; }
+      .ld-row{ display:flex; gap:3px; } .ld-row.off{ margin-left:0; }
+      .ld-row i{ display:block; width:40px; height:21px; border:2px solid #221407; box-shadow:2px 2px 0 #221407; animation:ldDrop .5s cubic-bezier(.3,1.5,.5,1) both; }
+      @keyframes ldDrop{ from{ transform:translateY(-140px) rotate(-8deg); opacity:0 } 55%{ opacity:1 } to{ transform:none; opacity:1 } }
+      .ld-title{ position:relative; font-family:'Archivo Black',sans-serif; font-size:30px; letter-spacing:.02em; color:#fff; -webkit-text-stroke:2px #221407; text-shadow:3px 3px 0 #221407; margin-bottom:10px; }
+      .ld-msg{ position:relative; font-family:'Archivo Black',sans-serif; font-size:14px; letter-spacing:.12em; min-height:20px; }
+      .ld-bar{ position:relative; width:190px; height:12px; margin-top:12px; border:3px solid #221407; background:rgba(255,255,255,.55); }
+      .ld-bar i{ display:block; height:100%; width:0; background:linear-gradient(90deg,#f5b921,#e0704a); animation:ldFill 1.3s ease-in-out forwards; }
+      @keyframes ldFill{ to{ width:100% } }
+      /* start: a glowing "something" in the sky, drifting bricks, a punchier title */
+      #ov-start{ overflow:hidden; background:linear-gradient(180deg, rgba(20,12,4,0) 20%, rgba(20,12,4,.5) 100%); }
+      #ov-start .title-wrap, #ov-start .cta-btn, #ov-start .start-how{ position:relative; z-index:2; }
+      #ov-start .st-glow{ position:absolute; z-index:1; left:50%; top:6%; width:170px; height:170px; margin-left:-85px; border-radius:50%; pointer-events:none;
+        background:radial-gradient(circle, #fff 0 7%, rgba(255,255,255,.8) 11%, rgba(255,246,200,.3) 38%, rgba(255,246,200,0) 70%); animation:holePulse 3s ease-in-out infinite; }
+      @keyframes holePulse{ 0%,100%{ transform:scale(.85); opacity:.75 } 50%{ transform:scale(1.15); opacity:1 } }
+      #ov-start .st-float{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+      #ov-start .st-float i{ position:absolute; bottom:-30px; width:28px; height:16px; background:var(--clay); border:2px solid #221407; box-shadow:2px 2px 0 #221407; opacity:0; animation:stFloat 7s linear infinite; }
+      #ov-start .st-float i:nth-child(1){ left:8%; animation-delay:0s } #ov-start .st-float i:nth-child(2){ left:22%; animation-delay:1.8s; background:#e0704a }
+      #ov-start .st-float i:nth-child(3){ left:38%; animation-delay:3.4s; background:#f5b921 } #ov-start .st-float i:nth-child(4){ left:55%; animation-delay:.9s }
+      #ov-start .st-float i:nth-child(5){ left:70%; animation-delay:2.6s; background:#e0704a } #ov-start .st-float i:nth-child(6){ left:84%; animation-delay:4.2s }
+      #ov-start .st-float i:nth-child(7){ left:46%; animation-delay:5.3s; background:#f5b921 }
+      @keyframes stFloat{ 0%{ transform:translateY(0) rotate(0); opacity:0 } 12%{ opacity:.9 } 100%{ transform:translateY(-75vh) rotate(170deg); opacity:0 } }
+      .title-kick{ font-weight:800; font-size:11.5px; letter-spacing:.3em; color:#fff; text-shadow:0 2px 0 #221407; margin-bottom:10px; animation:fadeIn .6s .55s both; }
+      #ov-start .t-brick{ display:inline-block; animation:tBob 2.4s ease-in-out infinite; text-shadow:5px 5px 0 #221407, 0 0 22px rgba(255,140,60,.8); }
+      @keyframes tBob{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-5px) } }
+      #btn-begin{ font-size:24px; padding:15px 54px; letter-spacing:.06em; }
       #ov-victory{ background:radial-gradient(ellipse at 50% 40%, rgba(255,250,230,.35), rgba(20,12,4,.6)); justify-content:center; animation:fadeIn .5s ease; }
       .panel-box{ background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow); padding:20px; max-width:430px; width:100%; margin:auto 0; animation:victoryPop .6s .15s cubic-bezier(.2,.9,.3,1.3) both; }
       @keyframes victoryPop{ from{ transform:scale(.8) translateY(20px); opacity:0 } to{ transform:none; opacity:1 } }
@@ -295,8 +366,9 @@
         #hud-money{ font-size:19px; padding:3px 8px; min-width:0; }
         #btn-shop{ padding:6px 9px; font-size:13px; }
         #btn-settings{ width:38px; height:38px; }
-        #kiln{ width:92px; height:92px; }
-        #prompt{ bottom:calc(122px + var(--safe-b)); font-size:11.5px; }
+        #kiln{ --ks:92px; }
+        #tray{ width:164px; }
+        #prompt{ bottom:calc(150px + var(--safe-b)); font-size:11.5px; }
         .sheet-head .sub{ display:none; }
         #streak .st-x{ font-size:24px; }
       }
@@ -306,10 +378,9 @@
         #btn-settings{ width:34px; height:34px; }
         #chips{ top:calc(56px + var(--safe-t)); }
         #streak{ top:calc(54px + var(--safe-t)); }
-        #kiln{ width:80px; height:80px; }
+        #kiln{ --ks:80px; }
         #kiln .k-lab{ font-size:13px; }
-        #prompt{ bottom:calc(98px + var(--safe-b)); }
-        #tray{ padding:5px 8px 6px; }
+        #prompt{ bottom:calc(128px + var(--safe-b)); }
         .title{ font-size:44px; }
         .tagline{ font-size:13px; margin-bottom:10px; }
         #story-card{ padding:14px 16px; }
@@ -324,14 +395,6 @@
       @media (prefers-reduced-motion: reduce){
         *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
       }
-      /* THE HAND (improvement 5): a looming hand that descends during telegraph/grab. */
-      #hand-alert{ position:fixed; left:50%; top:-30vh; transform:translate(-50%,0); z-index:60; text-align:center; pointer-events:none; opacity:0; transition:transform 1.2s ease, opacity .4s ease; }
-      #hand-alert .hand-glyph{ font-size:120px; line-height:1; filter:drop-shadow(0 10px 0 rgba(0,0,0,.45)); }
-      #hand-alert .hand-label{ font-weight:800; letter-spacing:.12em; color:#fff; text-shadow:2px 2px 0 #000; margin-top:2px; }
-      #hand-alert.telegraph{ opacity:1; transform:translate(-50%,38vh); }
-      #hand-alert.grab{ opacity:1; animation:handgrab .5s ease-in-out infinite alternate; }
-      #hand-alert.retreat{ opacity:1; transform:translate(-50%,-5vh); transition:transform .7s ease, opacity .7s ease; }
-      @keyframes handgrab{ from{ transform:translate(-50%,52vh) rotate(-2deg); } to{ transform:translate(-50%,56vh) rotate(2deg); } }
     </style>
   </head>
   <body>
@@ -339,7 +402,6 @@
       <canvas id="gl" aria-label="Brick by Brick — the wall"></canvas>
       <div id="vignette"></div>
       <div id="flash"></div>
-      <div id="hand-alert" class="hand-alert off"><div class="hand-glyph">✋</div><div class="hand-label">THE HAND</div></div>
 
       <header id="hud" data-ui>
         <div id="hud-course" class="chip hidden">
@@ -347,7 +409,7 @@
           <div class="prog"><i id="prog-fill"></i></div>
         </div>
         <div class="hud-spacer"></div>
-        <div id="hud-money" class="hidden" title="Money — paid for every brick">$<span id="money-num">0</span></div>
+        <div id="hud-money" class="hidden" title="Money">$<span id="money-num">0</span></div>
         <button id="btn-shop" class="pressable hidden" aria-label="Open the workshop">SHOP<span id="shop-new" class="badge hidden">NEW</span><span id="shop-count" class="badge hidden">0</span></button>
         <button id="btn-settings" class="pressable" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       </header>
@@ -356,18 +418,47 @@
         <div id="chip-row" class="tag hidden">ROW <span id="row-num">1</span> · <span id="row-in">0/8</span></div>
         <div id="chip-wind" class="tag hidden">WIND <span id="wind-arrow">→</span> <span id="wind-str"></span></div>
         <div id="chip-sc" class="tag hidden">2ND CHANCE</div>
+        <div id="chip-hand" class="tag hidden">HAND <span id="hand-t"></span></div>
+        <div id="chip-sway" class="tag hidden">TREMOR ≈</div>
       </div>
-      <div id="streak" class="hidden"><span class="st-lab">STREAK</span><span class="st-x" id="streak-x">×2</span><span class="st-pay" id="streak-pay"></span></div>
+      <div id="streak" class="hidden"><span class="st-lab">STREAK</span><span class="st-x" id="streak-x">×2</span><i class="st-bar"><b id="streak-fill"></b></i><span class="st-pay" id="streak-pay"></span></div>
       <div id="prompt" class="hidden"></div>
 
       <div id="dock" class="hidden" data-ui>
-        <button id="kiln" aria-label="Kiln — hold to stoke and bake bricks faster">
-          <svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle class="rk-bg" cx="50" cy="50" r="45"/><circle class="rk-fg" id="kiln-ring" cx="50" cy="50" r="45" stroke-dasharray="282.7" stroke-dashoffset="282.7"/></svg>
-          <span class="k-lab">KILN</span><span class="k-sub" id="kiln-sub">HOLD</span><span class="k-mouth"></span>
+        <button id="kiln" aria-label="Kiln — hold to bake bricks">
+          <span class="k-gauge" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><circle class="rk-bg" cx="24" cy="24" r="19"/><circle class="rk-fg" id="kiln-ring" cx="24" cy="24" r="19" stroke-dasharray="119.4" stroke-dashoffset="119.4"/></svg>
+            <i class="k-gbrick"></i>
+          </span>
+          <svg class="k-art" viewBox="0 0 120 104" aria-hidden="true">
+            <defs>
+              <clipPath id="kdome"><path d="M8 96V56Q8 18 60 18Q112 18 112 56V96Z"/></clipPath>
+              <linearGradient id="kg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0704a"/><stop offset=".6" stop-color="#c2502c"/><stop offset="1" stop-color="#8e3418"/></linearGradient>
+            </defs>
+            <rect x="80" y="10" width="20" height="36" fill="#9c3a1e" stroke="#221407" stroke-width="4"/>
+            <rect x="76" y="3" width="28" height="9" fill="#c2502c" stroke="#221407" stroke-width="4"/>
+            <path d="M84 24h12M84 34h12" stroke="#221407" stroke-opacity=".35" stroke-width="2"/>
+            <circle class="k-smoke s1" cx="90" cy="2" r="5"/><circle class="k-smoke s2" cx="90" cy="2" r="4"/><circle class="k-smoke s3" cx="90" cy="2" r="5"/>
+            <path d="M8 96V56Q8 18 60 18Q112 18 112 56V96Z" fill="url(#kg)"/>
+            <g clip-path="url(#kdome)" stroke="#221407" stroke-opacity=".3" stroke-width="2.2" fill="none">
+              <path d="M0 34H120M0 50H120M0 66H120M0 82H120"/>
+              <path d="M30 34v16M78 34v16M54 50v16M102 50v16M18 50v16M30 66v16M78 66v16M54 82v14M102 66v16M18 82v14"/>
+            </g>
+            <path d="M8 96V56Q8 18 60 18Q112 18 112 56V96Z" fill="none" stroke="#221407" stroke-width="4"/>
+            <path d="M40 96V70Q40 52 60 52Q80 52 80 70V96Z" fill="#2b1206" stroke="#221407" stroke-width="4"/>
+            <ellipse class="k-fire" cx="60" cy="86" rx="15" ry="11" fill="#ffb02e"/>
+            <path class="k-fire2" d="M51 96Q53 80 60 70Q67 80 69 96Z" fill="#fff3a6"/>
+            <rect x="2" y="94" width="116" height="9" fill="#8a7358" stroke="#221407" stroke-width="4"/>
+          </svg>
+          <span class="k-sign"><span class="k-lab">KILN</span><span class="k-sub" id="kiln-sub">HOLD</span></span>
         </button>
-        <div id="tray" class="chip">
-          <div class="tr-top"><span id="tray-count">0</span><span>IN HAND</span></div>
-          <div id="tray-list"></div>
+        <div id="tray">
+          <svg class="t-roof" viewBox="0 0 100 38" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="1,36 50,3 99,36" fill="#8e3418" stroke="#221407" stroke-width="4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+            <path d="M14 27H86M28 16H72" stroke="#221407" stroke-opacity=".3" stroke-width="2" vector-effect="non-scaling-stroke"/>
+          </svg>
+          <div class="t-sign"><span id="tray-count">0</span><span>STORAGE</span></div>
+          <div class="t-bay"><div id="tray-list"></div></div>
         </div>
       </div>
 
@@ -399,7 +490,7 @@
           <div class="set-row"><span>SHAKE</span><button class="set-opt" id="set-shk-on">ON</button><button class="set-opt" id="set-shk-off">OFF</button></div>
           <div class="set-row"><span>VIBRATION</span><button class="set-opt" id="set-vib-on">ON</button><button class="set-opt" id="set-vib-off">OFF</button></div>
           <div class="set-row"><span>GRAPHICS</span><button class="set-opt" id="set-q-hi">HIGH</button><button class="set-opt" id="set-q-lo">FAST</button></div>
-          <div class="keys-note">Tap <b>anywhere</b> to drop the brick. Hold the <b>KILN</b> to bake faster — two thumbs work best.<br />Keyboard: <kbd>Space</kbd> drop · hold <kbd>Shift</kbd> / <kbd>K</kbd> to stoke · <kbd>S</kbd> shop · <kbd>Esc</kbd> close.</div>
+          <div class="keys-note">Tap <b>anywhere</b> to drop the brick. Hold the <b>KILN</b> building to bake bricks — each full ring sends one to STORAGE (it only works while held) — two thumbs work best.<br />Keyboard: <kbd>Space</kbd> drop · hold <kbd>Shift</kbd> / <kbd>K</kbd> to bake · <kbd>S</kbd> shop · <kbd>Esc</kbd> close.</div>
         </div>
       </div>
 
@@ -418,23 +509,29 @@
       </div>
 
       <div class="overlay" id="ov-loading">
-        <div class="load-bricks"><div></div><div></div><div></div></div>
-        <div style="font-family:'Archivo Black',sans-serif; font-size:20px; letter-spacing:.06em;">FIRING THE KILN…</div>
+        <div class="ld-sun" aria-hidden="true"></div>
+        <div class="ld-wall" aria-hidden="true"><div class="ld-row"><i style="background:#c2502c;animation-delay:0.00s"></i><i style="background:#e0704a;animation-delay:0.10s"></i><i style="background:#c2502c;animation-delay:0.20s"></i></div><div class="ld-row off"><i style="background:#e0704a;animation-delay:0.30s"></i><i style="background:#f5b921;animation-delay:0.40s"></i></div><div class="ld-row"><i style="background:#9c3a1e;animation-delay:0.55s"></i><i style="background:#c2502c;animation-delay:0.65s"></i><i style="background:#e0704a;animation-delay:0.75s"></i></div></div>
+        <div class="ld-title">BRICK BY BRICK</div>
+        <div class="ld-msg" id="ld-msg">FIRING THE KILN…</div>
+        <div class="ld-bar" aria-hidden="true"><i></i></div>
       </div>
 
       <div class="overlay hidden" id="ov-start" data-ui>
+        <div class="st-glow" aria-hidden="true"></div>
+        <div class="st-float" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="title-wrap">
+          <div class="title-kick">A TINY WALL-BUILDING GAME</div>
           <h1 class="title">BRICK<br />BY <span class="t-brick">BRICK</span></h1>
-          <p class="tagline">There's a hole in the sky, and the whole town is pointing at it. You're the wall maker. Build.</p>
+          <p class="tagline">Tap. Stack. Climb. And try not to look up.</p>
         </div>
-        <button class="cta-btn" id="btn-begin">BEGIN</button>
+        <button class="cta-btn" id="btn-begin">START</button>
         <p class="start-how"><b>Hold</b> the kiln to bake · <b>tap anywhere</b> to drop · sound on</p>
       </div>
 
       <div class="overlay hidden" id="ov-victory" data-ui>
         <div class="panel-box">
-          <h1 class="v-title">THROUGH<br /><span class="t-brick">THE HOLE</span></h1>
-          <p class="v-tag">Fifty courses up. The silhouettes were people all along — and the town below is still cheering.</p>
+          <h1 class="v-title">THE KEYSTONE<br /><span class="t-brick">IS SET</span></h1>
+          <p class="v-tag">A hundred courses up. The two walls are one — and the silhouettes were people all along. Down in the town, nobody is pointing anymore.</p>
           <div class="stats-grid">
             <div class="stat-box"><span class="stat-num" id="st-laid">0</span><span class="stat-lab">BRICKS LAID</span></div>
             <div class="stat-box"><span class="stat-num" id="st-time">0:00</span><span class="stat-lab">TIME TAKEN</span></div>
@@ -442,6 +539,8 @@
             <div class="stat-box"><span class="stat-num" id="st-perfect">0</span><span class="stat-lab">PERFECT DROPS</span></div>
             <div class="stat-box"><span class="stat-num" id="st-acc">0%</span><span class="stat-lab">ACCURACY</span></div>
             <div class="stat-box"><span class="stat-num" id="st-money">$0</span><span class="stat-lab">COINS EARNED</span></div>
+            <div class="stat-box"><span class="stat-num" id="st-smash">0</span><span class="stat-lab">HANDS SMASHED</span></div>
+            <div class="stat-box"><span class="stat-num" id="st-stolen">0</span><span class="stat-lab">BRICKS LOST</span></div>
           </div>
           <button class="cta-btn" id="btn-endless">KEEP BUILDING</button>
         </div>
@@ -462,68 +561,96 @@
    BRICK BY BRICK — 3D
    core.js: config, economy, state, small helpers, audio
    ===================================================================== */
-var WIN_COURSES = 50;
+var FIRST_GOAL = 50, FINAL_GOAL = 100;   // 50 is only the rim of the hole — the keystone waits at 100
 var LEAD_COURSE = 8, WIND_COURSE = 20, CROWD_COURSE = 15, PLUMB_COURSE = 12, PRECISION_COURSE = 10;
+var HAND_COURSE = 25, MIST_COURSE = 40, HEAVY_MIST_COURSE = 45, TREMOR_COURSE = 65, GLASS_COURSE = 80;
 var HOT_FUSE = 10;            // seconds a hot brick stays hot
 var HIT_TOL = 0.085;          // accepted half-width of the drop window, fraction of a row
 var PERFECT_TOL = HIT_TOL * 0.25;
+var GLASS_TOL = 0.65;         // sky-glass bricks: the drop window is this much of normal
+var GRAB_TIME = 10;           // seconds a hand needs to rip a brick free
 
-/* ----- ECONOMY -----
-   Every brick pays RATE × MULTIPLIER × TYPE (× 1.5 on a PERFECT).
-   RATE rises every 10 courses; MULTIPLIER is your streak, capped (soft-cap past ×12,
-   Crowd Favor raises it); TYPE: gold ×3, hot ×2, lead ×4.
-   Row 1 is the tutorial (flat rate). A finished row pays 5 × RATE,
-   doubled if the row had no misses. The apprentice pays RATE flat. */
-var TYPE_MULT = { normal: 1, gold: 3, hot: 2, lead: 4 };
-var CAP = [12, 20, 30, 42, 60];  // Crowd Favor tiers raise the streak-pay cap
-var FILL_TIMES = [2.4, 1.9, 1.5, 1.15, 0.85, 0.6];  // kiln bake time, seconds per brick (passive only with Auto-Kiln)
-var BELLOWS = [2.2, 2.8, 3.4, 4.0];                  // stoke (hold) multiplier
+/* ----- ECONOMY (rebalanced) -----
+   Money is meant to be SCARCE and every upgrade a real choice.
+   - A plain brick pays BASE_PAY + 1 per 10 courses reached (the "pay raise").
+   - A streak is a gentle bonus: +5% per hit in a row, capped at ×1.8
+     (Crowd Favor lifts the cap to ×4.0). It used to be ×10 and up.
+   - Types: gold ×3, hot ×2, lead ×4, sky-glass ×5; a PERFECT drop ×1.5.
+   - A finished row pays 2 × rate (doubled if clean). Smashing a hand pays 10 × rate.
+   - The kiln only bakes while you HOLD it. Banked Coals (shop) lets it
+     smoulder on its own once you've earned it. The apprentice pays flat rate.
+   The upgrade tree costs ≈31k coins in total; a strong player earns ≈30k
+   over the whole 100 courses, so the tree is nearly — never quite — complete. */
+var TYPE_MULT = { normal: 1, gold: 3, hot: 2, lead: 4, glass: 5 };
+var BASE_PAY = 2;
+var PAY_FROM_ROW = 6;         // rows 1-5 are unpaid: the town only offers to pay you once row 5 is done
+/* Income is earned in stages, each one a purchase:
+   start  -> only a finished ROW pays (row bonus)
+   Piece Work (shop) -> every brick pays too
+   Combo Bonus (shop) -> hits in a row build a streak multiplier (Crowd Favor then raises its cap) */
+var STREAK_STEP = 0.05;       // slower climb: first cap (x1.8) now takes 17 hits in a row instead of 9
+var CAP = [1.8, 2.2, 2.7, 3.3, 4.0];
+var BAKE_TIMES = [1.8, 1.45, 1.15, 0.92, 0.72, 0.56];   // seconds per brick WHILE THE KILN IS HELD
+var COALS = [0, 0.2, 0.35, 0.5];                        // Banked Coals: share of the hold speed kept when you let go
 var AL_INT = [5, 3.5, 2.2, 1.4];
 var PREC_MULT = [1, 0.85, 0.72, 0.6];
 var GILD_PCT = [0, 8, 15, 22];
 var STEADY_MULT = [1, 1.3, 1.6, 1.6];
 var PLUMB_MULT = [1, 1.5, 2];
+var GLAZE_ADD = [0, 2, 4, 6];            // Slippery Glaze: extra seconds before a hand rips a brick free
+var LANTERN_MULT = [1, 0.7, 0.45, 0.25]; // Sky Lantern: how much cloud cover survives
+var LEVEL_MULT = [1, 0.6, 0.3];          // Spirit Level: how much of the tremor survives
 
 var S = {
-  started: false, won: false, endless: false,
-  molded: 0, laid: 0, drops: 0, hits: 0, courses: 0, inCourse: 0, perCourse: 8,
-  money: 0, earned: 0, misses: 0, perfects: 0, bestStreak: 0, rowMisses: 0,
+  started: false, won: false, endless: false, goal: FIRST_GOAL,
+  molded: 0, laid: 0, drops: 0, hits: 0, courses: 0, best: 0, inCourse: 0, perCourse: 8, tower: false, towerStart: 0, perFace: 4,
+  money: 0, earned: 0, misses: 0, perfects: 0, bestStreak: 0, rowMisses: 0, smashed: 0, stolen: 0, lost: 0,
   time: 0, playTime: 0, lastAct: 0,
   moldT: 0, held: false,
   stack: [],           // bottom → top; the LAST item loads onto the crane next
   crane: { item: null, state: "empty", pos: 0, dir: 1, t: 0, lock: 0 },
-  hotUnlocked: false, nextHot: false, leadUnlocked: false, windOn: false,
+  hotUnlocked: false, nextHot: false, leadUnlocked: false, glassUnlocked: false,
+  windOn: false, mistLevel: 0, swayOn: false, raid: null,
   wind: { dir: 1, phase: 0, flipAt: 0 },
   layAcc: 0, streak: 0, comboTutDone: false, scUsed: 0,
-  tier: { kilnSpeed: 0, autoKiln: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0 },
+  tier: { perBrick: 0, combo: 0, kilnSpeed: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
   flags: {}, beats: {}, seenLines: {},
   muted: false, shakeOn: true, vibOn: true, quality: "hi", hand: "r",
   workshopShown: false, shopOpen: false, seenVis: null
 };
 
-function rate() { return 1 + Math.floor(S.courses / 10); }
+// "best" = highest course ever reached. Pay and unlocks follow it, so a hand
+// tearing rows off the wall never takes your pay raise or your shop away.
+function comboOn() { return S.tier.combo > 0; }
+function perBrickOn() { return S.tier.perBrick > 0; }
+function rate() { return BASE_PAY + Math.floor(S.best / 10); }
 function multCap() { return CAP[S.tier.crowd]; }
-/* Streak pay keeps climbing past 22: linear to 12, then +1 per 2 streak,
-   capped by Crowd Favor. Cascade bricks feed this same streak. */
-function streakMult(n) {
-  var m = n <= 12 ? n : 12 + Math.floor((n - 12) / 2);
-  return Math.max(1, Math.min(m, multCap()));
-}
-function rowBonus(clean) { return 5 * rate() * (clean ? 2 : 1); }
-function hitTol() { return HIT_TOL * STEADY_MULT[S.tier.steady]; }
+function streakMult(n) { return Math.min(multCap(), 1 + STREAK_STEP * Math.max(0, n - 1)); }
+function fmtMult(m) { return String(Math.round(m * 10) / 10); }
+function brickPay(mult, type, perfect) { var p = rate() * mult * TYPE_MULT[type]; if (perfect) p *= 1.5; return Math.max(1, Math.round(p)); }
+function rowBonus(clean) { return 2 * rate() * (clean ? 2 : 1); }
+function glassF() { return (C && C.item && C.item.type === "glass") ? GLASS_TOL : 1; }
+function hitTol() { return HIT_TOL * STEADY_MULT[S.tier.steady] * glassF(); }
 function almostTol() { return hitTol() * 2; }
-function perfectTol() { return PERFECT_TOL * PLUMB_MULT[S.tier.plumb]; }
-/* Difficulty climbs with the wall: the crane quickens (0.70 → 1.40 rows/s
-   by course 50), lead grows common, and from course 20 the wind gusts. */
-function heightSpeed() { return 0.7 + 0.014 * Math.min(S.courses, 60); }
+function perfectTol() { return PERFECT_TOL * PLUMB_MULT[S.tier.plumb] * glassF(); }
+/* Difficulty climbs with the wall: the crane quickens (0.70 → 1.40 rows/s by
+   course 50, then more gently to 1.70 by course 100). */
+function heightSpeed() { var c = S.courses; return c <= 50 ? 0.7 + 0.014 * c : 1.4 + 0.006 * (Math.min(c, 100) - 50); }
 function swingSpeed() { return heightSpeed() * PREC_MULT[S.tier.precision]; }
-function windAmp() { return S.courses >= WIND_COURSE ? Math.min(0.45, 0.15 + 0.01 * (S.courses - WIND_COURSE)) : 0; }
+function windAmp() { return S.windOn ? Math.min(0.45, 0.15 + 0.01 * Math.max(0, S.courses - WIND_COURSE)) : 0; }
 function windGust() { return 0.5 + 0.5 * Math.sin(S.wind.phase); }
-function leadChance() { return S.courses >= LEAD_COURSE ? Math.min(0.12, 0.05 + 0.002 * (S.courses - LEAD_COURSE)) : 0; }
-function fillTime() { return FILL_TIMES[S.tier.kilnSpeed]; }
-function stokeMult() { return BELLOWS[S.tier.bellows]; }
-function autoLayInt() { return AL_INT[S.tier.autoLayer - 1]; }
-function targetFrac() { return (Math.min(S.inCourse, S.perCourse - 1) + 0.5) / S.perCourse; }
+function leadChance() { return S.leadUnlocked ? Math.min(0.12, 0.05 + 0.002 * (S.best - LEAD_COURSE)) : 0; }
+function glassChance() { return S.glassUnlocked ? Math.min(0.10, 0.05 + 0.003 * (S.best - GLASS_COURSE)) : 0; }
+function swayAmp() { return S.swayOn ? Math.min(0.06, 0.03 + 0.0008 * Math.max(0, S.courses - TREMOR_COURSE)) * LEVEL_MULT[S.tier.level] : 0; }
+function swayOff() { var a = swayAmp(); return a ? a * Math.sin(S.time * 2.1 + 1.3) : 0; }
+function bakeTime() { return BAKE_TIMES[S.tier.kilnSpeed] * (S.best === 0 ? 0.8 : 1); }   // the tutorial row is a touch quicker
+function grabTime() { return GRAB_TIME + GLAZE_ADD[S.tier.glaze]; }
+function autoLayInt() { return AL_INT[S.tier.fasterApp]; }          // Faster Apprentices: seconds between trips
+function autoLayBatch() { return 1 + S.tier.moreApp; }                 // More Apprentices: bricks per trip
+var PRED_TIME = 0.7, PRED_MIN = 0.25, PRED_MAX = 0.5;                   // Predictable Placement: target lead time (s) and the allowed spawn distance range
+var AT = { on: false, n: 0, rem: 1, pulsed: 0 };                        // apprentice countdown glow state
+function baseFrac() { var p = perFace(); return (Math.min(curSlot(), p - 1) + 0.5) / p; }
+function targetFrac() { return baseFrac() + swayOff(); }
 /* SINGLE SOURCE OF TRUTH for a drop at a crane position:
    3 = PERFECT, 2 = hit, 1 = almost ring (Steady Hands III), 0 = miss. */
 function dropOutcomeAt(pos) {
@@ -544,42 +671,66 @@ var ICON = {
   mortar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 10h18M3 15h18"/><path d="M5 20l2-15h10l2 15z"/></svg>',
   precision: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>',
   plumb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 2v9"/><path d="M8 11h8l-4 10z"/></svg>',
-  crowd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="8" r="2.5"/><circle cx="17" cy="8" r="2.5"/><circle cx="12" cy="6" r="2.5"/><path d="M3 20v-3a4 4 0 0 1 8 0M13 20v-3a4 4 0 0 1 8 0"/></svg>'
+  crowd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="8" r="2.5"/><circle cx="17" cy="8" r="2.5"/><circle cx="12" cy="6" r="2.5"/><path d="M3 20v-3a4 4 0 0 1 8 0M13 20v-3a4 4 0 0 1 8 0"/></svg>',
+  glaze: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3c4 5.5 6 8.5 6 11.5a6 6 0 0 1-12 0C6 11.5 8 8.5 12 3z"/></svg>',
+  lantern: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6M8 6h8l1.5 3v8L15 20H9l-2.5-3V9z"/><path d="M12 10v5"/></svg>',
+  level: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="2.5" y="9" width="19" height="6" rx="1"/><circle cx="12" cy="12" r="1.6"/><path d="M8 9v2M16 9v2"/></svg>'
 };
 var LINES = [
-  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [10, 50, 180, 500, 1300], gate: function () { return true; },
-    effect: function (t) { return "Bakes a brick every " + FILL_TIMES[t] + "s (faster while stoked)."; },
-    next: function (t) { return "Bake time " + FILL_TIMES[t] + "s → " + FILL_TIMES[t + 1] + "s." + (t === 1 ? " Something about the heat…" : ""); } },
-  { id: "autoKiln", icon: "kiln", name: "Auto-Kiln", costs: [40], gate: function () { return S.courses >= 1; },
-    effect: function (t) { return "The kiln bakes bricks on its own — no holding needed."; },
-    next: function (t) { return "The kiln bakes bricks on its own — no holding needed. Buy it and the kiln never sleeps."; } },
-  { id: "bellows", icon: "bellows", name: "Bellows", costs: [50, 200, 600], gate: function () { return S.courses >= 3; },
-    effect: function (t) { return "Stoking bakes ×" + BELLOWS[t] + " faster."; },
-    next: function (t) { return "Holding the kiln: ×" + BELLOWS[t] + " → ×" + BELLOWS[t + 1] + " bake speed."; } },
-  { id: "steady", icon: "steady", name: "Steady Hands", costs: [50, 200, 750], gate: function () { return S.courses >= 3; },
+  { id: "perBrick", icon: "gilded", name: "Piece Work", costs: [25], gate: function () { return S.best >= PAY_FROM_ROW - 1; },
+    effect: function (t) { return "Every brick you lay pays $" + rate() + " (plus type and perfect bonuses)."; },
+    next: function (t) { return "Get paid for every brick, not just finished rows. A plain brick pays $" + rate() + "."; } },
+  { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [70], gate: function () { return S.tier.perBrick >= 1; },
+    effect: function (t) { return "Hits in a row build a streak bonus (+5% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
+    next: function (t) { return "Land bricks in a row to build a STREAK multiplier on every brick. Miss and it resets."; } },
+  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [20, 65, 160, 360, 720], gate: function () { return true; },
+    effect: function (t) { return "Bakes a brick every " + BAKE_TIMES[t] + "s while you hold the kiln."; },
+    next: function (t) { return "Bake time " + BAKE_TIMES[t] + "s → " + BAKE_TIMES[t + 1] + "s while held." + (t === 1 ? " Something about the heat…" : ""); } },
+  { id: "bellows", icon: "bellows", name: "Banked Coals", costs: [90, 280, 750], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
+    effect: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t] * 100) + "% speed."; },
+    next: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t + 1] * 100) + "% speed — bricks while your hands are busy."; } },
+  { id: "steady", icon: "steady", name: "Steady Hands", costs: [50, 170, 480], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return t >= 3 ? "Window +60% and the ALMOST RING — near misses swing again." : "Drop window +" + Math.round((STEADY_MULT[t] - 1) * 100) + "% wider."; },
     next: function (t) { return t === 2 ? "Adds the ALMOST RING: land just outside and the brick swings again — streak safe." : "Drop window +" + Math.round((STEADY_MULT[t + 1] - 1) * 100) + "% wider — the gold zone on the crane grows."; } },
-  { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [90, 320, 950], gate: function () { return S.courses >= 3; },
+  { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [70, 230, 640], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return GILD_PCT[t] + "% of bricks come out golden (×3 pay)."; },
     next: function (t) { return GILD_PCT[t + 1] + "% of bricks come out golden — golden bricks pay ×3."; } },
-  { id: "secondChance", icon: "second", name: "Second Chance", costs: [70, 260, 800], gate: function () { return S.courses >= 4; },
+  { id: "secondChance", icon: "second", name: "Second Chance", costs: [55, 200, 560], gate: function () { return S.tier.perBrick >= 1 && S.best >= 4; },
     effect: function (t) { return "Forgives " + t + " miss" + (t > 1 ? "es" : "") + " per row."; },
     next: function (t) { return "Forgive " + (t + 1) + " miss" + (t > 0 ? "es" : "") + " per row — the brick comes back, the streak survives."; } },
-  { id: "autoLayer", icon: "apprentice", name: "Apprentice", costs: [150, 450, 1100, 2600], gate: function () { return S.courses >= 5; },
-    effect: function (t) { return "Lays a plain brick every " + AL_INT[t - 1] + "s when you pause or your hand overflows."; },
-    next: function (t) { return "Lays a plain brick every " + AL_INT[t] + "s when you pause or hold 4+. Flat rate, never touches specials."; } },
-  { id: "hotMortar", icon: "mortar", name: "Hot Mortar", costs: [400, 1500], gate: function () { return S.courses >= 6; },
-    effect: function (t) { return "Rows need " + (8 - t) + " bricks."; },
-    next: function (t) { return "Rows need " + (7 - t) + " bricks instead of " + (8 - t) + " — climb faster."; } },
-  { id: "precision", icon: "precision", name: "Precision Gears", costs: [250, 750, 2000], gate: function () { return S.flags.precisionShown; },
+  { id: "autoLayer", icon: "apprentice", name: "Apprentice", costs: [110], gate: function () { return S.tier.perBrick >= 1 && S.best >= 5; },
+    effect: function (t) { return "An apprentice lays a plain brick when you pause or your hand overflows. Flat rate, never touches specials."; },
+    next: function (t) { return "Hire an apprentice: lays a plain brick every " + AL_INT[0] + "s when you pause or hold 4+. The slot glows and counts down before they place it."; } },
+  { id: "fasterApp", icon: "precision", name: "Faster Apprentices", costs: [300, 720, 1500], gate: function () { return S.tier.autoLayer >= 1; },
+    effect: function (t) { return "Apprentices lay every " + AL_INT[t] + "s."; },
+    next: function (t) { return "Apprentices lay every " + AL_INT[t] + "s → " + AL_INT[t + 1] + "s."; } },
+  { id: "moreApp", icon: "crowd", name: "More Apprentices", costs: [450, 1100], gate: function () { return S.tier.autoLayer >= 1; },
+    effect: function (t) { return "Each trip lays " + (1 + t) + " bricks at once."; },
+    next: function (t) { return "Each trip lays " + (2 + t) + " bricks at once instead of " + (1 + t) + " (needs that many plain bricks in hand)."; } },
+  { id: "predictable", icon: "plumb", name: "Predictable Placement", costs: [350], gate: function () { return S.tier.perBrick >= 1 && S.best >= 8; },
+    effect: function (t) { return "The crane arm brings each brick in a set distance from the slot, so you get about the same time to place it."; },
+    next: function (t) { return "The crane always brings the next brick in from a set distance from the slot — about the same time to place every brick, however fast it climbs."; } },
+  { id: "hotMortar", icon: "mortar", name: "Hot Mortar", costs: [240, 800], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
+    effect: function (t) { return S.tower ? "Tower sides need " + [4, 3, 2][t] + " bricks." : "Rows need " + (8 - t) + " bricks."; },
+    next: function (t) { return S.tower ? "Tower sides need " + [4, 3, 2][t + 1] + " bricks instead of " + [4, 3, 2][t] + " — climb faster." : "Rows need " + (7 - t) + " bricks instead of " + (8 - t) + " — climb faster."; } },
+  { id: "precision", icon: "precision", name: "Precision Gears", costs: [150, 450, 1100], gate: function () { return S.flags.precisionShown; },
     effect: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t + 1]) * 100) + "% — the crane gets faster as you climb."; } },
-  { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [350, 1100], gate: function () { return S.courses >= PLUMB_COURSE; },
+  { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [220, 640], gate: function () { return S.best >= PLUMB_COURSE; },
     effect: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t] + " wider."; },
     next: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t + 1] + " wider — perfects pay ×1.5."; } },
-  { id: "crowd", icon: "crowd", name: "Crowd Favor", costs: [400, 1100, 2600, 5500], gate: function () { return S.courses >= CROWD_COURSE; },
-    effect: function (t) { return "Streak multiplier caps at ×" + CAP[t] + "."; },
-    next: function (t) { return "Streak cap ×" + CAP[t] + " → ×" + CAP[t + 1] + ". The crowd wants a show."; } }
+  { id: "crowd", icon: "crowd", name: "Crowd Favor", costs: [350, 900, 2000, 4000], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
+    effect: function (t) { return "Streak bonus caps at ×" + fmtMult(CAP[t]) + "."; },
+    next: function (t) { return "Streak cap ×" + fmtMult(CAP[t]) + " → ×" + fmtMult(CAP[t + 1]) + ". The crowd wants a show."; } },
+  { id: "glaze", icon: "glaze", name: "Slippery Glaze", costs: [300, 800, 1900], gate: function () { return S.best >= HAND_COURSE; },
+    effect: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s to rip a brick free."; },
+    next: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s → " + (GRAB_TIME + GLAZE_ADD[t + 1]) + "s to rip a brick free — more time to smash them."; } },
+  { id: "lantern", icon: "lantern", name: "Sky Lantern", costs: [700, 1600, 3200], gate: function () { return S.best >= MIST_COURSE; },
+    effect: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t]) * 100) + "%."; },
+    next: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t + 1]) * 100) + "% — see the crane through the weather."; } },
+  { id: "level", icon: "level", name: "Spirit Level", costs: [1400, 3000], gate: function () { return S.best >= TREMOR_COURSE; },
+    effect: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t]) * 100) + "%."; },
+    next: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t + 1]) * 100) + "% — the drop zone sways less."; } }
 ];
 
 /* ----- helpers ----- */
@@ -658,7 +809,13 @@ var snd = {
   cheer: function (big) { noiseBurst(big ? 0.45 : 0.22, big ? 0.12 : 0.06, 1600); tone(659, 0.12, "triangle", 0.06); tone(880, 0.14, "triangle", 0.07, 0.05); if (big) { tone(1047, 0.16, "triangle", 0.07, 0.1); tone(1319, 0.22, "triangle", 0.06, 0.16); } },
   whoosh: function () { noiseBurst(0.4, 0.06, 1300); },
   fuse: function () { tone(1700, 0.04, "square", 0.05); },
-  boom: function () { noiseBurst(0.5, 0.12, 500); tone(60, 0.4, "sine", 0.2, 0, 30); }
+  boom: function () { noiseBurst(0.5, 0.12, 500); tone(60, 0.4, "sine", 0.2, 0, 30); },
+  grab: function () { tone(120, 0.55, "sawtooth", 0.07, 0, 62); noiseBurst(0.35, 0.07, 480); },
+  creak: function () { tone(210 + Math.random() * 60, 0.09, "sawtooth", 0.03, 0, 140); },
+  smash: function () { noiseBurst(0.25, 0.22, 900); tone(170, 0.2, "square", 0.12, 0, 50); tone(520, 0.12, "triangle", 0.1, 0.12, 900); tone(780, 0.1, "triangle", 0.07, 0.2, 1200); },
+  collapse: function () { for (var i = 0; i < 5; i++) { noiseBurst(0.3, 0.16, 520 + i * 90, i * 0.09); tone(92 - i * 9, 0.3, "sine", 0.18, i * 0.09, 40); } },
+  rumble: function () { noiseBurst(0.7, 0.1, 220); tone(48, 0.6, "sine", 0.16, 0, 34); },
+  warn: function () { tone(440, 0.09, "square", 0.05); tone(330, 0.12, "square", 0.05, 0.1); }
 };
 var hum = null;
 function humStart() {
@@ -680,12 +837,27 @@ function humStop() {
    day→dusk→night sky, the hole, town + crowd, crane, particles, camera.
    ===================================================================== */
 var WALL_W = 8, PITCH = 0.5, BH = 0.44, BD = 0.62, GAP = 0.08, FOUND = 0.22, OUTLINE = 0.032;
+/* ----- TOWER (from the row-5 ask) -----
+   The tower is a 4x4 footprint standing behind the middle of your wall. Face 0 is the front (in line with
+   the wall), then right, back, left. A course is a full ring: 4 sides x perFace bricks, and the camera
+   walks round to each side as you finish the one before. Gameplay code works in "face-local" space
+   (x along the side, z out of it) inside W3.orbit; faceToWorld() places bricks on the real side. */
+var TW = 4, TH = TW / 2, TOWER_CUT = 4.6;
+function FW() { return S.tower ? TW : WALL_W; }
+function towerPerFace() { return [4, 3, 2][S.tier.hotMortar] || 2; }
+function perFace() { return S.tower ? S.perFace : S.perCourse; }
+function curFace() { return S.tower ? Math.min(3, Math.floor(S.inCourse / S.perFace)) : 0; }
+function curSlot() { return S.tower ? S.inCourse - curFace() * S.perFace : S.inCourse; }
+function faceToWorld(face, x, y, z, out) {
+  var a = (face || 0) * Math.PI / 2, ca = Math.cos(a), sa = Math.sin(a), zz = z + TH;
+  return out.set(x * ca + zz * sa, y, -x * sa + zz * ca - TH);
+}
 var INK = 0x221407;
 function rowY(r) { return FOUND + (r - 1) * PITCH + BH / 2; }
-function rowShift(r, per) { var s = WALL_W / per; return (r % 2 === 0) ? s / 4 : -s / 4; }   // running bond
-function rowLeft(r, per) { return -WALL_W / 2 + rowShift(r, per); }
-function slotX(r, i, per) { return rowLeft(r, per) + (i + 0.5) * WALL_W / per; }
-function posX(r, pos, per) { return rowLeft(r, per) + pos * WALL_W; }
+function rowShift(r, per) { var s = FW() / per; return (r % 2 === 0) ? s / 4 : -s / 4; }   // running bond
+function rowLeft(r, per) { return -FW() / 2 + rowShift(r, per); }
+function slotX(r, i, per) { return rowLeft(r, per) + (i + 0.5) * FW() / per; }
+function posX(r, pos, per) { return rowLeft(r, per) + pos * FW(); }
 
 var W3 = { ok: false, t: 0 };
 var renderer, scene, camera;
@@ -804,6 +976,30 @@ function setInst(ip, i, m) {
 function flushInst(ip) { ip.fill.instanceMatrix.needsUpdate = true; ip.out.instanceMatrix.needsUpdate = true; }
 
 /* ---------- init ---------- */
+function setupOrbit() {
+  W3.orbitPivot = new THREE.Group(); W3.orbitPivot.position.set(0, 0, -TH); scene.add(W3.orbitPivot);
+  W3.orbit = new THREE.Group(); W3.orbit.position.set(0, 0, TH); W3.orbitPivot.add(W3.orbit);
+  W3.orbitAng = 0; W3.orbitT = 0;
+  var move = [W3.crane, W3.ghost, W3.guide, W3.glint, W3.mistInst].concat(W3.aGhost || []);
+  FREE.forEach(function (f) { move.push(f.mesh); });
+  HANDS.forEach(function (hd) { move.push(hd.g, hd.mark, hd.markFill, hd.arrow); });
+  CRIT.items.forEach(function (it) { move.push(it.g); });
+  move.forEach(function (o) { if (o) W3.orbit.add(o); });
+  W3.orbitPivot.updateMatrixWorld(true);
+}
+function updateOrbit(dt) {
+  if (!W3.orbitPivot) return;
+  if (CAM.mode === "tower") {
+    W3.towerCut += dt; var u = clamp(W3.towerCut / TOWER_CUT, 0, 1), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(2 - 2 * u, 2) / 2;
+    W3.orbitAng = e * Math.PI * 2; W3.orbitT = Math.PI * 2;
+  } else {
+    if (S.tower && G.falls === 0) W3.orbitT = Math.PI * 2 + ((S.courses - S.towerStart) * 4 + curFace()) * Math.PI / 2;
+    W3.orbitAng = damp(W3.orbitAng, W3.orbitT, 3.4, dt);
+  }
+  CAM.turning = CAM.mode === "tower" || Math.abs(W3.orbitT - W3.orbitAng) > 0.08;
+  W3.orbitPivot.rotation.y = W3.orbitAng; W3.orbitPivot.updateMatrixWorld(true);
+}
+var _vc = new THREE.Vector3(), _vl = new THREE.Vector3();
 function initWorld() {
   var canvas = $("gl");
   try {
@@ -827,8 +1023,10 @@ function initWorld() {
   W3.amb = new THREE.AmbientLight(0xffffff, 0.12); scene.add(W3.amb);
 
   buildSky(); buildGround(); buildTown(); buildCrowd(); buildKiln();
-  buildWall(); buildCrane(); buildHole(); buildClouds(); buildBirds();
+  buildWall(); buildCrane(); buildHole(); buildClouds(); buildCritters();
   buildParticles(); buildFree();
+  buildMist(); buildHands(); buildDebris();
+  setupOrbit();
   applyQuality();
   resizeWorld();
   W3.ok = true;
@@ -972,8 +1170,8 @@ function buildCrowd() {
   W3.cArm = instPart(new THREE.BoxGeometry(0.08, 0.42, 0.08), N, 0.025);
   for (var i = 0; i < N; i++) {
     var side = i % 2 ? 1 : -1, k = Math.floor(i / 2);
-    var x = side * (5.9 + (k % 4) * 0.85 + rand(-0.2, 0.2) + Math.floor(k / 8) * 0.4);
-    var z = 0.9 + Math.floor(k / 4) * 0.85 + rand(-0.2, 0.2);
+    var x = side * (2.5 + (k % 4) * 0.62 + rand(-0.15, 0.15));          // flank the wall base, inside the portrait frame
+    var z = 1.3 + Math.floor(k / 4) * 0.85 + rand(-0.2, 0.2);
     W3.cBody.fill.setColorAt(i, _c.set(shirts[i % shirts.length]));
     W3.cHead.fill.setColorAt(i, _c.set(skins[(i * 7) % skins.length]));
     W3.cArm.fill.setColorAt(i, _c.set(skins[(i * 7) % skins.length]));
@@ -983,13 +1181,23 @@ function buildCrowd() {
   updateCrowd(0);
 }
 var _mp = new THREE.Matrix4(), _ml = new THREE.Matrix4(), _mw = new THREE.Matrix4();
+var CROWD_BY = [0, 4, 8, 12, 16, 20, 22, 24, 26, 28, 30];    // villagers on site after each finished row (best course)
+function crowdTarget() { return S.started ? (S.best >= 10 ? 30 : CROWD_BY[S.best]) : 0; }
 function updateCrowd(dt) {
+  var want = crowdTarget();
   for (var i = 0; i < W3.crowd.length; i++) {
     var d = W3.crowd[i];
     d.ph += dt * 3;
+    var wantI = i < want;
+    if (d.s === undefined) { d.s = 0; d.vs = 0; d.on = false; }
+    if (wantI && !d.on && dt > 0) { d.on = true; d.jump = Math.max(d.jump, 0.7); EMIT_WORLD = true; emitPuffs(d.x, 0.1, d.z, 6, 0xe9dcc2, 0.5); EMIT_WORLD = false; }
+    if (!wantI) d.on = false;
+    d.vs += ((wantI ? 1 : 0) - d.s) * 120 * Math.min(dt, 0.033) - d.vs * 10 * Math.min(dt, 0.033);   // springy pop-in
+    d.s += d.vs * Math.min(dt, 0.033); if (d.s < 0) { d.s = 0; d.vs = 0; }
+    var sc = Math.max(0.0001, d.s * 1.3);
     if (d.jump > 0) { d.jump -= dt; d.y = Math.abs(Math.sin(d.ph * 3)) * 0.35; d.arm = -0.5 + Math.sin(d.ph * 6) * 0.6; }
     else { d.y = damp(d.y, 0, 10, dt); d.arm = -0.5 + Math.sin(d.ph) * 0.12; }
-    _e.set(0, d.ry, 0); _q.setFromEuler(_e); _v.set(d.x, d.y, d.z); _s.set(1, 1, 1); _mp.compose(_v, _q, _s);
+    _e.set(0, d.ry, 0); _q.setFromEuler(_e); _v.set(d.x, d.y, d.z); _s.set(sc, sc, sc); _mp.compose(_v, _q, _s); _s.set(1, 1, 1);
     _ml.makeTranslation(0, 0.3, 0); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cBody, i, _mw);
     _ml.makeTranslation(0, 0.78, 0); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cHead, i, _mw);
     _e.set(0, 0, d.arm); _q.setFromEuler(_e); _v.set(0.2, 0.72, 0); _ml.compose(_v, _q, _s); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cArm, i, _mw);
@@ -1041,9 +1249,8 @@ function buildWall() {
 }
 function setBrickMatrix(i, dy, ky, kx) {
   var b = BRICKS[i];
-  _v.set(b.x, b.y + (dy || 0), 0);
-  _q.set(0, 0, 0, 1);
-  if (b.rot) { _e.set(0, 0, b.rot); _q.setFromEuler(_e); }
+  faceToWorld(b.face, b.x, b.y + (dy || 0), 0, _v);
+  _e.set(0, (b.face || 0) * Math.PI / 2, b.rot || 0); _q.setFromEuler(_e);
   var sx = b.sx * (kx || 1), sy = ky || 1;
   _s.set(sx, sy, 1); _m.compose(_v, _q, _s); W3.wall.setMatrixAt(i, _m);
   _s.set(sx + 2 * OUTLINE, sy * (BH + 2 * OUTLINE) / BH, (BD + 2 * OUTLINE) / BD); _m.compose(_v, _q, _s); W3.wallOut.setMatrixAt(i, _m);
@@ -1053,18 +1260,19 @@ function brickColorHex(type, seed) {
   if (type === "gold") return _c.set(0xf7c02a);
   if (type === "lead") return _c.set(0x4b505a);
   if (type === "hot") return _c.set(0xff7a2a);
+  if (type === "glass") return _c.set(0x9fe6f7);
   var h = clayHSL(seed); return _c.setHSL(h[0], h[1], h[2]);
 }
 // Adds a brick to the wall and returns its index.
-function wallAdd(row, slot, per, type, seed) {
+function wallAdd(row, slot, per, type, seed, face, ci) {
   if (BRICKS.length >= MAXB) return -1;
   var i = BRICKS.length;
-  var b = { x: slotX(row, slot, per), y: rowY(row), sx: WALL_W / per - GAP, row: row, slot: slot, type: type, seed: seed, rot: (hash01(seed + row) - 0.5) * 0.02 };
+  var b = { x: slotX(row, slot, per), y: rowY(row), sx: FW() / per - GAP, face: face || 0, ci: ci == null ? slot : ci, row: row, slot: slot, per: per, type: type, seed: seed, rot: (hash01(seed + row) - 0.5) * 0.02 };
   BRICKS.push(b);
   W3.wall.count = W3.wallOut.count = BRICKS.length;
   W3.wall.setColorAt(i, brickColorHex(type, seed)); W3.wall.instanceColor.needsUpdate = true;
   setBrickMatrix(i);
-  if (type === "gold") (W3.golds = W3.golds || []).push(i);
+  if (type === "gold" || type === "glass") (W3.golds = W3.golds || []).push(i);
   if (type === "hot") animBrick(i, "cool", 0, 2.5);
   return i;
 }
@@ -1092,16 +1300,16 @@ function updateBrickAnims(dt) {
 function rowWave(row) {
   var n = 0;
   for (var i = BRICKS.length - 1; i >= 0 && n < 12; i--) {
-    if (BRICKS[i].row === row) { animBrick(i, "wave", (BRICKS[i].x + WALL_W / 2) * 0.03, 0.45); n++; }
+    if (BRICKS[i].row === row) { animBrick(i, "wave", ((BRICKS[i].face || 0) * FW() + BRICKS[i].x + FW() / 2) * 0.03, 0.45); n++; }
   }
-  W3.glint.position.set(rowLeft(row, S.perCourse) - 0.5, rowY(row), BD / 2 + 0.06);
+  W3.glint.position.set(rowLeft(row, perFace()) - 0.5, rowY(row), BD / 2 + 0.06);
   W3.glintRow = row; W3.glintT = 0;
 }
 // Hot Mortar mid-row: re-space the half-built row to the new brick count.
 function refitWallRow(row, per) {
   for (var i = 0; i < BRICKS.length; i++) {
     var b = BRICKS[i]; if (b.row !== row) continue;
-    b.x = slotX(row, b.slot, per); b.sx = WALL_W / per - GAP; setBrickMatrix(i);
+    b.x = slotX(row, b.slot, per); b.sx = FW() / per - GAP; b.per = per; setBrickMatrix(i);
   }
 }
 
@@ -1134,9 +1342,15 @@ function buildCrane() {
   W3.hook = add(W3.trolley, new THREE.TorusGeometry(0.1, 0.035, 6, 12, Math.PI * 1.3), dark, 0, -1, 0, false);
   bake(c, { cast: true });
   // ghost slot + aim guide
-  W3.ghost = new THREE.Mesh(W3.brickGeo, new THREE.MeshBasicMaterial({ color: 0xffd94d, transparent: true, opacity: 0.35, depthWrite: false }));
-  var ge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, BH, BD)), new THREE.LineBasicMaterial({ color: 0xffd94d }));
+  W3.ghost = new THREE.Mesh(W3.brickGeo, new THREE.MeshBasicMaterial({ color: 0x2f8cff, transparent: true, opacity: 0.35, depthWrite: false }));
+  var ge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, BH, BD)), new THREE.LineBasicMaterial({ color: 0x2f8cff }));
   W3.ghost.add(ge); scene.add(W3.ghost);
+  W3.aGhost = [];                      // apprentice countdown glow (one per brick they will lay)
+  for (var q = 0; q < 4; q++) {
+    var agm = new THREE.Mesh(W3.brickGeo, new THREE.MeshBasicMaterial({ color: 0xfff2a8, transparent: true, opacity: 0, depthWrite: false }));
+    var agl = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, BH, BD)), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 }));
+    agm.add(agl); agm.userData.line = agl; agm.visible = false; scene.add(agm); W3.aGhost.push(agm);
+  }
   W3.guide = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1, 0.05), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false }));
   scene.add(W3.guide);
   W3.craneY = rowY(1) + 2.2;
@@ -1162,7 +1376,7 @@ function freeBrick(type, seed) {
 function styleFree(f, type, seed) {
   var mat = f.mesh.material;
   mat.color.copy(brickColorHex(type, seed));
-  mat.emissive.set(type === "hot" ? 0xff4a00 : type === "gold" ? 0x6a4a00 : 0x000000);
+  mat.emissive.set(type === "hot" ? 0xff4a00 : type === "gold" ? 0x6a4a00 : type === "glass" ? 0x2a7a8a : 0x000000);
   mat.emissiveIntensity = type === "hot" ? 0.6 : 0.5;
   f.type = type;
 }
@@ -1204,6 +1418,17 @@ function buildHole() {
     s.userData.ph = i * 2.1; g.add(s); W3.sils.push(s);
   }
   W3.silMat = silMat;
+  // the keystone gate: appears at the rim (course 50) and swells toward course 100
+  var gate = new THREE.Group(); gate.visible = false; gate.position.z = 0.05; g.add(gate); W3.gate = gate;
+  W3.gateMat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, fog: false, blending: THREE.AdditiveBlending,
+    uniforms: { uTime: { value: 0 } },
+    vertexShader: "varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }",
+    fragmentShader: "uniform float uTime; varying vec2 vUv; void main(){ vec2 p=vUv*2.0-1.0; float r=length(p); float a=atan(p.y,p.x); float rays=0.5+0.5*sin(a*14.0+uTime*1.2); float core=smoothstep(1.0,0.0,r); vec3 col=mix(vec3(1.0,0.74,0.28), vec3(1.0,0.97,0.82), core); float al=smoothstep(1.0,0.82,r)*(0.5+0.5*core)*(0.72+0.28*rays); gl_FragColor=vec4(col*al,1.0); }"
+  });
+  var gdisc = new THREE.Mesh(new THREE.CircleGeometry(10, 48), W3.gateMat); gdisc.renderOrder = -7.5; gate.add(gdisc);
+  var gring = new THREE.Mesh(new THREE.RingGeometry(9.5, 10.5, 48), new THREE.MeshBasicMaterial({ color: 0xf5b921, fog: false, depthWrite: false })); gring.renderOrder = -7.4; gate.add(gring);
+  W3.holeF = null;
   // clip silhouettes to the disc with a stencil-free trick: they sit low
 }
 
@@ -1227,32 +1452,243 @@ function buildClouds() {
   updateClouds(0);
 }
 function updateClouds(dt) {
-  var wa = windAmp() * windGust() * S.wind.dir, j = 0;
+  var wa = windAmp() * windGust() * S.wind.dir, j = 0, wyc = workY();
   for (var c = 0; c < W3.clouds.length; c++) {
     var cl = W3.clouds[c];
     cl.x += (cl.v * 0.6 + wa * 6) * dt;
     if (cl.x > 70) cl.x = -70; if (cl.x < -70) cl.x = 70;
+    // decorative clouds that float in front of the wall shrink away from the work band —
+    // only the dedicated cloud banks (updateMist, from course 40) ever hide the crane
+    var fade = cl.z > 3 ? clamp((Math.abs(cl.y - wyc - 1) - 3) / 4, 0, 1) : 1;
     for (var k = 0; k < cl.puffs.length; k++, j++) {
-      var p = cl.puffs[k], s = p.s * cl.sc;
+      var p = cl.puffs[k], s = Math.max(0.0001, p.s * cl.sc * fade), so = fade > 0.001 ? s + 0.08 : 0.0001;
       _m.makeScale(s, s, s); _m.setPosition(cl.x + p.ox * cl.sc, cl.y + p.oy * cl.sc, cl.z + p.oz * cl.sc);
       W3.cloudInst.fill.setMatrixAt(j, _m);
-      _m.makeScale(s + 0.08, s + 0.08, s + 0.08); _m.setPosition(cl.x + p.ox * cl.sc, cl.y + p.oy * cl.sc, cl.z + p.oz * cl.sc);
+      _m.makeScale(so, so, so); _m.setPosition(cl.x + p.ox * cl.sc, cl.y + p.oy * cl.sc, cl.z + p.oz * cl.sc);
       W3.cloudInst.out.setMatrixAt(j, _m);
     }
   }
   flushInst(W3.cloudInst);
 }
-function buildBirds() {
-  W3.birds = [];
-  var mat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.DoubleSide });
-  for (var i = 0; i < 6; i++) {
-    var b = new THREE.Group();
-    var wl = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.12), mat); wl.position.x = -0.27;
-    var wr = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.12), mat); wr.position.x = 0.27;
-    var pl = new THREE.Group(), pr = new THREE.Group(); pl.add(wl); pr.add(wr); b.add(pl); b.add(pr);
-    b.userData = { pl: pl, pr: pr, ph: Math.random() * 6, v: rand(1.6, 2.6), y: rand(7, 24), z: rand(-14, -4) };
-    b.position.set(rand(-40, 40), b.userData.y, b.userData.z);
-    scene.add(b); W3.birds.push(b);
+/* ---------- background critters ----------
+   Below row 50 the sky fills with nice things (birds from row 10, then a kite, colourful flocks,
+   glow bugs). Past row 50 it turns: eyes, peepers, limbs, imps and ghost-jellies drift by instead. */
+var CG = null, CM = {}, CRIT = { items: [], timer: {}, t: 0 };
+function cmat(c) { return CM[c] || (CM[c] = toon(c, { side: THREE.DoubleSide })); }
+function cbasic(c, o) { var k = "b" + c + (o ? JSON.stringify(o) : ""); return CM[k] || (CM[k] = new THREE.MeshBasicMaterial(Object.assign({ color: c, side: THREE.DoubleSide }, o || {}))); }
+function cpart(parent, geo, mat, s, x, y, z, ol) {
+  var m = new THREE.Mesh(geo, mat); m.scale.set(s[0], s[1], s[2]); m.position.set(x, y, z); parent.add(m);
+  if (ol) outline(m, ol); return m;
+}
+function wingsV(g, mat, len, wid) {
+  var pl = new THREE.Group(), pr = new THREE.Group();
+  var a = new THREE.Mesh(CG.plane, mat); a.scale.set(len, wid, 1); a.position.x = -len / 2; pl.add(a);
+  var b = new THREE.Mesh(CG.plane, mat); b.scale.set(len, wid, 1); b.position.x = len / 2; pr.add(b);
+  pl.position.x = -0.05; pr.position.x = 0.05; g.add(pl); g.add(pr);
+  g.userData.pl = pl; g.userData.pr = pr; g.userData.wm = [a, b];
+}
+function mkSwallow() { var g = new THREE.Group(), ink = cbasic(INK); cpart(g, CG.sph, ink, [0.16, 0.1, 0.1], 0, 0, 0); wingsV(g, ink, 0.6, 0.13); return g; }
+function mkFinch() {
+  var g = new THREE.Group(), c = cmat(0x3fa7d6);
+  g.userData.tint = [cpart(g, CG.sph, c, [0.17, 0.12, 0.12], 0, 0, 0, 0.12)];
+  g.userData.tint.push(cpart(g, CG.sph, c, [0.09, 0.09, 0.09], 0.17, 0.05, 0, 0.12));
+  cpart(g, CG.beak, cmat(0xf5b921), [1, 1, 1], 0.27, 0.05, 0);
+  g.userData.tint.push(cpart(g, CG.plane, c, [0.22, 0.1, 1], -0.26, -0.02, 0));
+  wingsV(g, c, 0.45, 0.16); g.userData.tint.push(g.userData.wm[0], g.userData.wm[1]);
+  return g;
+}
+function kiteTri(pts, col) {
+  var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]); sh.lineTo(pts[1][0], pts[1][1]); sh.lineTo(pts[2][0], pts[2][1]); sh.closePath();
+  return new THREE.Mesh(new THREE.ShapeGeometry(sh), cbasic(col));
+}
+function mkKite() {
+  var root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  var T0 = [0, 1.0], R = [0.62, 0], B = [0, -1.05], L = [-0.62, 0], C = [0, 0];
+  body.add(kiteTri([C, T0, R], 0xe0704a)); body.add(kiteTri([C, R, B], 0xf5b921)); body.add(kiteTri([C, B, L], 0xe0704a)); body.add(kiteTri([C, L, T0], 0xf5b921));
+  var pts = [new THREE.Vector3(T0[0], T0[1], 0.01), new THREE.Vector3(R[0], R[1], 0.01), new THREE.Vector3(B[0], B[1], 0.01), new THREE.Vector3(L[0], L[1], 0.01)];
+  body.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: INK })));
+  var tail = []; for (var i = 0; i < 7; i++) { var bow = cpart(body, CG.box, cbasic(i % 2 ? 0x3fa7d6 : 0xe0704a), [0.22, 0.1, 0.02], 0, -1.2 - i * 0.38, 0); tail.push(bow); }
+  var string = new THREE.Mesh(CG.cyl, cbasic(INK)); root.add(string);
+  root.userData.body = body; root.userData.tail = tail; root.userData.string = string; return root;
+}
+function mkBug() {
+  var g = new THREE.Group();
+  var halo = new THREE.Mesh(CG.sph, cbasic(0xd7ff4a, { transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending, fog: false })); halo.scale.setScalar(0.4); g.add(halo);
+  cpart(g, CG.sph, cbasic(0xf4ffa0, { fog: false }), [0.1, 0.1, 0.1], 0, 0, 0);
+  var w1 = cpart(g, CG.plane, cbasic(0xffffff, { transparent: true, opacity: 0.6 }), [0.16, 0.08, 1], -0.09, 0.07, 0), w2 = cpart(g, CG.plane, cbasic(0xffffff, { transparent: true, opacity: 0.6 }), [0.16, 0.08, 1], 0.09, 0.07, 0);
+  g.userData.halo = halo; g.userData.w = [w1, w2]; return g;
+}
+function mkEye() {
+  var root = new THREE.Group(), eb = new THREE.Group(); root.add(eb);
+  cpart(eb, CG.sph, cmat(0xf4f0e6), [1.1, 1.1, 1.1], 0, 0, 0, 0.06);
+  var iris = cpart(eb, CG.circle, cbasic(0xe8c21a), [0.6, 0.6, 1], 0, 0, 1.08);
+  cpart(eb, CG.circle, cbasic(0x120a14), [0.2, 0.45, 1], 0, 0, 1.09);
+  cpart(eb, CG.circle, cbasic(0xffffff), [0.12, 0.12, 1], 0.22, 0.25, 1.1);
+  var nerve = []; for (var i = 0; i < 5; i++) nerve.push(cpart(root, CG.sph, cmat(0xd98a9a), [0.3 - i * 0.04, 0.3 - i * 0.04, 0.3 - i * 0.04], 0, 0, 0, 0.1));
+  root.userData.eb = eb; root.userData.iris = iris; root.userData.nerve = nerve; return root;
+}
+function mkPeeper() {
+  var root = new THREE.Group(), face = new THREE.Group(); root.add(face);
+  cpart(root, CG.sph, cmat(0x2b1a45), [0.7, 0.55, 0.5], 0, 0, 0);
+  var eyes = [];
+  [[-0.28, 0.1], [0.28, 0.1], [0, -0.05]].forEach(function (p, i) {
+    var e = new THREE.Group(); e.position.set(p[0], p[1], 0.42); face.add(e);
+    cpart(e, CG.sph, cbasic(0xffe14a, { fog: false }), [0.15, 0.1, 0.05], 0, 0, 0);
+    cpart(e, CG.circle, cbasic(0x120a14), [0.025, 0.085, 1], 0, 0, 0.06);
+    eyes.push(e);
+  });
+  root.userData.face = face; root.userData.eyes = eyes; return root;
+}
+function mkLimb(kind) {
+  var g = new THREE.Group(), skin = cmat(0xc8c3e8), A = new THREE.Group(), B = new THREE.Group(); g.add(A);
+  A.position.y = -1.2;                        // pivot near the middle so it tumbles in place
+  if (kind === 0) {                           // arm + open hand
+    cpart(A, CG.sph, skin, [0.22, 0.22, 0.22], 0, 0, 0, 0.08);
+    cpart(A, CG.cyl, skin, [0.22, 0.55, 0.22], 0, 0.55, 0, 0.08);
+    cpart(A, CG.sph, skin, [0.24, 0.24, 0.24], 0, 1.1, 0, 0.08);
+    B.position.y = 1.1; B.rotation.z = -0.5; A.add(B);
+    cpart(B, CG.cyl, skin, [0.19, 0.5, 0.19], 0, 0.5, 0, 0.08);
+    cpart(B, CG.box, skin, [0.46, 0.4, 0.14], 0, 1.2, 0, 0.08);
+    for (var f = 0; f < 4; f++) cpart(B, CG.cyl, skin, [0.055, 0.22, 0.055], -0.17 + f * 0.113, 1.62, 0, 0.1);
+    cpart(B, CG.cyl, skin, [0.06, 0.18, 0.06], 0.32, 1.25, 0).rotation.z = -0.9;
+  } else {                                    // leg + foot
+    cpart(A, CG.sph, skin, [0.28, 0.28, 0.28], 0, 0, 0, 0.08);
+    cpart(A, CG.cyl, skin, [0.28, 0.6, 0.28], 0, 0.6, 0, 0.08);
+    cpart(A, CG.sph, skin, [0.3, 0.3, 0.3], 0, 1.2, 0, 0.08);
+    B.position.y = 1.2; B.rotation.z = 0.6; A.add(B);
+    cpart(B, CG.cyl, skin, [0.22, 0.55, 0.22], 0, 0.55, 0, 0.08);
+    cpart(B, CG.box, skin, [0.6, 0.2, 0.32], 0.2, 1.2, 0, 0.08);
+  }
+  return g;
+}
+function mkImp() {
+  var g = new THREE.Group(), pur = cmat(0x5a3a8c);
+  cpart(g, CG.sph, pur, [0.42, 0.4, 0.4], 0, 0, 0, 0.08);
+  var eb = new THREE.Group(); g.add(eb);
+  cpart(eb, CG.sph, cbasic(0xf4f0e6), [0.2, 0.2, 0.12], 0, 0.04, 0.36);
+  cpart(eb, CG.circle, cbasic(0xd42a1e), [0.11, 0.11, 1], 0, 0.04, 0.485);
+  cpart(eb, CG.circle, cbasic(0x120a14), [0.035, 0.09, 1], 0, 0.04, 0.49);
+  cpart(g, CG.hornGeo, pur, [1, 1, 1], -0.2, 0.36, 0, 0.1); cpart(g, CG.hornGeo, pur, [1, 1, 1], 0.2, 0.36, 0, 0.1);
+  var pl = new THREE.Group(), pr = new THREE.Group(); g.add(pl); g.add(pr);
+  var wl = new THREE.Mesh(CG.bat, cmat(0x3b2562)); wl.scale.set(-1.3, 1.3, 1); pl.add(wl); pl.position.x = -0.25;
+  var wr = new THREE.Mesh(CG.bat, cmat(0x3b2562)); wr.scale.set(1.3, 1.3, 1); pr.add(wr); pr.position.x = 0.25;
+  g.userData.pl = pl; g.userData.pr = pr; g.userData.eb = eb; return g;
+}
+function mkWisp() {
+  var g = new THREE.Group(), glass = { transparent: true, opacity: 0.55, depthWrite: false, fog: false };
+  var dome = new THREE.Mesh(CG.dome, cbasic(0xcfeeff, glass)); dome.scale.set(0.8, 0.7, 0.8); g.add(dome);
+  var face = new THREE.Group(); g.add(face);
+  cpart(face, CG.sph, cbasic(0x120a14), [0.1, 0.16, 0.05], -0.25, 0.2, 0.55); cpart(face, CG.sph, cbasic(0x120a14), [0.1, 0.16, 0.05], 0.25, 0.2, 0.55);
+  cpart(face, CG.sph, cbasic(0x120a14), [0.09, 0.12, 0.05], 0, -0.02, 0.6);
+  var ten = []; for (var i = 0; i < 5; i++) { var t = cpart(g, CG.cyl, cbasic(0xcfeeff, glass), [0.045, 0.7, 0.045], -0.5 + i * 0.25, -0.65, 0); t.userData.px = -0.5 + i * 0.25; ten.push(t); }
+  g.userData.dome = dome; g.userData.face = face; g.userData.ten = ten; return g;
+}
+var CRIT_TYPES = [
+  { id: "swallow", nice: true, from: 10, cap: 3, rate: 0.22, mk: mkSwallow, v: [1.7, 2.7], z: [-16, -6], dy: [0.35, 0.9], flip: true },
+  { id: "kite", nice: true, from: 20, cap: 1, rate: 0.09, mk: mkKite, life: 18, z: [-9, -7], dy: [0.3, 0.65] },
+  { id: "finch", nice: true, from: 30, cap: 5, rate: 0.14, mk: mkFinch, v: [1.3, 2.0], z: [-15, -7], dy: [0.3, 0.85], flip: true, flock: 3 },
+  { id: "bug", nice: true, from: 40, cap: 6, rate: 0.16, mk: mkBug, life: 14, z: [-12, -5], dy: [0.1, 0.85], flock: 3 },
+  { id: "eye", nice: false, from: 51, cap: 2, rate: 0.12, mk: mkEye, v: [0.5, 0.9], z: [-20, -10], dy: [0.3, 0.85] },
+  { id: "peeper", nice: false, from: 53, cap: 3, rate: 0.14, mk: mkPeeper, v: [0.3, 0.6], z: [-16, -8], dy: [0.2, 0.9] },
+  { id: "limb", nice: false, from: 57, cap: 2, rate: 0.09, mk: mkLimb, v: [0.6, 1.0], z: [-18, -9], dy: [0.3, 0.85], variants: 2 },
+  { id: "imp", nice: false, from: 62, cap: 3, rate: 0.12, mk: mkImp, v: [1.6, 2.6], z: [-14, -7], dy: [0.3, 0.9], flip: true, flock: 2 },
+  { id: "wisp", nice: false, from: 70, cap: 2, rate: 0.1, mk: mkWisp, v: [0.7, 1.1], z: [-16, -8], dy: [0.25, 0.9] }
+];
+var FINCH_COLS = [0x3fa7d6, 0xe0704a, 0x79a84e, 0xf5b921];
+function buildCritters() {
+  CG = {
+    sph: new THREE.SphereGeometry(1, 10, 8), box: new THREE.BoxGeometry(1, 1, 1), cyl: new THREE.CylinderGeometry(1, 1, 1, 8), plane: new THREE.PlaneGeometry(1, 1), circle: new THREE.CircleGeometry(1, 16),
+    beak: new THREE.ConeGeometry(0.05, 0.14, 6).rotateZ(-Math.PI / 2), hornGeo: new THREE.ConeGeometry(0.07, 0.25, 6), dome: new THREE.SphereGeometry(1, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2)
+  };
+  var ws = new THREE.Shape(); ws.moveTo(0, 0.05); ws.lineTo(0.35, 0.4); ws.lineTo(0.6, 0.12); ws.lineTo(0.75, 0.35); ws.lineTo(0.95, 0.05); ws.lineTo(0.7, -0.12); ws.lineTo(0.45, -0.05); ws.lineTo(0.25, -0.2); ws.lineTo(0, -0.1); ws.closePath();
+  CG.bat = new THREE.ShapeGeometry(ws);
+  CRIT_TYPES.forEach(function (T) {
+    var n = T.cap + (T.flock || 0);
+    for (var i = 0; i < n; i++) {
+      var g = T.mk(T.variants ? i % T.variants : undefined); g.visible = false; scene.add(g);
+      CRIT.items.push({ T: T, g: g, u: g.userData, active: false, leaving: false, s: 0, x: 0, dy: 0, by: 0, z: 0, dir: 1, v: 1, ph: Math.random() * 6, age: 0, tier: 0 });
+    }
+  });
+}
+function critAllowed(T) { var c = S.courses; return S.started && c >= T.from && (T.nice ? c < 50 : c > 50); }
+function critCap(T) { return Math.min(T.cap, 1 + Math.floor((S.courses - T.from) / 6)); }
+function critSpawn(T) {
+  var cnt = T.flock || 1, cz = CAM.D, hv = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  var z = rand(T.z[0], T.z[1]), halfH = hv * (cz - z), halfW = halfH * camera.aspect, dir = Math.random() < 0.5 ? -1 : 1, dy = rand(T.dy[0], T.dy[1]) * halfH, v = T.v ? rand(T.v[0], T.v[1]) : 0;
+  var col = FINCH_COLS[Math.floor(Math.random() * FINCH_COLS.length)];
+  for (var k = 0; k < CRIT.items.length && cnt > 0; k++) {
+    var it = CRIT.items[k]; if (it.T !== T || it.active) continue;
+    cnt--; it.active = true; it.leaving = false; it.s = 0; it.age = 0; it.dir = dir; it.v = v * rand(0.92, 1.08); it.z = z + rand(-0.6, 0.6); it.dy = dy + rand(-0.6, 0.6) * (T.flock ? 1 : 0); it.ph = Math.random() * 6;
+    it.halfW = halfW;
+    if (T.life) { it.x = rand(-0.75, 0.75) * halfW; if (T.id === "kite") { it.x0 = (Math.random() < 0.5 ? -1 : 1) * halfW * 0.5; it.dir = it.x0 < 0 ? -1 : 1; } }
+    else it.x = -dir * (halfW + 3) - dir * (T.flock ? (T.flock - cnt - 1) * 1.1 : 0);
+    if (T.id === "finch") it.u.tint.forEach(function (m) { m.material = cmat(col); });
+    if (T.id === "eye") it.u.iris.material = cbasic([0xe8c21a, 0xd42a1e, 0x5cd45a, 0x7a5cff][Math.floor(Math.random() * 4)]);
+    it.g.visible = true;
+  }
+}
+function updateCritters(dt) {
+  if (!CG) return;
+  CRIT.t += dt;
+  var cz = CAM.D, hv = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), maxAct = S.quality === "lo" ? 4 : 8, act = 0, ly = CAM.ly, t = CRIT.t, i, k;
+  for (i = 0; i < CRIT.items.length; i++) if (CRIT.items[i].active) act++;
+  // spawning
+  for (i = 0; i < CRIT_TYPES.length; i++) {
+    var T = CRIT_TYPES[i]; if (!critAllowed(T) || act >= maxAct) continue;
+    var cnt = 0; for (k = 0; k < CRIT.items.length; k++) if (CRIT.items[k].T === T && CRIT.items[k].active) cnt++;
+    if (cnt < critCap(T) && Math.random() < dt * T.rate) { critSpawn(T); act += T.flock || 1; }
+  }
+  // moving + animating
+  for (i = 0; i < CRIT.items.length; i++) {
+    var it = CRIT.items[i]; if (!it.active) continue;
+    var T2 = it.T, g = it.g, u = it.u; it.age += dt; it.ph += dt;
+    if (!critAllowed(T2)) it.leaving = true;
+    var ps = it.leaving ? 0 : (T2.life ? Math.min(1, it.age / 0.8, (T2.life - it.age) / 0.8) : 1);
+    it.s += (clamp(ps, 0, 1) - it.s) * Math.min(1, dt * 4);
+    if (it.leaving && it.s < 0.02) { it.active = false; g.visible = false; continue; }
+    if (T2.life && it.age > T2.life) it.leaving = true;
+    if (!T2.life) { it.x += it.dir * it.v * dt; if (it.dir * it.x > it.halfW + 4) { it.active = false; g.visible = false; continue; } }
+    var by = 0;
+    switch (T2.id) {
+      case "swallow": case "finch": { var f = Math.sin(it.ph * (T2.id === "finch" ? 14 : 11)); u.pl.rotation.z = f * 0.7; u.pr.rotation.z = -f * 0.7; by = Math.sin(it.ph * 1.1) * 0.35; break; }
+      case "kite": {
+        var kx = it.x0 + Math.sin(it.ph * 0.5) * 2.2, ky = Math.sin(it.ph * 0.8) * 1.0; it.x = kx; by = ky;
+        u.body.rotation.z = Math.sin(it.ph * 0.9) * 0.22 - it.dir * 0.12;
+        for (k = 0; k < u.tail.length; k++) { u.tail[k].position.x = Math.sin(it.ph * 2.2 - k * 0.6) * (0.08 + k * 0.05); u.tail[k].rotation.z = Math.sin(it.ph * 2.2 - k * 0.6) * 0.5; }
+        var ax = -it.dir * 5, ay = -60 - by, L = Math.sqrt(ax * ax + ay * ay);   // the string runs down to someone far below
+        u.string.scale.set(0.015, L, 0.015); u.string.position.set(ax / 2, ay / 2, 0); u.string.rotation.z = Math.atan2(-ax, ay);
+        break;
+      }
+      case "bug": {
+        it.x += Math.sin(it.ph * 0.9 + it.dir) * 0.6 * dt + it.dir * 0.4 * dt; by = Math.sin(it.ph * 1.3) * 0.8;
+        var pl = 0.5 + 0.5 * Math.sin(it.ph * 3); u.halo.material.opacity = 0.15 + 0.4 * pl; u.halo.scale.setScalar(0.3 + 0.18 * pl);
+        var fl = Math.sin(it.ph * 40) * 0.6; u.w[0].rotation.z = 0.4 + fl; u.w[1].rotation.z = -0.4 - fl; break;
+      }
+      case "eye": {
+        u.eb.lookAt(camera.position);
+        var bl = Math.sin(it.ph * 0.9 + it.age * 0.1), blink = bl > 0.985 ? 0.12 : 1; u.eb.scale.y += (blink - u.eb.scale.y) * Math.min(1, dt * 30);
+        for (k = 0; k < u.nerve.length; k++) u.nerve[k].position.set(-it.dir * (1.2 + k * 0.5), Math.sin(it.ph * 2.5 - k * 0.7) * 0.35 - k * 0.12, 0);
+        by = Math.sin(it.ph * 0.7) * 0.5; break;
+      }
+      case "peeper": {
+        u.face.lookAt(camera.position);
+        var bk = Math.sin(it.ph * 1.7) > 0.96 ? 0.1 : 1; for (k = 0; k < u.eyes.length; k++) u.eyes[k].scale.y += (bk - u.eyes[k].scale.y) * Math.min(1, dt * 30);
+        by = Math.sin(it.ph * 1.2) * 0.4; break;
+      }
+      case "limb": { g.rotation.z += dt * (0.5 + (it.v - 0.6)) * it.dir; g.rotation.x = Math.sin(it.ph * 0.6) * 0.4; by = Math.sin(it.ph * 0.8) * 0.5; break; }
+      case "imp": {
+        var fi = Math.sin(it.ph * 13); u.pl.rotation.z = fi * 0.8; u.pr.rotation.z = -fi * 0.8; by = Math.sin(it.ph * 2.2) * 0.45;
+        u.eb.rotation.y = clamp(-it.dir * 0.3, -0.5, 0.5); break;
+      }
+      case "wisp": {
+        var br = 1 + Math.sin(it.ph * 2) * 0.12; u.dome.scale.set(0.8 * br, 0.7 / br, 0.8 * br); by = Math.sin(it.ph * 0.9) * 0.7 + it.age * 0.15;
+        for (k = 0; k < u.ten.length; k++) u.ten[k].rotation.z = Math.sin(it.ph * 2 - k) * 0.35;
+        break;
+      }
+    }
+    it.by = by;
+    g.position.set(it.x, ly + it.dy + by, it.z);
+    if (T2.flip) g.scale.set(it.dir * it.s, it.s, it.s); else g.scale.setScalar(Math.max(0.0001, it.s));
   }
 }
 
@@ -1299,7 +1735,10 @@ function buildParticles() {
 }
 function hideInst(mesh, i) { _m.makeScale(0, 0, 0); mesh.setMatrixAt(i, _m); mesh.instanceMatrix.needsUpdate = true; }
 var CONF_COLS = [0xf5b921, 0xe0704a, 0x3fa7d6, 0x79a84e, 0xfffaf0, 0xd05a35, 0x8f6ad8];
+var EMIT_WORLD = false, _ve = new THREE.Vector3();
+function fxPos(x, y, z) { _ve.set(x, y, z); if (W3.orbit && !EMIT_WORLD) W3.orbit.localToWorld(_ve); return _ve; }
 function emitChips(x, y, z, colorHex, n, power) {
+  var P = fxPos(x, y, z); x = P.x; y = P.y; z = P.z;
   power = power || 1;
   for (var k = 0; k < n; k++) {
     var i = CHIPS.i = (CHIPS.i + 1) % CHIPS.n, p = CHIPS.p[i];
@@ -1311,6 +1750,7 @@ function emitChips(x, y, z, colorHex, n, power) {
   CHIPS.mesh.instanceColor.needsUpdate = true;
 }
 function emitPuffs(x, y, z, n, colorHex, spread, up, size) {
+  var P = fxPos(x, y, z); x = P.x; y = P.y; z = P.z;
   for (var k = 0; k < n; k++) {
     var i = PUFFS.i = (PUFFS.i + 1) % PUFFS.n, p = PUFFS.p[i];
     var a = Math.random() * Math.PI * 2;
@@ -1322,6 +1762,7 @@ function emitPuffs(x, y, z, n, colorHex, spread, up, size) {
   PUFFS.mesh.instanceColor.needsUpdate = true;
 }
 function emitGlow(x, y, z, n, colorHex, speed, life, size, grav, spreadUp) {
+  var P = fxPos(x, y, z); x = P.x; y = P.y; z = P.z;
   _c.set(colorHex);
   for (var k = 0; k < n; k++) {
     var i = GLOW.i = (GLOW.i + 1) % GLOW.n, p = GLOW.p[i];
@@ -1334,6 +1775,7 @@ function emitGlow(x, y, z, n, colorHex, speed, life, size, grav, spreadUp) {
   }
 }
 function emitConfetti(x, y, z, n, spread) {
+  var P = fxPos(x, y, z); x = P.x; y = P.y; z = P.z;
   for (var k = 0; k < n; k++) {
     var i = CONF.i = (CONF.i + 1) % CONF.n, p = CONF.p[i];
     p.x = x + rand(-spread, spread); p.y = y + rand(-0.5, 1.5); p.z = z + rand(-1, 2);
@@ -1397,12 +1839,14 @@ function camPunch(a) { if (REDUCED) return; CAM.punch += a; }
 function fitDistance() {
   var vf = THREE.MathUtils.degToRad(camera.fov / 2);
   var hf = Math.atan(Math.tan(vf) * camera.aspect);
-  var need = (WALL_W / 2 + 0.95) / Math.tan(hf);
+  var need = (FW() / 2 + (S.tower ? 1.9 : 0.95)) / Math.tan(hf);
   return clamp(need, 12.5, 36);
 }
 function workY() { return rowY(S.courses + 1); }
 function updateCamera(dt, rt) {
+  updateOrbit(dt);
   var D = fitDistance();
+  if (CAM.mode === "tower") D *= 1.35;
   var ly, cy, cx, lx = 0;
   if (CAM.mode === "title") {
     CAM.orbit += dt * 0.08;
@@ -1414,33 +1858,38 @@ function updateCamera(dt, rt) {
     ly = Math.max(1.7, wy + 0.55);
     cy = ly + D * 0.11;
     cx = 1.6 + Math.sin(rt * 0.23) * 0.7;
-    if (CAM.mode === "victory") { CAM.victory += dt; ly += CAM.victory * CAM.victory * 3; cy = ly + 2; cx = 0; }
+    if (CAM.mode === "tower") { ly = wy + 0.8; cy = ly + D * 0.2; cx = 0; }
+    if (CAM.mode === "rim") { ly = wy + 3.4; cy = ly + D * 0.08; cx = 0; }
+    if (CAM.mode === "victory") { CAM.victory += dt; var vtt = Math.min(CAM.victory, 3.6); ly += vtt * vtt * 3; cy = ly + 2; cx = 0; }
     CAM.x = damp(CAM.x, cx, 1.6, dt); CAM.y = damp(CAM.y, cy, 3.2, dt); CAM.ly = damp(CAM.ly, ly, 3.4, dt); CAM.D = damp(CAM.D, D, 3, dt);
   }
   CAM.trauma = Math.max(0, CAM.trauma - dt * 1.6);
   var k = CAM.trauma * CAM.trauma;
   var sx = (Math.random() * 2 - 1) * k * 0.45, sy = (Math.random() * 2 - 1) * k * 0.32;
   var zOff = CAM.mode === "title" ? Math.cos(CAM.orbit) * CAM.D * 0.25 : 0;
-  camera.position.set(CAM.x + sx, CAM.y + sy, CAM.D + zOff);
-  camera.lookAt(lx + sx * 0.4, CAM.ly + sy * 0.4, 0);
-  camera.rotation.z += (Math.random() * 2 - 1) * k * 0.03;
+  _vc.set(CAM.x + sx, CAM.y + sy, CAM.D + zOff); _vl.set(lx + sx * 0.4, CAM.ly + sy * 0.4, 0);
+  if (W3.orbit) { W3.orbit.localToWorld(_vc); W3.orbit.localToWorld(_vl); }
+  camera.position.copy(_vc); camera.lookAt(_vl);
+  camera.rotation.z += (Math.random() * 2 - 1) * k * 0.03 + swayOff() * 0.5;
   CAM.punch = damp(CAM.punch, 0, 7, dt);
   var fov = 40 + CAM.punch;
   if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
 }
+function toScreenW(x, y, z) { var w = EMIT_WORLD; EMIT_WORLD = true; var r = toScreen(x, y, z); EMIT_WORLD = w; return r; }
 function toScreen(x, y, z) {
-  _v.set(x, y, z).project(camera);
+  _v.set(x, y, z); if (W3.orbit && !EMIT_WORLD) W3.orbit.localToWorld(_v); _v.project(camera);
   return { x: (_v.x * 0.5 + 0.5) * window.innerWidth, y: (-_v.y * 0.5 + 0.5) * window.innerHeight, behind: _v.z > 1 };
 }
 
 /* ---------- per-frame world update ---------- */
 function updateWorld(dt, rt) {
   W3.t += dt;
-  var prog = Math.min(1, S.courses / WIN_COURSES);
+  var prog = Math.min(1, S.courses / FINAL_GOAL);
   var sk = skyAt(prog);
   W3.sky.material.uniforms.uTop.value.setRGB(sk.top[0], sk.top[1], sk.top[2]);
   W3.sky.material.uniforms.uHor.value.setRGB(sk.hor[0], sk.hor[1], sk.hor[2]);
   scene.fog.color.setRGB(sk.hor[0], sk.hor[1], sk.hor[2]);
+  W3.mistMat.color.setRGB(lerp(1, sk.hor[0], 0.2), lerp(1, sk.hor[1], 0.2), lerp(1, sk.hor[2], 0.2));
   W3.sun.color.setRGB(sk.sun[0], sk.sun[1], sk.sun[2]);
   W3.hemi.intensity = sk.hemi;
   W3.sky.position.copy(camera.position); W3.stars.position.copy(camera.position);
@@ -1454,32 +1903,28 @@ function updateWorld(dt, rt) {
   W3.sunDisc.material.color.setRGB(1, lerp(0.85, 0.5, prog), lerp(0.3, 0.25, prog));
   // the light itself
   var wy = workY();
-  W3.sun.position.set(-7, wy + 12, 9);
-  W3.sun.target.position.set(0, wy - 2, 0); W3.sun.target.updateMatrixWorld();
+  W3.sun.position.set(-7, wy + 12, 9); if (W3.orbit) W3.orbit.localToWorld(W3.sun.position);
+  W3.sun.target.position.set(0, wy - 2, 0); if (W3.orbit) W3.orbit.localToWorld(W3.sun.target.position); W3.sun.target.updateMatrixWorld();
   W3.sun.intensity = lerp(0.95, 0.55, prog);
   // hole: pinned high in view, growing as you approach
   updateHole(dt, prog);
-  updateClouds(dt);
-  for (var b = 0; b < W3.birds.length; b++) {
-    var bd = W3.birds[b], u = bd.userData;
-    u.ph += dt * 11;
-    u.pl.rotation.z = Math.sin(u.ph) * 0.7; u.pr.rotation.z = -Math.sin(u.ph) * 0.7;
-    bd.position.x += u.v * dt; bd.position.y = u.y + Math.sin(u.ph * 0.1) * 0.4;
-    if (bd.position.x > 50) { bd.position.x = -50; u.y = rand(6, 26); }
-  }
+  updateClouds(dt); updateMist(dt);
+  if (S.swayOn && S.started && !actionFrozen() && Math.random() < dt * 4) emitPuffs(rand(-4, 4), wy - 0.3, BD / 2, 1, 0xd8cdb8, 0.3, -0.4, 0.8);
+  updateCritters(dt);
   updateCrowd(dt);
   // finished-row glint
   if (W3.glintT >= 0) {
     W3.glintT += dt;
     var gu = W3.glintT / 0.5;
-    W3.glint.position.x = rowLeft(W3.glintRow, S.perCourse) - 0.5 + gu * (WALL_W + 1);
+    W3.glint.position.x = rowLeft(W3.glintRow, perFace()) - 0.5 + gu * (FW() + 1);
     W3.glint.material.opacity = Math.sin(Math.min(1, gu) * Math.PI) * 0.95;
     if (gu >= 1) { W3.glintT = -1; W3.glint.material.opacity = 0; }
   }
   // gold bricks twinkle
   if (W3.golds && W3.golds.length && Math.random() < dt * 4) {
     var gi = W3.golds[Math.floor(Math.random() * W3.golds.length)], gb = BRICKS[gi];
-    if (gb && Math.abs(gb.y - wy) < 14) emitGlow(gb.x + rand(-0.3, 0.3), gb.y + rand(-0.1, 0.2), BD / 2 + 0.05, 1, 0xfff2a8, 0.4, 0.6, 0.16, 0.5);
+    if (gb && Math.abs(gb.y - wy) < 14) { faceToWorld(gb.face, gb.x + rand(-0.3, 0.3), gb.y + rand(-0.1, 0.2), BD / 2 + 0.05, _ve); EMIT_WORLD = true; } else gb = null;
+    if (gb) emitGlow(_ve.x, _ve.y, _ve.z, 1, gb.type === "glass" ? 0xbff4ff : 0xfff2a8, 0.4, 0.6, 0.16, 0.5); EMIT_WORLD = false;
   }
   // wind streaks
   var amp = windAmp() * windGust();
@@ -1499,26 +1944,41 @@ function updateWorld(dt, rt) {
   // kiln: glows while stoked, smokes always
   var heat = S.held ? 1 : 0.25 + S.moldT * 0.3;
   W3.kilnMouthMat.color.setRGB(lerp(0.35, 1, heat), lerp(0.1, 0.6, heat), lerp(0.02, 0.15, heat));
+  EMIT_WORLD = true;
   if (Math.random() < dt * (S.held ? 9 : 2.5)) emitPuffs(W3.kilnChimney.x, W3.kilnChimney.y, W3.kilnChimney.z, 1, 0xb8b2a8, 0.15, 1.4, 1.2);
   if (S.held && Math.random() < dt * 14) emitGlow(-8.2 + rand(-0.3, 0.3), 0.45, -1.3, 1, 0xffa22e, 1.2, 0.8, 0.12, 2.2);
+  EMIT_WORLD = false;
   updateBrickAnims(dt);
   updateParticles(dt);
 }
 function updateHole(dt, prog) {
-  W3.holeMat.uniforms.uTime.value += dt;
-  var ny = lerp(0.66, 0.56, prog), dist = lerp(150, 110, prog);
-  if (CAM.mode === "victory") { ny = lerp(ny, 0, Math.min(1, CAM.victory / 1.4)); dist = lerp(dist, 30, Math.min(1, CAM.victory / 1.6)); }
-  if (CAM.mode === "title") { ny = 0.6; dist = 140; }
+  W3.holeMat.uniforms.uTime.value += dt; W3.gateMat.uniforms.uTime.value = W3.t;
+  // Size: a pinprick at course 0, swelling toward the rim at course 50 (eased so
+  // the later courses visibly widen it more than the early ones).
+  var p1 = clamp(S.courses / FIRST_GOAL, 0, 1);
+  var f = lerp(0.045, 1, Math.pow(p1, 1.3));
+  var ny = lerp(0.68, 0.52, p1), dist = lerp(150, 110, p1), boost = 0;
+  if (CAM.mode === "victory") { var vt = Math.min(1, CAM.victory / 1.4); ny = lerp(ny, 0, vt); dist = lerp(dist, 30, Math.min(1, CAM.victory / 1.6)); boost = vt * 1.6; }
+  if (CAM.mode === "title") { ny = 0.6; dist = 140; f = 0.16; }
+  if (CAM.mode === "rim") { f = 1.08; }
+  W3.holeF = W3.holeF == null ? f : damp(W3.holeF, f + boost, CAM.mode === "victory" ? 2.2 : 1.4, dt);
+  var Wd = window.innerWidth, Hd = window.innerHeight;
+  var Rpx = Math.min(0.21 * Hd, 0.46 * Wd) * W3.holeF;            // on-screen radius in pixels
+  var tanT = (Rpx / (Hd / 2)) * Math.tan(THREE.MathUtils.degToRad(20));
   _v.set(0.12, ny, 0.5).unproject(camera).sub(camera.position).normalize();
   W3.hole.position.copy(camera.position).addScaledVector(_v, dist);
   W3.hole.quaternion.copy(camera.quaternion);
-  var sc = lerp(0.75, 1.25, prog) * (dist / 150);
+  var sc = Math.max(0.01, tanT * dist / 10);
   W3.hole.scale.setScalar(sc * (1 + Math.sin(W3.t * 1.3) * 0.02));
-  W3.silMat.opacity = lerp(0.35, 0.9, prog);
+  W3.silMat.opacity = lerp(0.35, 0.9, p1);
   for (var i = 0; i < W3.sils.length; i++) {
     var s = W3.sils[i]; s.position.x = -4 + i * 4 + Math.sin(W3.t * 0.8 + s.userData.ph) * 0.5;
     s.rotation.z = Math.sin(W3.t * 0.6 + s.userData.ph) * 0.06;
   }
+  // the keystone gate
+  var showGate = !!S.flags.rimDone || CAM.mode === "victory";
+  W3.gate.visible = showGate;
+  if (showGate) { var gp = clamp((S.courses - FIRST_GOAL) / (FINAL_GOAL - FIRST_GOAL), 0, 1); W3.gate.scale.setScalar(CAM.mode === "victory" ? 0.95 : lerp(0.1, 0.78, gp)); }
 }
 function renderWorld() { renderer.render(scene, camera); }
 
@@ -1527,15 +1987,16 @@ function renderWorld() { renderer.render(scene, camera); }
    One tap drops. The next brick hooks on by itself. Hold the kiln to
    bake faster. Judging uses the exact moment of your tap.
    ===================================================================== */
-var G = { uid: 1, hitStop: 0, frameT: 0, afterLand: [], falls: 0, cascadeQueue: [], cascadeT: 0, cascadeActive: false, cascadeFired: {} };
+var G = { uid: 1, hitStop: 0, frameT: 0, afterLand: [], falls: 0, gen: 0 };
 
 function newItem(type) { return { uid: G.uid++, type: type, fuse: type === "hot" ? HOT_FUSE : 0, seed: (S.molded * 13 + 5) % 997 }; }
 function rollBrickType() {
-  var gild = GILD_PCT[S.tier.gilded] / 100, hot = S.hotUnlocked ? 0.10 : 0, lead = S.leadUnlocked ? leadChance() : 0;
+  var gild = GILD_PCT[S.tier.gilded] / 100, hot = S.hotUnlocked ? 0.10 : 0, lead = S.leadUnlocked ? leadChance() : 0, glass = glassChance();
   var r = Math.random();
   if (r < gild) return "gold";
   if (r < gild + hot) return "hot";
   if (r < gild + hot + lead) return "lead";
+  if (r < gild + hot + lead + glass) return "glass";
   return "normal";
 }
 // Heat rises: hot bricks always sit on top of the hand (next to load).
@@ -1550,11 +2011,8 @@ function plainCount() { var n = 0; for (var i = 0; i < S.stack.length; i++) if (
 
 /* ---------------- KILN ---------------- */
 function tickKiln(dt) {
-  /* MANUAL KILN: before the Auto-Kiln upgrade, the kiln only bakes while
-     you hold it. After buying it, the kiln bakes passively at the normal
-     rate and holding still stokes it faster. */
-  if (!S.tier.autoKiln && !S.held) return;
-  var rateK = (S.held ? stokeMult() : 1) / fillTime();
+  var rateK = (S.held ? 1 : COALS[S.tier.bellows]) / bakeTime();
+  if (rateK <= 0) return;
   S.moldT += rateK * dt;
   if (S.held) humSet(S.moldT);
   if (S.moldT >= 1) { S.moldT -= 1; produceBrick(); }
@@ -1570,7 +2028,9 @@ function produceBrick() {
   else snd.clink();
   UI.trayPop = it.uid;
   kilnPuff();
+  if (!REDUCED) UI.fly[it.uid] = 1;
   renderHUD();
+  flyBrick(it);
   checkUnlocks();
   if (S.molded === 1 && !S.flags.firstBrick) {
     S.flags.firstBrick = true;
@@ -1589,7 +2049,7 @@ function tickCrane(dt, frozen) {
   if (C.lock > 0) C.lock -= dt;
   if (C.state === "empty") {
     C.t -= dt;
-    if (!frozen && C.t <= 0 && S.stack.length > 0) loadCrane();
+    if (!frozen && C.t <= 0 && S.stack.length > 0 && !UI.fly[S.stack[S.stack.length - 1].uid]) loadCrane();
     return;
   }
   if (C.state === "swing" && !frozen) {
@@ -1603,14 +2063,15 @@ function loadCrane() {
   C.item = item; C.state = "swing"; C.lock = 0.12; C.loadT = 0;
   var fromRight = Math.random() < 0.5;
   C.pos = fromRight ? 1 : 0; C.dir = fromRight ? -1 : 1;
+  if (S.tier.predictable > 0) {         // spawn a set distance from the slot, already heading toward it
+    var ptf = targetFrac(), pd = clamp(PRED_TIME * swingSpeed(), PRED_MIN, PRED_MAX), side = fromRight ? 1 : -1;
+    if (ptf + side * pd > 1) side = -1; else if (ptf + side * pd < 0) side = 1;
+    C.pos = clamp(ptf + side * pd, 0, 1); C.dir = -side;
+  }
   C.free = freeBrick(item.type, item.seed);
   snd.load();
   renderHUD();
   if (!S.flags.dropTaught) { S.flags.dropTaught = true; enqueueHint("drop", "Tap ANYWHERE when the brick is over the glowing slot.", null); }
-  else if (S.courses === 1 && !S.comboTutDone && !S.flags.comboCoach) {
-    S.flags.comboCoach = true;
-    enqueueHint("combo", "Now hits in a row STACK: ×2, ×3, ×4… Don't break the streak!", null);
-  }
 }
 // Crane position at the exact time of the tap (not the last frame).
 function posAtTime(ts) {
@@ -1626,7 +2087,7 @@ function tryDrop(ts) {
     if (C.state === "empty" && S.stack.length === 0) { snd.err(); nudgeKiln(); }
     return;
   }
-  if (C.lock > 0) return;
+  if (C.lock > 0 || CAM.turning) return;
   S.lastAct = S.time;
   var pos = posAtTime(ts); C.pos = pos;
   var outcome = dropOutcomeAt(pos);
@@ -1650,7 +2111,7 @@ function tryDrop(ts) {
   C.item = null; C.free = null; C.state = "empty"; C.t = 0.25;
   handleMiss(item, f, from);
 }
-function hookPoint() { var r = S.courses + 1; return { x: posX(r, C.pos, S.perCourse), y: rowY(r) + 1.05, z: 0 }; }
+function hookPoint() { var r = S.courses + 1; return { x: posX(r, C.pos, perFace()), y: rowY(r) + 1.05, z: 0 }; }
 
 /* ---------------- PLACING ---------------- */
 function whenLanded(fn) { if (G.falls > 0) G.afterLand.push(fn); else fn(); }
@@ -1662,26 +2123,31 @@ function landedOne() {
 }
 var FALLING = [];
 function placeBrick(item, fromAuto, outcome, f, from) {
-  var row = S.courses + 1, slot = S.inCourse, per = S.perCourse;
+  var row = S.courses + 1, slot = curSlot(), per = perFace(), face = curFace(), ci = S.inCourse;
   var willComplete = S.inCourse + 1 >= S.perCourse;
   var r = rate();
   S.laid++; S.inCourse++; S.lastAct = S.time;
   var pay = r, mult = 1, prevMult = streakMult(S.streak);
-  var isCascade = (fromAuto === "cascade");
-  if (!fromAuto || isCascade) {
-    if (S.courses >= 1) {
+  if (!fromAuto) {
+    if (S.courses >= 1) {           // row-2 tutorial: misses are forgiven until you land two bricks
+      S.flags.tutHits = (S.flags.tutHits || 0) + 1;
+      if (S.flags.tutHits >= 2 && !S.comboTutDone) S.comboTutDone = true;
+    }
+    if (S.courses >= 1 && comboOn()) {
       S.streak++; if (S.streak > S.bestStreak) S.bestStreak = S.streak;
       mult = streakMult(S.streak);
-      pay = r * mult * TYPE_MULT[item.type];
-      if (S.streak >= 2 && !S.comboTutDone) { S.comboTutDone = true; dismissHint("combo"); }
-    } else pay = r * TYPE_MULT[item.type];
-    if (outcome === 3) { pay = Math.ceil(pay * 1.5); S.perfects++; }
+    }
+    pay = brickPay(mult, item.type, outcome === 3);
+    if (outcome === 3) S.perfects++;
   }
+  if (row < PAY_FROM_ROW || !perBrickOn()) pay = 0;
   credit(pay);
-  var streakNow = (!fromAuto || isCascade) ? S.streak : 0;
+  var streakNow = fromAuto ? 0 : S.streak;
+  var gen = G.gen;
   var land = function () {
-    var idx = wallAdd(row, slot, per, item.type, item.seed);
-    if (idx >= 0) animBrick(idx, "land", 0, 0.32);
+    if (gen !== G.gen) return;          // a collapse reset the wall while this brick was in flight
+    var idx = wallAdd(row, slot, per, item.type, item.seed, face, ci);
+    if (idx >= 0) { animBrick(idx, "land", 0, 0.32); checkHandSmash(BRICKS[idx]); }
     landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow);
   };
   // the visible fall (or the apprentice's pop-up)
@@ -1690,25 +2156,24 @@ function placeBrick(item, fromAuto, outcome, f, from) {
     G.falls++;
     var tx = slotX(row, slot, per), ty = rowY(row);
     var start = from || { x: tx, y: ty - 0.9, z: 0.7 };
-    f.mesh.scale.set(WALL_W / per - GAP, 1, 1);
+    f.mesh.scale.set(FW() / per - GAP, 1, 1);
     f.anim = { kind: fromAuto ? "pop" : "fall", t: 0, dur: fromAuto ? 0.2 : 0.13, sx: start.x, sy: start.y, sz: start.z, tx: tx, ty: ty, done: function () { releaseFree(f); land(); landedOne(); } };
     FALLING.push(f);
   } else land();
   if (willComplete) completeCourse();
+  else if (S.tower && S.inCourse % S.perFace === 0) sideDone();
   renderHUD();
-  if (!fromAuto || isCascade) renderStreak(true);
-  if (!fromAuto && HAND.mode === "grab") handFightOff();
-  if (!fromAuto || isCascade) checkCascade();
+  if (!fromAuto) renderStreak(true);
 }
 function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow) {
   var x = slotX(row, slot, per), y = rowY(row), z = BD / 2;
-  var col = item.type === "normal" ? (function () { var h = clayHSL(item.seed); return _c2.setHSL(h[0], h[1], h[2]).getHex(); })() : item.type === "gold" ? 0xf5b921 : item.type === "hot" ? 0xff8a2a : 0x4b505a;
+  var col = item.type === "normal" ? (function () { var h = clayHSL(item.seed); return _c2.setHSL(h[0], h[1], h[2]).getHex(); })() : item.type === "gold" ? 0xf5b921 : item.type === "hot" ? 0xff8a2a : item.type === "glass" ? 0x9fe6f7 : 0x4b505a;
   snd.place(streakNow, outcome, item.type);
   emitChips(x, y + BH / 2, z, col, item.type === "lead" ? 12 : fromAuto ? 3 : 7, item.type === "lead" ? 1.3 : 1);
   emitPuffs(x, y - BH / 2, z, item.type === "lead" ? 9 : fromAuto ? 2 : 5, 0xe9dcc2, 0.5);
   camShake(item.type === "lead" ? 0.42 : fromAuto ? 0.04 : 0.16);
   var sp = toScreen(x, y + 0.3, z);
-  moneyFloat(pay, sp.x, sp.y - 10);
+  if (pay > 0) moneyFloat(pay, sp.x, sp.y - 10);
   if (outcome === 3) {
     G.hitStop = 0.075;
     camPunch(-2.2);
@@ -1718,27 +2183,59 @@ function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, st
   }
   if (item.type === "hot") emitGlow(x, y, z, 18, 0xff7a2a, 2.4, 0.7, 0.14, 1.5);
   if (item.type === "lead") { emitPuffs(x, y - BH / 2, z, 6, 0xd8cdb8, 1.4, 0.3, 1.1); popText("THUD", sp.x + 30, sp.y - 6, { cls: "white", size: 15, rise: 16 }); }
-  if (item.type !== "normal" && !fromAuto) {
-    var tl = item.type === "gold" ? "GOLD ×3" : item.type === "hot" ? "HOT ×2" : "LEAD ×4";
+  if (item.type !== "normal" && !fromAuto && pay > 0) {
+    var tl = item.type === "gold" ? "GOLD ×3" : item.type === "hot" ? "HOT ×2" : item.type === "glass" ? "GLASS ×5" : "LEAD ×4";
     popText(tl, sp.x, sp.y + 26, { cls: item.type === "lead" ? "white" : "gold", size: 14, rise: 22, delay: 80 });
   }
-  if (!fromAuto && mult > prevMult && (mult === 5 || mult === 10 || mult === multCap() || (mult > 10 && mult % 5 === 0))) {
+  if (!fromAuto && mult > prevMult && (streakNow === 5 || streakNow === 10 || (mult >= multCap() && prevMult < multCap()))) {
     var sr = $("streak").getBoundingClientRect();
-    popText(mult === multCap() ? "MAX ×" + mult + "!" : "×" + mult + "!", sr.left + sr.width / 2 - 10, sr.bottom + 26, { cls: "gold", size: 28, rot: -6, dur: 1100 });
+    popText(mult >= multCap() ? "MAX ×" + fmtMult(mult) + "!" : "×" + fmtMult(mult) + "!", sr.left + sr.width / 2 - 10, sr.bottom + 26, { cls: "gold", size: 28, rot: -6, dur: 1100 });
     crowdCheer(1.6); snd.cheer(true);
-    if (mult >= 10) { vignette("gold"); firework(rand(-6, 6), y + rand(5, 9), -3); }
+    if (streakNow >= 10) { vignette("gold"); firework(rand(-6, 6), y + rand(5, 9), -3); }
   }
   crowdPay(pay, mult, outcome, item.type, fromAuto, sp);
 }
 function crowdPay(pay, mult, outcome, type, fromAuto, sp) {
-  if (fromAuto) { spawnCoins(1, sp); return; }
+  if (fromAuto) { if (pay > 0) spawnCoins(1, sp); return; }
   var special = type !== "normal";
-  spawnCoins(Math.min(7, 1 + Math.floor(mult / 2) + (special ? 2 : 0) + (outcome === 3 ? 1 : 0)), sp);
-  if (special || outcome === 3 || (mult >= 10 && S.streak % 3 === 0)) { crowdCheer(1); snd.cheer(mult >= 10 || type === "lead"); }
-  else if (mult >= 5 && S.streak % 2 === 0) snd.cheer(false);
+  if (pay > 0) spawnCoins(Math.min(12, 3 + Math.floor((mult - 1) * 3) + (special ? 3 : 0) + (outcome === 3 ? 2 : 0)), sp);
+  if (special || outcome === 3 || (S.streak >= 10 && S.streak % 3 === 0)) { crowdCheer(1); snd.cheer(S.streak >= 10 || type === "lead"); }
+  else if (S.streak >= 5 && S.streak % 2 === 0) snd.cheer(false);
+}
+var BUBBLES = [];
+function villagerSay(idx, text, delayMs) {
+  setTimeout(function () {
+    var d = W3.crowd[idx]; if (!d || el.fx.childElementCount > 90) return;
+    var b = document.createElement("div"); b.className = "vbubble"; b.textContent = text; b.style.opacity = "0"; el.fx.appendChild(b);
+    BUBBLES.push({ el: b, idx: idx, born: performance.now(), life: 4600 });
+    snd.pop();
+  }, delayMs || 0);
+}
+function updateBubbles() {
+  var now = performance.now();
+  for (var i = BUBBLES.length - 1; i >= 0; i--) {
+    var bb = BUBBLES[i], age = now - bb.born, d = W3.crowd[bb.idx];
+    if (age > bb.life || !d) { if (bb.el.parentNode) bb.el.parentNode.removeChild(bb.el); BUBBLES.splice(i, 1); continue; }
+    var sp = toScreenW(d.x, 1.75, d.z), x = clamp(sp.x, 100, window.innerWidth - 100);
+    bb.el.style.transform = "translate(" + x.toFixed(1) + "px," + (sp.y - 8).toFixed(1) + "px) translate(-50%,-100%)";
+    bb.el.style.opacity = Math.min(1, age / 250, (bb.life - age) / 500).toFixed(2);
+  }
+}
+// the villagers who just turned up say their piece (non-blocking speech bubbles)
+var HOLE_TALK = {
+  2: ["Is it just me, or is that hole getting bigger?", "It wasn't there yesterday. I'd swear it."],
+  3: ["Something's moving in there. See the shapes?", "My dog won't stop barking at it."],
+  4: ["Do you hear that? It's humming.", "Whoever's up there… they're watching us."]
+};
+function villagersJoin(n) {
+  var lines = HOLE_TALK[n]; if (!lines) return;
+  var from = CROWD_BY[n - 1] || 0, to = CROWD_BY[n] || from;
+  villagerSay(from, lines[0], 700);
+  villagerSay(Math.min(to - 1, from + 1), lines[1], 2200);
 }
 function crowdCheer(sec) { for (var i = 0; i < W3.crowd.length; i++) W3.crowd[i].jump = Math.max(W3.crowd[i].jump, sec * rand(0.7, 1.1)); }
 function tickFalling(dt) {
+  var fin = [];            // landings resolve oldest-first so the wall's brick order stays chronological
   for (var i = FALLING.length - 1; i >= 0; i--) {
     var f = FALLING[i], a = f.anim;
     if (!a) { FALLING.splice(i, 1); continue; }
@@ -1771,12 +2268,19 @@ function tickFalling(dt) {
       f.mesh.scale.setScalar(Math.max(0.01, 1 - u));
       f.mesh.position.y += dt * 1.5;
     }
-    if (u >= 1) { FALLING.splice(i, 1); a.done && a.done(); }
+    if (u >= 1) { FALLING.splice(i, 1); if (a.done) fin.unshift(a.done); }
   }
+  for (var q = 0; q < fin.length; q++) fin[q]();
 }
 function credit(amount) {
+  if (!(amount > 0)) return;
   S.money += amount; S.earned += amount;
   if (!S.flags.moneyShown && S.started) { S.flags.moneyShown = true; revealEl($("hud-money")); }
+  if (!S.workshopShown && S.started) {
+    S.workshopShown = true;
+    revealEl($("btn-shop")); $("btn-shop").classList.add("shop-pulse");
+    enqueueHint("shop", "First payday! The WORKSHOP is open — spend your coins.", "btn-shop", true);
+  }
 }
 
 /* ---------------- MISSES ---------------- */
@@ -1815,43 +2319,55 @@ function breakStreak() {
   if (S.streak >= 5) { var r = $("streak").getBoundingClientRect(); popText("STREAK LOST", r.left + r.width / 2, r.bottom + 22, { cls: "red", size: 15, rise: 24 }); }
   if (S.streak >= 2) { var st = $("streak"); st.classList.remove("break"); void st.offsetWidth; st.classList.add("break"); UI.streakBreakT = 0.5; }
   S.streak = 0;
-  G.cascadeFired = {};
 }
 
 /* ---------------- ROWS ---------------- */
+function sideDone() {
+  fleeAllHands();
+  var side = curFace() + 1;
+  whenLanded(function () { snd.whoosh(); bigWord("SIDE " + side + " / 4", "gold"); });
+}
+function startTower() {
+  if (S.tower) return;
+  S.tower = true; S.towerStart = S.courses; S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace; S.inCourse = 0;
+  releaseKiln(); fleeAllHands();
+  var ft = new THREE.Mesh(new THREE.BoxGeometry(TW + 1.0, FOUND, TW + 1.0), toon(0x8a8478)); ft.position.set(0, FOUND / 2, -TH);
+  ft.receiveShadow = true; outline(ft, 0.05); scene.add(ft);
+  // the villagers raise the other three sides to match your wall while the camera circles once
+  var starts = [0, 1.0, 1.8, 2.5];
+  for (var f = 1; f <= 3; f++) for (var r = 1; r <= S.towerStart; r++) for (var s = 0; s < S.perFace; s++) {
+    var idx = wallAdd(r, s, S.perFace, "normal", (r * 31 + s * 7 + f * 101) % 997, f, f * S.perFace + s);
+    if (idx >= 0) { setBrickMatrix(idx, 0, 0.0001, 0.0001); animBrick(idx, "land", starts[f] + (r - 1) * 0.15 + s * 0.035, 0.32); }
+  }
+  for (var q = 0; q < 3; q++) setTimeout(function () { snd.row(true); crowdCheer(1.2); }, (starts[q + 1] + 0.4) * 1000);
+  CAM.mode = "tower"; W3.towerCut = 0;
+  snd.fanfare(); crowdCheer(2);
+  banner("BUILD THE TOWER", "THE TOWN RAISED THE OTHER SIDES · NOW BUILD UP");
+  setTimeout(function () {
+    CAM.mode = "play"; W3.orbitAng = W3.orbitT = Math.PI * 2;
+    toast("Lay each side — the camera walks you around the tower.", 3600); renderHUD();
+  }, TOWER_CUT * 1000);
+  renderHUD();
+}
 function completeCourse() {
-  var clean = S.rowMisses === 0, bonus = rowBonus(clean), done = S.courses + 1;
+  var clean = S.rowMisses === 0, done = S.courses + 1, bonus = done >= PAY_FROM_ROW ? rowBonus(S.rowMisses === 0) : 0, isNew = done > S.best;
   S.courses++; S.inCourse = 0; S.scUsed = 0; S.rowMisses = 0;
+  if (S.tower) { S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace; fleeAllHands(); whenLanded(function () { snd.whoosh(); }); }
+  if (isNew) S.best = S.courses;
   credit(bonus);
   whenLanded(function () { rowFx(done, bonus, clean); });
-  if (S.courses === 1) {
-    enqueueStory("row1");
-    if (!S.workshopShown) {
-      S.workshopShown = true;
-      revealEl($("btn-shop")); revealEl($("hud-course"));
-      $("btn-shop").classList.add("shop-pulse");
-      enqueueHint("shop", "The WORKSHOP is open — spend coins on upgrades.", "btn-shop", true);
-    }
-  }
-  else if (S.courses === 5) enqueueStory("c5");
-  else if (S.courses === 10) enqueueStory("c10");
-  else if (S.courses === 25) enqueueStory("c25");
-  else if (S.courses === 40) enqueueStory("c40");
-  if (S.courses === LEAD_COURSE && !S.leadUnlocked) { S.leadUnlocked = true; enqueueReveal("lead"); }
-  if (S.courses === WIND_COURSE && !S.windOn) { S.windOn = true; S.wind.flipAt = S.time + 10; enqueueReveal("wind"); }
-  if (S.courses % 10 === 0) whenLanded(function () { banner("COURSE " + S.courses, "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE"); });
-  else if (S.courses === 49) toast("Course 49 — one more.", 3000);
+  if (isNew) milestone(S.courses);
+  updateHazards();
   renderHUD(); checkUnlocks();
-  if (S.courses >= WIN_COURSES && !S.won) { S.won = true; whenLanded(startVictory); }
 }
 function rowFx(row, bonus, clean) {
   rowWave(row);
   var y = rowY(row), sp = toScreen(0, y + 0.4, BD / 2);
-  popText("ROW! +$" + fmt(bonus), sp.x, sp.y - 34, { cls: "green", size: 24, dur: 1150, rise: 42 });
+  popText(bonus > 0 ? "ROW! +$" + fmt(bonus) : "ROW DONE!", sp.x, sp.y - 34, { cls: "green", size: 24, dur: 1150, rise: 42 });
   if (clean) popText("CLEAN ROW ×2", sp.x, sp.y - 6, { cls: "gold", size: 16, dur: 1100, rise: 34, delay: 120 });
-  moneyFloat(bonus, null);
+  if (bonus > 0) { moneyFloat(bonus, null); spawnCoins(clean ? 12 : 8, sp); }
   snd.row(clean); camShake(0.28); camPunch(1.4); popEl($("hud-course-num"));
-  for (var k = 0; k < 4; k++) emitPuffs(-WALL_W / 2 + k * WALL_W / 3, y - BH / 2, BD / 2, 3, 0xe9dcc2, 0.6);
+  for (var k = 0; k < 4; k++) emitPuffs(-FW() / 2 + k * FW() / 3, y - BH / 2, BD / 2, 3, 0xe9dcc2, 0.6);
   crowdCheer(1.2);
   if (row > 1) {
     emitConfetti(0, y + 3, 1.5, clean ? 46 : 22, 5);
@@ -1860,79 +2376,33 @@ function rowFx(row, bonus, clean) {
 }
 
 /* ---------------- APPRENTICE (auto-layer) ---------------- */
+function apprPulse() {                // 0..1 flash at 1s, 0.5s and 0.25s before the placement
+  var ps = [1, 0.5, 0.25], best = 0;
+  for (var i = 0; i < 3; i++) { var d = ps[i] - AT.rem; if (d >= 0 && d < 0.16) best = Math.max(best, 1 - d / 0.16); }
+  return best;
+}
 function tickApprentice(dt) {
-  if (S.tier.autoLayer <= 0 || CAM.mode === "victory") return;
-  var plain = plainCount();
+  if (S.tier.autoLayer <= 0 || CAM.mode === "victory") { AT.on = false; return; }
+  var plain = plainCount(), int = autoLayInt();
   var idle = S.time - S.lastAct > 1.8 && !S.held;
   var go = plain > 0 && (idle || plain >= 4);
   if (go) {
-    S.layAcc += dt / autoLayInt();
+    var slots = Math.max(1, perFace() - curSlot());
+    AT.n = Math.min(autoLayBatch(), plain, slots);
+    S.layAcc += dt / int;
+    AT.rem = Math.max(0, (1 - S.layAcc) * int);
+    AT.on = AT.rem <= 1;                                   // the slot glows for the last second
+    var th = [1, 0.5, 0.25];
+    while (AT.pulsed < 3 && AT.rem <= th[AT.pulsed]) { tone(520 + AT.pulsed * 170, 0.07, "triangle", 0.07); AT.pulsed++; }
     if (S.layAcc >= 1) {
-      S.layAcc -= 1;
-      for (var i = 0; i < S.stack.length; i++) if (S.stack[i].type === "normal") {
+      S.layAcc -= 1; AT.pulsed = 0; AT.on = false;
+      for (var k = 0; k < AT.n; k++) for (var i = 0; i < S.stack.length; i++) if (S.stack[i].type === "normal") {
         var it = S.stack.splice(i, 1)[0];
         placeBrick(it, true, 2, null, null);
         break;
       }
     }
-  } else if (plain === 0) S.layAcc = 0;
-}
-
-/* ---------------- COMBO STASH CASCADES ----------------
-   Chasing high combos is the endgame. When a live streak reaches a
-   threshold, the stash pays out in rapid succession — and every cascade
-   brick is a successful placement, so the combo keeps climbing instead
-   of resetting. Stash order is LIFO: stack.pop() takes the newest brick
-   first, exactly like the crane. Thresholds: 25 -> 5 bricks, 50 -> 10,
-   100 -> 25, 250 -> ALL, then every 100 past 250 (350, 450, ...) -> ALL.
-   A threshold only counts as fired once its cascade actually places a
-   brick; an empty stash leaves it armed for later. */
-function cascadeCountFor(streak) {
-  if (streak >= 250) return Infinity;
-  if (streak >= 100) return 25;
-  if (streak >= 50) return 10;
-  if (streak >= 25) return 5;
-  return 0;
-}
-function nextThresholdAfter(t) {
-  if (t < 25) return 25;
-  if (t < 50) return 50;
-  if (t < 100) return 100;
-  if (t < 250) return 250;
-  return t + 100;
-}
-function checkCascade() {
-  if (G.cascadeActive || !S.started) return;
-  var t = 25;
-  while (t <= S.streak) {
-    if (!G.cascadeFired[t]) {
-      if (S.stack.length === 0) return;
-      startCascade(t);
-      return;
-    }
-    t = nextThresholdAfter(t);
-  }
-}
-function startCascade(t) {
-  G.cascadeFired[t] = true;
-  var n = cascadeCountFor(t);
-  var take = (n === Infinity) ? S.stack.length : Math.min(n, S.stack.length);
-  G.cascadeQueue = [];
-  for (var i = 0; i < take; i++) G.cascadeQueue.push(S.stack.pop());
-  G.cascadeT = 0; G.cascadeActive = true;
-  toast("CASCADE x" + S.streak + " — " + take + " bricks!", 2400);
-  snd.cheer(true);
-}
-function tickCascade(dt) {
-  if (!G.cascadeActive) return;
-  if (G.cascadeQueue.length === 0) { G.cascadeActive = false; checkCascade(); return; }
-  G.cascadeT += dt;
-  while (G.cascadeT >= 0.09 && G.cascadeQueue.length > 0) {
-    G.cascadeT -= 0.09;
-    var it = G.cascadeQueue.shift();
-    placeBrick(it, "cascade", 2, freeBrick(it.type, it.seed), null);
-  }
-  if (G.cascadeQueue.length === 0) { G.cascadeActive = false; checkCascade(); }
+  } else { AT.on = false; AT.pulsed = 0; if (plain === 0) S.layAcc = 0; }
 }
 
 /* ---------------- HOT FUSES ---------------- */
@@ -1968,120 +2438,18 @@ function tickWind(dt) {
   if (S.time >= S.wind.flipAt) { S.wind.dir = -S.wind.dir; S.wind.flipAt = S.time + rand(8, 16); snd.whoosh(); }
 }
 
-/* ---------------- THE HAND ----------------
-   Main-game hazard, gated HARD on the course-25 story beat: the hand can
-   never appear before S.beats.c25 is set (that beat is enqueued when
-   course 25 completes, and story beats are never re-shown). It never
-   appears after the win, or in endless mode.
-   Timing: first hand 20-35s after arming; later hands every 45-75s after
-   the previous one resolves. Telegraph 2.5s (hand descends + warning),
-   then a 6s grab window: any brick YOU drop yourself (a manual hit)
-   lands on its fingers and drives it off. Apprentice and cascade bricks
-   do not count. If the window expires undefended: 50% tear 1 course,
-   25% tear 2 courses, 25% it only snatches a few loose bricks (no course
-   lost). Torn courses cost progress only: money already earned stays,
-   and the partial row being built is lost with the collapse. */
-var HAND = { mode: "off", t: 0, nextAt: 0 };
-function handArmed() { return !!S.beats.c25 && !S.won && !S.endless; }
-function handSetVisual(mode) {
-  var h = $("hand-alert"); if (!h) return;
-  h.className = "hand-alert " + mode;
-}
-function handScheduleNext() { HAND.nextAt = S.time + rand(45, 75); }
-function handStartTelegraph() {
-  HAND.mode = "telegraph"; HAND.t = 0;
-  toast("A HAND reaches for the wall — land a brick to fight it off!", 3000);
-  handSetVisual("telegraph");
-  snd.whoosh();
-}
-function handStartGrab() {
-  HAND.mode = "grab"; HAND.t = 0;
-  handSetVisual("grab");
-  toast("It's got the wall! Land a brick NOW!", 2600);
-}
-function handRetreat() {
-  HAND.mode = "retreat";
-  handSetVisual("retreat");
-  setTimeout(function () { HAND.mode = "idle"; handSetVisual("idle"); }, 1200);
-}
-function handFightOff() {
-  bigWord("FOUGHT OFF!", "gold"); snd.cheer(true); crowdCheer(1.5);
-  toast("You drove the hand off!", 2600);
-  handScheduleNext();
-  handRetreat();
-}
-function handResolve() {
-  var r = Math.random();
-  if (r < 0.50) handTear(1);
-  else if (r < 0.75) handTear(2);
-  else toast("The hand snatches a few loose bricks and withdraws.", 3000);
-  handScheduleNext();
-  handRetreat();
-}
-function handTear(n) {
-  var torn = tearCourses(n);
-  if (torn > 0) {
-    bigWord("THE WALL CRUMBLES!"); camShake(0.7); snd.crash();
-    toast("The hand tore down " + torn + (torn > 1 ? " courses!" : " course!"), 3200);
-  } else {
-    toast("The hand grabs at the wall but finds nothing solid.", 2600);
-  }
-}
-function tearCourses(n) {
-  var torn = Math.min(n, S.courses);
-  if (torn <= 0) return 0;
-  var keepRow = S.courses - torn;
-  var kept = [], fx = 0;
-  for (var i = 0; i < BRICKS.length; i++) {
-    var b = BRICKS[i];
-    if (b.row <= keepRow) kept.push(b);
-    else if (fx++ < 24) emitChips(b.x, b.y, BD / 2, 0xc2502c, 1, 1);
-  }
-  BRICKS.length = 0;
-  for (var j = 0; j < kept.length; j++) BRICKS.push(kept[j]);
-  W3.wall.count = W3.wallOut.count = BRICKS.length;
-  W3.golds = [];
-  for (var k = 0; k < BRICKS.length; k++) {
-    W3.wall.setColorAt(k, brickColorHex(BRICKS[k].type, BRICKS[k].seed));
-    setBrickMatrix(k);
-    if (BRICKS[k].type === "gold") W3.golds.push(k);
-  }
-  W3.wall.instanceColor.needsUpdate = true;
-  ANIMS.length = 0;
-  S.courses = keepRow; S.inCourse = 0; S.rowMisses = 0; S.scUsed = 0;
-  renderHUD();
-  return torn;
-}
-function tickHand(dt) {
-  if (!handArmed()) {
-    if (HAND.mode !== "off") { HAND.mode = "off"; handSetVisual("off"); }
-    HAND.nextAt = 0;
-    return;
-  }
-  if (!HAND.nextAt) HAND.nextAt = S.time + rand(20, 35);
-  if (HAND.mode === "off" || HAND.mode === "idle") {
-    if (S.time >= HAND.nextAt) handStartTelegraph();
-    return;
-  }
-  if (HAND.mode === "retreat") return;
-  if (HAND.mode === "telegraph") {
-    HAND.t += dt;
-    if (HAND.t >= 2.5) handStartGrab();
-    return;
-  }
-  if (HAND.mode === "grab") {
-    HAND.t += dt;
-    if (HAND.t >= 6) handResolve();
-    return;
-  }
-}
-
 /* ---------------- UNLOCKS & PURCHASES ---------------- */
+function lineOn(id) { for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) return LINES[i].gate(); return false; }
 function checkUnlocks() {
-  if (!S.flags.precisionShown && S.courses >= PRECISION_COURSE) { S.flags.precisionShown = true; toast("PRECISION GEARS unlocked — the crane speeds up as you climb; these slow it down.", 4400); snd.buy(); }
-  if (!S.flags.crowdShown && S.courses >= CROWD_COURSE) { S.flags.crowdShown = true; toast("CROWD FAVOR unlocked — raise your streak cap.", 4000); snd.buy(); }
-  if (!S.flags.plumbShown && S.courses >= PLUMB_COURSE) { S.flags.plumbShown = true; toast("PLUMB LINE unlocked — a wider PERFECT zone.", 3800); snd.buy(); }
-  if (!S.flags.alShown && S.courses >= 5) { S.flags.alShown = true; toast("APPRENTICE for hire — they lay plain bricks while you rest.", 4000); snd.buy(); }
+  var b = S.best;
+  if (!S.workshopShown) return;
+  if (!S.flags.precisionShown && b >= PRECISION_COURSE) { S.flags.precisionShown = true; toast("PRECISION GEARS unlocked — the crane speeds up as you climb; these slow it down.", 4400); snd.buy(); }
+  if (!S.flags.crowdShown && lineOn("crowd")) { S.flags.crowdShown = true; toast("CROWD FAVOR unlocked — raise your streak bonus cap.", 4000); snd.buy(); }
+  if (!S.flags.plumbShown && b >= PLUMB_COURSE) { S.flags.plumbShown = true; toast("PLUMB LINE unlocked — a wider PERFECT zone.", 3800); snd.buy(); }
+  if (!S.flags.alShown && lineOn("autoLayer")) { S.flags.alShown = true; toast("APPRENTICE for hire — they lay plain bricks while you rest.", 4000); snd.buy(); }
+  if (!S.flags.glazeShown && b >= HAND_COURSE) { S.flags.glazeShown = true; toast("SLIPPERY GLAZE unlocked — hands take longer to rip a brick free.", 4200); snd.buy(); }
+  if (!S.flags.lanternShown && b >= MIST_COURSE) { S.flags.lanternShown = true; toast("SKY LANTERN unlocked — see the crane through the clouds.", 4200); snd.buy(); }
+  if (!S.flags.levelShown && b >= TREMOR_COURSE) { S.flags.levelShown = true; toast("SPIRIT LEVEL unlocked — calm the tremors.", 4200); snd.buy(); }
 }
 function buyLine(id) {
   var l = null; for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) l = LINES[i];
@@ -2092,57 +2460,76 @@ function buyLine(id) {
   S.money -= cost; S.tier[id]++;
   snd.buy(); haptic(15);
   if (id === "hotMortar") {
-    S.perCourse = 8 - S.tier.hotMortar;
-    refitWallRow(S.courses + 1, S.perCourse);
-    toast("Hot mortar! Rows now take " + S.perCourse + " bricks.", 3400);
-    if (S.inCourse >= S.perCourse) completeCourse();
+    if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
+    else {
+      S.perCourse = 8 - S.tier.hotMortar;
+      refitWallRow(S.courses + 1, S.perCourse);
+      toast("Hot mortar! Rows now take " + S.perCourse + " bricks.", 3400);
+      if (S.inCourse >= S.perCourse) completeCourse();
+    }
   } else if (id === "kilnSpeed" && S.tier.kilnSpeed === 2 && !S.hotUnlocked) {
     S.hotUnlocked = true; S.nextHot = true; enqueueReveal("hot");
-  } else if (id === "kilnSpeed") toast("The kiln bakes faster now.", 2600);
-  else if (id === "autoKiln") toast("Auto-kiln! The kiln bakes on its own now.", 3400);
-  else if (id === "bellows") toast("Bellows: stoking bakes ×" + stokeMult() + " faster.", 3000);
+  } else if (id === "kilnSpeed") toast("The kiln bakes faster while you hold it.", 2600);
+  else if (id === "perBrick") toast("Piece Work! Every brick you lay now pays.", 3200);
+  else if (id === "combo") toast("Combos on — land hits in a row for a streak bonus. Don't break it!", 3600);
+  else if (id === "bellows") toast("Banked Coals: the kiln keeps baking at " + Math.round(COALS[S.tier.bellows] * 100) + "% when you let go.", 3400);
   else if (id === "steady") toast(S.tier.steady >= 3 ? "ALMOST RING live — near misses swing again." : "Steady hands — the green zone on the crane is wider.", 3200);
-  else if (id === "autoLayer") toast(S.tier.autoLayer === 1 ? "Your apprentice lays plain bricks when you pause or your hand overflows." : "Your apprentice works faster.", 3600);
+  else if (id === "autoLayer") toast("Apprentice hired! Watch the slot glow — then they lay it.", 3600);
+  else if (id === "fasterApp") toast("Faster apprentices — a trip every " + AL_INT[S.tier.fasterApp] + "s.", 3000);
+  else if (id === "moreApp") toast("More apprentices — " + autoLayBatch() + " bricks per trip.", 3000);
+  else if (id === "predictable") toast("Predictable Placement: the crane now brings each brick in from a set distance.", 3600);
   else if (id === "secondChance") toast("Second Chance " + S.tier.secondChance + " — misses forgiven, streaks kept.", 3200);
   else if (id === "precision") toast("Precision gears: the crane slows down.", 3000);
   else if (id === "gilded") toast(GILD_PCT[S.tier.gilded] + "% of bricks now come out golden — ×3 pay.", 3400);
   else if (id === "plumb") toast("Plumb line: the white PERFECT strip is wider.", 3000);
-  else if (id === "crowd") toast("The crowd roars — streak cap now ×" + multCap() + ".", 3200);
+  else if (id === "crowd") toast("The crowd roars — streak bonus now caps at ×" + fmtMult(multCap()) + ".", 3200);
+  else if (id === "glaze") toast("Slippery glaze: hands now need " + grabTime() + "s to rip a brick free.", 3400);
+  else if (id === "lantern") toast("The lantern burns through — the clouds thin out.", 3200);
+  else if (id === "level") toast("Spirit level: the tremors shrink.", 3000);
   renderHUD();
   var nr = $("upg-" + id); if (nr) { nr.classList.remove("bought"); void nr.offsetWidth; nr.classList.add("bought"); }
 }
 
 /* ---------------- VICTORY ---------------- */
 function startVictory() {
-  CAM.mode = "victory"; CAM.victory = 0;
+  CAM.mode = "victory"; CAM.victory = 0; clearHands();
   snd.fanfare(); setTimeout(snd.fanfare, 400); setTimeout(function () { snd.cheer(true); }, 800);
   crowdCheer(6);
   var y = workY();
   for (var k = 0; k < 6; k++) (function (k) { setTimeout(function () { firework(rand(-7, 7), y + rand(4, 10), rand(-6, -1)); snd.boom(); }, k * 260); })(k);
   emitConfetti(0, y + 4, 2, 120, 6);
   setTimeout(function () { flashScreen(1, 0.9); }, 1400);
-  setTimeout(showVictory, 1900);
+  setTimeout(function () { enqueueSeq(["c100a", "c100b", "c100c"]); }, 1900);
 }
 
 /* ---------------- per-frame crane visuals ---------------- */
 function updateCraneVisual(dt, rt) {
-  var r = S.courses + 1, per = S.perCourse, wy = rowY(r);
+  var r = S.courses + 1, per = perFace(), wy = rowY(r);
   var targetBeamY = wy + 2.15;
   W3.craneY = damp(W3.craneY, targetBeamY, 6, dt);
   W3.crane.position.set(0, W3.craneY, 0);
-  var bandW = Math.max(0.05, 2 * hitTol() * WALL_W);
-  var tx = slotX(r, Math.min(S.inCourse, per - 1), per);
+  var bandW = Math.max(0.05, 2 * hitTol() * FW());
+  var tx = slotX(r, Math.min(curSlot(), per - 1), per);
   var playing = S.started && CAM.mode !== "victory";
   W3.band.visible = W3.perfBand.visible = W3.marker.visible = playing;
-  W3.band.scale.x = bandW; W3.band.position.x = tx;
-  W3.perfBand.scale.x = Math.max(0.04, 2 * perfectTol() * WALL_W); W3.perfBand.position.x = tx;
-  W3.ringBand.visible = playing && S.tier.steady >= 3; W3.ringBand.scale.x = 2 * almostTol() * WALL_W; W3.ringBand.position.x = tx;
-  W3.marker.position.x = tx; W3.marker.position.y = 0.38 + Math.sin(rt * 6) * 0.05;
+  var sw = swayOff() * FW();               // the tremor slides the whole drop zone
+  W3.band.scale.x = bandW; W3.band.position.x = tx + sw;
+  W3.perfBand.scale.x = Math.max(0.04, 2 * perfectTol() * FW()); W3.perfBand.position.x = tx + sw;
+  W3.ringBand.visible = playing && S.tier.steady >= 3; W3.ringBand.scale.x = 2 * almostTol() * FW(); W3.ringBand.position.x = tx + sw;
+  W3.marker.position.x = tx + sw; W3.marker.position.y = 0.38 + Math.sin(rt * 6) * 0.05;
   // ghost slot
   var gy = wy;
   W3.ghost.visible = playing;
-  W3.ghost.position.set(tx, gy, 0); W3.ghost.scale.set(WALL_W / per - GAP, 1, 1);
+  W3.ghost.position.set(tx, gy, 0); W3.ghost.scale.set(FW() / per - GAP, 1, 1);
   W3.ghost.material.opacity = 0.22 + 0.16 * (0.5 + 0.5 * Math.sin(rt * 7));
+  var apl = apprPulse();
+  for (var ai = 0; ai < W3.aGhost.length; ai++) {
+    var ag = W3.aGhost[ai], aon = playing && AT.on && ai < AT.n;
+    ag.visible = aon; if (!aon) continue;
+    ag.position.set(slotX(r, curSlot() + ai, per), wy, 0.03);
+    ag.scale.set(FW() / per - GAP + 0.06, 1.1 + 0.12 * apl, 1.1 + 0.12 * apl);
+    ag.material.opacity = 0.28 + 0.55 * apl; ag.userData.line.material.opacity = 0.7 + 0.3 * apl;
+  }
   // trolley + hook brick
   var hx = posX(r, C.state === "swing" ? C.pos : 0.5, per);
   if (C.state !== "swing") hx = W3.trolley.position.x ? damp(W3.trolley.position.x, 0, 3, dt) : 0;
@@ -2161,7 +2548,7 @@ function updateCraneVisual(dt, rt) {
     var lean = -C.dir * (0.05 + windAmp() * windGust() * 0.25) * Math.min(1, craneSpeed());
     m.position.set(hx, wy + 1.05 + hop + (1 - lu) * 0.6, 0);
     m.rotation.set(0, 0, lean + Math.sin(rt * 9) * 0.015);
-    m.scale.set((WALL_W / per - GAP) * (0.4 + 0.6 * lu), 0.4 + 0.6 * lu, 1);
+    m.scale.set((FW() / per - GAP) * (0.4 + 0.6 * lu), 0.4 + 0.6 * lu, 1);
     var hot = C.item && C.item.type === "hot";
     if (hot) {
       var urgency = C.item.fuse < 3 ? 1 : 0;
@@ -2183,13 +2570,393 @@ function updateCraneVisual(dt, rt) {
 }
 
 /* =====================================================================
+   HAZARD SCHEDULER — every mechanic, once introduced, keeps coming back.
+   Rows are the row being BUILT (courses + 1). Each story card lands one
+   course before its mechanic first switches on, so the card always leads.
+     wind   rows 21-22, 27-28, 33-34 … (3 rows of every 6 from row 51)
+     hands  a raid after course 25, then every 3rd course (1 → 2 → 3 hands)
+     clouds light from row 41, heavy from row 46 (a lighter row every 4th)
+     tremor rows 66-67, 70-71 … (3 rows of every 4 from row 86)
+     glass  bricks join the kiln roll from row 81 on (random, like lead)
+   ===================================================================== */
+function hazardsFor(row) {
+  return {
+    wind: row > WIND_COURSE && ((row - (WIND_COURSE + 1)) % 6) < (row >= 51 ? 3 : 2),
+    mist: row <= MIST_COURSE ? 0 : row <= HEAVY_MIST_COURSE ? 1 : (((row - (HEAVY_MIST_COURSE + 1)) % 4) === 3 ? 1 : 2),
+    sway: row > TREMOR_COURSE && ((row - (TREMOR_COURSE + 1)) % 4) < (row >= 86 ? 3 : 2)
+  };
+}
+var RETURN_MSG = {
+  wind: "THE WIND IS BACK — watch the arrow", mist: "CLOUDS ROLLING BACK IN",
+  mist2: "THE CLOUDS THICKEN AGAIN", sway: "THE WALL SHUDDERS — follow the zone"
+};
+function announceReturn(kind) {
+  toast(RETURN_MSG[kind], 2600);
+  if (kind === "sway") snd.rumble(); else snd.whoosh();
+}
+function updateHazards() {
+  if (S.flags.rimPending && !S.flags.rimDone) return;       // the course-50 reveal plays out first…
+  if (S.won && !S.endless) return;                          // …and so does the finale
+  var h = hazardsFor(S.courses + 1);
+  if (h.wind !== S.windOn) {
+    S.windOn = h.wind;
+    if (h.wind) {
+      S.wind.flipAt = S.time + rand(6, 11);
+      if (!S.flags.windSeen) { S.flags.windSeen = true; enqueueReveal("wind"); } else announceReturn("wind");
+    }
+  }
+  if (h.mist !== S.mistLevel) {
+    var was = S.mistLevel; S.mistLevel = h.mist;
+    if (h.mist > was) {
+      if (h.mist === 1 && !S.flags.mistSeen) { S.flags.mistSeen = true; enqueueReveal("mist"); }
+      else if (h.mist === 2 && !S.flags.mist2Seen) { S.flags.mist2Seen = true; toast("THE CLOUDS THICKEN — they'll hide the crane for seconds at a time", 3800); snd.whoosh(); }
+      else announceReturn(h.mist === 2 ? "mist2" : "mist");
+    }
+  }
+  if (h.sway !== S.swayOn) {
+    S.swayOn = h.sway;
+    if (h.sway) {
+      if (!S.flags.swaySeen) { S.flags.swaySeen = true; enqueueReveal("tremor"); } else announceReturn("sway");
+      snd.rumble(); camShake(0.3);
+    }
+  }
+}
+
+/* ---------- milestones: story, reveals, raids, banners ---------- */
+var STORY_AT = { 10: "c10", 25: "c25", 30: "c30", 35: "c35", 40: "c40", 45: "c45", 48: "c48", 55: "c55", 60: "c60", 65: "c65", 70: "c70", 75: "c75", 80: "c80", 85: "c85", 90: "c90", 95: "c95" };
+function milestone(n) {
+  if (n === 1) {
+    enqueueStory("row1");
+    revealEl($("hud-course"));
+  }
+  if (n >= 2 && n <= 4) villagersJoin(n);
+  if (n === 5) enqueueSeq(["c5a", "c5b"]);
+  if (STORY_AT[n]) enqueueStory(STORY_AT[n]);
+  if (n === LEAD_COURSE && !S.leadUnlocked) { S.leadUnlocked = true; enqueueReveal("lead"); }
+  if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; enqueueReveal("glass"); }
+  if (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0) queueRaid(n);
+  if (n % 10 === 0 && n !== FIRST_GOAL && n !== FINAL_GOAL) whenLanded(function () { banner("COURSE " + n, perBrickOn() ? "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE" : "PAY RAISE · ROW BONUS NOW $" + rowBonus(true)); });
+  else if (n === FIRST_GOAL - 1 || n === FINAL_GOAL - 1) toast("Course " + n + " — one more.", 3000);
+  if (n === FIRST_GOAL && !S.flags.rimStarted) { S.flags.rimPending = true; whenLanded(startRim); }
+  if (n >= FINAL_GOAL && !S.won) { S.won = true; whenLanded(startVictory); }
+}
+
+/* ---------- the rim (course 50) — not the end ---------- */
+function startRim() {
+  S.flags.rimStarted = true;
+  CAM.mode = "rim"; releaseKiln(); clearHands();
+  snd.fanfare(); setTimeout(snd.fanfare, 380); crowdCheer(5);
+  var y = workY();
+  for (var k = 0; k < 5; k++) (function (k) { setTimeout(function () { firework(rand(-6, 6), y + rand(4, 9), rand(-6, -1)); snd.boom(); }, k * 240); })(k);
+  emitConfetti(0, y + 4, 2, 100, 6);
+  setTimeout(function () { flashScreen(0.7, 0.8); }, 1300);
+  setTimeout(function () { snd.rumble(); camShake(0.6); vignette("miss"); }, 2000);
+  setTimeout(function () { enqueueSeq(["c50a", "c50b", "c50c", "c50d"]); }, 2500);
+}
+function finishRim() {
+  S.flags.rimDone = true; S.flags.rimPending = false; CAM.mode = "play"; S.goal = FINAL_GOAL;
+  flashScreen(0.45, 0.6); snd.fanfare(); camPunch(3);
+  banner("THE GOAL MOVES", "50 WAS NEVER THE END · BUILD TO COURSE 100");
+  popEl($("hud-goal")); renderHUD();
+  updateHazards();
+}
+
+/* ---------- debris: bricks that come down with a grabbed brick ---------- */
+var DEB = [];
+function buildDebris() {
+  for (var i = 0; i < 28; i++) {
+    var m = new THREE.Mesh(W3.brickGeo, toon(0xc2502c)); m.castShadow = true; outline(m, OUTLINE); m.visible = false; scene.add(m);
+    DEB.push({ mesh: m, busy: false, t: 0, delay: 0, col: 0xc2502c });
+  }
+}
+function spawnDebris(b, frac) {
+  var d = null; for (var i = 0; i < DEB.length; i++) if (!DEB[i].busy) { d = DEB[i]; break; }
+  if (!d) return;
+  d.busy = true; d.t = 0; d.delay = frac * 0.35; d.mesh.visible = true;
+  d.mesh.material.color.copy(brickColorHex(b.type, b.seed)); d.col = d.mesh.material.color.getHex();
+  var fa = (b.face || 0) * Math.PI / 2;
+  d.mesh.scale.set(b.sx, 1, 1); faceToWorld(b.face, b.x, b.y, 0, d.mesh.position); d.mesh.rotation.set(0, fa, b.rot || 0);
+  var lvx = rand(-1.6, 1.6) + b.x * 0.18, lvz = rand(0.8, 3.4);
+  d.vx = lvx * Math.cos(fa) + lvz * Math.sin(fa); d.vy = rand(0.2, 2.6); d.vz = -lvx * Math.sin(fa) + lvz * Math.cos(fa); d.rx = rand(-5, 5); d.rz = rand(-3, 3);
+}
+function tickDebris(dt) {
+  for (var i = 0; i < DEB.length; i++) {
+    var d = DEB[i]; if (!d.busy) continue;
+    d.t += dt; if (d.t < d.delay) continue;
+    var m = d.mesh; d.vy -= 24 * dt;
+    m.position.x += d.vx * dt; m.position.y += d.vy * dt; m.position.z += d.vz * dt;
+    m.rotation.x += d.rx * dt; m.rotation.z += d.rz * dt;
+    if (m.position.y < 0.35 || d.t > 4) {
+      if (m.position.y < 1) { EMIT_WORLD = true; emitChips(m.position.x, 0.3, m.position.z, d.col, 8, 1); emitPuffs(m.position.x, 0.2, m.position.z, 4, 0xd8cdb8, 0.6); EMIT_WORLD = false; if (Math.random() < 0.4) snd.clink(); }
+      d.busy = false; m.visible = false;
+    }
+  }
+}
+
+/* ---------- the hands ----------
+   A raid sends a hand down the wall to clamp onto a brick in the top finished
+   row. ~10s later it rips that brick away and EVERYTHING laid after it falls.
+   Land a brick on the hand first and it is smashed. A red outline marks the
+   slot that covers the hand. */
+var HANDS = [], HAND_ARRIVE = 1.7, HAND_SCALE = 1.35;   // huge pale hands
+function buildHands() { for (var n = 0; n < 3; n++) HANDS.push(makeHand()); }
+function makeHand() {
+  var g = new THREE.Group(); g.visible = false; scene.add(g);
+  var skin = toon(0xf1d0b4), sleeve = toon(0x2d2557), cuff = toon(0x6a5cc0);
+  var h = { g: g, fingers: [], active: false, state: "off", t: 0, timer: 0, grabT: GRAB_TIME, brick: null, bi: -1, row: 0, x: 0, topY: 0, iFirst: 0, per: 8, scale: 1, creakT: 0, lastSec: 99 };
+  add(g, roundedBox(0.98, 0.3, 0.74, 0.1, 2), skin, 0, 0, 0, 0.035);
+  var fx = [-0.33, -0.11, 0.11, 0.33], fl = [0.2, 0.26, 0.24, 0.18];
+  for (var i = 0; i < 4; i++) {
+    var pv = new THREE.Group(); pv.position.set(fx[i], 0.02, 0.27); g.add(pv);
+    var g1 = new THREE.CapsuleGeometry(0.095, fl[i], 3, 8); g1.rotateX(Math.PI / 2);
+    add(pv, g1, skin, 0, 0, fl[i] / 2 + 0.05, 0.03);
+    var tip = new THREE.Group(); tip.position.set(0, 0, fl[i] + 0.1); pv.add(tip);
+    var g2 = new THREE.CapsuleGeometry(0.085, 0.2, 3, 8); g2.rotateX(Math.PI / 2);
+    add(tip, g2, skin, 0, 0, 0.14, 0.03);
+    h.fingers.push({ pv: pv, tip: tip });
+  }
+  var th = new THREE.Group(); th.position.set(-0.5, 0, 0.1); th.rotation.y = 0.35; g.add(th); h.thumb = th;
+  var gT = new THREE.CapsuleGeometry(0.1, 0.3, 3, 8); gT.rotateX(Math.PI / 2); add(th, gT, skin, 0, 0, 0.25, 0.03);
+  var arm = new THREE.Group(); arm.position.set(0, 0.28, -0.3); g.add(arm); h.arm = arm;
+  add(arm, new THREE.CylinderGeometry(0.4, 0.44, 90, 10), sleeve, 0, 45, 0, 0.05);
+  add(arm, new THREE.CylinderGeometry(0.52, 0.52, 0.34, 12), cuff, 0, 0.05, 0, 0.04);
+  h.carry = new THREE.Mesh(W3.brickGeo, toon(0xc2502c)); outline(h.carry, OUTLINE);
+  h.carry.visible = false; g.add(h.carry);
+  var bar = new THREE.Group(); bar.position.set(0, 1.05, 0.5); g.add(bar); h.bar = bar;
+  var bg = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.22), new THREE.MeshBasicMaterial({ color: INK, depthTest: false, transparent: true })); bg.renderOrder = 40; bar.add(bg);
+  h.fill = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.13), new THREE.MeshBasicMaterial({ color: 0xff5a3a, depthTest: false, transparent: true })); h.fill.position.z = 0.01; h.fill.renderOrder = 41; bar.add(h.fill);
+  h.mark = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, BH + 0.08, BD + 0.08)), new THREE.LineBasicMaterial({ color: 0xff4a3a, transparent: true }));
+  h.markFill = new THREE.Mesh(new THREE.BoxGeometry(1, BH, BD), new THREE.MeshBasicMaterial({ color: 0xff4a3a, transparent: true, opacity: 0.3, depthWrite: false }));
+  h.arrow = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.42, 3), new THREE.MeshBasicMaterial({ color: 0xff3b2a })); h.arrow.rotation.z = Math.PI; outline(h.arrow, 0.04);
+  h.mark.visible = h.markFill.visible = h.arrow.visible = false; scene.add(h.mark); scene.add(h.markFill); scene.add(h.arrow);
+  return h;
+}
+function poseHand(h, grip) {
+  var a = lerp(0.12, 1.4, grip);
+  for (var i = 0; i < 4; i++) { h.fingers[i].pv.rotation.x = a + i * 0.03; h.fingers[i].tip.rotation.x = a * 0.55; }
+  h.thumb.rotation.x = lerp(0.1, 1.15, grip);
+}
+function tintBrick(h, k) {
+  if (!h.brick || BRICKS[h.bi] !== h.brick) return;
+  brickColorHex(h.brick.type, h.brick.seed); _c2.copy(_c);
+  _c.set(0xff3b2a).lerp(_c2, 1 - k);
+  W3.wall.setColorAt(h.bi, _c); W3.wall.instanceColor.needsUpdate = true;
+}
+function untintBrick(h) { tintBrick(h, 0); }
+function handOn(b) { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && HANDS[i].brick === b) return true; return false; }
+function handNeed(h) { return Math.max(1, h.iFirst - curSlot() + 1); }
+function nearestHand() {
+  var best = null;
+  for (var i = 0; i < HANDS.length; i++) { var h = HANDS[i]; if (h.active && (h.state === "arrive" || h.state === "grip") && (!best || h.timer < best.timer)) best = h; }
+  return best;
+}
+function handCount() { var n = 0; for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && (HANDS[i].state === "arrive" || HANDS[i].state === "grip")) n++; return n; }
+function handNMax() {
+  var cap = clamp(2 + Math.floor((S.courses - HAND_COURSE) / 12), 2, 7);          // how far ahead a hand may sit
+  var inHand = S.stack.length + (C.item ? 1 : 0);
+  var perBrick = Math.max(bakeTime() * 0.95, 1.15);
+  var feasible = inHand + Math.floor(grabTime() * 0.8 / perBrick);               // never ask the impossible
+  return Math.max(1, Math.min(cap, feasible));
+}
+function pickHandTarget(nMax) {
+  var R = S.courses; if (R < 1 || G.falls > 0) return null;
+  var per = perFace(), w = FW() / per, cands = [], cs = curSlot(), cf = curFace();
+  for (var i = BRICKS.length - 1; i >= 0; i--) {
+    var b = BRICKS[i]; if (b.row < R) break;
+    if (b.row !== R || b.per !== per || (b.face || 0) !== cf || handOn(b)) continue;
+    var first = -1;
+    for (var s = 0; s < per; s++) if (Math.abs(slotX(R + 1, s, per) - b.x) < 0.72 * w) { first = s; break; }
+    if (first < 0 || first < cs) continue;
+    var n = first - cs + 1;
+    if (n < 1 || n > nMax) continue;
+    cands.push({ brick: b, i: first, bi: i, n: n });
+  }
+  return cands.length ? cands[Math.floor(Math.random() * cands.length)] : null;
+}
+function spawnHand() {
+  var h = null; for (var i = 0; i < HANDS.length; i++) if (!HANDS[i].active) { h = HANDS[i]; break; }
+  if (!h) return false;
+  var first = !S.flags.handDone;
+  var tgt = pickHandTarget(first ? 1 : handNMax());
+  if (!tgt && first) tgt = pickHandTarget(2);
+  if (!tgt) return false;
+  S.flags.handDone = true;
+  h.active = true; h.state = "arrive"; h.t = 0; h.brick = tgt.brick; h.bi = tgt.bi; h.row = tgt.brick.row; h.x = tgt.brick.x;
+  h.iFirst = tgt.i; h.per = perFace(); h.face = curFace();
+  h.scale = clamp((FW() / h.per) / 1.0, 0.9, 1.4) * HAND_SCALE;
+  h.topY = rowY(h.row) + BH / 2 + 0.15 * h.scale + 0.02;
+  h.grabT = grabTime() + rand(-0.6, 0.6); h.timer = h.grabT; h.lastSec = 99; h.creakT = 0.5;
+  h.carry.scale.set(tgt.brick.sx / h.scale, 1 / h.scale, 1 / h.scale); h.carry.position.set(0, -(0.15 * h.scale + BH / 2) / h.scale, 0.02 / h.scale);
+  h.g.visible = true; h.g.scale.setScalar(h.scale); h.g.position.set(h.x, h.topY + 16, 0.05); h.g.scale.y = h.scale;
+  h.carry.visible = false; poseHand(h, 0.05);
+  var mx = slotX(h.row + 1, h.iFirst, h.per);
+  h.mx = mx; h.my = rowY(h.row + 1);
+  h.mark.position.set(mx, rowY(h.row + 1), 0); h.mark.scale.set(FW() / h.per - GAP, 1, 1);
+  h.markFill.position.copy(h.mark.position); h.markFill.scale.copy(h.mark.scale);
+  h.mark.visible = h.markFill.visible = h.arrow.visible = true;
+  snd.whoosh(); setTimeout(snd.warn, 150); bigWord("HAND!"); camShake(0.12);
+  return true;
+}
+function queueRaid(n) { S.raid = { left: n < 55 ? 1 : n < 80 ? 2 : 3, delay: 0.6 }; }
+function tickRaid(dt) {
+  var r = S.raid; if (!r) return;
+  if (activeMsg || msgQ.length || G.falls > 0 || CAM.mode !== "play") return;
+  if (!S.flags.handSeen) { S.flags.handSeen = true; enqueueReveal("hand"); return; }
+  r.delay -= dt; if (r.delay > 0) return;
+  if (spawnHand()) { r.left--; r.delay = 1.8; } else r.left = 0;
+  if (r.left <= 0) S.raid = null;
+}
+function fleeAllHands() { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && (HANDS[i].state === "arrive" || HANDS[i].state === "grip")) fleeHand(HANDS[i]); }
+function clearHands() { S.raid = null; for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && (HANDS[i].state === "arrive" || HANDS[i].state === "grip")) fleeHand(HANDS[i]); }
+function fleeHand(h) {
+  if (!h.active || h.state === "flee" || h.state === "yank") return;
+  untintBrick(h); h.state = "flee"; h.t = 0; h.mark.visible = h.markFill.visible = h.arrow.visible = false; h.carry.visible = false;
+}
+function dropHand(h) { h.active = false; h.state = "off"; h.g.visible = false; h.mark.visible = h.markFill.visible = h.arrow.visible = false; }
+function checkHandSmash(b) {
+  for (var i = 0; i < HANDS.length; i++) {
+    var h = HANDS[i]; if (!h.active || (h.state !== "arrive" && h.state !== "grip")) continue;
+    if (h.row + 1 !== b.row || (h.face || 0) !== (b.face || 0)) continue;
+    if (Math.abs(b.x - h.x) < 0.72 * (b.sx + GAP)) smashHand(h);
+  }
+}
+function smashHand(h) {
+  untintBrick(h);
+  h.state = "smash"; h.t = 0; h.mark.visible = h.markFill.visible = h.arrow.visible = false;
+  S.smashed++;
+  var bonus = 10 * rate(); credit(bonus);
+  var sp = toScreen(h.x, h.topY + 0.3, BD / 2);
+  snd.smash(); camShake(0.35); G.hitStop = 0.06; flashScreen(0.12);
+  emitGlow(h.x, h.topY + 0.2, BD / 2 + 0.2, 24, 0xfff2a8, 3.4, 0.7, 0.16, -2);
+  emitPuffs(h.x, h.topY, BD / 2, 6, 0xe9dcc2, 0.7);
+  popText("SMASHED!", sp.x, sp.y - 44, { cls: "gold", size: 26, rot: -5, dur: 1100 });
+  popText("+$" + fmt(bonus), sp.x, sp.y - 14, { cls: "green", size: 20, dur: 1000, delay: 120 });
+  moneyFloat(bonus, null); spawnCoins(6, sp);
+  crowdCheer(1.6); snd.cheer(true);
+}
+function yankHand(h) {
+  var bi = BRICKS.indexOf(h.brick);
+  if (bi < 0) { fleeHand(h); return; }
+  h.state = "yank"; h.t = 0; h.mark.visible = h.markFill.visible = h.arrow.visible = false;
+  h.carry.visible = true; h.carry.material.color.copy(brickColorHex(h.brick.type, h.brick.seed));
+  poseHand(h, 1);
+  collapseFrom(bi);
+}
+// Everything laid after the grabbed brick — and the brick itself — leaves the wall.
+function collapseFrom(bi) {
+  G.gen++;
+  var gone = BRICKS.splice(bi, BRICKS.length - bi), g0 = gone[0];
+  W3.wall.count = W3.wallOut.count = BRICKS.length;
+  W3.wall.instanceMatrix.needsUpdate = W3.wallOut.instanceMatrix.needsUpdate = true;
+  ANIMS = ANIMS.filter(function (a) { return a.i < BRICKS.length; });
+  if (W3.golds) W3.golds = W3.golds.filter(function (i) { return i < BRICKS.length; });
+  S.courses = g0.row - 1; S.inCourse = g0.ci != null ? g0.ci : g0.slot; if (S.tower && g0.row > S.towerStart) { S.perFace = g0.per; S.perCourse = 4 * g0.per; } S.scUsed = 0; S.rowMisses = Math.max(S.rowMisses, 1);
+  S.stolen++; S.lost += gone.length;
+  for (var k = 1; k < gone.length; k++) spawnDebris(gone[k], (k - 1) / Math.max(1, gone.length - 1));
+  breakStreak();
+  snd.collapse(); camShake(0.85); vignette("miss"); haptic([40, 30, 60]);
+  bigWord("TORN AWAY!");
+  toast("A hand tore out a brick — " + gone.length + " came down with it", 3600);
+  crowdCheer(0);
+  renderHUD(); updateHazards();
+}
+function tickHands(dt) {
+  tickRaid(dt);
+  for (var i = 0; i < HANDS.length; i++) {
+    var h = HANDS[i]; if (!h.active) continue;
+    h.t += dt; var g = h.g, u, p;
+    if ((h.state === "arrive" || h.state === "grip") && BRICKS[h.bi] !== h.brick) {
+      h.bi = BRICKS.indexOf(h.brick);
+      if (h.bi < 0) { fleeHand(h); continue; }
+    }
+    if (h.state === "arrive") {
+      u = Math.min(1, h.t / HAND_ARRIVE); var e = 1 - Math.pow(1 - u, 3);
+      g.position.set(h.x + Math.sin(h.t * 3) * 0.3 * (1 - u), lerp(h.topY + 16, h.topY, e), 0.05);
+      h.arm.rotation.z = Math.sin(h.t * 2.4) * 0.05 * (1 - u);
+      poseHand(h, 0.05 + 0.1 * Math.sin(h.t * 7));
+      if (u >= 1) { h.state = "grip"; h.t = 0; snd.grab(); camShake(0.14); emitPuffs(h.x, h.topY - 0.2, BD / 2, 4, 0xe9dcc2, 0.4, 0.6); }
+    } else if (h.state === "grip") {
+      h.timer -= dt;
+      p = 1 - clamp(h.timer / h.grabT, 0, 1);
+      poseHand(h, 0.4 + 0.6 * Math.min(1, p * 1.5));
+      var sh = p * p * 0.06;
+      g.position.set(h.x + (Math.random() * 2 - 1) * sh, h.topY + (Math.random() * 2 - 1) * sh * 0.6, 0.05);
+      tintBrick(h, 0.2 + 0.5 * (0.5 + 0.5 * Math.sin(h.t * (4 + p * 12))));
+      h.creakT -= dt; if (h.creakT <= 0) { snd.creak(); h.creakT = lerp(0.9, 0.18, p); }
+      if (h.timer < 3 && Math.ceil(h.timer) !== h.lastSec) { h.lastSec = Math.ceil(h.timer); snd.warn(); }
+      if (h.timer <= 0 && G.falls === 0) yankHand(h);
+    } else if (h.state === "yank") {
+      var yt = Math.max(0, h.t - 0.12);
+      g.position.set(h.x, h.topY - 0.15 * Math.min(1, h.t / 0.12) + 60 * yt * yt, 0.05);
+      if (h.t > 1.2) dropHand(h);
+    } else if (h.state === "smash") {
+      u = Math.min(1, h.t / 0.16); g.scale.y = h.scale * lerp(1, 0.16, u);
+      g.position.set(h.x + Math.sin(h.t * 60) * 0.03 * (1 - u), h.topY, 0.05);
+      if (h.t > 0.6) { g.scale.y = h.scale; h.state = "flee"; h.t = 0; h.carry.visible = false; }
+    } else if (h.state === "flee") {
+      g.position.y += (5 + h.t * 55) * dt;
+      if (g.position.y > h.topY + 45) dropHand(h);
+    }
+    if (h.state === "arrive" || h.state === "grip") {
+      var fr = clamp(h.timer / h.grabT, 0, 1);
+      h.fill.scale.x = Math.max(0.001, fr); h.fill.position.x = -0.7 * (1 - fr);
+      h.fill.material.color.setHex(fr < 0.3 ? 0xff2a1a : fr < 0.6 ? 0xffa22e : 0xffd94d);
+      h.bar.visible = true;
+      var mp = 0.5 + 0.5 * Math.sin(h.t * 8);
+      h.mark.material.opacity = 0.5 + 0.5 * mp; h.markFill.material.opacity = 0.2 + 0.3 * mp;
+      h.arrow.position.set(h.mx, h.my + 0.62 + Math.sin(h.t * 7) * 0.09, 0.42);
+    } else h.bar.visible = false;
+  }
+}
+
+/* ---------- cloud banks that drift across the work site ----------
+   Light from row 41, heavy from row 46. They hide the crane and the drop
+   zone; the Sky Lantern thins them. Purely visual — taps always work. */
+var MIST_BANKS = 8, MIST_PUFFS = 5;
+function buildMist() {
+  W3.mistMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, fog: false });
+  W3.mistInst = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), W3.mistMat, MIST_BANKS * MIST_PUFFS);
+  W3.mistInst.frustumCulled = false; W3.mistInst.renderOrder = 30; scene.add(W3.mistInst);
+  W3.mistBanks = [];
+  for (var b = 0; b < MIST_BANKS; b++) {
+    var puffs = [];
+    for (var k = 0; k < MIST_PUFFS; k++) puffs.push({ ox: (k - 2) * 1.35 + rand(-0.3, 0.3), oy: rand(-0.35, 0.45) + (k === 2 ? 0.45 : 0), s: rand(1.2, 2.0) * (k === 2 ? 1.2 : 1) });
+    W3.mistBanks.push({ x: rand(-22, 22), yo: rand(0.6, 3.2), z: rand(3.2, 6.5), v: (b % 2 ? 1 : -1) * rand(0.7, 1.7), puffs: puffs, vis: 0, sc: rand(0.9, 1.4) });
+  }
+  W3.mistOp = 0;
+  for (var j = 0; j < MIST_BANKS * MIST_PUFFS; j++) hideInst(W3.mistInst, j);
+}
+function updateMist(dt) {
+  var lvl = (S.started && CAM.mode !== "title") ? S.mistLevel : 0, lan = LANTERN_MULT[S.tier.lantern];
+  var want = lvl === 0 ? 0 : lvl === 1 ? 3 : 6;
+  if (want) want = Math.max(1, Math.ceil(want * lan));
+  var wantOp = (lvl === 0 ? 0 : lvl === 1 ? 0.45 : 0.66) * (0.45 + 0.55 * lan);
+  W3.mistOp = damp(W3.mistOp, wantOp, 1.6, dt);
+  W3.mistMat.opacity = W3.mistOp;
+  var wy = workY(), j = 0;
+  for (var b = 0; b < MIST_BANKS; b++) {
+    var bk = W3.mistBanks[b];
+    bk.vis = damp(bk.vis, b < want ? 1 : 0, 1.4, dt);
+    bk.x += bk.v * dt * (0.7 + lvl * 0.4);
+    if (bk.x > 26) { bk.x = -26; bk.yo = rand(0.6, 3.2); bk.z = rand(3.2, 6.5); }
+    if (bk.x < -26) { bk.x = 26; bk.yo = rand(0.6, 3.2); bk.z = rand(3.2, 6.5); }
+    for (var k = 0; k < MIST_PUFFS; k++, j++) {
+      var p = bk.puffs[k], s = Math.max(0.0001, p.s * bk.sc * bk.vis * (lvl >= 2 ? 1.1 : 1));
+      _m.makeScale(s, s, s); _m.setPosition(bk.x + p.ox * bk.sc, wy + bk.yo + p.oy * bk.sc, bk.z);
+      W3.mistInst.setMatrixAt(j, _m);
+    }
+  }
+  W3.mistInst.instanceMatrix.needsUpdate = true;
+}
+
+/* =====================================================================
    ui.js — HUD, dock, DOM effects, messages, shop, settings, input,
    main loop and the test probe.
    ===================================================================== */
-var UI = { trayPop: 0, traySig: "", shopSig: "", shopNew: {}, moneyShown: 0, streakBreakT: 0, promptTxt: "" };
+var UI = { fly: {}, trayPop: 0, traySig: "", shopSig: "", shopNew: {}, moneyShown: 0, streakBreakT: 0, promptTxt: "" };
 var el = {};
 ["hud-course-num", "hud-goal", "prog-fill", "money-num", "hud-money", "btn-shop", "shop-new", "shop-count", "chip-row", "row-num", "row-in",
- "chip-wind", "wind-arrow", "wind-str", "chip-sc", "streak", "streak-x", "streak-pay", "prompt", "dock", "kiln", "kiln-ring", "kiln-sub",
+ "chip-wind", "wind-arrow", "wind-str", "chip-sc", "chip-hand", "hand-t", "chip-sway", "streak", "streak-x", "streak-pay", "prompt", "dock", "kiln", "kiln-ring", "kiln-sub",
  "tray", "tray-count", "tray-list", "fx", "toast", "banner", "bn-big", "bn-small", "big-word", "reveal", "hr-brick", "hr-title", "hr-text",
  "workshop", "upg-list", "rate-chip", "settings", "story", "story-card", "story-text", "story-kicker", "story-dots", "story-next",
  "hintwrap", "hint-dim", "hint-label", "hint-text", "vignette", "flash", "ov-loading", "ov-start", "ov-victory"].forEach(function (id) {
@@ -2258,26 +3025,40 @@ function banner(big, small) {
 }
 // Coins fly from the landing point into the money pill on a real arc.
 var coinFx = [], coinRaf = null;
+// Coins pop out of the brick in a fountain, hang for a beat, then get sucked into the money pill.
 function spawnCoins(n, from) {
   if (el.hudMoney.classList.contains("hidden") || REDUCED) return;
-  var t = el.hudMoney.getBoundingClientRect(), tx = t.left + t.width / 2, ty = t.top + t.height / 2, now = performance.now();
+  var t = el.hudMoney.getBoundingClientRect(), tx = t.left + t.width / 2 - 9, ty = t.top + t.height / 2 - 9, now = performance.now();
   for (var i = 0; i < n; i++) {
-    if (el.fx.childElementCount > 70 && i > 0) break;
+    if (el.fx.childElementCount > 80 && i > 0) break;
     var c = document.createElement("div"); c.className = "coin"; c.style.opacity = "0"; el.fx.appendChild(c);
-    var sx = from.x + rand(-14, 14), sy = from.y + rand(-6, 6), T = rand(0.55, 0.8), G2 = 1900;
-    coinFx.push({ el: c, x: sx - 7, y: sy - 7, vx: (tx - sx) / T, vy: (ty - sy) / T - 0.5 * G2 * T, g: G2, T: T, start: now + i * 55, spin: rand(0, 6.28) });
+    var ang = -Math.PI / 2 + rand(-1.2, 1.2), spd = rand(140, 300);
+    coinFx.push({ el: c, x0: from.x - 9 + rand(-8, 8), y0: from.y - 9, bvx: Math.cos(ang) * spd, bvy: Math.sin(ang) * spd, tx: tx, ty: ty,
+      start: now + i * 30, B: rand(0.28, 0.4), F: rand(0.4, 0.55), swirl: rand(-45, 45), spin: rand(0, 6.28) });
   }
   if (!coinRaf && coinFx.length) coinRaf = requestAnimationFrame(coinStep);
+}
+function coinGlint(x, y) {
+  var g = document.createElement("div"); g.className = "coin-glint"; g.style.left = x + "px"; g.style.top = y + "px"; el.fx.appendChild(g);
+  var a = g.animate([{ transform: "scale(.3)", opacity: 1 }, { transform: "scale(1.6)", opacity: 0 }], { duration: 260, easing: "ease-out" });
+  fxKill(g, a, 400);
 }
 function coinStep(now) {
   coinRaf = null;
   for (var i = coinFx.length - 1; i >= 0; i--) {
     var c = coinFx[i], t = (now - c.start) / 1000;
     if (t < 0) continue;
-    if (t >= c.T) { if (c.el.parentNode) c.el.parentNode.removeChild(c.el); coinFx.splice(i, 1); snd.clink(); popEl(el.hudMoney); continue; }
-    var x = c.x + c.vx * t, y = c.y + c.vy * t + 0.5 * c.g * t * t, sh = 1 - 0.4 * (t / c.T), flip = Math.abs(Math.cos(c.spin + t * 14));
-    c.el.style.opacity = Math.min(1, t / 0.05).toFixed(2);
-    c.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) scale(" + (sh * Math.max(0.15, flip)).toFixed(3) + "," + sh.toFixed(3) + ")";
+    var px = c.x0 + c.bvx * c.B, py = c.y0 + c.bvy * c.B + 450 * c.B * c.B, x, y, sc;
+    if (t < c.B) { x = c.x0 + c.bvx * t; y = c.y0 + c.bvy * t + 450 * t * t; sc = 0.6 + 0.4 * (t / c.B); }
+    else {
+      var u = (t - c.B) / c.F;
+      if (u >= 1) { if (c.el.parentNode) c.el.parentNode.removeChild(c.el); coinFx.splice(i, 1); snd.clink(); popEl(el.hudMoney); coinGlint(c.tx + 9, c.ty + 9); continue; }
+      var e = u * u * (1.6 - 0.6 * u);                       // ease-in: accelerates into the pill
+      x = lerp(px, c.tx, e) + Math.sin(u * Math.PI) * c.swirl; y = lerp(py, c.ty, e); sc = 1 - 0.35 * u;
+    }
+    var flip = Math.max(0.2, Math.abs(Math.cos(c.spin + t * 15)));
+    c.el.style.opacity = Math.min(1, t / 0.04).toFixed(2);
+    c.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) scale(" + (sc * flip).toFixed(3) + "," + sc.toFixed(3) + ")";
   }
   if (coinFx.length) coinRaf = requestAnimationFrame(coinStep);
 }
@@ -2296,13 +3077,13 @@ function domBurst(x, y) {
   }
 }
 function kilnPuff() {
-  var k = el.kiln; if (!k.animate || REDUCED) return;
-  k.animate([{ transform: "scale(1.08)" }, { transform: "scale(1)" }], { duration: 200, easing: "cubic-bezier(.3,1.6,.5,1)" });
+  var k = el.kiln; if (REDUCED) return;
+  k.classList.remove("gauge-pop"); void k.offsetWidth; k.classList.add("gauge-pop");
 }
 function ember() {
   if (REDUCED || el.fx.childElementCount > 60) return;
   var r = el.kiln.getBoundingClientRect(), e = document.createElement("div");
-  e.className = "ember"; e.style.left = (r.left + r.width * rand(0.3, 0.7)) + "px"; e.style.top = (r.top + r.height * 0.7) + "px";
+  e.className = "ember"; e.style.left = (r.left + r.width * rand(0.66, 0.8)) + "px"; e.style.top = (r.top + r.height * 0.1) + "px";
   el.fx.appendChild(e);
   var anim = e.animate([{ transform: "translate(0,0) scale(1)", opacity: 1 }, { transform: "translate(" + rand(-18, 18) + "px," + (-rand(30, 70)) + "px) scale(.3)", opacity: 0 }], { duration: rand(500, 850), easing: "ease-out" });
   fxKill(e, anim, 1000);
@@ -2315,42 +3096,72 @@ function nudgeKiln() {
 /* ---------------- HUD ---------------- */
 function renderHUD() {
   el.hudCourseNum.textContent = S.courses;
-  el.hudGoal.textContent = S.endless ? "· ENDLESS" : "/ " + WIN_COURSES;
-  el.progFill.style.width = (Math.min(1, S.courses / WIN_COURSES) * 100).toFixed(1) + "%";
+  el.hudGoal.textContent = S.endless ? "· ENDLESS" : "/ " + S.goal;
+  el.progFill.style.width = (Math.min(1, S.courses / S.goal) * 100).toFixed(1) + "%";
   el.rowNum.textContent = S.courses + 1;
-  el.rowIn.textContent = Math.min(S.inCourse, S.perCourse) + "/" + S.perCourse;
+  el.rowIn.textContent = S.tower ? "SIDE " + (curFace() + 1) + "/4 · " + Math.min(curSlot(), S.perFace) + "/" + S.perFace : Math.min(S.inCourse, S.perCourse) + "/" + S.perCourse;
   el.chipSc.classList.toggle("hidden", !(S.started && S.tier.secondChance > 0 && S.scUsed < S.tier.secondChance));
   el.chipSc.textContent = "2ND CHANCE" + (S.tier.secondChance > 1 ? " ×" + (S.tier.secondChance - S.scUsed) : "");
-  el.rateChip.textContent = "RATE $" + rate() + " · CAP ×" + multCap();
+  el.rateChip.textContent = "RATE $" + rate() + (comboOn() ? " · CAP ×" + fmtMult(multCap()) : "");
   renderTray(); renderStreak(false); renderShop(); renderShopBadge();
 }
+function trayShown() { var n = S.stack.length; for (var i = 0; i < S.stack.length; i++) if (UI.fly[S.stack[i].uid]) n--; return n; }
+// a fresh brick arcs from the kiln mouth into the storage bay, then appears on the shelf
+function flyBrick(it) {
+  if (!UI.fly[it.uid]) return;
+  var dest = el.trayList.querySelector('[data-uid="' + it.uid + '"]');
+  if (!dest || !el.fx.animate) { finishFly(it.uid); return; }
+  var kr = el.kiln.getBoundingClientRect(), dr = dest.getBoundingClientRect();
+  var sx = kr.left + kr.width / 2 - 15, sy = kr.top + kr.height * 0.82 - 8, ex = dr.left + dr.width / 2 - 15, ey = dr.top + dr.height / 2 - 8.5;
+  var f = document.createElement("div"); f.className = "tb fly t-" + it.type;
+  if (it.type === "normal") f.style.background = clayCss(it.seed);
+  el.fx.appendChild(f);
+  var mx = (sx + ex) / 2, my = Math.min(sy, ey) - 52;
+  var a = f.animate([
+    { transform: "translate(" + sx + "px," + sy + "px) scale(.5) rotate(-12deg)", opacity: 0 },
+    { transform: "translate(" + sx + "px," + (sy - 14) + "px) scale(1) rotate(-6deg)", opacity: 1, offset: 0.16 },
+    { transform: "translate(" + mx + "px," + my + "px) scale(1.15) rotate(5deg)", opacity: 1, offset: 0.55 },
+    { transform: "translate(" + ex + "px," + ey + "px) scale(1) rotate(0deg)", opacity: 1 }
+  ], { duration: 430, easing: "ease-in-out", fill: "forwards" });
+  var done = function () { if (f.parentNode) f.parentNode.removeChild(f); finishFly(it.uid); };
+  a.onfinish = done; setTimeout(done, 900);
+}
+function finishFly(uid) {
+  if (!UI.fly[uid]) return;
+  delete UI.fly[uid];
+  var node = el.trayList.querySelector('[data-uid="' + uid + '"]'); if (node) node.classList.remove("pend");
+  el.trayCount.textContent = trayShown(); popEl(el.trayCount);
+  el.tray.classList.remove("thunk"); void el.tray.offsetWidth; el.tray.classList.add("thunk");
+  snd.clink();
+}
 function renderTray() {
-  el.trayCount.textContent = S.stack.length;
+  el.trayCount.textContent = trayShown();
   var sig = S.stack.map(function (it) { return it.uid; }).join(",");
   if (sig === UI.traySig) return;
   UI.traySig = sig;
   var html = "", shown = 0, prev = UI.trayUids || {}, now = {};
-  for (var i = S.stack.length - 1; i >= 0 && shown < 7; i--, shown++) {
+  for (var i = S.stack.length - 1; i >= 0 && shown < 8; i--, shown++) {
     var it = S.stack[i]; now[it.uid] = 1;
-    html += '<div class="tb t-' + it.type + (shown === 0 ? " first" : "") + (prev[it.uid] ? "" : " new") + '" data-uid="' + it.uid + '"' + (it.type === "normal" ? ' style="background:' + clayCss(it.seed) + '"' : "") + ">";
+    html += '<div class="tb t-' + it.type + (shown === 0 ? " first" : "") + (UI.fly[it.uid] ? " pend" : prev[it.uid] ? "" : " new") + '" data-uid="' + it.uid + '"' + (it.type === "normal" ? ' style="background:' + clayCss(it.seed) + '"' : "") + ">";
     if (it.type === "hot") html += '<span class="fuse"><i></i></span>';
     html += "</div>";
   }
-  if (S.stack.length > 7) html += '<span class="tb-more">+' + (S.stack.length - 7) + "</span>";
+  if (S.stack.length > 8) html += '<span class="tb-more">+' + (S.stack.length - 8) + "</span>";
   if (!S.stack.length) html = '<div class="tb empty"></div>';
   el.trayList.innerHTML = html; UI.trayUids = now;
-  if (UI.trayPop) popEl(el.trayCount);
+  if (UI.trayPop && !UI.fly[UI.trayPop]) popEl(el.trayCount);
   UI.trayPop = 0;
 }
 function renderStreak(pop) {
   var st = el.streak;
   if (S.streak >= 2) {
-    var m = streakMult(S.streak), cap = multCap();
+    var m = streakMult(S.streak), cap = multCap(), ratio = (m - 1) / Math.max(0.01, cap - 1);
     if (st.classList.contains("hidden") || st.classList.contains("break")) { st.classList.remove("break"); revealEl(st); }
-    el.streakX.textContent = "×" + m;
-    el.streakPay.textContent = m >= cap ? "MAX · $" + fmt(rate() * m) + "/BRICK" : "NEXT $" + fmt(rate() * streakMult(S.streak + 1));
-    st.classList.toggle("warm", m >= 5 && m < 10); st.classList.toggle("hot", m >= 10 && m < cap); st.classList.toggle("maxed", m >= cap);
-    st.style.transform = "scale(" + (1 + Math.min(0.3, (m - 2) * 0.025)).toFixed(3) + ")";
+    el.streakX.textContent = "×" + fmtMult(m);
+    el.streakPay.textContent = m >= cap ? "MAX · $" + fmt(rate() * m) + " / BRICK" : "$" + fmt(rate() * m) + " / BRICK";
+    var sf = $("streak-fill"); if (sf) sf.style.width = (Math.min(1, ratio) * 100).toFixed(0) + "%";
+    st.classList.toggle("warm", ratio >= 0.4 && ratio < 0.8); st.classList.toggle("hot", ratio >= 0.8 && m < cap); st.classList.toggle("maxed", m >= cap);
+    st.style.transform = "scale(" + (1 + Math.min(0.18, ratio * 0.18)).toFixed(3) + ")";
     if (pop) popEl(el.streakX);
   } else if (!st.classList.contains("break")) st.classList.add("hidden");
 }
@@ -2394,13 +3205,14 @@ el.upgList.addEventListener("click", function (e) { var b = e.target.closest("[d
 
 // Per-frame UI: money roll, kiln ring, fuses, prompt, wind chip.
 function uiFrame(rdt) {
+  updateBubbles();
   var diff = S.money - UI.moneyShown;
   if (diff !== 0) {
     UI.moneyShown = Math.abs(diff) < 1.5 ? S.money : UI.moneyShown + diff * Math.min(1, rdt * 12);
     el.moneyNum.textContent = fmt(UI.moneyShown);
   }
-  el.kilnRing.style.strokeDashoffset = (282.7 * (1 - clamp(S.moldT, 0, 1))).toFixed(1);
-  el.kilnSub.textContent = S.held ? "STOKING!" : (S.tier.autoKiln ? "AUTO" : "HOLD");
+  el.kilnRing.style.strokeDashoffset = (119.4 * (1 - clamp(S.moldT, 0, 1))).toFixed(1);
+  el.kilnSub.textContent = S.held ? "STOKING!" : "HOLD";
   if (S.held && Math.random() < rdt * 22) ember();
   var fuses = el.trayList.querySelectorAll(".t-hot");
   for (var i = 0; i < fuses.length; i++) {
@@ -2417,12 +3229,16 @@ function uiFrame(rdt) {
   // prompt
   var txt = "", urgent = false;
   if (S.started && CAM.mode === "play" && !modalPaused()) {
-    if (C.state === "swing" && C.item) {
-      if (C.item.type === "hot") { txt = "HOT BRICK — drop it in " + Math.max(0, Math.ceil(C.item.fuse)) + "s!"; urgent = C.item.fuse < 3; }
-      else if (C.item.type === "lead") txt = "LEAD — heavy, fast, pays ×4";
+    var hh = nearestHand();
+    if (C.state === "swing" && C.item && C.item.type === "hot") { txt = "HOT BRICK — drop it in " + Math.max(0, Math.ceil(C.item.fuse)) + "s!"; urgent = C.item.fuse < 3; }
+    else if (hh) { txt = "HAND! Land a brick on the red slot — " + handNeed(hh) + " to go"; urgent = hh.timer < 3; }
+    else if (C.state === "swing" && C.item) {
+      if (C.item.type === "lead") txt = "LEAD — heavy, fast, pays ×4";
+      else if (C.item.type === "glass") txt = "GLASS — fragile, tight window, pays ×5";
+      else if (S.swayOn) txt = "TREMOR — follow the sliding zone";
       else if (S.windOn) txt = "WIND " + (S.wind.dir > 0 ? "→" : "←") + " fast with it, slow against it";
       else if (S.courses < 2) txt = "Tap anywhere to drop";
-    } else if (C.state === "empty" && S.stack.length === 0) { txt = "Out of bricks — hold the KILN"; }
+    } else if (C.state === "empty" && S.stack.length === 0) { txt = "Out of bricks — HOLD the KILN"; }
   }
   if (txt !== UI.promptTxt) { UI.promptTxt = txt; el.prompt.textContent = txt; el.prompt.classList.toggle("hidden", !txt); }
   el.prompt.classList.toggle("urgent", urgent);
@@ -2434,26 +3250,70 @@ function uiFrame(rdt) {
     el.windArrow.style.transform = "scale(" + (1 + g * 1.4).toFixed(2) + ")";
     var bars = Math.max(1, Math.round(g / 0.45 * 4)), s = ""; for (var b = 0; b < 4; b++) s += b < bars ? "▮" : "▯";
     if (el.windStr.textContent !== s) el.windStr.textContent = s;
-  }
+  } else if (!el.chipWind.classList.contains("hidden")) el.chipWind.classList.add("hidden");
+  // hands + tremor chips
+  var hn = handCount(), nh = nearestHand();
+  if (hn > 0 && S.started) {
+    if (el.chipHand.classList.contains("hidden")) revealEl(el.chipHand);
+    el.handT.textContent = (hn > 1 ? "×" + hn + " · " : "") + (nh.state === "arrive" ? "INCOMING" : Math.max(0, Math.ceil(nh.timer)) + "s");
+    el.chipHand.classList.toggle("urgent", nh.timer < 3 && nh.state === "grip");
+  } else if (!el.chipHand.classList.contains("hidden")) el.chipHand.classList.add("hidden");
+  el.chipSway.classList.toggle("hidden", !(S.swayOn && S.started));
+  // nothing bakes by itself any more — if the hand is empty, point at the kiln
+  if (S.started && CAM.mode === "play" && !modalPaused() && !S.shopOpen && !S.held && C.state === "empty" && S.stack.length === 0) {
+    UI.noBrickT = (UI.noBrickT || 0) + rdt; if (UI.noBrickT > 2.5) { nudgeKiln(); UI.noBrickT = 0; }
+  } else UI.noBrickT = 0;
   if (UI.streakBreakT > 0) { UI.streakBreakT -= rdt; if (UI.streakBreakT <= 0) { el.streak.classList.remove("break"); renderStreak(false); } }
   el.kiln.classList.toggle("idle-glow", !S.held);
 }
 
 /* ---------------- MESSAGES: story first, hints second ---------------- */
 var BEATS = {
-  start: "You woke to the whole town outside, pointing up. There's a HOLE in the sky — silhouettes moving inside it.",
+  start: "You woke to the whole town outside, pointing up. There's a HOLE in the sky — a pinprick of white light, with silhouettes moving inside it.",
   mold: "Every head turns to you, the town wall maker. The verdict is unanimous: this is your divine task.",
-  row1: "The town cheers and throws coins — they pay for every brick. Build until the wall reaches the hole.",
-  c5: "The higher the wall, the clearer the silhouettes in the hole become.",
-  c10: "You can almost hear voices drifting down through the hole.",
-  c25: "A hand reaches down through the hole, feeling for the top of the wall.",
-  c40: "The silhouettes are leaning out now, cheering with the town below. Ten more courses."
+  row1: "Word got around. A few villagers have wandered over, all staring up at a hole in the sky — a pinprick of white light. Not your problem. You're the wall maker, and the wall is the job. Keep laying bricks.",
+  c5a: "The villagers have been creeping closer all morning, necks craned at the hole. \u201cWall maker!\u201d calls one. \u201cWe can\u2019t tell what that is from down here. Build closer \u2014 get us a proper look.\u201d",
+  c5b: "A murmur, then a decision. \u201cNot a wall,\u201d says the eldest. \u201cA tower. Build us a tower up toward that hole \u2014 and we\u2019ll pay you for every finished row.\u201d",
+  c10: "You can almost hear voices drifting down through the hole. They sound like they're counting.",
+  c25: "Hands are starting to grab at the wall. Huge pale hands reach down through the hole, clamp onto a brick and pull — and everything laid after it falls. Drop a brick on top of a hand to smash it.",
+  c30: "The hands are getting bolder. Whatever is up there does not want this wall finished.",
+  c35: "The silhouettes are waving their arms now. Not cheering — warning. You still can't make out the words.",
+  c40: "Clouds are gathering around the hole, curling into a slow ring. They drift down toward your crane. Something up there doesn't want you to see.",
+  c45: "The cloud ring tightens and rolls straight through your work site. You'll be dropping bricks half-blind. Trust the rhythm.",
+  c48: "Two courses to go. The silhouettes have stopped moving. They're standing at the rim, hands pressed to its edge, watching you.",
+  c50a: "Your last brick touches the rim of the hole. For one heartbeat the whole world is silent. Then the town below ERUPTS. You did it.",
+  c50b: "But the light behind the hole is wrong. The silhouettes aren't cheering — they're beating on the edge of the sky with both fists. Now you can hear them: “NOT YET. HIGHER.”",
+  c50c: "The hole isn't a door. It's a tear in the underside of the sky — and through it you can see what's above: a second wall, a hundred courses tall, standing unfinished in the dark. The silhouettes are its builders. The hands are the sky's way of tearing it all back down.",
+  c50d: "Your wall is the other half. Reach course 100 and the two walls meet, and a KEYSTONE can lock them together. Stop now and the tear seals — with them on the wrong side. Fifty was never the end. Build higher.",
+  c55: "The hands come in pairs now. The sky has noticed you aren't stopping.",
+  c60: "The other wall is close enough to read. Its bricks are scratched with tally marks — thousands of them. They have been building down toward you for a very long time.",
+  c65: "The wall begins to hum. Something enormous is shifting on the far side of the sky, and every course you lay trembles with it. Your drop zone will sway — follow it.",
+  c70: "Seventy. The air is thin and the stars are out in broad daylight. Their wall glows faintly from within — glass, you realize. They build in glass.",
+  c75: "Voices call down your name now. They know you. They've watched every brick since the first.",
+  c80: "A new brick comes out of the kiln, clear as ice and light as breath. SKY GLASS — what their wall is made of. It's fragile, and it pays like treasure.",
+  c85: "Fifteen to go. Hands in threes, clouds like a second wall, the ground shuddering under you. The sky is throwing everything it has left.",
+  c90: "Ten courses. You can see the keystone now: one great block of white light hanging in the middle of the hole on a chain, waiting.",
+  c95: "Five. The whole town is on its rooftops. Nobody is cheering. Nobody is breathing.",
+  c100a: "The last course closes. The keystone swings down on its chain and drops into place with a note like a bell the size of the sky.",
+  c100b: "Light runs the whole length of the wall — yours and theirs — and the two halves are one. The tear doesn't seal. It opens. And the hands unclench, and let go.",
+  c100c: "The silhouettes step through. They aren't giants, and they aren't gods. They're people — builders, like you — and down in the town, nobody is pointing anymore."
 };
-var KICKERS = { start: "MORNING", mold: "MORNING", row1: "THE FIRST ROW", c5: "COURSE 5", c10: "COURSE 10", c25: "COURSE 25", c40: "COURSE 40" };
+var KICKERS = { start: "MORNING", mold: "MORNING", row1: "ROW ONE · LOOK UP", c5a: "ROW FIVE · THE TOWN ASKS", c5b: "ROW FIVE · THE TOWN ASKS", c10: "COURSE 10", c25: "COURSE 25 · THE HANDS", c30: "COURSE 30", c35: "COURSE 35", c40: "COURSE 40 · THE CLOUDS", c45: "COURSE 45", c48: "COURSE 48",
+  c50a: "COURSE 50", c50b: "COURSE 50", c50c: "COURSE 50 · THE TRUTH", c50d: "COURSE 50 · NOT THE END", c55: "COURSE 55", c60: "COURSE 60", c65: "COURSE 65 · THE TREMORS", c70: "COURSE 70", c75: "COURSE 75",
+  c80: "COURSE 80 · SKY GLASS", c85: "COURSE 85", c90: "COURSE 90", c95: "COURSE 95", c100a: "COURSE 100", c100b: "COURSE 100", c100c: "COURSE 100" };
+var CTAS = { row1: "BACK TO WORK", c5b: "TAKE THE JOB", c50d: "BUILD HIGHER", c100c: "STEP THROUGH" };
+var BEAT_END = { c5b: function () { startTower(); }, c50d: function () { finishRim(); }, c100c: function () { showVictory(); } };
+var ICO_HAND = '<svg viewBox="0 0 64 46" width="66" height="46"><g fill="#f1d0b4" stroke="#221407" stroke-width="3" stroke-linejoin="round"><rect x="10" y="24" width="44" height="16" rx="6"/><rect x="12" y="8" width="8" height="22" rx="4"/><rect x="23" y="3" width="8" height="27" rx="4"/><rect x="34" y="5" width="8" height="25" rx="4"/><rect x="45" y="11" width="8" height="19" rx="4"/></g></svg>';
+var ICO_CLOUD = '<svg viewBox="0 0 64 46" width="66" height="46"><path d="M16 38a10 10 0 0 1 2-19.800A14 14 0 0 1 45 15a11.5 11.500 0 0 1 3 23z" fill="#fff" stroke="#221407" stroke-width="3" stroke-linejoin="round"/></svg>';
+var ICO_TREMOR = '<svg viewBox="0 0 64 46" width="66" height="46"><rect x="16" y="14" width="32" height="18" fill="#c2502c" stroke="#221407" stroke-width="3"/><path d="M6 10l-3 8 5 5-3 9M58 10l3 8-5 5 3 9" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var REVEALS = {
-  hot: { cls: "hot", title: "THE KILN RUNS HOT", text: "Some bricks now come out glowing. Drop a hot brick before it cools — it pays <b>×2</b>. Let it burn out and it's a miss." },
-  lead: { cls: "lead", title: "LEAD BRICKS", text: "Heavier clay up here. Dark lead bricks swing <b>40% faster</b> — land one and it pays <b>×4</b>." },
-  wind: { cls: "wind", title: "THE WIND PICKS UP", text: "From here on the wind gusts. The crane runs <b>fast with it</b> and <b>slow against it</b> — watch the arrow, time the slow side." }
+  hot: { cls: "hot", title: "THE KILN RUNS HOT", text: "Some bricks now come out glowing. Drop a hot brick before it cools — it's worth <b>×2</b>. Let it burn out and it's a miss." },
+  lead: { cls: "lead", title: "LEAD BRICKS", text: "Heavier clay up here. Dark lead bricks swing <b>40% faster</b> — land one and it's worth <b>×4</b>." },
+  wind: { cls: "wind", title: "THE WIND PICKS UP", text: "The wind gusts in spells. The crane runs <b>fast with it</b> and <b>slow against it</b> — watch the arrow, time the slow side. It will come and go." },
+  hand: { cls: "icon", icon: ICO_HAND, title: "HANDS!", text: "A hand is clamping onto a brick. In <b>about 10 seconds</b> it rips it free — and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to smash it. The red slot shows where." },
+  mist: { cls: "icon", icon: ICO_CLOUD, title: "CLOUDS ROLL IN", text: "Clouds drift across the work site and hide the crane. <b>Judge by rhythm</b>, not by eye — they come and go, and thicken as you climb. A Sky Lantern thins them." },
+  tremor: { cls: "icon tremor", icon: ICO_TREMOR, title: "TREMORS", text: "The wall shudders. The green drop zone now <b>slides side to side</b> — drop where it <b>is</b> when you tap, not where it was. A Spirit Level calms it." },
+  glass: { cls: "glass", title: "SKY GLASS", text: "Pale glass bricks now come out of the kiln. The drop window is <b>35% narrower</b> — but they're worth <b>×5</b>." }
 };
 var msgQ = [], activeMsg = null, openingPending = false, storyBusy = false, storyClosing = false, hintShownAt = 0, revealTimer = null;
 function panelsBusy() {
@@ -2464,10 +3324,11 @@ function storyActive() { return !!(activeMsg && activeMsg.kind === "story"); }
 function modalPaused() {
   return !el.settings.classList.contains("hidden") || storyActive() || !!(activeMsg && activeMsg.kind === "reveal") || !el.ovVictory.classList.contains("hidden");
 }
-function actionFrozen() { return modalPaused() || S.shopOpen || CAM.mode === "victory"; }
+function actionFrozen() { return modalPaused() || S.shopOpen || CAM.mode === "victory" || CAM.mode === "rim" || CAM.mode === "tower"; }
 function setStoryContent(m) {
   el.storyText.textContent = m.text;
   el.storyKicker.textContent = KICKERS[m.id] || "";
+  el.storyNext.textContent = CTAS[m.id] || "CONTINUE";
   var html = "";
   if (m.seqTotal > 1) for (var i = 1; i <= m.seqTotal; i++) html += '<i class="' + (i <= m.seqIdx ? "on" : "") + '"></i>';
   el.storyDots.innerHTML = html;
@@ -2487,6 +3348,7 @@ function endMsg() {
   var m = activeMsg;
   if (m.kind === "story") {
     if (storyBusy) return;
+    if (BEAT_END[m.id]) setTimeout(BEAT_END[m.id], 140);
     var next = msgQ[0]; storyBusy = true;
     if (next && next.kind === "story" && !panelsBusy()) {
       msgQ.shift(); activeMsg = next;
@@ -2504,6 +3366,12 @@ function endMsg() {
   setTimeout(pumpMsg, 80);
 }
 function enqueueStory(id) { if (S.beats[id] || !BEATS[id]) return; S.beats[id] = true; msgQ.push({ kind: "story", id: id, text: BEATS[id] }); pumpMsg(); }
+function enqueueSeq(ids) {
+  var n = 0; ids.forEach(function (id) { if (!S.beats[id] && BEATS[id]) n++; });
+  var k = 0;
+  ids.forEach(function (id) { if (S.beats[id] || !BEATS[id]) return; S.beats[id] = true; k++; msgQ.push({ kind: "story", id: id, text: BEATS[id], seqIdx: k, seqTotal: n }); });
+  pumpMsg();
+}
 function enqueueHint(id, text, targetId, sticky) {
   if (activeMsg && activeMsg.kind === "hint" && activeMsg.id === id) return;
   for (var i = 0; i < msgQ.length; i++) if (msgQ[i].kind === "hint" && msgQ[i].id === id) return;
@@ -2555,9 +3423,9 @@ $("app").addEventListener("pointerdown", hintTapThrough, true);
 function clearHintForPanel() { if (activeMsg && activeMsg.kind === "hint") endMsg(); }
 function showReveal(id) {
   var R = REVEALS[id] || REVEALS.hot;
-  el.hrBrick.className = "hr-brick " + R.cls; el.hrTitle.textContent = R.title; el.hrText.innerHTML = R.text;
+  el.hrBrick.className = "hr-brick " + R.cls; el.hrBrick.innerHTML = R.icon || ""; el.hrTitle.textContent = R.title; el.hrText.innerHTML = R.text;
   showPanel(el.reveal); releaseKiln();
-  if (id === "hot") snd.sizzle(); else if (id === "wind") snd.whoosh(); else snd.crash();
+  if (id === "hot") snd.sizzle(); else if (id === "wind" || id === "mist") snd.whoosh(); else if (id === "hand") snd.grab(); else if (id === "tremor") snd.rumble(); else if (id === "glass") { snd.clink(); tone(2349, 0.2, "sine", 0.07, 0.05); } else snd.crash();
   snd.fanfare(); camShake(0.25);
   clearTimeout(revealTimer); revealTimer = setTimeout(function () { if (activeMsg && activeMsg.kind === "reveal") endMsg(); }, 8000);
 }
@@ -2570,17 +3438,18 @@ function finishOpening() {
   S.started = true; CAM.mode = "play";
   revealEl(el.dock);
   renderHUD();
-  enqueueHint("mold", "HOLD the KILN to bake bricks. They hook onto the crane by themselves.", "kiln");
+  enqueueHint("mold", "HOLD the KILN building — watch the ring fill. Each full ring sends a brick to STORAGE, and the crane picks them up by itself.", "kiln");
 }
 function showVictory() {
   $("st-laid").textContent = fmt(S.laid); $("st-time").textContent = fmtTime(S.playTime);
   $("st-streak").textContent = S.bestStreak; $("st-perfect").textContent = S.perfects;
   $("st-acc").textContent = (S.drops ? Math.round(S.hits / S.drops * 100) : 100) + "%";
   $("st-money").textContent = "$" + fmt(S.earned);
+  $("st-smash").textContent = S.smashed; $("st-stolen").textContent = S.lost;
   releaseKiln(); showPanel(el.ovVictory); snd.fanfare();
 }
 $("btn-endless").addEventListener("click", function () {
-  S.endless = true; CAM.mode = "play"; hidePanel(el.ovVictory, 300, pumpMsg);
+  S.endless = true; CAM.mode = "play"; hidePanel(el.ovVictory, 300, pumpMsg); updateHazards();
   toast("Endless building. Every 10 courses still raises your rate.", 3600); snd.pop(); renderHUD();
 });
 
@@ -2668,12 +3537,9 @@ window.addEventListener("resize", function () { resizeWorld(); if (activeMsg && 
 /* ---------------- MAIN LOOP ---------------- */
 var lastFrame = 0, fpsAcc = 0, fpsN = 0;
 G.fps = 60; G.maxDt = 0.05;
-function frame(now) {
-  requestAnimationFrame(frame);
-  var rdt = lastFrame ? Math.min(G.maxDt, (now - lastFrame) / 1000) : 1 / 60;
-  lastFrame = now;
-  fpsAcc += rdt; fpsN++; if (fpsAcc > 0.5) { G.fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
-  if (W3.ok) autoRes(G.fps, rdt);
+// One simulation tick (everything except drawing). The render loop calls it
+// every frame; the test probe calls it directly to fast-forward.
+function simStep(rdt, now) {
   var scale = 1;
   if (G.hitStop > 0) { G.hitStop -= rdt; scale = 0.07; }
   var dt = rdt * scale;
@@ -2682,20 +3548,27 @@ function frame(now) {
     var frozen = actionFrozen();
     tickKiln(dt);
     tickCrane(dt, frozen);
-    if (!frozen) { tickFuses(dt); tickApprentice(dt); tickCascade(dt); }
+    if (!frozen) { tickFuses(dt); tickApprentice(dt); tickHands(dt); }
     tickWind(dt);
-    tickHand(dt);
     if (Math.floor(S.time * 2) !== Math.floor((S.time - dt) * 2)) renderHUD();
   }
   G.frameT = performance.now();
-  tickFalling(dt);
+  tickFalling(dt); tickDebris(dt);
   if (W3.ok) {
     updateCraneVisual(dt, now / 1000);
     updateWorld(dt, now / 1000);
     updateCamera(rdt, now / 1000);
-    renderWorld();
   }
   uiFrame(rdt);
+}
+function frame(now) {
+  requestAnimationFrame(frame);
+  var rdt = lastFrame ? Math.min(G.maxDt, (now - lastFrame) / 1000) : 1 / 60;
+  lastFrame = now;
+  fpsAcc += rdt; fpsN++; if (fpsAcc > 0.5) { G.fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
+  if (W3.ok) autoRes(G.fps, rdt);
+  simStep(rdt, now);
+  if (W3.ok) renderWorld();
 }
 
 /* ---------------- BOOT ---------------- */
@@ -2707,16 +3580,15 @@ function boot() {
   }
   syncSettings(); renderHUD();
   requestAnimationFrame(frame);
-  setTimeout(function () { hidePanel(el.ovLoading, 300); showPanel(el.ovStart); }, 650);
+  var ldLines = ["FIRING THE KILN…", "MIXING THE MORTAR…", "STACKING THE BRICKS…"], ldI = 0;
+  var ldT = setInterval(function () { var m = $("ld-msg"); if (m) { ldI = (ldI + 1) % ldLines.length; m.textContent = ldLines[ldI]; } }, 430);
+  setTimeout(function () { clearInterval(ldT); hidePanel(el.ovLoading, 300); showPanel(el.ovStart); }, 1350);
 }
 $("btn-begin").addEventListener("click", function () {
   if (S.flags.begun) return;
   S.flags.begun = true; audio(); snd.pop();
   hidePanel(el.ovStart, 300);
-  openingPending = true;
-  enqueueStory("start"); enqueueStory("mold");
-  if (activeMsg) { activeMsg.seqIdx = 1; activeMsg.seqTotal = 2; setStoryContent(activeMsg); }
-  if (msgQ[0]) { msgQ[0].seqIdx = 2; msgQ[0].seqTotal = 2; }
+  finishOpening();          // straight to the kiln — the story waits until the first row is done
 });
 
 /* ---------------- TEST PROBE ---------------- */
@@ -2742,7 +3614,28 @@ window.__bb = {
   holdStart: holdKiln, holdEnd: releaseKiln,
   paused: modalPaused, frozen: actionFrozen, rate: rate, multCap: multCap, windAmp: windAmp,
   fps: function () { return G.fps; }, bricks: function () { return BRICKS.length; },
-  cam: CAM, setMaxDt: function (v) { G.maxDt = v; }
+  cam: CAM, setMaxDt: function (v) { G.maxDt = v; },
+  // --- extra probes for the headless tests ---
+  S: S, BRICKS: BRICKS, HANDS: HANDS,
+  clock: 0,
+  step: function (dt, n) { for (var i = 0; i < (n || 1); i++) { this.clock += dt * 1000; simStep(dt, this.clock); } },
+  fast: function (n) {               // build the wall to n finished courses instantly (no events)
+    while (S.courses < n) {
+      var row = S.courses + 1, per = S.perCourse;
+      if (S.tower) { for (var fz = 0; fz < 4; fz++) for (var s2 = 0; s2 < S.perFace; s2++) wallAdd(row, s2, S.perFace, "normal", (row * 31 + s2 * 7 + fz) % 997, fz, fz * S.perFace + s2); }
+      else for (var s = 0; s < per; s++) wallAdd(row, s, per, "normal", (row * 31 + s * 7) % 997);
+      S.courses++; if (S.courses > S.best) S.best = S.courses; S.laid += per;
+    }
+    S.inCourse = 0; updateHazards(); renderHUD(); checkUnlocks();
+  },
+  complete: function () { S.inCourse = S.perCourse - 1; this.lay(); },
+  spawnHand: spawnHand, queueRaid: queueRaid, hazards: hazardsFor, updateHazards: updateHazards,
+  startTower: startTower, orbit: function () { return { ang: W3.orbitAng, t: W3.orbitT, turning: CAM.turning, face: curFace(), slot: curSlot() }; },
+  startRim: startRim, startVictory: startVictory, milestone: milestone,
+  setTier: function (id, t) { S.tier[id] = t; if (id === "hotMortar") S.perCourse = 8 - t; renderHUD(); },
+  money: function (m) { S.money = m; S.earned += m; renderHUD(); },
+  grabNow: function () { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && HANDS[i].state === "grip") HANDS[i].timer = 0.01; },
+  handNeed: handNeed, nearestHand: nearestHand, handCount: handCount
 };
 boot();
 
