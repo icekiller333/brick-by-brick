@@ -1,0 +1,2417 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Brick by Brick</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@500;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        color-scheme: light dark;
+        --ink:#221407;
+        --line:#221407;
+        --shadowc:#221407;
+        --paper:#fdf3df;
+        --panel:#fffaf0;
+        --panel2:#ffeecb;
+        --sky1:#7fd4f2;
+        --sky2:#ffe3ae;
+        --clay:#c2502c;
+        --clay-d:#9c3a1e;
+        --clay-l:#e0704a;
+        --gold:#f5b921;
+        --gold-d:#d99a06;
+        --grass:#79a84e;
+        --grass-d:#5d8a3a;
+        --dirt:#8a5a33;
+        --mortar:#efe3cb;
+        --good:#3e8e4f;
+        --muted:#8a7358;
+        --bh:19px;
+        --shadow:5px 5px 0 var(--shadowc);
+        --shadow-s:3px 3px 0 var(--shadowc);
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --ink:#f3e7d3;
+          --line:#f0e2c8;
+          --shadowc:#000000;
+          --paper:#221812;
+          --panel:#2c2015;
+          --panel2:#3a2a18;
+          --sky1:#152a44;
+          --sky2:#4a3049;
+          --clay:#d05a35;
+          --clay-d:#a8431f;
+          --clay-l:#e87f56;
+          --mortar:#4a3a28;
+          --muted:#b39d7d;
+        }
+      }
+      *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+      html,body{ height:100%; }
+      body{
+        margin:0; overflow:hidden;
+        font-family:'Archivo', system-ui, sans-serif;
+        background:#1d2b33; color:var(--ink);
+      }
+      @media (prefers-color-scheme: dark){ body{ background:#0b0f16; } }
+      button{ font-family:inherit; cursor:pointer; color:inherit; }
+      .hidden{ display:none !important; }
+
+      #app{
+        position:relative; height:100dvh; max-width:560px; margin:0 auto;
+        display:flex; flex-direction:column; overflow:hidden;
+        background:linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 78%);
+        border-left:3px solid var(--line); border-right:3px solid var(--line);
+      }
+
+      /* ---------- HUD ---------- */
+      #hud{
+        display:flex; align-items:center; gap:10px; padding:8px 12px;
+        background:var(--paper); border-bottom:3px solid var(--line); z-index:30;
+      }
+      .hud-course{ display:flex; align-items:baseline; gap:7px; }
+      .hud-label{ font-weight:800; font-size:11px; letter-spacing:.14em; }
+      #hud-course-num{
+        font-family:'Archivo Black', sans-serif; font-size:30px; line-height:1;
+      }
+      #hud-course-num.pop{ animation:pop .35s ease; }
+      .hud-goal{ font-size:11px; font-weight:700; color:var(--muted); }
+      .hud-spacer{ flex:1; }
+      #btn-settings{
+        border:3px solid var(--line); background:var(--panel); box-shadow:var(--shadow-s);
+        width:40px; height:40px; display:grid; place-items:center; padding:0;
+      }
+      #btn-settings:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadowc); }
+      #btn-settings svg{ width:21px; height:21px; }
+      @keyframes pop{ 0%{transform:scale(1)} 40%{transform:scale(1.22)} 100%{transform:scale(1)} }
+      .hud-money{
+        display:flex; align-items:center; gap:2px;
+        border:3px solid var(--line); background:var(--gold);
+        padding:4px 11px; box-shadow:var(--shadow-s); color:#221407;
+        font-family:'Archivo Black', sans-serif; font-size:22px;
+      }
+      .hud-money.pop{ animation:pop .25s ease; }
+      /* Layout: slim HUD on top, tower fills the rest, controls on a side rail */
+      #hud{ order:1; } #statusbar{ order:2; } #scene{ order:5; }
+      #app{ --railgap:94px; }
+      /* The wall yields the rail's strip so the tower never hides under it */
+      #app.rail-r #wall-clip{ right:var(--railgap); }
+      #app.rail-l #wall-clip{ left:var(--railgap); }
+      #app.rail-r #shimmer{ left:calc(50% - 47px); }
+      #app.rail-l #shimmer{ left:calc(50% + 47px); }
+      /* ---------- STATUS BAR ---------- */
+      #statusbar{
+        background:var(--paper); border-bottom:3px solid var(--line); z-index:30;
+        padding:3px 12px; font-size:11.5px; font-weight:700; color:var(--muted);
+        text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      /* ---------- SHOP BUTTON ---------- */
+      #btn-shop{
+        position:relative; border:3px solid var(--line); background:var(--gold); color:#221407;
+        box-shadow:var(--shadow-s); font-family:'Archivo Black',sans-serif; font-size:14px;
+        letter-spacing:.05em; padding:7px 12px;
+      }
+      #btn-shop:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadowc); }
+      #btn-shop.shop-pulse{ animation:shopPulse 1.1s ease-in-out infinite; }
+      @keyframes shopPulse{
+        0%,100%{ box-shadow:3px 3px 0 var(--shadowc), 0 0 0 0 rgba(245,185,33,0) }
+        50%{ box-shadow:3px 3px 0 var(--shadowc), 0 0 0 7px rgba(245,185,33,.85) }
+      }
+      #shop-new{
+        position:absolute; top:-10px; right:-8px; background:#d42a1e; color:#fff;
+        border:2px solid var(--line); font-family:'Archivo',sans-serif; font-weight:800;
+        font-size:9px; letter-spacing:.07em; padding:1px 5px;
+      }
+
+      /* ---------- SWING (timing drop) ---------- */
+      #swing-layer{ position:absolute; z-index:6; height:40px; pointer-events:none; }
+      #swing-rail{
+        position:absolute; left:0; right:0; top:19px; height:4px;
+        background:repeating-linear-gradient(90deg, var(--line) 0 10px, transparent 10px 18px);
+        opacity:.55;
+      }
+      #swing-brick{
+        position:absolute; top:8px; width:34px; height:20px; margin-left:-17px;
+        background:var(--clay); border:3px solid var(--line);
+        box-shadow:var(--shadow-s); pointer-events:auto; cursor:pointer;
+      }
+      #swing-brick::after{
+        content:""; position:absolute; left:50%; top:0; bottom:0; width:2px; background:rgba(0,0,0,.35);
+      }
+      #swing-marker{
+        position:absolute; top:-4px; width:0; height:0; margin-left:-8px;
+        border-left:8px solid transparent; border-right:8px solid transparent;
+        border-top:11px solid var(--gold-d);
+      }
+      /* Accepted drop window on the rail — widens with Steady Hands.
+         The almost ring (tier 3) is a fainter, wider halo around it. */
+      #swing-window{
+        position:absolute; top:7px; height:26px; transform:translateX(-50%);
+        background:rgba(245,185,33,.30); border:2px solid rgba(245,185,33,.9);
+        box-shadow:0 0 10px rgba(245,185,33,.55); pointer-events:none;
+      }
+      #swing-ring{
+        position:absolute; top:3px; height:34px; transform:translateX(-50%);
+        background:rgba(245,185,33,.09); border:2px dashed rgba(245,185,33,.5);
+        pointer-events:none;
+      }
+      /* Live positioning feedback ON the swinging brick: full green glow
+         inside the accepted window, faint gold halo in the almost ring. */
+      #swing-brick.in-zone{
+        outline:3px solid var(--good); outline-offset:1px;
+        box-shadow:0 0 0 3px var(--good), 0 0 18px 6px rgba(62,142,79,.8);
+      }
+      #swing-brick.in-ring{
+        outline:3px solid rgba(245,185,33,.85); outline-offset:1px;
+        box-shadow:0 0 10px 3px rgba(245,185,33,.45);
+      }
+      .brick.ghost{
+        background:rgba(245,185,33,.35) !important; border:3px dashed var(--gold-d);
+        box-shadow:0 0 0 0 rgba(245,185,33,.7); animation:ghostPulse .6s ease-in-out infinite;
+      }
+      @keyframes ghostPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(245,185,33,.0) } 50%{ box-shadow:0 0 0 5px rgba(245,185,33,.65) } }
+      .brick.dropped{ animation:dropIn .18s ease-out; }
+      @keyframes dropIn{ from{ transform:translateY(-16px) } to{ transform:translateY(0) } }
+      #miss-flash{
+        position:absolute; inset:0; z-index:7; background:rgba(200,30,20,.35);
+        opacity:0; pointer-events:none;
+      }
+      #miss-flash.show{ animation:missFlash .45s ease-out; }
+      @keyframes missFlash{ 0%{ opacity:1 } 100%{ opacity:0 } }
+      #miss-text{
+        position:absolute; left:50%; top:38%; z-index:9; transform:translate(-50%,-50%) rotate(-6deg);
+        font-family:'Archivo Black', sans-serif; font-size:44px; color:#d42a1e;
+        text-shadow:3px 3px 0 var(--paper); opacity:0; pointer-events:none;
+      }
+      #miss-text.show{ animation:missText .7s ease-out; }
+      @keyframes missText{ 0%{ opacity:0; transform:translate(-50%,-50%) rotate(-6deg) scale(.6) } 18%{ opacity:1; transform:translate(-50%,-50%) rotate(-6deg) scale(1.15) } 70%{ opacity:1 } 100%{ opacity:0; transform:translate(-50%,-60%) rotate(-6deg) scale(1) } }
+      .money-float{
+        position:absolute; z-index:41; font-family:'Archivo Black', sans-serif; font-size:19px;
+        color:var(--good); text-shadow:1.5px 1.5px 0 var(--paper); pointer-events:none;
+      }
+      @media (prefers-color-scheme: dark){ .money-float{ color:#7ed492; } }
+
+      /* ---------- SHIMMER / BEATS / COMBO / CROWD ---------- */
+      #shimmer{
+        position:absolute; top:12px; left:50%; transform:translateX(-50%);
+        width:132px; height:80px; border-radius:50%; z-index:1; pointer-events:none;
+        background:radial-gradient(ellipse at center, rgba(255,255,255,.9) 0%, rgba(170,225,255,.5) 52%, rgba(170,225,255,0) 72%);
+        box-shadow:0 0 26px 8px rgba(190,230,255,.45), inset 0 0 18px rgba(255,255,255,.8);
+        animation:shimmerPulse 3.2s ease-in-out infinite;
+      }
+      @keyframes shimmerPulse{ 0%,100%{ transform:translateX(-50%) scale(1) } 50%{ transform:translateX(-50%) scale(1.06) } }
+      .sh-shape{
+        position:absolute; bottom:6px; width:22px; height:34px;
+        background:rgba(24,18,48,.55); border-radius:11px 11px 6px 6px;
+        animation:sway 4s ease-in-out infinite;
+      }
+      .sh-shape::before{
+        content:""; position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+        width:15px; height:15px; border-radius:50%; background:inherit;
+      }
+      .sh-shape.s1{ left:34px; }
+      .sh-shape.s2{ right:32px; height:28px; animation-delay:-2s; }
+      @keyframes sway{ 0%,100%{ transform:translateX(0) } 50%{ transform:translateX(3px) } }
+      @keyframes beatIn{ from{ transform:translateX(-50%) translateY(-8px); opacity:0 } to{ transform:translateX(-50%) translateY(0); opacity:1 } }
+      #combo{
+        position:absolute; top:10px; right:10px; z-index:6;
+        background:var(--gold); color:#221407; border:3px solid var(--line);
+        box-shadow:var(--shadow-s); padding:4px 10px;
+        font-family:'Archivo Black', sans-serif; font-size:15px; letter-spacing:.04em;
+      }
+      #combo.break{ background:#d42a1e; color:#fff; animation:comboBreak .45s ease; }
+      @keyframes comboBreak{ 0%{ transform:rotate(0) scale(1.15) } 25%{ transform:rotate(-7deg) scale(1.1) } 55%{ transform:rotate(6deg) scale(.95) } 100%{ transform:rotate(0) scale(.8); opacity:.4 } }
+      #try-text{
+        position:absolute; left:50%; top:38%; z-index:9; transform:translate(-50%,-50%) rotate(-4deg);
+        font-family:'Archivo Black', sans-serif; font-size:36px; color:var(--gold-d);
+        text-shadow:3px 3px 0 var(--paper); opacity:0; pointer-events:none; white-space:nowrap;
+      }
+      #try-text.show{ animation:missText .8s ease-out; }
+      #crowd-vig{ position:absolute; inset:0; z-index:7; pointer-events:none; opacity:0; box-shadow:inset 0 0 64px 12px rgba(245,185,33,.55); }
+      #crowd-vig.pulse{ animation:crowdVig .7s ease-out; }
+      @keyframes crowdVig{ 0%{ opacity:0 } 25%{ opacity:1 } 100%{ opacity:0 } }
+      .coin{
+        position:absolute; width:14px; height:14px; border-radius:50%; z-index:41; pointer-events:none;
+        background:radial-gradient(circle at 35% 35%, #ffec8a, var(--gold) 60%, var(--gold-d));
+        border:2px solid #7a5200; will-change:transform;
+      }
+      /* ---------- STREAK FANFARE SET DRESSING ---------- */
+      /* Trumpets slide in from both edges at streak 5+; townspeople poke
+         out under them at streak 10+. Both retreat when the streak breaks. */
+      .fanfare{
+        position:absolute; top:29%; width:34px; z-index:23; pointer-events:none;
+        display:flex; flex-direction:column; gap:7px; align-items:center;
+        transition:transform .45s cubic-bezier(.3,.9,.3,1.15);
+      }
+      .fanfare.side-l{ left:2px; transform:translateX(-125%); }
+      .fanfare.side-r{ right:2px; transform:translateX(125%); }
+      .fanfare.show{ transform:translateX(0); }
+      .fanfare svg{ display:block; width:31px; height:auto; }
+      .fanfare.side-r svg{ transform:scaleX(-1); }
+      .fanfare .person{ transition:transform .45s ease, opacity .3s ease; }
+      .fanfare.side-l .person{ transform:translateX(-135%); opacity:0; }
+      .fanfare.side-r .person{ transform:translateX(135%); opacity:0; }
+      .fanfare.folk .person{ transform:translateX(0); opacity:1; }
+      /* ---------- FIVE-METAL COIN STACKS (inside the control panel) ---------- */
+      /* Base-10 denominations in place-value order (platinum … copper):
+         copper $1 · bronze $10 · silver $100 · gold $1,000 · platinum
+         $10,000. Each stack draws its digit as 0–9 real coins; gains are
+         animated in through the copper stack and cascade up a metal on
+         rollover, spends drain back down with breakdowns. */
+      #wealth{ border-top:3px solid var(--line); margin:auto -7px -12px; padding:7px 0 2px; }
+      #wealth-stack{ display:flex; align-items:flex-end; justify-content:center; gap:1px; }
+      .wcol{ position:relative; width:14px; height:62px; flex:none; }
+      .wcoin{ position:absolute; left:0; width:13px; height:13px; border-radius:50%; border:2px solid; }
+      .wcol.m0 .wcoin{ background:#cf7031; border-color:#7e3f14; }
+      .wcol.m1 .wcoin{ background:#a37f2d; border-color:#5f4712; }
+      .wcol.m2 .wcoin{ background:#ccd1d9; border-color:#767e8a; }
+      .wcol.m3 .wcoin{ background:#f5b921; border-color:#7a5200; }
+      .wcol.m4 .wcoin{ background:#e9f4f6; border-color:#5d7f8f; }
+      .wcoin.drop{ animation:coinDrop .3s cubic-bezier(.3,.7,.4,1); }
+      .wcoin.shine{ animation:coinShine .5s ease; }
+      .wcoin.ghostout{ animation:coinPop .18s ease-out forwards; z-index:2; }
+      @keyframes coinDrop{ 0%{ transform:translateY(-15px); } 55%{ transform:translateY(0); } 75%{ transform:translateY(-2.5px); } 100%{ transform:translateY(0); } }
+      @keyframes coinShine{ 0%{ filter:brightness(1.9); box-shadow:0 0 9px 3px rgba(255,255,255,.85); } 100%{ filter:brightness(1); box-shadow:0 0 0 0 rgba(255,255,255,0); } }
+      @keyframes coinPop{ 0%{ transform:scale(1); opacity:1; } 100%{ transform:scale(1.35) translateY(-3px); opacity:0; } }
+      .wlab{ position:absolute; bottom:0; left:-1px; right:-1px; text-align:center; font-size:7.5px; font-weight:800; color:var(--muted); }
+      @media (prefers-reduced-motion: reduce){ .wcoin.drop, .wcoin.shine, .wcoin.ghostout{ animation:none; } }
+      .confetti{ position:absolute; width:8px; height:12px; z-index:41; pointer-events:none; }
+      .hud-sc{
+        border:3px solid var(--line); background:var(--clay); color:#fff;
+        box-shadow:var(--shadow-s); padding:5px 8px;
+        font-weight:800; font-size:11px; letter-spacing:.08em; white-space:nowrap;
+      }
+      .reveal-anim{ animation:revealIn .45s ease; }
+
+      /* ---------- SCENE ---------- */
+      #scene{ position:relative; flex:1 1 auto; min-height:128px; overflow:hidden; }
+      .sun{
+        position:absolute; top:16px; right:18px; width:52px; height:52px;
+        background:var(--gold); border:3px solid var(--line); border-radius:50%;
+        box-shadow:var(--shadow-s); z-index:1;
+      }
+      @media (prefers-color-scheme: dark){ .sun{ background:#e8e0c8; } }
+      .cloud{
+        position:absolute; background:var(--panel); border:3px solid var(--line);
+        height:20px; z-index:1; opacity:.95;
+      }
+      .cloud::before,.cloud::after{
+        content:""; position:absolute; background:inherit; border:3px solid var(--line);
+      }
+      .cloud::before{ width:26px; height:26px; top:-16px; left:12px; border-bottom:none; }
+      .cloud::after{ width:18px; height:18px; top:-11px; right:10px; border-bottom:none; }
+      .c1{ width:86px; top:26px; left:-30px; animation:drift 46s linear infinite; }
+      .c2{ width:64px; top:74px; left:-20px; animation:drift 68s linear infinite; animation-delay:-30s; transform:scale(.75); }
+      @keyframes drift{ from{ margin-left:0 } to{ margin-left:calc(100% + 140px) } }
+      @media (prefers-reduced-motion: reduce){
+        .cloud{ animation:none; }
+        *{ transition-duration:.01ms !important; }
+      }
+
+      #wall-clip{ position:absolute; inset:0; overflow:hidden; z-index:2; }
+      #world{
+        position:absolute; bottom:0; left:50%; width:100%;
+        transform:translateX(-50%) translateY(0px);
+        transition:transform .8s cubic-bezier(.25,.8,.25,1);
+        display:flex; flex-direction:column; align-items:center;
+      }
+      #wall{
+        width:min(88%, 430px); display:flex; flex-direction:column-reverse;
+        align-items:stretch;
+      }
+      #foundation{
+        background:repeating-linear-gradient(45deg, #6e6e6e 0 14px, #5c5c5c 14px 28px);
+        border:3px solid var(--line); border-bottom:none; width:100%;
+        display:flex; align-items:center; justify-content:center;
+        color:#fff; font-weight:800; font-size:11px; letter-spacing:.12em;
+      }
+      .course{ display:flex; gap:3px; margin-top:3px; height:var(--bh); }
+      .brick{
+        flex:1 1 0; min-width:0; border:2px solid rgba(20,10,4,.6);
+        box-shadow:inset 0 -3px 0 rgba(0,0,0,.20), inset 0 2px 0 rgba(255,255,255,.22);
+      }
+      .brick.gold{
+        background:linear-gradient(180deg, #ffd94d, var(--gold) 55%, var(--gold-d)) !important;
+        border-color:#7a5200;
+        box-shadow:0 0 10px 2px rgba(245,185,33,.75), inset 0 2px 0 rgba(255,255,255,.5);
+      }
+      .brick.hotb{
+        background:linear-gradient(180deg, #ffb02e, #e2541e 72%) !important;
+        box-shadow:0 0 9px 2px rgba(255,120,30,.65), inset 0 2px 0 rgba(255,255,255,.5);
+        animation:hotGlow .7s ease-in-out infinite alternate;
+      }
+      .brick.leadb{
+        background:linear-gradient(180deg, #62676f, #33363f 75%) !important;
+        box-shadow:inset 0 -3px 0 rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.18);
+      }
+      @keyframes hotGlow{ from{ filter:brightness(1) } to{ filter:brightness(1.25) } }
+      .pile-brick.pb-gold{ background:linear-gradient(180deg, #ffd94d, var(--gold) 55%, var(--gold-d)); border-color:#7a5200; }
+      .pile-brick.pb-hot{ background:linear-gradient(180deg, #ffb02e, #e2541e); animation:hotGlow .7s ease-in-out infinite alternate; }
+      .pile-brick.pb-lead{ background:linear-gradient(180deg, #62676f, #33363f); }
+      .fly-brick.pb-gold{ background:linear-gradient(180deg, #ffd94d, var(--gold) 55%, var(--gold-d)); }
+      .fly-brick.pb-hot{ background:linear-gradient(180deg, #ffb02e, #e2541e); }
+      .fly-brick.pb-lead{ background:linear-gradient(180deg, #62676f, #33363f); }
+      #swing-brick.sw-gold{ background:linear-gradient(180deg, #ffd94d, var(--gold) 55%, var(--gold-d)); border-color:#7a5200; }
+      #swing-brick.sw-hot{ background:linear-gradient(180deg, #ffb02e, #e2541e); animation:hotGlow .6s ease-in-out infinite alternate; }
+      #swing-brick.sw-lead{ background:linear-gradient(180deg, #62676f, #33363f); }
+      #ground{ width:100%; }
+      .grass{
+        height:13px; background:var(--grass); border-top:3px solid var(--line);
+        background-image:repeating-linear-gradient(90deg, transparent 0 9px, rgba(0,0,0,.14) 9px 11px);
+      }
+      .dirt{
+        height:34px; background:var(--dirt);
+        background-image:radial-gradient(rgba(0,0,0,.22) 1.6px, transparent 1.7px), radial-gradient(rgba(255,255,255,.10) 1.2px, transparent 1.3px);
+        background-size:26px 18px, 18px 14px; background-position:0 0, 7px 6px;
+      }
+      /* Auto-layer progress: fixed at the bottom of the wall area, spanning
+         the wall's width. Only exists once Auto-Layer tier 1 is owned.
+         (The auto-kiln's progress lives only in the panel kiln bar.) */
+      #ak-bar{
+        position:absolute; left:50%; transform:translateX(-50%);
+        width:min(88%, 430px); bottom:56px; height:15px; z-index:5;
+        border:3px solid var(--line); background:var(--panel2); overflow:visible;
+      }
+      #ak-fill{
+        height:100%; width:0%;
+        background:repeating-linear-gradient(-45deg, var(--gold) 0 10px, var(--gold-d) 10px 20px);
+      }
+      #ak-label{
+        position:absolute; left:0; top:-17px; font-size:9.5px; font-weight:800;
+        letter-spacing:.14em; color:var(--ink);
+        text-shadow:1px 1px 0 var(--paper);
+      }
+      /* Hot-brick surprise reveal card */
+      #hot-reveal{
+        position:absolute; left:50%; top:26%; transform:translateX(-50%);
+        z-index:62; width:min(88%, 340px); text-align:center; cursor:pointer;
+        background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow);
+        padding:16px 18px 12px; animation:beatIn .4s ease;
+      }
+      .hr-brick{
+        width:52px; height:30px; margin:0 auto 10px;
+        background:linear-gradient(180deg, #ffb02e, #e2541e 72%);
+        border:3px solid var(--line); position:relative;
+        box-shadow:0 0 16px 5px rgba(255,120,30,.7);
+        animation:hotGlow .6s ease-in-out infinite alternate;
+      }
+      .hr-brick::after{
+        content:""; position:absolute; left:50%; top:0; bottom:0; width:3px; background:rgba(0,0,0,.3);
+      }
+      .hr-title{ font-family:'Archivo Black', sans-serif; font-size:21px; letter-spacing:.03em; margin-bottom:6px; }
+      .hr-text{ font-weight:700; font-size:14px; line-height:1.4; margin:0 0 8px; }
+      .hr-tap{ font-size:10.5px; font-weight:800; letter-spacing:.12em; color:var(--muted); }
+      #course-flag{
+        position:absolute; top:10px; left:10px; z-index:5;
+        background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s);
+        padding:4px 9px; font-weight:800; font-size:12px; letter-spacing:.08em;
+      }
+      #toast{
+        position:absolute; top:172px; left:50%; transform:translate(-50%,-16px);
+        z-index:8; max-width:88%; text-align:center;
+        background:var(--ink); color:var(--paper); border:3px solid var(--line);
+        box-shadow:var(--shadow-s); padding:9px 14px; font-weight:700; font-size:14px;
+        opacity:0; pointer-events:none; transition:opacity .3s ease, transform .3s ease;
+      }
+      #toast.show{ opacity:1; transform:translate(-50%,0); }
+
+      /* ---------- THUMB RAIL ---------- */
+      /* One solid bordered slab running the height of the play area.
+         Colors are FIXED, not theme vars: a warm cream panel with a 4px
+         near-black border and a 6px hard offset shadow in BOTH color
+         schemes, so the frame can never wash out against the sky. */
+      #rail{
+        position:absolute; top:10px; bottom:10px; width:86px; z-index:24;
+        display:flex; flex-direction:column; gap:8px; align-items:stretch;
+        background:#fdf3df; color:#221407;
+        border:4px solid #1e1206; box-shadow:6px 6px 0 #1e1206;
+        padding:12px 7px;
+      }
+      #app.rail-r #rail{ right:8px; }
+      #app.rail-l #rail{ left:8px; }
+      /* Fixed frame colors for the rail's inner chrome too (the mold
+         bar's track/border and the wealth divider/labels would otherwise
+         flip pale in dark mode and vanish on the cream slab). */
+      #rail .bar{ background:#ffeecb; border-color:#1e1206; }
+      #rail #wealth{ border-top:3px solid #1e1206; }
+      #rail .wlab{ color:#7a6248; }
+      /* Scene dressing that used to peek past the short centered rail
+         now clears the full-height slab on whichever side it sits. */
+      #app.rail-r #combo{ right:calc(var(--railgap) + 10px); }
+      #app.rail-r .sun{ right:calc(var(--railgap) + 16px); }
+      #app.rail-r .fanfare.side-r{ right:calc(var(--railgap) + 2px); }
+      #app.rail-l .fanfare.side-l{ left:calc(var(--railgap) + 2px); }
+      #app.rail-l #course-flag{ left:calc(var(--railgap) + 10px); }
+      #rail .big-btn{ width:100%; font-size:13px; padding:15px 3px; }
+      #pile-count{
+        text-align:center; font-family:'Archivo Black', sans-serif; font-size:24px; line-height:1.05;
+        margin-top:auto; /* with #wealth's auto top margin, the controls sit mid-slab */
+      }
+      #pile-count.pop{ animation:pop .25s ease; }
+      .rail-bar{ height:12px; margin-bottom:-3px; }
+      #btn-mold.firing{ filter:brightness(1.18); }
+      .bar{
+        height:14px; border:3px solid var(--line); background:var(--panel2); overflow:hidden;
+      }
+      .bar > div{ height:100%; width:0%; background:repeating-linear-gradient(-45deg, var(--clay) 0 10px, var(--clay-l) 10px 20px); }
+      .big-btn{
+        border:3px solid var(--line); box-shadow:4px 4px 0 var(--shadowc);
+        font-family:'Archivo Black', sans-serif; font-size:16px; letter-spacing:.04em;
+        padding:12px 8px; color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.3);
+        touch-action:manipulation; user-select:none; -webkit-user-select:none;
+      }
+      .big-btn:active{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--shadowc); }
+      #btn-mold{ background:var(--clay); width:100%; }
+      #btn-mold.held{ background:var(--clay-d); transform:translate(2px,2px); box-shadow:2px 2px 0 var(--shadowc); }
+      #pile{
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        min-height:32px; padding:4px 0; cursor:pointer;
+        touch-action:none; user-select:none; -webkit-user-select:none;
+      }
+      /* One brick wide — exactly the footprint of a placed / swinging brick */
+      .pile-brick{
+        width:34px; height:20px; background:var(--clay); flex:none; position:relative;
+        border:2px solid rgba(20,10,4,.65);
+        box-shadow:inset 0 -3px 0 rgba(0,0,0,.20), inset 0 2px 0 rgba(255,255,255,.22);
+      }
+      .pile-brick::after{
+        content:""; position:absolute; left:50%; top:0; bottom:0; width:2px;
+        background:rgba(0,0,0,.25);
+      }
+      .pile-brick.empty{
+        background:transparent; border:2px dashed var(--muted); box-shadow:none;
+      }
+      .pile-brick.empty::after{ display:none; }
+      .pile-ring{ position:absolute; right:1px; top:50%; transform:translateY(-50%); z-index:2; }
+
+      /* ---------- ALL-BRICKS PANEL (hold the pile brick) ---------- */
+      #brickpanel{
+        position:absolute; inset:0; z-index:58; background:rgba(24,14,4,.48);
+        display:flex; align-items:flex-end; justify-content:center;
+      }
+      #bp-panel{
+        background:var(--paper); border-top:3px solid var(--line); width:100%;
+        max-height:84dvh; overflow-y:auto; padding:12px; animation:revealIn .3s ease;
+      }
+      #btn-bp-close{
+        border:3px solid var(--line); background:var(--panel); box-shadow:var(--shadow-s);
+        width:36px; height:36px; font-weight:800; font-size:15px; flex:none; padding:0;
+      }
+      #btn-bp-close:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadowc); }
+      #bp-list{ display:flex; flex-wrap:wrap; gap:8px; }
+      .bp-item{ display:flex; flex-direction:column; align-items:center; gap:2px; width:40px; }
+      .bp-item .pile-brick{ flex:none; }
+      .bp-item.first .pile-brick{ outline:3px solid var(--gold-d); outline-offset:1px; }
+      .bp-fuse{ font-size:10px; font-weight:800; color:#d42a1e; line-height:1; min-height:10px; }
+      .bp-tag{ font-size:9px; font-weight:800; letter-spacing:.06em; color:var(--muted); line-height:1; }
+      #bp-empty{ font-weight:700; font-size:13.5px; color:var(--muted); padding:6px 2px 10px; }
+
+      @keyframes pulse{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.35) } }
+      @keyframes revealIn{ from{ transform:translateY(14px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+
+      /* ---------- WORKSHOP (overlay panel) ---------- */
+      #workshop{
+        position:absolute; inset:0; z-index:58; background:rgba(24,14,4,.48);
+        display:flex; align-items:flex-end; justify-content:center;
+      }
+      #shop-panel{
+        background:var(--paper); border-top:3px solid var(--line); width:100%;
+        max-height:84dvh; overflow-y:auto; padding:12px; animation:revealIn .3s ease;
+      }
+      .shop-head{ display:flex; align-items:center; gap:10px; margin:0 0 10px; }
+      .shop-head h2{
+        margin:0; font-family:'Archivo Black', sans-serif; font-size:16px; letter-spacing:.1em;
+      }
+      .shop-head span{ font-family:'Archivo',sans-serif; font-size:11px; font-weight:700; color:var(--muted); flex:1; }
+      #btn-shop-close, #btn-settings-close{
+        border:3px solid var(--line); background:var(--panel); box-shadow:var(--shadow-s);
+        width:36px; height:36px; font-weight:800; font-size:15px; flex:none; padding:0;
+      }
+      #btn-shop-close:active, #btn-settings-close:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadowc); }
+
+      /* ---------- SETTINGS ---------- */
+      #settings{
+        position:absolute; inset:0; z-index:59; background:rgba(24,14,4,.48);
+        display:flex; align-items:flex-end; justify-content:center;
+      }
+      #settings-panel{
+        background:var(--paper); border-top:3px solid var(--line); width:100%;
+        padding:12px; animation:revealIn .3s ease;
+      }
+      .set-row{
+        display:flex; align-items:center; gap:8px; padding:8px; margin-bottom:8px;
+        background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s);
+      }
+      .set-row:last-child{ margin-bottom:0; }
+      .set-row > span{ flex:1; font-weight:800; font-size:13px; letter-spacing:.07em; }
+      .set-opt{
+        border:3px solid var(--line); background:var(--panel2); color:var(--muted);
+        font-weight:800; font-size:12px; padding:7px 11px; flex:none;
+      }
+      .set-opt.on{ background:var(--gold); color:#221407; }
+      .upg-row{
+        display:flex; align-items:center; gap:10px; padding:7px 8px; margin-bottom:7px;
+        background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s);
+      }
+      .upg-row:last-child{ margin-bottom:0; }
+      .upg-info{ flex:1; min-width:0; }
+      .upg-name{ font-weight:800; font-size:13.5px; }
+      .upg-desc{ font-size:11.5px; color:var(--muted); font-weight:600; }
+      .upg-lvl{ font-size:11px; font-weight:800; color:var(--clay-d); letter-spacing:.05em; }
+      @media (prefers-color-scheme: dark){ .upg-lvl{ color:var(--clay-l); } }
+      .buy-btn{
+        border:3px solid var(--line); background:var(--gold); color:#221407;
+        box-shadow:3px 3px 0 var(--shadowc); font-weight:800; font-size:13px;
+        padding:8px 10px; flex:none; min-width:98px;
+      }
+      .buy-btn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadowc); }
+      .buy-btn.cant{ background:var(--panel2); color:var(--muted); }
+      .buy-btn.maxed{ background:var(--good); color:#fff; }
+      .shake{ animation:shake .3s ease; }
+      @keyframes shake{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+      /* ---------- FX ---------- */
+      #fx{ position:absolute; inset:0; pointer-events:none; z-index:40; overflow:hidden; }
+      .fly-brick{
+        position:absolute; width:30px; height:16px; background:var(--clay);
+        border:2px solid rgba(20,10,4,.7); box-shadow:2px 2px 0 rgba(0,0,0,.3);
+      }
+      .dust{
+        position:absolute; width:9px; height:9px; border-radius:50%;
+        background:var(--mortar); border:1.5px solid rgba(0,0,0,.3);
+      }
+
+      /* ---------- OVERLAYS ---------- */
+      .overlay{
+        position:absolute; inset:0; z-index:60; display:flex; flex-direction:column;
+        align-items:center; justify-content:center; padding:24px; text-align:center;
+        background:linear-gradient(180deg, var(--sky1), var(--sky2));
+      }
+      .panel-box{
+        background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow);
+        padding:22px; max-width:420px; width:100%;
+      }
+      .title{
+        font-family:'Archivo Black', sans-serif; font-size:clamp(38px, 11vw, 58px);
+        line-height:.98; margin:0 0 6px; letter-spacing:.01em;
+      }
+      .title .t-brick{ color:var(--clay); }
+      .tagline{ font-weight:700; font-size:15px; margin:0 0 20px; }
+      .cta-btn{
+        border:3px solid var(--line); box-shadow:var(--shadow); background:var(--clay);
+        color:#fff; font-family:'Archivo Black', sans-serif; font-size:19px;
+        padding:14px 34px; text-shadow:0 1px 0 rgba(0,0,0,.3);
+      }
+      .cta-btn:active{ transform:translate(3px,3px); box-shadow:2px 2px 0 var(--shadowc); }
+      .mini-wall{ display:flex; flex-direction:column-reverse; gap:3px; width:min(240px,70vw); margin:0 auto 20px; }
+      .mini-wall .course{ margin-top:0; }
+      .load-bricks{ display:flex; gap:4px; margin-bottom:18px; }
+      .load-bricks div{
+        width:30px; height:17px; background:var(--clay); border:2px solid var(--line);
+        animation:loadUp 1s ease-in-out infinite;
+      }
+      .load-bricks div:nth-child(2){ animation-delay:.15s; background:var(--clay-l); }
+      .load-bricks div:nth-child(3){ animation-delay:.3s; background:var(--gold); }
+      @keyframes loadUp{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-9px) } }
+      .stats-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:0 0 20px; }
+      .stat-box{ border:3px solid var(--line); background:var(--panel2); padding:10px 6px; }
+      .stat-num{ font-family:'Archivo Black', sans-serif; font-size:24px; display:block; }
+      .stat-lab{ font-size:11px; font-weight:800; letter-spacing:.1em; color:var(--muted); }
+
+      /* ---------- STORY CARDS + SPOTLIGHT HINTS ---------- */
+      /* One message on screen at a time, ever (see the arbiter in the
+         script): a story card OR a spotlight hint, never both, never two.
+         Story cards cover the screen (opaque during the opening sequence,
+         dimmed mid-game) and advance only via CONTINUE. A hint dims the
+         whole screen except a cutout around its target, which pulses;
+         one short line sits next to the target. */
+      #story{
+        position:absolute; inset:0; z-index:65; display:flex; flex-direction:column;
+        align-items:center; justify-content:center; padding:24px; text-align:center;
+        background:rgba(24,14,4,.55);
+      }
+      #story.opaque{ background:linear-gradient(180deg, var(--sky1), var(--sky2)); }
+      #story-card{
+        background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow);
+        padding:24px 22px; max-width:400px; width:100%; animation:storyIn .35s ease;
+      }
+      @keyframes storyIn{ from{ transform:translateY(10px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
+      #story-text{ font-weight:700; font-size:16.5px; line-height:1.5; margin:0 0 20px; }
+      #hintwrap{ position:absolute; inset:0; z-index:56; pointer-events:none; }
+      /* The dim is four strips around the target's cutout — no element
+         covers the target itself, so it stays fully interactive. Only
+         the strips take clicks (tap-through dismisses the hint). */
+      #hint-dim{ position:absolute; inset:0; pointer-events:none; }
+      #hint-dim .hd{ position:absolute; background:rgba(24,14,4,.58); pointer-events:auto; }
+      #hint-label{
+        position:absolute; max-width:250px; pointer-events:none;
+        background:var(--ink); color:var(--paper); border:3px solid var(--line);
+        box-shadow:var(--shadow-s); padding:10px 12px;
+        font-weight:700; font-size:14px; line-height:1.35; text-align:left;
+      }
+      .spot-on{ animation:spotPulse 1s ease-in-out infinite; position:relative; }
+      @keyframes spotPulse{
+        0%,100%{ box-shadow:0 0 0 2px rgba(245,185,33,.55), 0 0 0 4px rgba(245,185,33,.22) }
+        50%{ box-shadow:0 0 0 3px rgba(245,185,33,1), 0 0 14px 5px rgba(245,185,33,.65) }
+      }
+      @media (prefers-reduced-motion: reduce){ .spot-on{ animation:none; } }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="rail-r">
+      <!-- GAME -->
+      <header id="hud">
+        <div class="hud-course hidden" id="hud-course-block">
+          <span class="hud-label">COURSE</span>
+          <span id="hud-course-num">0</span>
+          <span class="hud-goal" id="hud-goal">/ 50</span>
+        </div>
+        <div class="hud-spacer"></div>
+        <div class="hud-money hidden" id="hud-money-box" title="Money — earned by placing bricks">$<span id="hud-money">0</span></div>
+        <div class="hud-sc hidden" id="hud-sc" title="Second Chance: one miss per row is forgiven">2ND CHANCE</div>
+        <button id="btn-shop" class="hidden" aria-label="Open the workshop">SHOP<span id="shop-new" class="hidden">NEW</span></button>
+        <button id="btn-settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </header>
+
+      <div id="statusbar"><span id="status-line">Cold clay, warm hands.</span></div>
+
+      <div id="scene">
+        <div class="sun"></div>
+        <div id="shimmer"><div class="sh-shape s1"></div><div class="sh-shape s2"></div></div>
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+        <div id="wall-clip">
+          <div id="world">
+            <div id="wall"></div>
+            <div id="ground"><div class="grass"></div><div class="dirt"></div></div>
+          </div>
+          <div id="ak-bar" class="hidden"><span id="ak-label">AUTO-LAYER</span><div id="ak-fill"></div></div>
+        </div>
+        <div id="rail">
+          <div id="pile-count" title="Bricks in hand"><span id="hud-bricks">0</span></div>
+          <div id="pile" role="button" aria-label="Your newest brick — tap to place it, hold to see all your bricks"></div>
+          <div class="bar rail-bar"><div id="mold-fill"></div></div>
+          <button class="big-btn" id="btn-mold">HOLD TO MOLD</button>
+          <div id="wealth" title="Your money, stacked — copper $1 · bronze $10 · silver $100 · gold $1,000 · platinum $10,000">
+            <div id="wealth-stack"></div>
+          </div>
+        </div>
+        <div id="fanfare-l" class="fanfare side-l">
+          <div class="trumpet"><svg viewBox="0 0 48 26" aria-hidden="true"><path d="M7 11 L35 4 L35 22 L7 15 Z" fill="#f5b921" stroke="#221407" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="10.5" width="7" height="5" fill="#d99a06" stroke="#221407" stroke-width="2"/></svg></div>
+          <div class="person"><svg viewBox="0 0 24 34" aria-hidden="true"><circle cx="12" cy="7" r="5.5" fill="#eec39a" stroke="#221407" stroke-width="2"/><path d="M2.5 34 v-9 a9.5 9.5 0 0 1 19 0 v9 Z" fill="#3fa7d6" stroke="#221407" stroke-width="2"/></svg></div>
+          <div class="person"><svg viewBox="0 0 24 34" aria-hidden="true"><circle cx="12" cy="7" r="5.5" fill="#c68863" stroke="#221407" stroke-width="2"/><path d="M2.5 34 v-9 a9.5 9.5 0 0 1 19 0 v9 Z" fill="#79a84e" stroke="#221407" stroke-width="2"/></svg></div>
+        </div>
+        <div id="fanfare-r" class="fanfare side-r">
+          <div class="trumpet"><svg viewBox="0 0 48 26" aria-hidden="true"><path d="M7 11 L35 4 L35 22 L7 15 Z" fill="#f5b921" stroke="#221407" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="10.5" width="7" height="5" fill="#d99a06" stroke="#221407" stroke-width="2"/></svg></div>
+          <div class="person"><svg viewBox="0 0 24 34" aria-hidden="true"><circle cx="12" cy="7" r="5.5" fill="#eec39a" stroke="#221407" stroke-width="2"/><path d="M2.5 34 v-9 a9.5 9.5 0 0 1 19 0 v9 Z" fill="#d05a35" stroke="#221407" stroke-width="2"/></svg></div>
+          <div class="person"><svg viewBox="0 0 24 34" aria-hidden="true"><circle cx="12" cy="7" r="5.5" fill="#c68863" stroke="#221407" stroke-width="2"/><path d="M2.5 34 v-9 a9.5 9.5 0 0 1 19 0 v9 Z" fill="#8a5a33" stroke="#221407" stroke-width="2"/></svg></div>
+        </div>
+        <div id="course-flag" class="hidden">COURSE <span id="flag-num">0</span> · <span id="flag-in">0/8</span></div>
+        <div id="combo" class="hidden">COMBO <span id="combo-n">×2</span></div>
+        <div id="hot-reveal" class="hidden">
+          <div class="hr-brick"></div>
+          <div class="hr-title">THE KILN RUNS HOT</div>
+          <p class="hr-text">Some bricks now come out glowing. Place a hot brick within 10 seconds — it pays <b>double</b>.</p>
+          <div class="hr-tap">TAP TO DISMISS</div>
+        </div>
+        <div id="crowd-vig"></div>
+        <div id="swing-layer" class="hidden">
+          <div id="swing-ring" class="hidden"></div>
+          <div id="swing-window"></div>
+          <div id="swing-rail"></div>
+          <div id="swing-marker"></div>
+          <div id="swing-brick" title="Tap to drop"></div>
+        </div>
+        <div id="miss-flash"></div>
+        <div id="miss-text">MISS!</div>
+        <div id="try-text">TRY AGAIN!</div>
+        <div id="toast"></div>
+      </div>
+
+      <div id="workshop" class="hidden">
+        <div id="shop-panel">
+          <div class="shop-head">
+            <h2>WORKSHOP</h2><span>Spend money. Climb faster.</span>
+            <button id="btn-shop-close" aria-label="Close workshop">✕</button>
+          </div>
+          <div id="upg-list"></div>
+        </div>
+      </div>
+
+      <div id="settings" class="hidden">
+        <div id="settings-panel">
+          <div class="shop-head">
+            <h2>SETTINGS</h2><span></span>
+            <button id="btn-settings-close" aria-label="Close settings">✕</button>
+          </div>
+          <div class="set-row"><span>CONTROLS</span>
+            <button class="set-opt" id="set-hand-r">RIGHT HAND</button>
+            <button class="set-opt" id="set-hand-l">LEFT HAND</button>
+          </div>
+          <div class="set-row"><span>SOUND</span>
+            <button class="set-opt" id="set-snd-on">ON</button>
+            <button class="set-opt" id="set-snd-off">OFF</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="brickpanel" class="hidden">
+        <div id="bp-panel">
+          <div class="shop-head">
+            <h2>YOUR BRICKS</h2><span id="bp-count"></span>
+            <button id="btn-bp-close" aria-label="Close brick list">✕</button>
+          </div>
+          <div id="bp-list"></div>
+          <div id="bp-empty" class="hidden">No bricks yet — hold the kiln to mold some.</div>
+        </div>
+      </div>
+
+      <div id="fx"></div>
+
+      <!-- SPOTLIGHT HINT (arbiter-driven: dims everything but its target) -->
+      <div id="hintwrap" class="hidden">
+        <div id="hint-dim"><div class="hd"></div><div class="hd"></div><div class="hd"></div><div class="hd"></div></div>
+        <div id="hint-label"><span id="hint-text"></span></div>
+      </div>
+
+      <!-- STORY CARD (arbiter-driven: one card at a time, CONTINUE advances) -->
+      <div id="story" class="hidden">
+        <div id="story-card">
+          <p id="story-text"></p>
+          <button class="cta-btn" id="story-next">CONTINUE</button>
+        </div>
+      </div>
+
+      <!-- LOADING -->
+      <div class="overlay" id="ov-loading">
+        <div class="load-bricks"><div></div><div></div><div></div></div>
+        <div style="font-family:'Archivo Black',sans-serif; font-size:20px; letter-spacing:.06em;">STACKING BRICKS…</div>
+      </div>
+
+      <!-- START -->
+      <div class="overlay hidden" id="ov-start">
+        <div class="mini-wall" id="mini-wall"></div>
+        <h1 class="title">BRICK<br />BY <span class="t-brick">BRICK</span></h1>
+        <p class="tagline">There's a hole in the sky, and the whole town is pointing at it.<br />You're the wall maker. Build.</p>
+        <button class="cta-btn" id="btn-begin">BEGIN</button>
+      </div>
+
+      <!-- VICTORY -->
+      <div class="overlay hidden" id="ov-victory">
+        <div class="panel-box">
+          <h1 class="title" style="font-size:clamp(30px,9vw,44px);">THROUGH<br /><span class="t-brick">THE HOLE</span></h1>
+          <p class="tagline">Fifty courses up. The silhouettes were people all along — and the town below is still cheering.</p>
+          <div class="stats-grid">
+            <div class="stat-box"><span class="stat-num" id="st-molded">0</span><span class="stat-lab">BRICKS MOLDED</span></div>
+            <div class="stat-box"><span class="stat-num" id="st-laid">0</span><span class="stat-lab">BRICKS LAID</span></div>
+            <div class="stat-box"><span class="stat-num" id="st-time">0:00</span><span class="stat-lab">TIME TAKEN</span></div>
+            <div class="stat-box"><span class="stat-num" id="st-peak">0</span><span class="stat-lab">PEAK BRICKS / SEC</span></div>
+            <div class="stat-box" style="grid-column:span 2;"><span class="stat-num" id="st-money">$0</span><span class="stat-lab">MONEY EARNED</span></div>
+          </div>
+          <button class="cta-btn" id="btn-endless">KEEP BUILDING</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+      /* ================= STATE ================= */
+      var TICK = 0.05; // 50ms tick-based clock (never wall-clock dependent)
+      var S = {
+        started: false, won: false, endless: false,
+        bricks: 0, molded: 0, laid: 0, courses: 0, inCourse: 0,
+        money: 0, earned: 0, misses: 0,
+        perCourse: 8,
+        tick: 0, playTicks: 0,
+        moldT: 0, held: false,
+        swing: { active: false, pos: 0, dir: 1, item: null, from: "L" },
+        hotUnlocked: false, nextHot: false,
+        autoKilnShown: false, autoLayerShown: false, workshopShown: false, precisionShown: false,
+        layAcc: 0,
+        tier: { kilnSpeed: 0, autoKiln: 0, autoLayer: 0, secondChance: 0, precision: 0, gilded: 0, hotMortar: 0, steady: 0 },
+        stack: [],
+        moldEvents: [], peak: 0,
+        streak: 0, comboTutDone: false, scUsed: 0,
+        flags: {}, beats: {},
+        muted: false,
+        shopOpen: false, seenVis: null, railSide: "r"
+      };
+      var HOT_FUSE_TICKS = 200; // a hot brick's 10-second fuse, in 50ms ticks
+      var UNLOCK_MOLDED = 25, UNLOCK_COURSES = 5, WIN_COURSES = 50, PRECISION_COURSE = 10;
+      var HIT_TOL = 0.085; // base accepted half-width, fraction of wall width
+      // Steady Hands widens the accepted window: +30% at tier 1, +60% at 2.
+      function hitTol() { return HIT_TOL * (S.tier.steady >= 2 ? 1.6 : S.tier.steady >= 1 ? 1.3 : 1); }
+      // Tier 3's ALMOST RING: a wider halo around the accepted window.
+      function almostTol() { return hitTol() * 2; }
+      var SWING_BRICK_PX = 34; // the swinging brick's width in px
+      /* SINGLE SOURCE OF TRUTH for a drop at a given swing position:
+         2 = success, 1 = almost ring, 0 = miss — judged by the brick's
+         CENTER against the accepted range. The drop resolution and the
+         brick's glow both read this and nothing else, so the glow can
+         never promise what a drop won't deliver. */
+      function dropOutcomeAt(pos) {
+        var d = Math.abs(pos - targetFrac());
+        if (d <= hitTol()) return 2;
+        if (S.tier.steady >= 3 && d <= almostTol()) return 1;
+        return 0;
+      }
+      /* ----- Tiered upgrade tree: one workshop row per line; a line's next
+         tier appears only after the previous tier is bought. ----- */
+      var FILL_TIMES = [2.0, 1.5, 1.1, 0.8, 0.55];
+      var AK_INT = [8, 5, 3, 1.8];
+      var AL_INT = [6, 4, 2.5, 1.5];
+      var PREC_MULT = [1, 0.85, 0.7, 0.55];
+      var GILD_PCT = [0, 10, 20, 30];
+      var LINES = [
+        { id: "kilnSpeed", name: "Kiln Fill Speed", costs: [10, 35, 90, 200], gate: "start",
+          effect: function (t) { return "Hold-fill: " + FILL_TIMES[t] + "s per brick."; },
+          next: function (t) { return "Hold-fill " + FILL_TIMES[t] + "s → " + FILL_TIMES[t + 1] + "s per brick."; } },
+        { id: "autoKiln", name: "Auto-Kiln", costs: [30, 80, 180, 380], gate: "molded25",
+          effect: function (t) { return t === 0 ? "The fill bar creeps up on its own." : "Idle fill: 1 brick / " + AK_INT[t - 1] + "s. Holding is always faster."; },
+          next: function (t) { return "Idle fill: 1 brick / " + AK_INT[t] + "s. Holding overrides at your fill speed."; } },
+        { id: "autoLayer", name: "Auto-Layer", costs: [75, 160, 320, 550], gate: "courses5",
+          effect: function (t) { return t === 0 ? "Places bricks for you, perfectly." : "Places a brick every " + AL_INT[t - 1] + "s — perfect, flat $1, no combo."; },
+          next: function (t) { return "Places a brick every " + AL_INT[t] + "s — perfect, flat $1, no combo."; } },
+        { id: "secondChance", name: "Second Chance", costs: [50, 120, 250], gate: "autoKilnOwned",
+          effect: function (t) { return t === 0 ? "Forgives a miss, streak intact." : "Forgives " + t + " miss" + (t > 1 ? "es" : "") + " per row — brick returns, streak survives."; },
+          next: function (t) { return "Forgives " + (t + 1) + " miss" + (t > 0 ? "es" : "") + " per row — brick returns, streak survives."; } },
+        { id: "precision", name: "Precision Tools", costs: [100, 200, 350], gate: "precision",
+          effect: function (t) { return t === 0 ? "The swing, slowed down." : "Swing speed −" + Math.round((1 - PREC_MULT[t]) * 100) + "%."; },
+          next: function (t) { return "Swing speed −" + Math.round((1 - PREC_MULT[t + 1]) * 100) + "% — easier drops."; } },
+        { id: "steady", name: "Steady Hands", costs: [60, 140, 260], gate: "courses3",
+          effect: function (t) {
+            if (t <= 0) return "A wider target window.";
+            if (t === 1) return "Accepted drop window +30% wider.";
+            if (t === 2) return "Accepted drop window +60% wider.";
+            return "Window +60%, plus the ALMOST RING — a near miss re-swings the same brick, streak safe.";
+          },
+          next: function (t) {
+            if (t === 0) return "Accepted drop window +30% wider — the glow on the rail grows.";
+            if (t === 1) return "Accepted drop window +60% wider in total.";
+            return "Adds the ALMOST RING — land just outside and the same brick swings again. No streak lost, no Second Chance spent.";
+          } },
+        { id: "gilded", name: "Gilded Clay", costs: [110, 240, 450], gate: "courses3",
+          effect: function (t) { return t === 0 ? "Some bricks come out golden." : GILD_PCT[t] + "% of molded bricks come out golden — they pay $8."; },
+          next: function (t) { return GILD_PCT[t + 1] + "% of molded bricks come out golden — they pay $8."; } },
+        { id: "hotMortar", name: "Hot Mortar", costs: [150, 300], gate: "courses5",
+          effect: function (t) { return "Rows need " + (8 - t) + " bricks."; },
+          next: function (t) { return "Rows need " + (7 - t) + " bricks instead of " + (8 - t) + "."; } }
+      ];
+      function lineVisible(l) {
+        if (l.gate === "start") return true;
+        if (l.gate === "molded25") return S.molded >= UNLOCK_MOLDED;
+        if (l.gate === "courses5") return S.courses >= UNLOCK_COURSES;
+        if (l.gate === "courses3") return S.courses >= 3;
+        if (l.gate === "autoKilnOwned") return S.tier.autoKiln >= 1;
+        if (l.gate === "precision") return S.precisionShown;
+        return true;
+      }
+      function moldTime() { return FILL_TIMES[S.tier.kilnSpeed]; }
+      function autoMoldInt() { return AK_INT[S.tier.autoKiln - 1]; }
+      function autoLayInt() { return AL_INT[S.tier.autoLayer - 1]; }
+      function swingSpeed() { return 0.85 * PREC_MULT[S.tier.precision]; } // wall-widths per second
+      function targetFrac() { return (Math.min(S.inCourse, S.perCourse - 1) + 0.5) / S.perCourse; }
+
+      /* ================= DOM ================= */
+      function $(id) { return document.getElementById(id); }
+      var el = {
+        hudCourse: $("hud-course-num"), hudGoal: $("hud-goal"), hudBricks: $("hud-bricks"),
+        hudMoney: $("hud-money"), hudMoneyBox: $("hud-money-box"),
+        flagNum: $("flag-num"), flagIn: $("flag-in"),
+        swingLayer: $("swing-layer"), swingBrick: $("swing-brick"), swingMarker: $("swing-marker"),
+        swingWindow: $("swing-window"), swingRing: $("swing-ring"),
+        akBar: $("ak-bar"), akFill: $("ak-fill"), hotReveal: $("hot-reveal"),
+        fanL: $("fanfare-l"), fanR: $("fanfare-r"),
+        wealthStack: $("wealth-stack"),
+        missFlash: $("miss-flash"), missText: $("miss-text"),
+        scene: $("scene"), world: $("world"), wall: $("wall"), wallClip: $("wall-clip"),
+        toast: $("toast"), fx: $("fx"),
+        kilnVis: $("btn-mold"), statusLine: $("status-line"), moldFill: $("mold-fill"),
+        btnMold: $("btn-mold"),
+        pile: $("pile"), pileCount: $("pile-count"),
+        workshop: $("workshop"), upgList: $("upg-list"),
+        btnShop: $("btn-shop"), shopNew: $("shop-new"),
+        courseFlag: $("course-flag"), hudCourseBlock: $("hud-course-block"),
+        hudSc: $("hud-sc"), combo: $("combo"), comboN: $("combo-n"),
+        story: $("story"), storyText: $("story-text"),
+        hintWrap: $("hintwrap"), hintDim: $("hint-dim"), hintLabel: $("hint-label"), hintText: $("hint-text"),
+        shimmer: $("shimmer"),
+        crowdVig: $("crowd-vig"), tryText: $("try-text"),
+        settings: $("settings"),
+        brickPanel: $("brickpanel"), bpList: $("bp-list"), bpCount: $("bp-count"), bpEmpty: $("bp-empty")
+      };
+
+      /* ================= AUDIO ================= */
+      var AC = null, lastClink = -99;
+      function audio() {
+        if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } }
+        if (AC && AC.state === "suspended") AC.resume();
+        return AC;
+      }
+      function tone(freq, dur, type, vol, delay, slideTo) {
+        if (S.muted || !audio()) return;
+        var t = AC.currentTime + (delay || 0);
+        var o = AC.createOscillator(), g = AC.createGain();
+        o.type = type || "sine"; o.frequency.setValueAtTime(freq, t);
+        if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+        g.gain.setValueAtTime(vol || 0.15, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.connect(g); g.connect(AC.destination);
+        o.start(t); o.stop(t + dur + 0.02);
+      }
+      function noiseBurst(dur, vol, freq) {
+        if (S.muted || !audio()) return;
+        var n = Math.floor(AC.sampleRate * dur);
+        var buf = AC.createBuffer(1, n, AC.sampleRate);
+        var d = buf.getChannelData(0);
+        for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+        var src = AC.createBufferSource(); src.buffer = buf;
+        var f = AC.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = freq || 800;
+        var g = AC.createGain(); g.gain.value = vol || 0.2;
+        src.connect(f); f.connect(g); g.connect(AC.destination);
+        src.start();
+      }
+      function sndClink() {
+        if (S.tick - lastClink < 2) return; lastClink = S.tick;
+        tone(1900, 0.06, "square", 0.04); tone(2650, 0.08, "sine", 0.07, 0.02);
+      }
+      function sndThunk() { tone(130, 0.13, "sine", 0.32, 0, 55); noiseBurst(0.07, 0.14, 500); }
+      function sndTick() { tone(1250, 0.03, "square", 0.05); }
+      function sndPop() { tone(480, 0.07, "triangle", 0.14, 0, 760); }
+      function sndBuy() { tone(1900, 0.06, "square", 0.05); tone(2650, 0.09, "sine", 0.09, 0.06); tone(880, 0.12, "triangle", 0.12, 0.05); }
+      function sndErr() { tone(150, 0.16, "sawtooth", 0.07, 0, 90); }
+      function sndCoin() { tone(1560, 0.05, "square", 0.05); tone(2090, 0.1, "sine", 0.08, 0.04); }
+      function sndMiss() { tone(320, 0.22, "sawtooth", 0.09, 0, 110); noiseBurst(0.12, 0.1, 900); }
+      function sndFanfare() {
+        var notes = [523, 659, 784, 1047];
+        for (var i = 0; i < notes.length; i++) tone(notes[i], 0.22, "triangle", 0.16, i * 0.09);
+        noiseBurst(0.25, 0.05, 3000);
+      }
+      function sndSizzle() { noiseBurst(0.18, 0.06, 4200); noiseBurst(0.12, 0.04, 5200); }
+      function sndCheer(big) {
+        // The crowd's "yay": a bright noise swell plus rising voices.
+        noiseBurst(big ? 0.4 : 0.2, big ? 0.12 : 0.06, 1600);
+        tone(659, 0.12, "triangle", 0.07, 0);
+        tone(880, 0.14, "triangle", 0.08, 0.05);
+        if (big) { tone(1047, 0.16, "triangle", 0.08, 0.1); tone(1319, 0.22, "triangle", 0.07, 0.16); }
+      }
+
+      /* ================= HELPERS ================= */
+      function shade(seed) {
+        var r = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+        var f = r - Math.floor(r);
+        var r2 = Math.sin(seed * 269.5 + 183.3) * 28001.8384;
+        var f2 = r2 - Math.floor(r2);
+        return "hsl(" + Math.round(11 + f * 9) + ", " + Math.round(56 + f2 * 12) + "%, " + Math.round(39 + f * 11) + "%)";
+      }
+      function fmtTime(ticks) {
+        var s = Math.floor(ticks * TICK);
+        return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
+      }
+      var toastTimer = null;
+      function toast(msg, ms) {
+        el.toast.textContent = msg;
+        el.toast.classList.add("show");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { el.toast.classList.remove("show"); }, ms || 3400);
+      }
+      function appRect() { return $("app").getBoundingClientRect(); }
+      function centerOf(node) {
+        var r = node.getBoundingClientRect(), a = appRect();
+        return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2, w: r.width, h: r.height };
+      }
+      function flyBrick(from, to, done, type) {
+        var b = document.createElement("div");
+        b.className = "fly-brick";
+        if (type && type !== "normal") b.classList.add("pb-" + type);
+        else b.style.background = shade(S.molded + S.laid + Math.floor(Math.random() * 50));
+        b.style.left = (from.x - 15) + "px"; b.style.top = (from.y - 8) + "px";
+        el.fx.appendChild(b);
+        var dx = to.x - from.x, dy = to.y - from.y;
+        var arc = -Math.max(46, Math.abs(dy) * 0.4);
+        var anim = b.animate([
+          { transform: "translate(0,0) rotate(0deg)" },
+          { transform: "translate(" + (dx * 0.5) + "px," + (dy * 0.5 + arc) + "px) rotate(9deg)", offset: 0.55 },
+          { transform: "translate(" + dx + "px," + dy + "px) rotate(0deg)" }
+        ], { duration: 380, easing: "cubic-bezier(.3,.7,.4,1)" });
+        var finished = false;
+        var finish = function () {
+          if (finished) return; finished = true;
+          if (b.parentNode) b.parentNode.removeChild(b);
+          if (done) done();
+        };
+        if (anim && anim.finished) anim.finished.then(finish); else setTimeout(finish, 400);
+        setTimeout(finish, 900); // safety
+      }
+      function dustPuff(x, y, n) {
+        for (var i = 0; i < (n || 5); i++) {
+          var d = document.createElement("div");
+          d.className = "dust";
+          d.style.left = (x - 5) + "px"; d.style.top = (y - 5) + "px";
+          el.fx.appendChild(d);
+          var ang = Math.random() * Math.PI - Math.PI; // upward hemisphere
+          var dist = 16 + Math.random() * 26;
+          var dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist * 0.7 - 6;
+          var anim = d.animate([
+            { transform: "translate(0,0) scale(1)", opacity: 0.95 },
+            { transform: "translate(" + dx + "px," + dy + "px) scale(0.4)", opacity: 0 }
+          ], { duration: 420 + Math.random() * 200, easing: "ease-out" });
+          (function (node, a) {
+            var kill = function () { if (node.parentNode) node.parentNode.removeChild(node); };
+            if (a && a.finished) a.finished.then(kill); setTimeout(kill, 900);
+          })(d, anim);
+        }
+      }
+    </script>
+    <script>
+      "use strict";
+      /* ================= RENDER: WALL ================= */
+      var courseEls = {};       // courseNumber -> row element (rendered window only)
+      var foundationEl = null;
+      var renderedFrom = 1;     // lowest course number currently in DOM
+      var MAX_RENDER = 160;
+      var BRICK_H = 22, GROUND_H = 47; // 19 + 3 margin; 13 grass + 34 dirt
+      S.topCourse = 0;
+      var ghostEl = null;
+      function showGhost() {
+        hideGhost();
+        var row = getCourseRow(S.courses + 1);
+        ghostEl = document.createElement("div");
+        ghostEl.className = "brick ghost";
+        ghostEl.style.flex = "0 0 calc((100% - " + ((S.perCourse - 1) * 3) + "px) / " + S.perCourse + ")";
+        row.appendChild(ghostEl);
+      }
+      function hideGhost() {
+        if (ghostEl && ghostEl.parentNode) ghostEl.parentNode.removeChild(ghostEl);
+        ghostEl = null;
+      }
+
+      function makeBrick(courseNum, slot, type) {
+        var b = document.createElement("div");
+        b.className = "brick";
+        // Fixed slot width (1/perCourse of the row) — a lone brick must not
+        // stretch to fill the whole course.
+        b.style.flex = "0 0 calc((100% - " + ((S.perCourse - 1) * 3) + "px) / " + S.perCourse + ")";
+        var center = Math.floor(S.perCourse / 2);
+        if (type === "gold") b.classList.add("gold");
+        else if (type === "hot") b.classList.add("hotb");
+        else if (type === "lead") b.classList.add("leadb");
+        else if (courseNum % 10 === 0 && slot === center) b.classList.add("gold");
+        else b.style.background = shade(courseNum * 31 + slot * 7 + 3);
+        if (!b.classList.contains("gold")) b.style.transform = "translateY(" + ((slot % 3) - 1) + "px)";
+        return b;
+      }
+      function getCourseRow(courseNum) {
+        if (courseEls[courseNum]) return courseEls[courseNum];
+        var row = document.createElement("div");
+        row.className = "course";
+        el.wall.appendChild(row);
+        courseEls[courseNum] = row;
+        return row;
+      }
+      function compressWall() {
+        // Keep only the newest MAX_RENDER course rows in the DOM.
+        var oldest = S.courses - MAX_RENDER;
+        if (oldest < renderedFrom) return;
+        if (!foundationEl) {
+          foundationEl = document.createElement("div");
+          foundationEl.id = "foundation";
+          el.wall.insertBefore(foundationEl, el.wall.firstChild);
+        }
+        for (var c = renderedFrom; c <= oldest; c++) {
+          if (courseEls[c]) { courseEls[c].parentNode.removeChild(courseEls[c]); delete courseEls[c]; }
+        }
+        renderedFrom = oldest + 1;
+        foundationEl.style.height = ((oldest) * BRICK_H) + "px";
+        foundationEl.textContent = "COURSES 1–" + oldest + " BELOW";
+      }
+      function slotPoint(courseNum, slot) {
+        // Screen point (app coords) where the next brick lands.
+        var row = getCourseRow(courseNum);
+        var bricks = row.children.length;
+        var r = row.getBoundingClientRect(), a = appRect();
+        var wSlot = r.width / S.perCourse;
+        return {
+          x: r.left - a.left + wSlot * (slot + 0.5),
+          y: r.top - a.top + r.height / 2,
+          empty: bricks === 0
+        };
+      }
+      function updatePan() {
+        var clipH = el.wallClip.clientHeight;
+        var totalH = Math.max(S.courses, S.topCourse) * BRICK_H + GROUND_H;
+        var off = Math.max(0, totalH - clipH + 26);
+        el.world.style.transform = "translateX(-50%) translateY(" + off + "px)";
+      }
+
+      /* ================= HUD / PANELS ================= */
+      function popEl(node) { node.classList.remove("pop"); void node.offsetWidth; node.classList.add("pop"); }
+      function renderHUD() {
+        el.hudCourse.textContent = S.courses;
+        el.flagNum.textContent = S.courses + (S.inCourse > 0 ? 1 : 0);
+        el.flagIn.textContent = Math.min(S.inCourse, S.perCourse) + "/" + S.perCourse;
+        el.hudBricks.textContent = S.bricks;
+        el.hudMoney.textContent = S.money;
+        el.hudGoal.textContent = S.endless ? "· ENDLESS" : "/ " + WIN_COURSES;
+        el.hudSc.classList.toggle("hidden", !(S.started && S.tier.secondChance > 0 && S.scUsed < S.tier.secondChance));
+        el.hudSc.textContent = "2ND CHANCE" + (S.tier.secondChance > 1 ? " ×" + (S.tier.secondChance - S.scUsed) : "");
+        el.shimmer.style.opacity = Math.min(1, 0.5 + S.courses * 0.014).toFixed(2);
+        // The bottom-of-wall progress bar exists only once Auto-Layer
+        // tier 1 is owned — it tracks auto placement, not the auto-kiln.
+        el.akBar.classList.toggle("hidden", S.tier.autoLayer < 1);
+        // pile visual — ONE brick only: the top of the stack (the next to
+        // place — a hot brick whenever one is held, since heat rises;
+        // otherwise the most recently molded one). It never stacks
+        // or grows; the count above carries the total. Its own type art
+        // (gold sheen / hot glow + fuse ring / dark lead) shows on it.
+        var html = "";
+        var top0 = S.stack.length ? S.stack[S.stack.length - 1] : null;
+        if (top0) {
+          html += '<div class="pile-brick pb-' + top0.type + '"' + (top0.type === "normal" ? ' style="background:' + shade(top0.seed || 5) + '"' : "") + ">";
+          if (top0.type === "hot") {
+            html += '<svg class="pile-ring" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="rgba(0,0,0,.3)" stroke="rgba(255,255,255,.45)" stroke-width="2.6"></circle><circle id="pile-ring-fg" cx="8" cy="8" r="5.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="34.6" stroke-dashoffset="0" transform="rotate(-90 8 8)"></circle></svg>';
+          }
+          html += "</div>";
+        } else {
+          html = '<div class="pile-brick empty" aria-hidden="true"></div>';
+        }
+        el.pile.innerHTML = html;
+        el.statusLine.textContent = statusLineText();
+        renderPileFx();
+        wealthKick();
+        renderWealth();
+        renderShop();
+        renderShopBadge();
+      }
+      /* ----- Five-metal coin stacks -----
+         Base-10 denominations: copper $1, bronze $10, silver $100,
+         gold $1,000, platinum $10,000. Each stack draws the digit of
+         the DISPLAYED amount as 0–9 real coins. The real balance
+         (S.money) is always exact and immediate — the stacks are a
+         display that catches up: gains enter one copper at a time
+         (accelerating on big payouts, so it never becomes a wait) and
+         cascade up a metal whenever a stack rolls past 9; spends
+         drain fast, higher coins breaking down into lower ones as
+         the digits fall. New payouts queue behind a running cascade —
+         the stepper always chases S.money, so it can never desync. */
+      var WLAB = ["1", "10", "100", "1K", "10K"]; // by metal index: 0 copper … 4 platinum
+      var wDisp = 0;                    // amount the stacks currently show
+      var wPrev = [0, 0, 0, 0, 0];      // digits at last render (for drop anims)
+      var wGhosts = [0, 0, 0, 0, 0];    // coins mid pop-out per stack (cascade clears)
+      var wShine = [false, false, false, false, false];
+      var wTimer = null, wGhostTimer = null, wDelay = 55;
+      var wealthSig = "";
+      function wDigits(v) {
+        return [v % 10, Math.floor(v / 10) % 10, Math.floor(v / 100) % 10, Math.floor(v / 1000) % 10, Math.min(9, Math.floor(v / 10000))];
+      }
+      function renderWealth() {
+        var sig = wDisp + "|" + wGhosts.join(",");
+        if (sig === wealthSig) return;
+        wealthSig = sig;
+        var digs = wDigits(wDisp);
+        var html = "";
+        for (var c = 4; c >= 0; c--) { // place-value order: platinum … copper
+          html += '<div class="wcol m' + c + '">';
+          for (var i = 0; i < digs[c]; i++) {
+            var cls = "wcoin";
+            if (i >= wPrev[c]) { cls += " drop"; if (wShine[c]) cls += " shine"; }
+            html += '<div class="' + cls + '" style="bottom:' + (11 + i * 4.5).toFixed(1) + 'px"></div>';
+          }
+          for (var g = 0; g < wGhosts[c]; g++) {
+            html += '<div class="wcoin ghostout" style="bottom:' + (11 + (digs[c] + g) * 4.5).toFixed(1) + 'px"></div>';
+          }
+          html += '<div class="wlab">' + WLAB[c] + "</div></div>";
+        }
+        el.wealthStack.innerHTML = html;
+        wPrev = digs;
+      }
+      /* One animation step toward S.money. A step that makes any stack
+         shrink is a rollover/breakdown: the lost coins pop out as ghosts
+         and every stack that gained a coin on the same step shines. */
+      function wealthStep() {
+        wTimer = null;
+        var diff = S.money - wDisp;
+        if (diff === 0) { wDelay = 55; return; }
+        var before = wDigits(wDisp);
+        if (diff > 0) wDisp += diff > 60 ? Math.ceil(diff / 10) : 1;
+        else wDisp -= Math.min(-diff, Math.max(1, Math.ceil(-diff / 6)));
+        var after = wDigits(wDisp);
+        var anyDown = false, anyGhost = false;
+        wShine = [false, false, false, false, false];
+        for (var c = 0; c < 5; c++) {
+          if (after[c] < before[c]) { wGhosts[c] = before[c] - after[c]; anyDown = true; anyGhost = true; }
+        }
+        if (anyDown) for (var s = 0; s < 5; s++) if (after[s] > before[s]) wShine[s] = true;
+        if (anyGhost) {
+          if (wGhostTimer) clearTimeout(wGhostTimer);
+          wGhostTimer = setTimeout(function () {
+            wGhosts = [0, 0, 0, 0, 0]; wGhostTimer = null; renderWealth();
+          }, 190);
+        }
+        renderWealth();
+        var remain = S.money - wDisp;
+        if (remain !== 0) {
+          wDelay = remain > 0 ? Math.max(12, wDelay * 0.82) : 26;
+          wTimer = setTimeout(wealthStep, wDelay);
+        } else wDelay = 55;
+      }
+      function wealthKick() {
+        if (!wTimer && wDisp !== S.money) { wDelay = 55; wTimer = setTimeout(wealthStep, 24); }
+      }
+      function statusLineText() {
+        if (S.swing.active) return layStatusText();
+        var top = topItem();
+        if (top && top.type === "hot") return layStatusText();
+        if (S.held) return kilnStatusText();
+        if (S.bricks <= 0) return layStatusText();
+        if (S.tier.autoKiln > 0) return kilnStatusText();
+        return layStatusText();
+      }
+      // The SHOP button's NEW badge: appears when a workshop line becomes
+      // visible that the player hasn't seen yet. Opening the shop (or being
+      // in it while a line appears) marks everything as seen.
+      function currentVis() {
+        var ids = [];
+        for (var i = 0; i < LINES.length; i++) if (lineVisible(LINES[i])) ids.push(LINES[i].id);
+        return ids.join(",");
+      }
+      function renderShopBadge() {
+        if (!S.workshopShown) return;
+        var vis = currentVis();
+        if (S.shopOpen || S.seenVis === null) { S.seenVis = vis; el.shopNew.classList.add("hidden"); return; }
+        el.shopNew.classList.toggle("hidden", vis === S.seenVis);
+      }
+      function topItem() { return S.stack.length ? S.stack[S.stack.length - 1] : null; }
+      // The pile's top brick carries its own type art — and a hot brick
+      // carries its countdown ring, ticking down right on the brick.
+      function renderPileFx() {
+        var ring = document.getElementById("pile-ring-fg");
+        if (ring) {
+          var it = topItem();
+          if (it && it.type === "hot" && !S.swing.active) {
+            var rem = Math.max(0, it.fuseEnd - S.tick);
+            ring.style.strokeDashoffset = (34.6 * (1 - rem / HOT_FUSE_TICKS)).toFixed(1);
+          }
+        }
+        // Keep the all-bricks panel's hot fuses live while it's open.
+        if (!el.brickPanel.classList.contains("hidden")) {
+          var rings = el.bpList.querySelectorAll(".bp-ring-fg");
+          for (var i = 0; i < rings.length; i++) {
+            var fe = parseInt(rings[i].getAttribute("data-fuseend"), 10) || 0;
+            var r2 = Math.max(0, fe - S.tick);
+            rings[i].style.strokeDashoffset = (34.6 * (1 - r2 / HOT_FUSE_TICKS)).toFixed(1);
+          }
+          var labels = el.bpList.querySelectorAll(".bp-fuse");
+          for (var j = 0; j < labels.length; j++) {
+            var fe2 = parseInt(labels[j].getAttribute("data-fuseend"), 10) || 0;
+            labels[j].textContent = Math.max(0, Math.ceil((fe2 - S.tick) * TICK)) + "s";
+          }
+        }
+      }
+      /* ================= ALL-BRICKS PANEL ================= */
+      // Read-only view of the whole inventory, in placement order (top of
+      // stack first — hot bricks lead, since heat rises). Opened by
+      // holding the pile brick; the game keeps running behind it.
+      function renderBrickPanel() {
+        el.bpCount.textContent = S.stack.length ? S.stack.length + (S.stack.length === 1 ? " brick" : " bricks") + " · next to place first" : "";
+        el.bpEmpty.classList.toggle("hidden", S.stack.length > 0);
+        var html = "";
+        for (var i = S.stack.length - 1; i >= 0; i--) {
+          var it = S.stack[i];
+          var first = i === S.stack.length - 1;
+          html += '<div class="bp-item' + (first ? " first" : "") + '">';
+          html += '<div class="pile-brick pb-' + it.type + '"' + (it.type === "normal" ? ' style="background:' + shade(it.seed || 5) + '"' : "") + ">";
+          if (it.type === "hot") {
+            html += '<svg class="pile-ring" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="rgba(0,0,0,.3)" stroke="rgba(255,255,255,.45)" stroke-width="2.6"></circle><circle class="bp-ring-fg" data-fuseend="' + it.fuseEnd + '" cx="8" cy="8" r="5.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="34.6" stroke-dashoffset="0" transform="rotate(-90 8 8)"></circle></svg>';
+          }
+          html += "</div>";
+          if (it.type === "hot") html += '<span class="bp-fuse" data-fuseend="' + it.fuseEnd + '">' + Math.max(0, Math.ceil((it.fuseEnd - S.tick) * TICK)) + "s</span>";
+          else if (first) html += '<span class="bp-tag">NEXT</span>';
+          else html += '<span class="bp-fuse"></span>';
+          html += "</div>";
+        }
+        el.bpList.innerHTML = html;
+      }
+      function openBrickPanel() {
+        renderBrickPanel();
+        el.brickPanel.classList.remove("hidden");
+        sndPop();
+      }
+      function closeBrickPanel() {
+        el.brickPanel.classList.add("hidden");
+        pumpMsg();
+      }
+      $("btn-bp-close").addEventListener("click", function () { closeBrickPanel(); sndPop(); });
+      el.brickPanel.addEventListener("click", function (e) { if (e.target === el.brickPanel) closeBrickPanel(); });
+      function layStatusText() {
+        if (S.swing.active) return "Tap again when it's over the glowing slot!";
+        if (S.bricks <= 0) return "No bricks — hold the kiln to mold some.";
+        var top = topItem();
+        if (top && top.type === "hot") return "The glowing brick is hot — tap it before its ring runs out!";
+        if (S.tier.autoLayer > 0) return "Your layer places perfectly; you can swing too.";
+        return "Tap your top brick to swing it onto the wall.";
+      }
+      function kilnStatusText() {
+        if (S.held) return "Molding… keep holding!";
+        if (S.tier.autoKiln > 0) return "Auto-kiln: 1 brick / " + autoMoldInt() + "s idle — hold to mold faster.";
+        if (S.moldT > 0) return "Half-fired — hold again to finish it.";
+        if (S.molded === 0) return "Cold clay, warm hands.";
+        return "Hold the kiln button to mold the next one.";
+      }
+      var shopSig = "";
+      function renderShop() {
+        if (!S.workshopShown) return;
+        var sig = S.money + "|";
+        for (var s = 0; s < LINES.length; s++) {
+          sig += LINES[s].id + ":" + S.tier[LINES[s].id] + ":" + (lineVisible(LINES[s]) ? 1 : 0) + "|";
+        }
+        if (sig === shopSig) return;
+        shopSig = sig;
+        var html = "";
+        for (var i = 0; i < LINES.length; i++) {
+          var l = LINES[i];
+          if (!lineVisible(l)) continue;
+          var t = S.tier[l.id], maxed = t >= l.costs.length;
+          var cost = maxed ? 0 : l.costs[t];
+          var tierTxt = "TIER " + t + (maxed ? " · MAX" : " → " + (t + 1));
+          html += '<div class="upg-row" id="upg-' + l.id + '">' +
+            '<div class="upg-info"><div class="upg-name">' + l.name + ' <span class="upg-lvl">' + tierTxt + "</span></div>" +
+            '<div class="upg-desc">' + (maxed ? l.effect(t) : l.next(t)) + "</div></div>" +
+            (maxed ? '<button class="buy-btn maxed" disabled>MAX</button>'
+                    : '<button class="buy-btn' + (S.money < cost ? " cant" : "") + '" data-upg="' + l.id + '">$' + cost + "</button>") +
+            "</div>";
+        }
+        el.upgList.innerHTML = html;
+        var btns = el.upgList.querySelectorAll("[data-upg]");
+        for (var j = 0; j < btns.length; j++) {
+          btns[j].addEventListener("click", function () { buyLine(this.getAttribute("data-upg")); });
+        }
+      }
+
+      /* ================= ACTIONS ================= */
+      function trackPeak() {
+        S.moldEvents.push(S.tick);
+        var cutoff = S.tick - 100; // 5 seconds
+        while (S.moldEvents.length && S.moldEvents[0] < cutoff) S.moldEvents.shift();
+        var rate = S.moldEvents.length / 5;
+        if (rate > S.peak) S.peak = rate;
+      }
+      function rollBrickType() {
+        var gild = GILD_PCT[S.tier.gilded] / 100;
+        var r = Math.random();
+        if (r < gild) return "gold";
+        // Hot bricks NEVER spawn on their own — they exist only after the
+        // Kiln Fill Speed tier-2 surprise unlock, then at ~10%.
+        if (S.hotUnlocked && r < gild + 0.10) return "hot";
+        if (S.courses >= 7 && r < gild + (S.hotUnlocked ? 0.16 : 0.06)) return "lead"; // from row 8, ~6%
+        return "normal";
+      }
+      function syncBricks() { S.bricks = S.stack.length; }
+      /* Heat rises: hot bricks ALWAYS sit on top of the stack. The stack
+         array is bottom→top (the LAST element is next to place), so this
+         re-orders it as [non-hot bricks in their current LIFO order] then
+         [hot bricks in their current order, newest hot last = on top].
+         A newly molded brick can never bury a hot brick; the hot brick
+         stays next-to-place until it's placed or its fuse expires.
+         Called after every push onto the stack. Stable: relative order
+         within each group is preserved. */
+      function settleStack() {
+        var plain = [], hot = [];
+        for (var i = 0; i < S.stack.length; i++) (S.stack[i].type === "hot" ? hot : plain).push(S.stack[i]);
+        if (!hot.length) return;
+        S.stack.length = 0;
+        for (var a = 0; a < plain.length; a++) S.stack.push(plain[a]);
+        for (var b = 0; b < hot.length; b++) S.stack.push(hot[b]);
+      }
+      function produceBrick(fromAuto) {
+        // Special bricks (gold / hot / lead) only form while actively
+        // playing. With the workshop open, automation keeps molding and
+        // laying — but every brick comes out plain.
+        var type = S.shopOpen ? "normal" : rollBrickType();
+        // The brick right after the hot unlock is guaranteed hot, so the
+        // player meets one immediately (not consumed while the shop is open).
+        if (!S.shopOpen && S.nextHot) { type = "hot"; S.nextHot = false; }
+        S.stack.push({ type: type, fuseEnd: type === "hot" ? S.tick + HOT_FUSE_TICKS : 0, seed: (S.molded * 13 + 5) % 997 });
+        settleStack(); // a fresh brick never buries a hot one — heat rises
+        syncBricks();
+        S.molded++;
+        trackPeak();
+        if (type === "hot") {
+          sndSizzle();
+          if (!S.flags.hotSeen) { S.flags.hotSeen = true; toast("HOT BRICK! Place it within 10 seconds — it pays double. If the fuse dies, it counts as a miss.", 4400); }
+        } else sndClink();
+        popEl(el.pileCount);
+        var from = centerOf(el.kilnVis);
+        var to = centerOf(el.pile);
+        var flights = el.fx.querySelectorAll(".fly-brick").length;
+        if (flights < 4) flyBrick(from, to, null, type);
+        renderHUD();
+        checkUnlocks();
+        if (S.molded === 1 && !S.flags.moldBeat) {
+          // First brick ever: the course flag fades in, the shimmer answers.
+          S.flags.moldBeat = true;
+          revealEl(el.courseFlag);
+          dismissHint("mold");
+          enqueueHint("place", "Tap your brick.", "pile");
+        }
+      }
+      function earnMoney(amount, x, y, label) {
+        S.money += amount; S.earned += amount;
+        wealthKick();
+        if (!S.flags.moneyShown && S.started) {
+          // First pay ever: the money counter fades in with this pop.
+          S.flags.moneyShown = true;
+          revealEl(el.hudMoneyBox);
+          enqueueHint("paid", "They're paying you.", "hud-money-box");
+        }
+        sndCoin();
+        popEl(el.hudMoneyBox);
+        if (x != null) {
+          var f = document.createElement("div");
+          f.className = "money-float";
+          f.textContent = label || ("+$" + amount);
+          f.style.left = (x - 14) + "px"; f.style.top = (y - 10) + "px";
+          el.fx.appendChild(f);
+          var anim = f.animate([
+            { transform: "translateY(0)", opacity: 1 },
+            { transform: "translateY(-38px)", opacity: 0 }
+          ], { duration: 750, easing: "ease-out" });
+          var kill = function () { if (f.parentNode) f.parentNode.removeChild(f); };
+          if (anim && anim.finished) anim.finished.then(kill); setTimeout(kill, 900);
+        }
+      }
+      function completeCourse() {
+        S.courses++;
+        S.inCourse = 0;
+        S.scUsed = 0;
+        var pt = slotPoint(S.courses, Math.floor(S.perCourse / 2));
+        earnMoney(5, pt.x, pt.y - 16, "+$5 ROW!");
+        sndFanfare(); sndTick();
+        popEl(el.hudCourse);
+        var row = getCourseRow(S.courses);
+        var r = row.getBoundingClientRect(), a = appRect();
+        dustPuff(r.left - a.left + r.width / 2, r.top - a.top, 10);
+        if (S.courses === 1) {
+          enqueueStory("row1");
+          if (!S.workshopShown) {
+            // First row done: the workshop (and course counter) fade in.
+            // The story card shows first; the SHOP spotlight hint queues
+            // behind it and appears only once the story is dismissed.
+            S.workshopShown = true;
+            revealEl(el.btnShop);
+            el.btnShop.classList.add("shop-pulse");
+            revealEl(el.hudCourseBlock);
+            enqueueHint("shop", "The WORKSHOP is open — tap SHOP.", "btn-shop");
+          }
+        }
+        else if (S.courses === 5) enqueueStory("c5");
+        else if (S.courses === 10) enqueueStory("c10");
+        else if (S.courses === 25) enqueueStory("c25");
+        if (S.courses % 10 === 0) toast("Course " + S.courses + " — a golden keystone sits at its heart.", 3600);
+        else if (S.courses === 40) toast("Course 40 — ten to go.", 3000);
+        else if (S.courses === 49) toast("Course 49 — one more.", 3000);
+        compressWall();
+        updatePan();
+        renderHUD();
+        checkUnlocks();
+        if (S.courses >= WIN_COURSES && !S.won) {
+          S.won = true;
+          setTimeout(showVictory, 900);
+        }
+      }
+      // Places one specific brick item (already off the stack).
+      function placeBrick(item, fromAuto) {
+        var courseNum = S.courses + 1;
+        var slot = S.inCourse;
+        if (courseNum > S.topCourse) S.topCourse = courseNum;
+        var willComplete = (S.inCourse + 1 >= S.perCourse);
+        S.laid++;
+        S.inCourse++;
+        var row = getCourseRow(courseNum);
+        var brick = makeBrick(courseNum, slot, item.type);
+        brick.classList.add("dropped");
+        row.appendChild(brick);
+        sndThunk();
+        var target = slotPoint(courseNum, slot);
+        dustPuff(target.x, target.y - 8, 5);
+        // Payout: the auto-layer is always flat $1 and never touches the
+        // streak. Manual: row 1 is pure flat $1. From row 2, streak brick #N
+        // pays $N — golden pays $8 flat, hot pays 2× the streak value,
+        // lead pays 3×. Specials still advance the streak.
+        var pay = 1;
+        if (!fromAuto && S.courses >= 1) {
+          S.streak++;
+          pay = S.streak;
+          if (item.type === "gold") pay = 8;
+          else if (item.type === "hot") pay = S.streak * 2;
+          else if (item.type === "lead") pay = S.streak * 3;
+          if (S.streak >= 2) {
+            renderCombo(true);
+            if (!S.comboTutDone) {
+              S.comboTutDone = true;
+              dismissHint("combo");
+            }
+          }
+        }
+        earnMoney(pay, target.x, target.y - 14, "+$" + pay);
+        if (willComplete) completeCourse();
+        else { updatePan(); renderHUD(); }
+        // The crowd celebrates the TOTAL paid on this drop (brick + row bonus).
+        crowdPayday(pay + (willComplete ? 5 : 0), target);
+        return true;
+      }
+      // Auto-layer placement: always takes the top of the stack (a hot
+      // brick whenever one is held; otherwise LIFO).
+      function layBrick(fromAuto) {
+        if (S.stack.length <= 0) return false;
+        var item = S.stack.pop();
+        syncBricks();
+        return placeBrick(item, fromAuto);
+      }
+      /* ----- timing swing ----- */
+      function startSwing() {
+        if (S.swing.active) return;
+        if (S.bricks <= 0) { sndErr(); el.statusLine.textContent = "No bricks — hold the kiln to mold some."; return; }
+        var placeWasActive = !!(activeMsg && activeMsg.kind === "hint" && activeMsg.id === "place");
+        if (placeWasActive) dismissHint("place");
+        // The swing always carries the top of the stack (a hot brick
+        // whenever one is held; otherwise the most recently molded one).
+        var item = S.stack.pop();
+        syncBricks();
+        armSwing(item);
+        if (S.courses === 1 && !S.comboTutDone && !S.flags.comboCoach) {
+          // Row 2 opens the multiplier lesson — its spotlight hint takes
+          // the place of the drop hint for this swing.
+          S.flags.comboCoach = true;
+          enqueueHint("combo", "Streak! Consecutive drops pay more.", "swing-layer");
+        } else if (placeWasActive) {
+          enqueueHint("drop", "Tap it again when it's over the glow.", "swing-layer");
+        }
+        sndPop();
+        renderHUD();
+      }
+      // Puts a brick on the rail. Entry side is random every time — the
+      // brick sweeps in from the LEFT or the RIGHT, 50/50, no pattern.
+      function armSwing(item) {
+        S.swing.item = item;
+        S.swing.active = true;
+        var fromRight = Math.random() < 0.5;
+        S.swing.from = fromRight ? "R" : "L";
+        S.swing.pos = fromRight ? 1 : 0;
+        S.swing.dir = fromRight ? -1 : 1;
+        el.swingBrick.classList.remove("sw-gold", "sw-hot", "sw-lead", "in-zone", "in-ring");
+        if (item.type !== "normal") el.swingBrick.classList.add("sw-" + item.type);
+        showGhost();
+        el.swingLayer.classList.remove("hidden");
+        updateSwingPos();
+        updateSwingGlow();
+      }
+      function endSwing() {
+        S.swing.active = false;
+        S.swing.item = null;
+        el.swingBrick.classList.remove("sw-gold", "sw-hot", "sw-lead", "in-zone", "in-ring");
+        hideGhost();
+        el.swingLayer.classList.add("hidden");
+      }
+      function dropSwing() {
+        if (!S.swing.active) return;
+        var outcome = dropOutcomeAt(S.swing.pos);
+        var pt = swingBrickPoint();
+        var item = S.swing.item;
+        if (outcome === 2) {
+          endSwing();
+          dismissHint("drop");
+          placeBrick(item, false);
+          return;
+        }
+        // Steady Hands tier 3 — the ALMOST RING: the same brick goes back
+        // on the rail for another swing. Streak intact, brick kept, and it
+        // does NOT consume a Second Chance. Unlimited retries.
+        if (outcome === 1) {
+          sndPop();
+          showTryText("SO CLOSE!");
+          armSwing(item);
+          renderHUD();
+          return;
+        }
+        endSwing();
+        handleMiss(item, pt);
+      }
+      // Shared miss resolution: row-2 tutorial grace → Second Chance charges
+      // → real miss. A forgiven miss returns the brick to the top of the
+      // stack (a hot brick gets a fresh fuse) and the streak survives.
+      // A real miss loses the brick and breaks the streak.
+      function handleMiss(item, pt) {
+        dismissHint("drop");
+        if (S.courses === 1 && !S.comboTutDone) {
+          sndPop();
+          showTryText("TRY AGAIN!");
+          returnBrick(item);
+        } else if (S.scUsed < S.tier.secondChance) {
+          S.scUsed++;
+          sndPop();
+          showTryText("2ND CHANCE!");
+          returnBrick(item);
+        } else {
+          S.misses++;
+          breakCombo();
+          sndMiss();
+          el.missFlash.classList.remove("show"); void el.missFlash.offsetWidth; el.missFlash.classList.add("show");
+          el.missText.classList.remove("show"); void el.missText.offsetWidth; el.missText.classList.add("show");
+          if (pt) throwBrick(pt);
+        }
+        renderHUD();
+      }
+      function returnBrick(item) {
+        if (!item) return;
+        if (item.type === "hot") item.fuseEnd = S.tick + HOT_FUSE_TICKS;
+        S.stack.push(item);
+        settleStack(); // hot bricks stay on top, even when one returns
+        syncBricks();
+      }
+      function throwBrick(from) {
+        var b = document.createElement("div");
+        b.className = "fly-brick";
+        b.style.left = (from.x - 15) + "px"; b.style.top = (from.y - 8) + "px";
+        el.fx.appendChild(b);
+        var anim = b.animate([
+          { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+          { transform: "translate(190px,-70px) rotate(300deg)", opacity: 0.9 },
+          { transform: "translate(340px,30px) rotate(560deg)", opacity: 0 }
+        ], { duration: 550, easing: "cubic-bezier(.3,.6,.6,1)" });
+        var kill = function () { if (b.parentNode) b.parentNode.removeChild(b); };
+        if (anim && anim.finished) anim.finished.then(kill); setTimeout(kill, 800);
+      }
+      function swingBrickPoint() {
+        var r = el.swingBrick.getBoundingClientRect(), a = appRect();
+        return { x: r.left - a.left + r.width / 2, y: r.top - a.top + r.height / 2 };
+      }
+      function updateSwingPos() {
+        if (!S.swing.active) return;
+        var row = getCourseRow(S.courses + 1);
+        var rr = row.getBoundingClientRect(), sc = el.scene.getBoundingClientRect();
+        var wr = el.wall.getBoundingClientRect();
+        var left = wr.left - sc.left, width = wr.width;
+        var top = rr.top - sc.top - 46;
+        el.swingLayer.style.left = left + "px";
+        el.swingLayer.style.top = top + "px";
+        el.swingLayer.style.width = width + "px";
+        el.swingBrick.style.left = (S.swing.pos * width) + "px";
+        el.swingMarker.style.left = (targetFrac() * width) + "px";
+        // Accepted window on the rail — visibly widens with Steady Hands.
+        // Drawn one brick-width NARROWER than the center-travel range:
+        // the drop is judged by the brick's CENTER, so the band is sized
+        // so the brick's BODY overlaps it exactly while the center is in
+        // range. An edge merely inside the band can no longer read as a
+        // hit that the drop then denies. Same sizing for the ring band.
+        el.swingWindow.style.left = (targetFrac() * width) + "px";
+        el.swingWindow.style.width = Math.max(6, 2 * hitTol() * width - SWING_BRICK_PX) + "px";
+        // The almost ring halo shows only at Steady Hands tier 3.
+        if (S.tier.steady >= 3) {
+          el.swingRing.classList.remove("hidden");
+          el.swingRing.style.left = (targetFrac() * width) + "px";
+          el.swingRing.style.width = Math.max(6, 2 * almostTol() * width - SWING_BRICK_PX) + "px";
+        } else {
+          el.swingRing.classList.add("hidden");
+        }
+      }
+      // Live feedback on the swinging brick itself: full green glow while a
+      // drop would land, faint gold halo while it would only almost-land.
+      // Recomputed every swing frame so it never sticks or lags.
+      function updateSwingGlow() {
+        if (!S.swing.active) {
+          el.swingBrick.classList.remove("in-zone", "in-ring");
+          return;
+        }
+        var zone = dropOutcomeAt(S.swing.pos);
+        el.swingBrick.classList.toggle("in-zone", zone === 2);
+        el.swingBrick.classList.toggle("in-ring", zone === 1);
+      }
+      function checkUnlocks() {
+        if (!S.autoKilnShown && S.molded >= UNLOCK_MOLDED) {
+          S.autoKilnShown = true;
+          toast("AUTO-KILN unlocked in the workshop — the kiln molds on its own, slowly.", 4200);
+          sndBuy();
+          renderHUD();
+        }
+        if (!S.autoLayerShown && S.courses >= UNLOCK_COURSES) {
+          S.autoLayerShown = true;
+          toast("AUTO-LAYER unlocked in the workshop — it places bricks for you. It never misses.", 4200);
+          sndBuy();
+          renderHUD();
+        }
+        if (!S.precisionShown && S.courses >= PRECISION_COURSE) {
+          S.precisionShown = true;
+          toast("Row 10! PRECISION TOOLS unlocked in the workshop — slow the swing down.", 4600);
+          sndBuy();
+          renderHUD();
+        }
+      }
+      function buyLine(id) {
+        var l = null;
+        for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) l = LINES[i];
+        if (!l || !lineVisible(l) || S.tier[id] >= l.costs.length) return;
+        var cost = l.costs[S.tier[id]];
+        if (S.money < cost) {
+          sndErr();
+          var row = $("upg-" + id);
+          if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); }
+          return;
+        }
+        S.money -= cost;
+        wealthKick();
+        S.tier[id]++;
+        sndBuy();
+        if (id === "hotMortar") {
+          S.perCourse = 8 - S.tier.hotMortar;
+          toast("Hot mortar! Courses now take " + S.perCourse + " bricks.", 3400);
+          hideGhost();
+          if (S.inCourse >= S.perCourse) completeCourse();
+        }
+        else if (id === "kilnSpeed" && S.tier.kilnSpeed === 2 && !S.hotUnlocked) {
+          // SURPRISE: fill-speed tier 2 makes the kiln run hot. Hot bricks
+          // exist from this moment on — and the next brick molded is one.
+          S.hotUnlocked = true;
+          S.nextHot = true;
+          enqueueHotReveal();
+        }
+        else if (id === "kilnSpeed") toast("The kiln fills faster now — hold and watch the bar.", 3000);
+        else if (id === "steady") toast(S.tier.steady >= 3 ? "Steady Hands maxed — the ALMOST RING is live. Near misses swing again." : "Steady Hands — the drop window on the rail is wider now.", 3200);
+        else if (id === "autoKiln") toast("The kiln fires itself now — slowly. Holding is still faster.", 3400);
+        else if (id === "autoLayer") toast("A tireless layer joins the wall — every placement perfect, $1 a brick.", 3400);
+        else if (id === "secondChance") toast("Second Chance tier " + S.tier.secondChance + " — misses forgiven, streaks kept.", 3200);
+        else if (id === "precision") toast("Precision tools: the swing moves slower. Drops get easier.", 3000);
+        else if (id === "gilded") toast("Gilded clay! Some bricks now come out golden — $8 when placed.", 3400);
+        renderHUD();
+      }
+
+      /* ================= COMBO ================= */
+      function renderCombo(pop) {
+        if (S.streak >= 2) {
+          el.combo.classList.remove("hidden");
+          el.comboN.textContent = "×" + S.streak;
+          if (pop) popEl(el.combo);
+        } else if (!el.combo.classList.contains("break")) {
+          el.combo.classList.add("hidden");
+        }
+        updateFanfare();
+      }
+      function breakCombo() {
+        if (S.streak >= 2 && !el.combo.classList.contains("hidden")) {
+          el.combo.classList.add("break");
+          setTimeout(function () {
+            el.combo.classList.remove("break");
+            if (S.streak < 2) el.combo.classList.add("hidden");
+          }, 480);
+        }
+        S.streak = 0;
+        updateFanfare();
+      }
+      // Streak set dressing: trumpets out at 5+, townspeople join at 10+,
+      // everything retreats the moment the streak breaks.
+      function updateFanfare() {
+        var show = S.started && S.streak >= 5;
+        var folk = S.streak >= 10;
+        el.fanL.classList.toggle("show", show);
+        el.fanR.classList.toggle("show", show);
+        el.fanL.classList.toggle("folk", folk);
+        el.fanR.classList.toggle("folk", folk);
+        if (show && !S.flags.fanfareSnd) { S.flags.fanfareSnd = true; sndFanfare(); }
+        if (!show) S.flags.fanfareSnd = false;
+      }
+      function showTryText(txt) {
+        el.tryText.textContent = txt;
+        el.tryText.classList.remove("show"); void el.tryText.offsetWidth; el.tryText.classList.add("show");
+      }
+
+      /* ================= CROWD PAYDAY ================= */
+      var CONFETTI_COLORS = ["#f5b921", "#e0704a", "#3fa7d6", "#79a84e", "#fffaf0", "#d05a35"];
+      function fxBusy() { return el.fx.childElementCount > 46; }
+      function fxCleanup(node, anim, ms) {
+        var kill = function () { if (node.parentNode) node.parentNode.removeChild(node); };
+        if (anim && anim.finished) anim.finished.then(kill);
+        setTimeout(kill, ms);
+      }
+      /* Tossed coins, simulated for real: each coin launches from a screen
+         edge with a ballistic velocity solved to land in the money box
+         after flight time T under gravity — a true arc, with tumble spin
+         and a slight shrink as it "collects". Launches stagger ~70ms so a
+         payout reads as a thrown handful, not a teleport. */
+      var coinFx = [], coinRaf = null;
+      function spawnCoins(n) {
+        var target = centerOf(el.hudMoneyBox);
+        var a = appRect();
+        var sc = el.scene.getBoundingClientRect();
+        var now = performance.now();
+        for (var i = 0; i < n; i++) {
+          if (fxBusy() && i > 1) break;
+          var c = document.createElement("div");
+          c.className = "coin";
+          c.style.left = "0px"; c.style.top = "0px"; c.style.opacity = "0";
+          el.fx.appendChild(c);
+          var fromLeft = i % 2 === 0;
+          var sx = fromLeft ? 2 : a.width - 16;
+          var sy = sc.top - a.top + sc.height * (0.55 + Math.random() * 0.3);
+          var T = 0.72 + Math.random() * 0.3;      // flight time, seconds
+          var G = 2000;                            // gravity, px/s^2
+          var dx = target.x - (sx + 7), dy = target.y - (sy + 7);
+          coinFx.push({
+            el: c, x: sx, y: sy,
+            vx: dx / T, vy: dy / T - 0.5 * G * T, g: G,
+            T: T, start: now + i * 70,
+            spin: Math.random() * 6.28, spinSpd: 11 + Math.random() * 9,
+            rot: (Math.random() * 120 - 60)
+          });
+        }
+        if (!coinRaf && coinFx.length) coinRaf = requestAnimationFrame(coinStep);
+      }
+      function coinStep(now) {
+        coinRaf = null;
+        for (var i = coinFx.length - 1; i >= 0; i--) {
+          var c = coinFx[i];
+          var t = (now - c.start) / 1000;
+          if (t < 0) continue; // still waiting for its staggered launch
+          if (t >= c.T) {
+            if (c.el.parentNode) c.el.parentNode.removeChild(c.el);
+            coinFx.splice(i, 1);
+            sndClink();
+            continue;
+          }
+          var x = c.x + c.vx * t;
+          var y = c.y + c.vy * t + 0.5 * c.g * t * t;
+          var shrink = 1 - 0.45 * (t / c.T);
+          var flip = Math.abs(Math.cos(c.spin + t * c.spinSpd));
+          var fade = Math.min(1, t / 0.05);
+          c.el.style.opacity = fade.toFixed(2);
+          c.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) scale(" + (shrink * Math.max(0.12, flip)).toFixed(3) + "," + shrink.toFixed(3) + ") rotate(" + (c.rot * t).toFixed(1) + "deg)";
+        }
+        if (coinFx.length) coinRaf = requestAnimationFrame(coinStep);
+      }
+      function spawnConfetti(n) {
+        var a = appRect();
+        var sc = el.scene.getBoundingClientRect();
+        var top0 = sc.top - a.top;
+        for (var i = 0; i < n; i++) {
+          if (fxBusy()) break;
+          var p = document.createElement("div");
+          p.className = "confetti";
+          p.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+          var fromLeft = i % 2 === 0;
+          p.style.left = (fromLeft ? -6 : a.width - 2) + "px";
+          p.style.top = (top0 + 20 + Math.random() * sc.height * 0.5) + "px";
+          el.fx.appendChild(p);
+          var dx = (fromLeft ? 1 : -1) * (70 + Math.random() * 150);
+          var up = -(30 + Math.random() * 70);
+          var down = 90 + Math.random() * 120;
+          var rot = (Math.random() * 540 + 180) * (fromLeft ? 1 : -1);
+          var anim = p.animate([
+            { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+            { transform: "translate(" + (dx * 0.6) + "px," + up + "px) rotate(" + (rot * 0.6) + "deg)", opacity: 1, offset: 0.45 },
+            { transform: "translate(" + dx + "px," + down + "px) rotate(" + rot + "deg)", opacity: 0 }
+          ], { duration: 750 + Math.random() * 350, delay: Math.random() * 90, easing: "cubic-bezier(.2,.7,.4,1)", fill: "backwards" });
+          fxCleanup(p, anim, 1700);
+        }
+      }
+      // Celebration scaled to the TOTAL paid on one drop (brick + row bonus):
+      // $1 = one coin of change · $2–5 = a "yay" · $6+ = full fanfare.
+      function crowdPayday(total) {
+        if (total <= 1) { spawnCoins(1); return; }
+        if (total <= 5) { spawnConfetti(10); spawnCoins(3); sndCheer(false); return; }
+        spawnConfetti(26); spawnCoins(8); sndCheer(true); sndFanfare();
+        popEl(el.hudMoneyBox);
+        el.crowdVig.classList.remove("pulse"); void el.crowdVig.offsetWidth; el.crowdVig.classList.add("pulse");
+      }
+
+      /* ================= MESSAGE ARBITER: STORY FIRST, HINTS SECOND =====
+         One message on screen at a time, ever. Story cards and spotlight
+         hints share a single queue — whatever triggers second waits until
+         the first is dismissed, so a story beat and a hint (or two hints)
+         can never overlap or compete. Story outranks teaching: a beat is
+         enqueued at the moment it happens, and any hint triggered by the
+         same event is enqueued after it. */
+      function revealEl(node) {
+        node.classList.remove("hidden");
+        node.classList.remove("reveal-anim"); void node.offsetWidth; node.classList.add("reveal-anim");
+      }
+      var BEATS = {
+        start: "You woke to the whole town outside, pointing up. There's a HOLE in the sky — silhouettes moving inside it.",
+        mold: "Every head turns to you, the town wall maker. The verdict is unanimous: this is your divine task.",
+        row1: "The town cheers and throws coins — they pay for every brick. Build until the wall reaches the hole.",
+        c5: "The higher the wall, the clearer the silhouettes in the hole become.",
+        c10: "You can almost hear voices drifting down through the hole.",
+        c25: "A hand reaches down through the hole, feeling for the top of the wall."
+      };
+      var msgQ = [];
+      var activeMsg = null;
+      var openingPending = false;
+      var hintTimer = null;
+      function panelsBusy() {
+        return !el.workshop.classList.contains("hidden") ||
+               !el.settings.classList.contains("hidden") ||
+               !el.brickPanel.classList.contains("hidden") ||
+               !$("ov-victory").classList.contains("hidden") ||
+               !$("ov-start").classList.contains("hidden");
+      }
+      function pumpMsg() {
+        if (activeMsg) return;
+        if (!msgQ.length) {
+          if (openingPending) finishOpening();
+          return;
+        }
+        if (panelsBusy()) return;
+        var m = msgQ.shift();
+        activeMsg = m;
+        if (m.kind === "story") {
+          el.storyText.textContent = m.text;
+          el.story.classList.toggle("opaque", openingPending);
+          el.story.classList.remove("hidden");
+        } else if (m.kind === "hot") {
+          showHotCard();
+        } else {
+          showHintEl(m);
+        }
+      }
+      function endMsg() {
+        if (!activeMsg) return;
+        var m = activeMsg;
+        activeMsg = null;
+        if (m.kind === "story") el.story.classList.add("hidden");
+        else if (m.kind === "hot") hideHotCard();
+        else hideHintEl(m);
+        setTimeout(pumpMsg, 80);
+      }
+      function enqueueStory(id) {
+        if (S.beats[id] || !BEATS[id]) return;
+        S.beats[id] = true;
+        msgQ.push({ kind: "story", id: id, text: BEATS[id] });
+        pumpMsg();
+      }
+      function enqueueHint(id, text, targetId) {
+        if (activeMsg && activeMsg.kind === "hint" && activeMsg.id === id) return;
+        for (var i = 0; i < msgQ.length; i++) if (msgQ[i].kind === "hint" && msgQ[i].id === id) return;
+        msgQ.push({ kind: "hint", id: id, text: text, targetId: targetId });
+        pumpMsg();
+      }
+      function dismissHint(id) {
+        for (var i = msgQ.length - 1; i >= 0; i--) {
+          if (msgQ[i].kind === "hint" && msgQ[i].id === id) msgQ.splice(i, 1);
+        }
+        if (activeMsg && activeMsg.kind === "hint" && activeMsg.id === id) endMsg();
+      }
+      function storyActive() { return !!(activeMsg && activeMsg.kind === "story"); }
+      $("story-next").addEventListener("click", function () { sndPop(); endMsg(); });
+
+      /* ----- spotlight hints: dim everything but the target ----- */
+      function showHintEl(m) {
+        el.hintText.textContent = m.text;
+        el.hintWrap.classList.remove("hidden");
+        var t = $(m.targetId);
+        if (t) t.classList.add("spot-on");
+        layoutHint();
+        if (hintTimer) clearInterval(hintTimer);
+        hintTimer = setInterval(layoutHint, 120);
+      }
+      function hideHintEl(m) {
+        if (hintTimer) { clearInterval(hintTimer); hintTimer = null; }
+        var t = $(m.targetId);
+        if (t) t.classList.remove("spot-on");
+        el.hintWrap.classList.add("hidden");
+      }
+      function layoutHint() {
+        if (!activeMsg || activeMsg.kind !== "hint") return;
+        var a = appRect();
+        var W = a.width, H = a.height;
+        var t = $(activeMsg.targetId);
+        var r = t ? t.getBoundingClientRect() : null;
+        var pad = 10, hole = false;
+        var x0 = 0, y0 = 0, x1 = 0, y1 = 0, cx = W / 2;
+        if (r && r.width > 0 && r.height > 0) {
+          hole = true;
+          x0 = Math.max(0, r.left - a.left - pad);
+          y0 = Math.max(0, r.top - a.top - pad);
+          x1 = Math.min(W, r.right - a.left + pad);
+          y1 = Math.min(H, r.bottom - a.top + pad);
+          cx = (r.left - a.left + r.right - a.left) / 2;
+        }
+        // Four dim strips around the cutout (top, bottom, left, right);
+        // with no target the top strip simply covers the whole screen.
+        var strips = el.hintDim.children;
+        var sy0 = hole ? y0 : 0, sy1 = hole ? y1 : 0, sx0 = hole ? x0 : 0, sx1 = hole ? x1 : 0;
+        strips[0].style.cssText = "left:0;top:0;width:" + W + "px;height:" + (hole ? sy0 : H) + "px";
+        strips[1].style.cssText = "left:0;top:" + sy1 + "px;width:" + W + "px;height:" + (hole ? H - sy1 : 0) + "px";
+        strips[2].style.cssText = "left:0;top:" + sy0 + "px;width:" + sx0 + "px;height:" + (hole ? sy1 - sy0 : 0) + "px";
+        strips[3].style.cssText = "left:" + sx1 + "px;top:" + sy0 + "px;width:" + (hole ? W - sx1 : 0) + "px;height:" + (hole ? sy1 - sy0 : 0) + "px";
+        var lw = el.hintLabel.offsetWidth, lh = el.hintLabel.offsetHeight;
+        var lx = Math.max(8, Math.min(W - lw - 8, cx - lw / 2));
+        var ly;
+        if (hole && y0 > H * 0.45) ly = Math.max(8, y0 - lh - 14);
+        else if (hole) ly = Math.min(H - lh - 8, y1 + 14);
+        else ly = 90;
+        el.hintLabel.style.left = lx + "px";
+        el.hintLabel.style.top = ly + "px";
+      }
+      // Tapping through a hint (anywhere on the dim) dismisses it; the
+      // lit target itself stays fully interactive through the cutout.
+      el.hintDim.addEventListener("pointerdown", function () {
+        if (activeMsg && activeMsg.kind === "hint") endMsg();
+      });
+
+      /* ----- opening sequence: story cards ONLY, then the game ----- */
+      function finishOpening() {
+        openingPending = false;
+        el.story.classList.remove("opaque");
+        S.started = true;
+        renderHUD();
+        updatePan();
+        enqueueHint("mold", "HOLD to fill the kiln.", "btn-mold");
+      }
+
+      /* ================= HOT-BRICK SURPRISE REVEAL ================= */
+      /* Also arbiter-driven: it queues like any other message and shows
+         alone, never on top of a story card or a hint. */
+      var hotRevealTimer = null;
+      function enqueueHotReveal() {
+        if (activeMsg && activeMsg.kind === "hot") return;
+        for (var i = 0; i < msgQ.length; i++) if (msgQ[i].kind === "hot") return;
+        msgQ.push({ kind: "hot", id: "hot" });
+        pumpMsg();
+      }
+      function showHotCard() {
+        el.hotReveal.classList.remove("hidden");
+        sndSizzle();
+        sndFanfare();
+        if (hotRevealTimer) clearTimeout(hotRevealTimer);
+        hotRevealTimer = setTimeout(function () { if (activeMsg && activeMsg.kind === "hot") endMsg(); }, 6500);
+      }
+      function hideHotCard() {
+        el.hotReveal.classList.add("hidden");
+        if (hotRevealTimer) { clearTimeout(hotRevealTimer); hotRevealTimer = null; }
+      }
+      el.hotReveal.addEventListener("click", function () {
+        sndPop();
+        if (activeMsg && activeMsg.kind === "hot") endMsg();
+        else hideHotCard();
+      });
+
+      /* ================= VICTORY ================= */
+      function showVictory() {
+        $("st-molded").textContent = S.molded;
+        $("st-laid").textContent = S.laid;
+        $("st-time").textContent = fmtTime(S.playTicks);
+        $("st-peak").textContent = S.peak.toFixed(1);
+        $("st-money").textContent = "$" + S.earned;
+        $("ov-victory").classList.remove("hidden");
+        sndFanfare();
+        setTimeout(sndFanfare, 350);
+      }
+      $("btn-endless").addEventListener("click", function () {
+        S.endless = true;
+        $("ov-victory").classList.add("hidden");
+        toast("Endless building. The hole isn't done with you.", 3400);
+        sndPop();
+        renderHUD();
+      });
+
+      /* ================= INPUT ================= */
+      function moldDown(e) {
+        if (!S.started) return;
+        if (e) e.preventDefault();
+        audio();
+        // HOLD to fill: moldT is never reset here — releasing pauses the bar,
+        // holding again resumes right where it left off.
+        S.held = true;
+        el.btnMold.classList.add("held");
+        el.kilnVis.classList.add("firing");
+        el.statusLine.textContent = "Molding… keep holding!";
+      }
+      function moldUp() {
+        S.held = false;
+        el.btnMold.classList.remove("held");
+        if (S.tier.autoKiln <= 0) el.kilnVis.classList.remove("firing");
+        renderHUD();
+      }
+      el.btnMold.addEventListener("pointerdown", moldDown);
+      el.kilnVis.addEventListener("pointerdown", moldDown);
+      window.addEventListener("pointerup", moldUp);
+      window.addEventListener("pointercancel", moldUp);
+      el.btnMold.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+      el.swingBrick.addEventListener("pointerdown", function (e) { e.stopPropagation(); if (S.started) { audio(); dropSwing(); } });
+      el.wallClip.addEventListener("pointerdown", function () { if (S.started && S.swing.active) { audio(); dropSwing(); } });
+      // Placement lives on the bricks themselves: TAP the pile brick to
+      // swing the top brick onto the rail; tap again — pile, swinging
+      // brick, or the tower — to drop it. HOLD the brick (~450ms) to open
+      // the all-bricks panel instead: the hold never starts a swing, and
+      // releasing after a hold places nothing. An empty pile tap just
+      // nudges you to the kiln.
+      var pilePress = { active: false, held: false, timer: null };
+      el.pile.addEventListener("pointerdown", function (e) {
+        if (!S.started) return;
+        e.preventDefault();
+        audio();
+        pilePress.active = true;
+        pilePress.held = false;
+        if (pilePress.timer) clearTimeout(pilePress.timer);
+        pilePress.timer = setTimeout(function () {
+          if (!pilePress.active) return;
+          pilePress.held = true;
+          openBrickPanel();
+        }, 450);
+      });
+      el.pile.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+      window.addEventListener("pointerup", function () {
+        if (!pilePress.active) return;
+        pilePress.active = false;
+        if (pilePress.timer) { clearTimeout(pilePress.timer); pilePress.timer = null; }
+        if (pilePress.held) { pilePress.held = false; return; } // hold opened the panel — no swing
+        if (S.started) pileTap();
+      });
+      window.addEventListener("pointercancel", function () {
+        pilePress.active = false;
+        pilePress.held = false;
+        if (pilePress.timer) { clearTimeout(pilePress.timer); pilePress.timer = null; }
+      });
+      function pileTap() {
+        if (S.won && !$("ov-victory").classList.contains("hidden")) return;
+        if (S.swing.active) { dropSwing(); return; }
+        if (S.stack.length > 0) { startSwing(); return; }
+        sndErr();
+        el.statusLine.textContent = "No bricks — hold the kiln to mold some.";
+        if (!el.btnMold.classList.contains("spot-on")) {
+          el.btnMold.classList.add("spot-on");
+          setTimeout(function () {
+            if (!(activeMsg && activeMsg.targetId === "btn-mold")) el.btnMold.classList.remove("spot-on");
+          }, 1300);
+        }
+      }
+
+      /* ================= SHOP OPEN / CLOSE + RAIL FLIP ================= */
+      // The game never pauses behind the shop: auto-kiln and auto-layer
+      // keep working. Only special-brick spawns stop (see produceBrick).
+      function openShop() {
+        if (!S.workshopShown) return;
+        S.shopOpen = true;
+        el.workshop.classList.remove("hidden");
+        el.btnShop.classList.remove("shop-pulse");
+        dismissHint("shop");
+        sndPop();
+        renderShop();
+        renderHUD();
+      }
+      function closeShop() {
+        S.shopOpen = false;
+        el.workshop.classList.add("hidden");
+        renderHUD();
+        pumpMsg();
+      }
+      el.btnShop.addEventListener("click", function () { audio(); openShop(); });
+      $("btn-shop-close").addEventListener("click", function () { closeShop(); sndPop(); });
+      el.workshop.addEventListener("click", function (e) { if (e.target === el.workshop) closeShop(); });
+      /* ================= SETTINGS (handedness + sound live here) ================= */
+      // The game always starts right-handed; flipping is a settings choice.
+      function setRailSide(side) {
+        S.railSide = side;
+        $("app").className = side === "r" ? "rail-r" : "rail-l";
+        syncSettings();
+        updatePan();
+        if (S.swing.active) updateSwingPos();
+      }
+      function syncSettings() {
+        $("set-hand-r").classList.toggle("on", S.railSide === "r");
+        $("set-hand-l").classList.toggle("on", S.railSide === "l");
+        $("set-snd-on").classList.toggle("on", !S.muted);
+        $("set-snd-off").classList.toggle("on", S.muted);
+      }
+      function openSettings() { syncSettings(); el.settings.classList.remove("hidden"); sndPop(); }
+      function closeSettings() { el.settings.classList.add("hidden"); pumpMsg(); }
+      $("btn-settings").addEventListener("click", function () { audio(); openSettings(); });
+      $("btn-settings-close").addEventListener("click", function () { closeSettings(); sndPop(); });
+      el.settings.addEventListener("click", function (e) { if (e.target === el.settings) closeSettings(); });
+      $("set-hand-r").addEventListener("click", function () { setRailSide("r"); sndPop(); });
+      $("set-hand-l").addEventListener("click", function () { setRailSide("l"); sndPop(); });
+      $("set-snd-on").addEventListener("click", function () { S.muted = false; syncSettings(); sndPop(); });
+      $("set-snd-off").addEventListener("click", function () { S.muted = true; syncSettings(); });
+
+
+      /* ================= HOT FUSES ================= */
+      function checkHotFuses() {
+        // Fuses never burn while a story card is up — reading is not a miss.
+        if (storyActive()) return;
+        // A hot brick on the rail burns down too — expiry mid-swing is a miss.
+        if (S.swing.active && S.swing.item && S.swing.item.type === "hot" && S.tick >= S.swing.item.fuseEnd) {
+          var pt = swingBrickPoint();
+          var it = S.swing.item;
+          endSwing();
+          handleMiss(it, pt);
+          return;
+        }
+        for (var i = S.stack.length - 1; i >= 0; i--) {
+          var hb = S.stack[i];
+          if (hb.type !== "hot" || S.tick < hb.fuseEnd) continue;
+          if (S.courses === 1 && !S.comboTutDone) {
+            hb.fuseEnd = S.tick + HOT_FUSE_TICKS;
+            showTryText("TRY AGAIN!");
+          } else if (S.scUsed < S.tier.secondChance) {
+            S.scUsed++;
+            hb.fuseEnd = S.tick + HOT_FUSE_TICKS;
+            sndPop();
+            showTryText("2ND CHANCE!");
+          } else {
+            S.stack.splice(i, 1);
+            syncBricks();
+            S.misses++;
+            breakCombo();
+            sndMiss();
+            el.missFlash.classList.remove("show"); void el.missFlash.offsetWidth; el.missFlash.classList.add("show");
+            el.missText.classList.remove("show"); void el.missText.offsetWidth; el.missText.classList.add("show");
+          }
+          renderHUD();
+          break; // at most one expiry per tick
+        }
+        // sizzle ambience while any hot brick is live
+        if (S.tick % 20 === 0) {
+          var anyHot = !!(S.swing.item && S.swing.item.type === "hot");
+          if (!anyHot) for (var j = 0; j < S.stack.length; j++) if (S.stack[j].type === "hot") { anyHot = true; break; }
+          if (anyHot) sndSizzle();
+        }
+      }
+
+      /* ================= MAIN LOOP (tick-based) ================= */
+      setInterval(function () {
+        if (!S.started) return;
+        S.tick++;
+        S.playTicks++;
+
+        // Molding: HOLD fills the bar at your manual speed; idle, the
+        // auto-kiln creeps the same bar up on its own. Progress pauses
+        // when neither applies — it never resets.
+        var rate = 0;
+        if (S.held) rate = 1 / moldTime();
+        else if (S.tier.autoKiln > 0) rate = 1 / autoMoldInt();
+        if (rate > 0) {
+          S.moldT += rate * TICK;
+          if (S.moldT >= 1) { S.moldT = 0; produceBrick(!S.held); }
+        }
+        el.moldFill.style.width = Math.min(100, S.moldT * 100) + "%";
+        // Auto-kiln progress shows only here, in the panel kiln bar —
+        // the bottom-of-wall bar below belongs to the auto-layer.
+        el.kilnVis.classList.toggle("firing", S.held || S.tier.autoKiln > 0);
+        // timing swing: slide back and forth above the current row
+        // (a lead brick on the rail runs 50% faster)
+        if (S.swing.active) {
+          var spd = swingSpeed() * (S.swing.item && S.swing.item.type === "lead" ? 1.5 : 1);
+          S.swing.pos += S.swing.dir * TICK * spd;
+          if (S.swing.pos >= 1) { S.swing.pos = 1; S.swing.dir = -1; }
+          else if (S.swing.pos <= 0) { S.swing.pos = 0; S.swing.dir = 1; }
+          updateSwingPos();
+          updateSwingGlow();
+        }
+        checkHotFuses();
+        // auto-layer: LIFO, perfect, flat $1 — paused while you aim a swing
+        if (S.tier.autoLayer > 0 && !S.swing.active) {
+          if (S.stack.length > 0) {
+            S.layAcc += TICK / autoLayInt();
+            var g2 = 0;
+            while (S.layAcc >= 1 && g2 < 20) {
+              S.layAcc -= 1; g2++;
+              if (!layBrick(true)) { S.layAcc = 0; break; }
+            }
+          } else S.layAcc = 0; // nothing to place: the bar waits empty
+        }
+        // The bottom-of-wall bar fills over the auto-layer's interval;
+        // when it completes, the placement above fires and it restarts.
+        el.akFill.style.width = Math.min(100, S.layAcc * 100) + "%";
+        renderPileFx();
+        // peak decay bookkeeping
+        var cutoff = S.tick - 100;
+        while (S.moldEvents.length && S.moldEvents[0] < cutoff) S.moldEvents.shift();
+        if (S.tick % 10 === 0) renderHUD();
+      }, 50);
+
+      /* ================= FLOW: loading → start → story → why → game ================= */
+      (function buildMiniWall() {
+        var mw = $("mini-wall");
+        var widths = [8, 8, 8, 5];
+        for (var c = 1; c <= 4; c++) {
+          var row = document.createElement("div");
+          row.className = "course";
+          for (var s = 0; s < widths[c - 1]; s++) row.appendChild(makeBrick(c, s));
+          mw.appendChild(row);
+        }
+      })();
+      window.addEventListener("resize", updatePan);
+      setTimeout(function () {
+        $("ov-loading").classList.add("hidden");
+        $("ov-start").classList.remove("hidden");
+      }, 1000);
+      $("btn-begin").addEventListener("click", function () {
+        audio(); sndPop();
+        $("ov-start").classList.add("hidden");
+        // STORY FIRST: the opening cards play alone over a covered screen,
+        // one CONTINUE at a time. Only when the sequence is done does the
+        // game start (finishOpening) and the kiln get its spotlight hint.
+        openingPending = true;
+        enqueueStory("start");
+        enqueueStory("mold");
+      });
+      renderHUD();
+
+      /* Probe handle for verification */
+      window.__bb = {
+        state: S,
+        moldBrick: function () { produceBrick(false); },
+        lay: function () { layBrick(false); },
+        place: startSwing, drop: dropSwing,
+        setSwing: function (frac) { S.swing.pos = frac; updateSwingPos(); updateSwingGlow(); },
+        hitTol: hitTol, almostTol: almostTol,
+        dropOutcome: dropOutcomeAt,
+        glowState: function () {
+          return el.swingBrick.classList.contains("in-zone") ? 2 : (el.swingBrick.classList.contains("in-ring") ? 1 : 0);
+        },
+        bandPx: function () { return { win: el.swingWindow.style.width, ring: el.swingRing.style.width }; },
+        fanfare: updateFanfare, wealth: renderWealth,
+        wDisp: function () { return wDisp; },
+        holdStart: function () { moldDown(null); }, holdEnd: moldUp,
+        moldTime: moldTime, swingSpeed: swingSpeed, targetFrac: targetFrac,
+        buyLine: buyLine, crowd: crowdPayday,
+        openShop: openShop, closeShop: closeShop,
+        flip: function () { setRailSide(S.railSide === "r" ? "l" : "r"); },
+        pileTap: pileTap,
+        openBricks: openBrickPanel, closeBricks: closeBrickPanel,
+        settings: function (open) { if (open) openSettings(); else closeSettings(); },
+        push: function (type) {
+          S.stack.push({ type: type, fuseEnd: type === "hot" ? S.tick + HOT_FUSE_TICKS : 0, seed: 5 });
+          settleStack(); syncBricks(); renderHUD();
+        },
+        start: function () {
+          $("ov-loading").classList.add("hidden");
+          $("ov-start").classList.add("hidden");
+          $("ov-victory").classList.add("hidden");
+          msgQ.length = 0;
+          if (activeMsg) { var m0 = activeMsg; activeMsg = null; if (m0.kind === "hint") hideHintEl(m0); }
+          el.story.classList.add("hidden");
+          hideHotCard();
+          openingPending = false;
+          S.started = true; renderHUD(); updatePan();
+        },
+        msgState: function () {
+          return {
+            active: activeMsg ? activeMsg.kind + ":" + activeMsg.id : null,
+            queued: msgQ.map(function (m) { return m.kind + ":" + m.id; }),
+            storyVisible: !el.story.classList.contains("hidden"),
+            storyText: el.storyText.textContent,
+            hintVisible: !el.hintWrap.classList.contains("hidden"),
+            hintText: el.hintText.textContent
+          };
+        },
+        continueMsg: function () { endMsg(); },
+        story: enqueueStory, hint: enqueueHint, dismissHint: dismissHint
+      };
+    </script>
+  </body>
+</html>
