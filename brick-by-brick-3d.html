@@ -422,6 +422,17 @@
       .tkids > .tnode::after{ content:""; position:absolute; left:0; top:25px; width:15px; border-top:3px solid var(--line); }
       .upg-row.locked{ opacity:.55; border-style:dashed; box-shadow:none; }
       .upg-row.locked .upg-ico{ filter:grayscale(1); }
+      /* Brick Sorter: warehouse tabs inside the storage building */
+      #wh-tabs{ display:flex; gap:4px; margin:0 0 7px; }
+      #wh-tabs.hidden{ display:none; }
+      .wh-btn{ flex:1 1 0; min-width:0; padding:3px 1px 2px; border:2px solid #8a7358; background:rgba(0,0,0,.28); color:#d9c7a4; font-family:'Archivo',sans-serif; font-weight:800; font-size:8.5px; letter-spacing:.03em; line-height:1.1; text-align:center; position:relative; }
+      .wh-btn i{ display:block; width:20px; height:10px; margin:0 auto 2px; border:2px solid rgba(20,10,4,.75); }
+      .wh-btn i.w-normal{ background:var(--clay); } .wh-btn i.w-lead{ background:linear-gradient(180deg,#6b707a,#33363f); }
+      .wh-btn i.w-silver{ background:linear-gradient(180deg,#f2f5f8,#c9d2da 55%,#9aa5b0); } .wh-btn i.w-gold{ background:linear-gradient(180deg,#ffe27a,#f5b921 55%,#d99a06); }
+      .wh-btn b{ display:block; font-family:'Archivo Black',sans-serif; font-size:11px; color:#fff; letter-spacing:0; }
+      .wh-btn.on{ border-color:#ffd94d; background:rgba(245,185,33,.24); box-shadow:0 0 0 2px rgba(255,217,77,.55); color:#fff3d1; }
+      .wh-btn.zero{ opacity:.5; }
+      .wh-btn.bump{ animation:pop .3s cubic-bezier(.3,1.6,.5,1); }
     </style>
   </head>
   <body>
@@ -484,8 +495,8 @@
             <polygon points="1,36 50,3 99,36" fill="#8e3418" stroke="#221407" stroke-width="4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
             <path d="M14 27H86M28 16H72" stroke="#221407" stroke-opacity=".3" stroke-width="2" vector-effect="non-scaling-stroke"/>
           </svg>
-          <div class="t-sign"><span id="tray-count">0</span><span>STORAGE</span></div>
-          <div class="t-bay"><div id="tray-list"></div></div>
+          <div class="t-sign"><span id="tray-count">0</span><span id="tray-lab">STORAGE</span></div>
+          <div class="t-bay"><div id="wh-tabs" class="hidden"></div><div id="tray-list"></div></div>
         </div>
       </div>
 
@@ -605,14 +616,24 @@ var GRAB_TIME = 10;           // seconds a hand needs to rip a brick free
    - A plain brick pays BASE_PAY + 1 per 10 courses reached (the "pay raise").
    - A streak is a gentle bonus: +1% per hit in a row, capped at ×1.3
      (Crowd Favor lifts the cap to ×4.0). It used to be ×10 and up.
-   - Types: gold ×3, hot ×2, lead ×4, sky-glass ×5; a PERFECT drop ×1.5.
-   - A finished row pays 2 × rate (doubled if clean). Smashing a hand pays 10 × rate.
+   - Types: lead ×1.5, silver ×2, gold ×2.5, hot ×2, sky-glass ×5; a PERFECT drop pays more with Perfect Eye.
+   - A finished row (on the tower: a finished SIDE) pays 2 × rate (doubled if clean). Smashing a hand pays 10 × rate.
+   - METAL BONUSES: every lead / silver / gold brick in a finished row adds +2 / +2.5 / +3 × rate to that row's payout; a run of the
+     same metal pays little bumps; a row that is ALL one metal pays a pure-row bonus on top (see ROW_ADD / RUN_ADD / PURE_ADD).
+   - PRICES (rebalanced): a tier costs roughly  income-per-second at the row you would normally buy it  ×  (25 s + 500 s × the share of
+     income it adds).  Strong upgrades cost more, weak ones (Crowd Favor, Sky Lantern…) cost less.  The whole tree is ≈15k coins.
    - The kiln only bakes while you HOLD it. Banked Coals (shop) lets it
      smoulder on its own once you've earned it. The apprentice pays flat rate.
-   The upgrade tree costs ≈28k coins in total (re-priced for the 6-wide wall and 24-brick tower
-   rings so each upgrade still arrives at the same point in real time as before). */
-var TYPE_MULT = { normal: 1, lead: 2, silver: 3, gold: 4, hot: 2, glass: 5 };   // provisional — the full rebalance comes last
+   Pay now arrives every finished SIDE (4× as often on the tower), so the tree was re-priced against that faster income. */
+var TYPE_MULT = { normal: 1, lead: 1.5, silver: 2, gold: 2.5, hot: 2, glass: 5 };
 var TYPE_NAME = { gold: "GOLD", silver: "SILVER", lead: "LEAD", hot: "HOT", glass: "GLASS" };
+var ROW_ADD = { lead: 2, silver: 2.5, gold: 3 };        // × rate: each metal brick in a finished row (side) adds this to that row's payout
+var PURE_ADD = { lead: 3, silver: 5, gold: 8 };         // × rate: a row that is ALL one metal pays this on top
+var RUN_ADD = { lead: 0.2, silver: 0.3, gold: 0.5 };    // × rate per step of a same-metal run (2nd brick in a row = 1 step … capped at 5 steps)
+var WH_NAME = { normal: "PLAIN", lead: "LEAD", silver: "SILVER", gold: "GOLD" };
+function round2(x) { return Math.round(x * 100) / 100; }
+function isMetal(t) { return t === "lead" || t === "silver" || t === "gold"; }
+function freshRowT() { return { lead: 0, silver: 0, gold: 0, n: 0 }; }
 var PERF_PAY = [1, 1.25, 1.5, 2];       // Perfect Eye tiers: what a PERFECT drop pays (tier 0 = perfects do not exist yet)
 var SILVER_ROW = 15;
 function typeLabel(t) { return (TYPE_NAME[t] || "") + " ×" + TYPE_MULT[t]; }
@@ -647,7 +668,8 @@ var S = {
   windOn: false, mistLevel: 0, swayOn: false, raid: null,
   wind: { dir: 1, phase: 0, flipAt: 0 },
   layAcc: 0, streak: 0, comboTutDone: false, scUsed: 0,
-  tier: { perBrick: 0, perfect: 0, lead: 0, silver: 0, gold: 0, combo: 0, kilnSpeed: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
+  fill: 0, active: "normal", rowT: { lead: 0, silver: 0, gold: 0, n: 0 }, run: { t: null, n: 0 },
+  tier: { perBrick: 0, perfect: 0, lead: 0, silver: 0, gold: 0, sorter: 0, combo: 0, kilnSpeed: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
   flags: {}, beats: {}, seenLines: {},
   muted: false, musicOn: true, shakeOn: true, vibOn: true, quality: "hi", hand: "r",
   workshopShown: false, shopOpen: false, seenVis: null
@@ -665,7 +687,9 @@ function fmtPay(n) { n = Math.round(n * 100) / 100; return n % 1 === 0 ? String(
 function fmtMoney(n) { return fmt(Math.floor(n + 1e-6)); }                                          // HUD shows whole dollars only
 function coinsFor(amount) { return amount <= 12 ? Math.max(1, Math.round(amount)) : Math.min(24, 12 + Math.round(Math.sqrt(amount - 12))); }   // one coin per $1, then thinning out
 function brickPay(mult, type, perfect) { var p = rate() * mult * TYPE_MULT[type]; if (perfect) p *= PERF_PAY[S.tier.perfect] || 1; return Math.max(rate(), Math.round(p * 100) / 100); }
-function payable(row) { return row >= PAY_FROM_ROW || S.best >= PAY_FROM_ROW; }
+function payable(row) { return row >= PAY_FROM_ROW || S.best >= PAY_FROM_ROW || S.tower; }   // the tower is a paid job from the first side
+function workRow() { return S.fill > 0 ? S.fill : S.courses + 1; }     // the row the crane is working on (the tower fill starts back at row 1)
+function towerQ() { return (S.fill > 0 ? S.fill - 1 : S.courses) * 4 + curFace(); }   // quarter-turns the camera has walked round the tower
 function rowBonus(clean) { return 2 * rate() * (clean ? 2 : 1); }
 function glassF() { return (C && C.item && C.item.type === "glass") ? GLASS_TOL : 1; }
 function hitTol() { return HIT_TOL * STEADY_MULT[S.tier.steady] * glassF(); }
@@ -716,75 +740,79 @@ var ICON = {
   crowd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="8" r="2.5"/><circle cx="17" cy="8" r="2.5"/><circle cx="12" cy="6" r="2.5"/><path d="M3 20v-3a4 4 0 0 1 8 0M13 20v-3a4 4 0 0 1 8 0"/></svg>',
   glaze: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3c4 5.5 6 8.5 6 11.5a6 6 0 0 1-12 0C6 11.5 8 8.5 12 3z"/></svg>',
   lantern: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6M8 6h8l1.5 3v8L15 20H9l-2.5-3V9z"/><path d="M12 10v5"/></svg>',
+  sorter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 21V9l4.5-4L12 9v12M12 21V9l4.5-4L21 9v12"/><path d="M6 21v-5h3v5M15 21v-5h3v5"/></svg>',
   level: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="2.5" y="9" width="19" height="6" rx="1"/><circle cx="12" cy="12" r="1.6"/><path d="M8 9v2M16 9v2"/></svg>'
 };
 var LINES = [
   { id: "perBrick", icon: "gilded", name: "Piece Work", costs: [50], gate: function () { return S.best >= PAY_FROM_ROW - 1; },
     effect: function (t) { return "Every brick you lay pays $" + rate() + " (plus type and perfect bonuses)."; },
     next: function (t) { return "Get paid for every brick, not just finished rows. A plain brick pays $" + rate() + "."; } },
-  { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [65], gate: function () { return S.tier.perBrick >= 1; },
+  { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [70], gate: function () { return S.tier.perBrick >= 1; },
     effect: function (t) { return "Hits in a row build a streak bonus (+1% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
     next: function (t) { return "Land bricks in a row to build a STREAK multiplier on every brick. Miss and it resets."; } },
-  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [10,  60,  135,  310,  610], gate: function () { return true; },
+  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [10,  70,  160,  300,  460], gate: function () { return true; },
     effect: function (t) { return "Bakes a brick every " + BAKE_TIMES[t] + "s while you hold the kiln."; },
     next: function (t) { return "Bake time " + BAKE_TIMES[t] + "s → " + BAKE_TIMES[t + 1] + "s while held." + (t === 1 ? " Something about the heat…" : ""); } },
-  { id: "bellows", icon: "bellows", name: "Banked Coals", costs: [85,  240,  640], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
+  { id: "bellows", icon: "bellows", name: "Banked Coals", costs: [100,  190,  320], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
     effect: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t] * 100) + "% speed."; },
     next: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t + 1] * 100) + "% speed — bricks while your hands are busy."; } },
-  { id: "steady", icon: "steady", name: "Steady Hands", costs: [45,  145,  410], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
+  { id: "steady", icon: "steady", name: "Steady Hands", costs: [45,  110,  190], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return t >= 3 ? "Window +60% and the ALMOST RING — near misses swing again." : "Drop window +" + Math.round((STEADY_MULT[t] - 1) * 100) + "% wider."; },
     next: function (t) { return t === 2 ? "Adds the ALMOST RING: land just outside and the brick swings again — streak safe." : "Drop window +" + Math.round((STEADY_MULT[t + 1] - 1) * 100) + "% wider — the gold zone on the crane grows."; } },
-  { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [65,  195,  540], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
+  { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [750,  1000,  1250], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return "+" + GILD_PCT[t] + "% more bricks come out golden (×" + TYPE_MULT.gold + " pay)."; },
     next: function (t) { return "+" + GILD_PCT[t + 1] + "% more bricks come out golden — gold pays ×" + TYPE_MULT.gold + "."; } },
-  { id: "secondChance", icon: "second", name: "Second Chance", costs: [50,  170,  480], gate: function () { return S.tier.perBrick >= 1 && S.best >= 4; },
+  { id: "secondChance", icon: "second", name: "Second Chance", costs: [60,  130,  200], gate: function () { return S.tier.perBrick >= 1 && S.best >= 4; },
     effect: function (t) { return "Forgives " + t + " miss" + (t > 1 ? "es" : "") + " per row."; },
     next: function (t) { return "Forgive " + (t + 1) + " miss" + (t > 0 ? "es" : "") + " per row — the brick comes back, the streak survives."; } },
-  { id: "autoLayer", icon: "apprentice", name: "Apprentice", costs: [105], gate: function () { return S.tier.perBrick >= 1 && S.best >= 5; },
-    effect: function (t) { return "An apprentice lays a plain brick when you pause or your hand overflows. Flat rate, never touches specials."; },
+  { id: "autoLayer", icon: "apprentice", name: "Apprentice", costs: [160], gate: function () { return S.tier.perBrick >= 1 && S.best >= 5; },
+    effect: function (t) { return S.tier.sorter > 0 ? "An apprentice lays bricks from the warehouse you have selected when you pause or hold 4+. Flat rate — but metal rows still pay their bonuses." : "An apprentice lays a plain brick when you pause or your hand overflows. Flat rate, never touches specials."; },
     next: function (t) { return "Hire an apprentice: lays a plain brick every " + AL_INT[0] + "s when you pause or hold 4+. The slot glows and counts down before they place it."; } },
-  { id: "fasterApp", icon: "precision", name: "Faster Apprentices", costs: [255,  610,  1280], gate: function () { return S.tier.autoLayer >= 1; },
+  { id: "fasterApp", icon: "precision", name: "Faster Apprentices", costs: [200,  350,  525], gate: function () { return S.tier.autoLayer >= 1; },
     effect: function (t) { return "Apprentices lay every " + AL_INT[t] + "s."; },
     next: function (t) { return "Apprentices lay every " + AL_INT[t] + "s → " + AL_INT[t + 1] + "s."; } },
-  { id: "moreApp", icon: "crowd", name: "More Apprentices", costs: [380,  940], gate: function () { return S.tier.autoLayer >= 1; },
+  { id: "moreApp", icon: "crowd", name: "More Apprentices", costs: [300,  525], gate: function () { return S.tier.autoLayer >= 1; },
     effect: function (t) { return "Each trip lays " + (1 + t) + " bricks at once."; },
     next: function (t) { return "Each trip lays " + (2 + t) + " bricks at once instead of " + (1 + t) + " (needs that many plain bricks in hand)."; } },
-  { id: "predictable", icon: "plumb", name: "Predictable Placement", costs: [300], gate: function () { return S.tier.perBrick >= 1 && S.best >= 8; },
+  { id: "predictable", icon: "plumb", name: "Predictable Placement", costs: [100], gate: function () { return S.tier.perBrick >= 1 && S.best >= 8; },
     effect: function (t) { return "The crane arm brings each brick in a set distance from the slot, so you get about the same time to place it."; },
     next: function (t) { return "The crane always brings the next brick in from a set distance from the slot — about the same time to place every brick, however fast it climbs."; } },
-  { id: "hotMortar", icon: "mortar", name: "Hot Mortar", costs: [205,  680], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
+  { id: "hotMortar", icon: "mortar", name: "Hot Mortar", costs: [160,  420], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
     effect: function (t) { return S.tower ? "Tower sides need " + [6, 5, 4][t] + " bricks." : "Rows need " + (6 - t) + " bricks."; },
     next: function (t) { return S.tower ? "Tower sides need " + [6, 5, 4][t + 1] + " bricks instead of " + [6, 5, 4][t] + " — climb faster." : "Rows need " + (5 - t) + " bricks instead of " + (6 - t) + " — climb faster."; } },
-  { id: "precision", icon: "precision", name: "Precision Gears", costs: [130,  380,  940], gate: function () { return S.flags.precisionShown; },
+  { id: "precision", icon: "precision", name: "Precision Gears", costs: [100,  210,  400], gate: function () { return S.flags.precisionShown; },
     effect: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t + 1]) * 100) + "% — the crane gets faster as you climb."; } },
-  { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [185,  540], gate: function () { return S.best >= PLUMB_COURSE; },
+  { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [100,  240], gate: function () { return S.best >= PLUMB_COURSE; },
     effect: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t] + " wider."; },
     next: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t + 1] + " wider — more perfects, more pay."; } },
-  { id: "crowd", icon: "crowd", name: "Crowd Favor", costs: [300,  760,  1700,  3400], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
+  { id: "crowd", icon: "crowd", name: "Crowd Favor", costs: [95,  160,  280,  420], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
     effect: function (t) { return "Streak bonus caps at ×" + fmtMult(CAP[t]) + "."; },
     next: function (t) { return "Streak cap ×" + fmtMult(CAP[t]) + " → ×" + fmtMult(CAP[t + 1]) + ". The crowd wants a show."; } },
-  { id: "glaze", icon: "glaze", name: "Slippery Glaze", costs: [255,  680,  1620], gate: function () { return S.best >= HAND_COURSE; },
+  { id: "glaze", icon: "glaze", name: "Slippery Glaze", costs: [170,  260,  400], gate: function () { return S.best >= HAND_COURSE; },
     effect: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s to rip a brick free."; },
     next: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s → " + (GRAB_TIME + GLAZE_ADD[t + 1]) + "s to rip a brick free — more time to smash them."; } },
-  { id: "lantern", icon: "lantern", name: "Sky Lantern", costs: [600,  1360,  2700], gate: function () { return S.best >= MIST_COURSE; },
+  { id: "lantern", icon: "lantern", name: "Sky Lantern", costs: [280,  400,  525], gate: function () { return S.best >= MIST_COURSE; },
     effect: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t + 1]) * 100) + "% — see the crane through the weather."; } },
-  { id: "level", icon: "level", name: "Spirit Level", costs: [1200,  2550], gate: function () { return S.best >= TREMOR_COURSE; },
+  { id: "level", icon: "level", name: "Spirit Level", costs: [550,  725], gate: function () { return S.best >= TREMOR_COURSE; },
     effect: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t + 1]) * 100) + "% — the drop zone sways less."; } }
-  ,{ id: "perfect", icon: "star", name: "Perfect Eye", costs: [30, 140, 380],
+  ,{ id: "perfect", icon: "star", name: "Perfect Eye", costs: [35, 110, 230],
     effect: function (t) { return "PERFECT drops are on — they pay ×" + PERF_PAY[t] + "."; },
     next: function (t) { return t === 0 ? "Start landing PERFECT drops: hit the white strip in the green zone for ×" + PERF_PAY[1] + " pay." : "PERFECT drops pay ×" + PERF_PAY[t + 1] + " instead of ×" + PERF_PAY[t] + "."; } },
-  { id: "lead", icon: "brick", name: "Lead Bricks", costs: [40],
-    effect: function (t) { return "Dark lead bricks (×" + TYPE_MULT.lead + " pay) come out of the kiln. They swing 40% faster."; },
-    next: function (t) { return "Unlock LEAD bricks: heavy and fast, but worth ×" + TYPE_MULT.lead + "."; } },
-  { id: "silver", icon: "brick", name: "Silver Bricks", costs: [110],
-    effect: function (t) { return "Silver bricks (×" + TYPE_MULT.silver + " pay) turn up in the kiln."; },
-    next: function (t) { return "Unlock SILVER bricks, worth ×" + TYPE_MULT.silver + "."; } },
-  { id: "gold", icon: "gilded", name: "Gold Bricks", costs: [260],
-    effect: function (t) { return "Gold bricks (×" + TYPE_MULT.gold + " pay) turn up in the kiln."; },
-    next: function (t) { return "Unlock GOLD bricks, worth ×" + TYPE_MULT.gold + ". Gilded Clay then makes them common."; } }
+  { id: "lead", icon: "brick", name: "Lead Bricks", costs: [100],
+    effect: function (t) { return "Lead bricks (×" + TYPE_MULT.lead + " pay, swing 40% faster) come out of the kiln. Each one in a finished row adds +" + ROW_ADD.lead + "× rate to that row's payout."; },
+    next: function (t) { return "Unlock LEAD bricks: heavy and fast, worth ×" + TYPE_MULT.lead + " — and +" + ROW_ADD.lead + "× rate on every row they sit in. A run of lead earns bumps."; } },
+  { id: "silver", icon: "brick", name: "Silver Bricks", costs: [230],
+    effect: function (t) { return "Silver bricks (×" + TYPE_MULT.silver + " pay) turn up in the kiln. Each one in a finished row adds +" + ROW_ADD.silver + "× rate."; },
+    next: function (t) { return "Unlock SILVER bricks: ×" + TYPE_MULT.silver + " pay and +" + ROW_ADD.silver + "× rate on every row they sit in."; } },
+  { id: "gold", icon: "gilded", name: "Gold Bricks", costs: [410],
+    effect: function (t) { return "Gold bricks (×" + TYPE_MULT.gold + " pay) turn up in the kiln. Each one in a finished row adds +" + ROW_ADD.gold + "× rate."; },
+    next: function (t) { return "Unlock GOLD bricks: ×" + TYPE_MULT.gold + " pay and +" + ROW_ADD.gold + "× rate on every row they sit in. Gilded Clay then makes them common."; } },
+  { id: "sorter", icon: "sorter", name: "Brick Sorter", costs: [170],
+    effect: function (t) { return "Bricks are sorted into a warehouse per type. Tap a warehouse to pick what the crane AND your apprentices build with. A whole row of one metal pays a pure-row bonus."; },
+    next: function (t) { return "Sort lead, silver and gold into their own warehouses and choose which one you build from — stockpile gold, then lay a pure gold row for a big bonus."; } }
 ];
 /* ----- SKILL TREE: every upgrade hangs off a parent. A node opens once its parent is owned (to the tier shown) and you've reached its row. ----- */
 var TABS = [ { id: "kiln", name: "KILN" }, { id: "bricks", name: "BRICKS" }, { id: "money", name: "MONEY" }, { id: "skill", name: "SKILL" }, { id: "crew", name: "CREW" }, { id: "weather", name: "WEATHER" } ];
@@ -792,7 +820,7 @@ var TREE = {
   kilnSpeed: { tab: "kiln", parent: null }, bellows: { tab: "kiln", parent: "kilnSpeed", row: 6 }, hotMortar: { tab: "kiln", parent: "kilnSpeed", ptier: 2, row: 6 },
   perBrick: { tab: "money", parent: null, row: 5 }, combo: { tab: "money", parent: "perBrick" }, crowd: { tab: "money", parent: "combo", row: 15 },
   perfect: { tab: "money", parent: "perBrick", row: 3 }, plumb: { tab: "money", parent: "perfect", row: 12 },
-  lead: { tab: "bricks", parent: "perBrick", row: 8 }, silver: { tab: "bricks", parent: "lead", row: 15 }, gold: { tab: "bricks", parent: "silver", row: 22 }, gilded: { tab: "bricks", parent: "gold" },
+  lead: { tab: "bricks", parent: "perBrick", row: 8 }, silver: { tab: "bricks", parent: "lead", row: 15 }, gold: { tab: "bricks", parent: "silver", row: 22 }, gilded: { tab: "bricks", parent: "gold" }, sorter: { tab: "bricks", parent: "lead", row: 12 },
   steady: { tab: "skill", parent: "perBrick", row: 3 }, secondChance: { tab: "skill", parent: "steady", row: 4 }, precision: { tab: "skill", parent: "steady", row: 10 },
   predictable: { tab: "skill", parent: "steady", row: 8 }, glaze: { tab: "skill", parent: "secondChance", row: 25 },
   autoLayer: { tab: "crew", parent: "perBrick", row: 5 }, fasterApp: { tab: "crew", parent: "autoLayer" }, moreApp: { tab: "crew", parent: "autoLayer" },
@@ -1068,7 +1096,7 @@ function updateOrbit(dt) {
     W3.towerCut += dt; var u = clamp(W3.towerCut / TOWER_CUT, 0, 1), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(2 - 2 * u, 2) / 2;
     W3.orbitAng = e * Math.PI * 2; W3.orbitT = Math.PI * 2;
   } else {
-    if (S.tower && G.falls === 0) W3.orbitT = Math.PI * 2 + ((S.courses - S.towerStart) * 4 + curFace()) * Math.PI / 2;
+    if (S.tower && G.falls === 0) W3.orbitT = Math.PI * 2 + towerQ() * Math.PI / 2;
     W3.orbitAng = damp(W3.orbitAng, W3.orbitT, 3.4, dt);
   }
   CAM.turning = CAM.mode === "tower" || Math.abs(W3.orbitT - W3.orbitAng) > 0.08;
@@ -2032,7 +2060,7 @@ function fitDistance() {
   var need = (FW() / 2 + (S.tower ? 1.9 : 0.95)) / Math.tan(hf);
   return clamp(need, 12.5, 36);
 }
-function workY() { return rowY(S.courses + 1); }
+function workY() { return rowY(workRow()); }
 function updateCamera(dt, rt) {
   updateOrbit(dt);
   var D = fitDistance();
@@ -2199,6 +2227,62 @@ function settleStack() {
   Array.prototype.push.apply(S.stack, plain); Array.prototype.push.apply(S.stack, hot);
 }
 function plainCount() { var n = 0; for (var i = 0; i < S.stack.length; i++) if (S.stack[i].type === "normal") n++; return n; }
+/* ---------------- BRICK SORTER: one warehouse per type; the ACTIVE one feeds the crane and the apprentices ---------------- */
+function sorterOn() { return S.tier.sorter > 0; }
+function whKey(type) { return isMetal(type) ? type : "normal"; }            // plain, glass and hot bricks share the plain warehouse
+function whCount(k) { var n = 0; for (var i = 0; i < S.stack.length; i++) if (whKey(S.stack[i].type) === k) n++; return n; }
+function whOpen(k) { return k === "normal" || S.tier[k] > 0; }               // a warehouse exists once its brick type is unlocked
+function nextIdx() {                      // which brick the crane takes next (-1 = none)
+  var i;
+  if (!sorterOn()) return S.stack.length - 1;
+  for (i = S.stack.length - 1; i >= 0; i--) if (S.stack[i].type === "hot") return i;          // heat rises: hot bricks go first, whatever is selected
+  for (i = S.stack.length - 1; i >= 0; i--) if (whKey(S.stack[i].type) === S.active) return i;
+  return -1;
+}
+function apprPick() {                     // apprentices build from the selected warehouse (plain only until the Sorter is bought)
+  var key = sorterOn() ? S.active : "normal";
+  for (var i = S.stack.length - 1; i >= 0; i--) { var t = S.stack[i].type; if (t === "hot") continue; if (key === "normal" ? t === "normal" : t === key) return i; }
+  return -1;
+}
+function apprCount() {
+  var key = sorterOn() ? S.active : "normal", n = 0;
+  for (var i = 0; i < S.stack.length; i++) { var t = S.stack[i].type; if (t === "hot") continue; if (key === "normal" ? t === "normal" : t === key) n++; }
+  return n;
+}
+function ensureActive() {                 // the selected warehouse ran dry → fall back to plain
+  if (!sorterOn() || S.active === "normal" || whCount(S.active) > 0) return;
+  var was = S.active; S.active = "normal"; UI.traySig = "";
+  toast(WH_NAME[was] + " storage is empty — back to PLAIN", 2400); renderHUD();
+}
+function selectWh(k) {
+  if (!sorterOn() || !whOpen(k)) return;
+  if (k !== "normal" && whCount(k) === 0) { snd.err(); toast(WH_NAME[k] + " storage is empty", 1600); return; }
+  if (S.active === k) return;
+  S.active = k; UI.traySig = ""; snd.pop(); haptic(8); renderHUD(); saveGame();
+}
+function trayView() {                     // what the storage building shows
+  if (!sorterOn()) return S.stack;
+  return S.stack.filter(function (it) { return whKey(it.type) === S.active; });
+}
+function rowTypeBonus(row) {              // metal bonuses for the row (side) that was just finished
+  var out = { row: row, bonus: 0, metal: 0, pureAmt: 0, pure: null, n: { lead: S.rowT.lead, silver: S.rowT.silver, gold: S.rowT.gold } };
+  if (!payable(row)) return out;
+  var r = rate();
+  ["lead", "silver", "gold"].forEach(function (t) { out.metal += S.rowT[t] * ROW_ADD[t] * r; if (S.rowT.n > 0 && S.rowT[t] === S.rowT.n) out.pure = t; });
+  if (out.pure) out.pureAmt = PURE_ADD[out.pure] * r;
+  out.metal = round2(out.metal); out.pureAmt = round2(out.pureAmt); out.bonus = round2(out.metal + out.pureAmt);
+  return out;
+}
+function typeRowFx(tb) {
+  if (!tb || tb.bonus <= 0) return;
+  var sp = toScreen(0, rowY(tb.row) + 0.4, BD / 2), parts = [];
+  ["gold", "silver", "lead"].forEach(function (t) { if (tb.n[t]) parts.push(tb.n[t] + " " + WH_NAME[t]); });
+  if (tb.metal > 0) popText(parts.join(" · ") + "  +$" + fmtPay(tb.metal), sp.x, sp.y + 16, { cls: "gold", size: 13, dur: 1200, rise: 26, delay: 260 });
+  if (tb.pure) {
+    popText("PURE " + WH_NAME[tb.pure] + " ROW!  +$" + fmtPay(tb.pureAmt), sp.x, sp.y + 42, { cls: "gold", size: 19, dur: 1500, rise: 30, delay: 420, rot: -3 });
+    snd.cheer(true); crowdCheer(1.4); flashScreen(0.14);
+  }
+}
 
 /* ---------------- KILN ---------------- */
 function tickKiln(dt) {
@@ -2218,7 +2302,7 @@ function produceBrick() {
   else if (type === "gold") { snd.clink(); tone(2349, 0.14, "sine", 0.06, 0.05); }
   else if (type === "silver") { snd.clink(); tone(1976, 0.12, "sine", 0.05, 0.05); }
   else snd.clink();
-  UI.trayPop = it.uid;
+  UI.trayPop = it.uid; UI.whPop = whKey(type);
   kilnPuff();
   if (!REDUCED) UI.fly[it.uid] = 1;
   renderHUD();
@@ -2241,7 +2325,7 @@ function tickCrane(dt, frozen) {
   if (C.lock > 0) C.lock -= dt;
   if (C.state === "empty") {
     C.t -= dt;
-    if (!frozen && C.t <= 0 && S.stack.length > 0 && !UI.fly[S.stack[S.stack.length - 1].uid]) loadCrane();
+    if (!frozen && C.t <= 0) { ensureActive(); var ni = nextIdx(); if (ni >= 0 && !UI.fly[S.stack[ni].uid]) loadCrane(); }
     return;
   }
   if (C.state === "swing" && !frozen) {
@@ -2251,7 +2335,8 @@ function tickCrane(dt, frozen) {
   }
 }
 function loadCrane() {
-  var item = S.stack.pop();
+  var ni = nextIdx(); if (ni < 0) return;
+  var item = S.stack.splice(ni, 1)[0];
   C.item = item; C.state = "swing"; C.lock = 0.12; C.loadT = 0;
   var fromRight = Math.random() < 0.5;
   C.pos = fromRight ? 1 : 0; C.dir = fromRight ? -1 : 1;
@@ -2276,7 +2361,7 @@ function posAtTime(ts) {
 function tryDrop(ts) {
   if (!S.started || modalPaused() || actionFrozen()) return;
   if (C.state !== "swing") {
-    if (C.state === "empty" && S.stack.length === 0) { snd.err(); nudgeKiln(); }
+    if (C.state === "empty" && nextIdx() < 0) { snd.err(); nudgeKiln(); }
     return;
   }
   if (C.lock > 0 || CAM.turning) return;
@@ -2303,7 +2388,7 @@ function tryDrop(ts) {
   C.item = null; C.free = null; C.state = "empty"; C.t = 0.25;
   handleMiss(item, f, from);
 }
-function hookPoint() { var r = S.courses + 1; return { x: posX(r, C.pos, perFace()), y: rowY(r) + 1.05, z: 0 }; }
+function hookPoint() { var r = workRow(); return { x: posX(r, C.pos, perFace()), y: rowY(r) + 1.05, z: 0 }; }
 
 /* ---------------- PLACING ---------------- */
 function whenLanded(fn) { if (G.falls > 0) G.afterLand.push(fn); else fn(); }
@@ -2315,7 +2400,7 @@ function landedOne() {
 }
 var FALLING = [];
 function placeBrick(item, fromAuto, outcome, f, from) {
-  var row = S.courses + 1, slot = curSlot(), per = perFace(), face = curFace(), ci = S.inCourse;
+  var row = workRow(), slot = curSlot(), per = perFace(), face = curFace(), ci = S.inCourse;
   var willComplete = S.inCourse + 1 >= S.perCourse;
   var r = rate();
   S.laid++; S.inCourse++; S.lastAct = S.time;
@@ -2333,6 +2418,12 @@ function placeBrick(item, fromAuto, outcome, f, from) {
     if (outcome === 3) S.perfects++;
   }
   if (!payable(row) || !perBrickOn()) pay = 0;
+  // METAL LEDGER: every metal brick counts toward the row's bonus, and a run of the same metal pays little bumps
+  var metal = isMetal(item.type) ? item.type : null, bump = 0;
+  S.rowT.n++; if (metal) S.rowT[metal]++;
+  if (metal && S.run.t === metal) S.run.n++; else S.run = { t: metal, n: metal ? 1 : 0 };
+  var runN = S.run.n;
+  if (metal && runN >= 2 && payable(row) && perBrickOn()) { bump = round2(rate() * RUN_ADD[metal] * Math.min(runN - 1, 5)); pay = round2(pay + bump); }
   credit(pay);
   var streakNow = fromAuto ? 0 : S.streak;
   var gen = G.gen;
@@ -2340,7 +2431,7 @@ function placeBrick(item, fromAuto, outcome, f, from) {
     if (gen !== G.gen) return;          // a collapse reset the wall while this brick was in flight
     var idx = wallAdd(row, slot, per, item.type, item.seed, face, ci);
     if (idx >= 0) { animBrick(idx, "land", 0, 0.32); checkHandSmash(BRICKS[idx]); }
-    landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow);
+    landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow, bump, runN);
   };
   // the visible fall (or the apprentice's pop-up)
   if (!f) f = freeBrick(item.type, item.seed);
@@ -2357,7 +2448,7 @@ function placeBrick(item, fromAuto, outcome, f, from) {
   renderHUD();
   if (!fromAuto) renderStreak(true);
 }
-function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow) {
+function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow, bump, runN) {
   var x = slotX(row, slot, per), y = rowY(row), z = BD / 2;
   var col = item.type === "normal" ? (function () { var h = clayHSL(item.seed); return _c2.setHSL(h[0], h[1], h[2]).getHex(); })() : item.type === "gold" ? 0xf5b921 : item.type === "silver" ? 0xdfe6ec : item.type === "hot" ? 0xff8a2a : item.type === "glass" ? 0x9fe6f7 : 0x4b505a;
   snd.place(streakNow, outcome, item.type);
@@ -2379,6 +2470,7 @@ function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, st
     var tl = typeLabel(item.type);
     popText(tl, sp.x, sp.y + 26, { cls: (item.type === "lead" || item.type === "silver") ? "white" : "gold", size: 14, rise: 22, delay: 80 });
   }
+  if (bump > 0) popText(WH_NAME[item.type] + " RUN ×" + runN + "  +$" + fmtPay(bump), sp.x, sp.y + 50, { cls: "gold", size: 13, rise: 24, delay: 200 });
   if (!fromAuto && mult > prevMult && (streakNow % 10 === 0 || (mult >= multCap() && prevMult < multCap()))) {
     var sr = $("streak").getBoundingClientRect();
     popText(mult >= multCap() ? "MAX ×" + fmtMult(mult) + "!" : "×" + fmtMult(mult) + "!", sr.left + sr.width / 2 - 10, sr.bottom + 26, { cls: "gold", size: 28, rot: -6, dur: 1100 });
@@ -2535,11 +2627,12 @@ function missFx(item, f) {
   snd.miss(); haptic([30, 40, 30]);
   camShake(0.5); vignette("miss"); bigWord("MISS!");
   if (f) {
-    f.anim = { kind: "miss", t: 0, vx: C.dir * rand(1.2, 2.4), vy: 1.6, vz: 0.6, rx: rand(-2, 2), rz: -C.dir * rand(4, 8), ty: rowY(S.courses + 1) - PITCH, bounced: false };
+    f.anim = { kind: "miss", t: 0, vx: C.dir * rand(1.2, 2.4), vy: 1.6, vz: 0.6, rx: rand(-2, 2), rz: -C.dir * rand(4, 8), ty: rowY(workRow()) - PITCH, bounced: false };
     FALLING.push(f);
   }
 }
 function breakStreak() {
+  S.run = { t: null, n: 0 };
   if (S.streak >= 5) { var r = $("streak").getBoundingClientRect(); popText("STREAK LOST", r.left + r.width / 2, r.bottom + 22, { cls: "red", size: 15, rise: 24 }); }
   if (S.streak >= 2) { var st = $("streak"); st.classList.remove("break"); void st.offsetWidth; st.classList.add("break"); UI.streakBreakT = 0.5; }
   S.streak = 0;
@@ -2548,11 +2641,11 @@ function breakStreak() {
 /* ---------------- ROWS ---------------- */
 function sideDone() {
   fleeAllHands();
-  var side = curFace() + 1, row = S.courses + 1, clean = S.rowMisses === 0;
-  var bonus = payable(row) ? rowBonus(clean) : 0;     // each side is a row of its own: it pays its own row bonus
-  S.rowMisses = 0; S.scUsed = 0;                              // ...and gets its own clean-row check and Second Chance
+  var side = curFace() + 1, row = workRow(), clean = S.rowMisses === 0;
+  var tb = rowTypeBonus(row), bonus = (payable(row) ? rowBonus(clean) : 0) + tb.bonus;     // each side is a row of its own: it pays its own row + metal bonuses
+  S.rowMisses = 0; S.scUsed = 0; S.rowT = freshRowT();                                  // ...and gets its own clean-row check, Second Chance and metal ledger
   credit(bonus);
-  whenLanded(function () { snd.whoosh(); bigWord("SIDE " + side + " / 4", "gold"); faceFx(row, bonus, clean); });
+  whenLanded(function () { snd.whoosh(); bigWord("SIDE " + side + " / 4", "gold"); faceFx(row, bonus, clean); typeRowFx(tb); });
   saveGame();
 }
 function faceFx(row, bonus, clean) {
@@ -2565,33 +2658,40 @@ function faceFx(row, bonus, clean) {
 }
 function startTower() {
   if (S.tower) return;
-  S.tower = true; S.towerStart = S.courses; S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace; S.inCourse = 0;
+  S.tower = true; S.towerStart = S.courses; S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace;
+  S.fill = S.towerStart >= 1 ? 1 : 0;                        // your wall is the FRONT: the other three sides are yours to build, from the ground up
+  S.inCourse = S.fill ? S.perFace : 0;                       // (the front side of the rows below is already standing)
+  S.rowT = freshRowT(); S.run = { t: null, n: 0 };
   releaseKiln(); fleeAllHands();
   var ft = new THREE.Mesh(new THREE.BoxGeometry(TW + 1.0, FOUND, TW + 1.0), toon(0x8a8478)); ft.position.set(0, FOUND / 2, -TH);
   ft.receiveShadow = true; outline(ft, 0.05); scene.add(ft);
-  // the villagers raise the other three sides to match your wall while the camera circles once
-  var starts = [0, 1.0, 1.8, 2.5];
-  for (var f = 1; f <= 3; f++) for (var r = 1; r <= S.towerStart; r++) for (var s = 0; s < S.perFace; s++) {
-    var idx = wallAdd(r, s, S.perFace, "normal", (r * 31 + s * 7 + f * 101) % 997, f, f * S.perFace + s);
-    if (idx >= 0) { setBrickMatrix(idx, 0, 0.0001, 0.0001); animBrick(idx, "land", starts[f] + (r - 1) * 0.15 + s * 0.035, 0.32); }
-  }
-  for (var q = 0; q < 3; q++) setTimeout(function () { snd.row(true); crowdCheer(1.2); }, (starts[q + 1] + 0.4) * 1000);
+  // nothing is raised for you any more: the camera just circles the bare foundation once so you can see what is ahead
   CAM.mode = "tower"; W3.towerCut = 0;
   snd.fanfare(); crowdCheer(2);
-  banner("BUILD THE TOWER", "THE TOWN RAISED THE OTHER SIDES · NOW BUILD UP");
+  banner("BUILD THE TOWER", "THE FRONT IS UP · NOW BUILD THE OTHER THREE SIDES");
   setTimeout(function () {
     CAM.mode = "play"; W3.orbitAng = W3.orbitT = Math.PI * 2;
-    toast("Lay each side — the camera walks you around the tower.", 3600); renderHUD();
+    toast("Start at the bottom: lay the other three sides row by row — the camera walks you round.", 4200); renderHUD();
   }, TOWER_CUT * 1000);
   renderHUD();
 }
 function completeCourse() {
-  var clean = S.rowMisses === 0, done = S.courses + 1, bonus = payable(done) ? rowBonus(S.rowMisses === 0) : 0, isNew = done > S.best;
-  S.courses++; S.inCourse = 0; S.scUsed = 0; S.rowMisses = 0;
+  var clean = S.rowMisses === 0, filling = S.fill > 0, done = filling ? S.fill : S.courses + 1;
+  var tb = rowTypeBonus(done), bonus = (payable(done) ? rowBonus(clean) : 0) + tb.bonus, isNew = !filling && done > S.best;
+  S.scUsed = 0; S.rowMisses = 0; S.rowT = freshRowT();
+  if (filling) {                    // a row of the tower's back-fill: the three new sides are done, step up to the next row down below
+    S.fill++; var allUp = S.fill > S.towerStart; if (allUp) S.fill = 0;
+    S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace; S.inCourse = S.fill > 0 ? S.perFace : 0;
+    fleeAllHands(); credit(bonus);
+    whenLanded(function () { snd.whoosh(); rowFx(done, bonus, clean); typeRowFx(tb); if (allUp) { banner("FOUR SIDES UP", "NOW BUILD UP · EVERY SIDE IS A ROW"); toast("The whole tower stands — now every side you finish pays.", 3400); } });
+    updateHazards(); renderHUD(); checkUnlocks(); saveGame();
+    return;
+  }
+  S.courses++; S.inCourse = 0;
   if (S.tower) { S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace; fleeAllHands(); whenLanded(function () { snd.whoosh(); }); }
   if (isNew) S.best = S.courses;
   credit(bonus);
-  whenLanded(function () { rowFx(done, bonus, clean); });
+  whenLanded(function () { rowFx(done, bonus, clean); typeRowFx(tb); });
   if (isNew) milestone(S.courses);
   updateHazards();
   renderHUD(); checkUnlocks(); saveGame();
@@ -2619,7 +2719,8 @@ function apprPulse() {                // 0..1 flash at 1s, 0.5s and 0.25s before
 }
 function tickApprentice(dt) {
   if (S.tier.autoLayer <= 0 || CAM.mode === "victory") { AT.on = false; return; }
-  var plain = plainCount(), int = autoLayInt();
+  ensureActive();
+  var plain = apprCount(), int = autoLayInt();
   var idle = S.time - S.lastAct > 1.8 && !S.held;
   var go = plain > 0 && (idle || plain >= 4);
   if (go) {
@@ -2632,10 +2733,10 @@ function tickApprentice(dt) {
     while (AT.pulsed < 3 && AT.rem <= th[AT.pulsed]) { tone(520 + AT.pulsed * 170, 0.07, "triangle", 0.07); AT.pulsed++; }
     if (S.layAcc >= 1) {
       S.layAcc -= 1; AT.pulsed = 0; AT.on = false;
-      for (var k = 0; k < AT.n; k++) for (var i = 0; i < S.stack.length; i++) if (S.stack[i].type === "normal") {
-        var it = S.stack.splice(i, 1)[0];
+      for (var k = 0; k < AT.n; k++) {
+        var pi = apprPick(); if (pi < 0) break;
+        var it = S.stack.splice(pi, 1)[0];
         placeBrick(it, true, 2, null, null);
-        break;
       }
     }
   } else { AT.on = false; AT.pulsed = 0; if (plain === 0) S.layAcc = 0; }
@@ -2705,6 +2806,7 @@ function buyLine(id) {
   else if (id === "lead") { S.leadUnlocked = true; enqueueReveal("lead"); }
   else if (id === "silver") enqueueReveal("silver");
   else if (id === "gold") enqueueReveal("gold");
+  else if (id === "sorter") { S.active = "normal"; UI.traySig = ""; enqueueReveal("sorter"); }
   else if (id === "perfect") toast(S.tier.perfect === 1 ? "Perfect Eye! Hit the white strip for a PERFECT — it pays ×" + PERF_PAY[1] + "." : "Perfect drops now pay ×" + PERF_PAY[S.tier.perfect] + ".", 3400);
   else if (id === "perBrick") toast("Piece Work! Every brick you lay now pays.", 3200);
   else if (id === "combo") toast("Combos on — land hits in a row for a streak bonus. Don't break it!", 3600);
@@ -2740,7 +2842,7 @@ function startVictory() {
 
 /* ---------------- per-frame crane visuals ---------------- */
 function updateCraneVisual(dt, rt) {
-  var r = S.courses + 1, per = perFace(), wy = rowY(r);
+  var r = workRow(), per = perFace(), wy = rowY(r);
   var targetBeamY = wy + 2.15;
   W3.craneY = damp(W3.craneY, targetBeamY, 6, dt);
   W3.crane.position.set(0, W3.craneY, 0);
@@ -2995,7 +3097,7 @@ function handNMax() {
   return Math.max(1, Math.min(cap, feasible));
 }
 function pickHandTarget(nMax) {
-  var R = S.courses; if (R < 1 || G.falls > 0) return null;
+  var R = S.courses; if (R < 1 || G.falls > 0 || S.fill > 0) return null;
   var per = perFace(), w = FW() / per, cands = [], cs = curSlot(), cf = curFace();
   for (var i = BRICKS.length - 1; i >= 0; i--) {
     var b = BRICKS[i]; if (b.row < R) break;
@@ -3086,7 +3188,7 @@ function collapseFrom(bi) {
   W3.wall.instanceMatrix.needsUpdate = W3.wallOut.instanceMatrix.needsUpdate = true;
   ANIMS = ANIMS.filter(function (a) { return a.i < BRICKS.length; });
   if (W3.golds) W3.golds = W3.golds.filter(function (i) { return i < BRICKS.length; });
-  S.courses = g0.row - 1; S.inCourse = g0.ci != null ? g0.ci : g0.slot; if (S.tower && g0.row > S.towerStart) { S.perFace = g0.per; S.perCourse = 4 * g0.per; } S.scUsed = 0; S.rowMisses = Math.max(S.rowMisses, 1);
+  S.courses = g0.row - 1; S.inCourse = g0.ci != null ? g0.ci : g0.slot; if (S.tower && g0.row > S.towerStart) { S.perFace = g0.per; S.perCourse = 4 * g0.per; } S.scUsed = 0; S.rowMisses = Math.max(S.rowMisses, 1); S.rowT = freshRowT();
   S.stolen++; S.lost += gone.length;
   for (var k = 1; k < gone.length; k++) spawnDebris(gone[k], (k - 1) / Math.max(1, gone.length - 1));
   breakStreak();
@@ -3193,7 +3295,7 @@ var UI = { tab: "kiln", fly: {}, trayPop: 0, traySig: "", shopSig: "", shopNew: 
 var el = {};
 ["hud-course-num", "hud-goal", "prog-fill", "money-num", "hud-money", "btn-shop", "shop-new", "shop-count", "chip-row", "row-num", "row-in",
  "chip-wind", "wind-arrow", "wind-str", "chip-sc", "chip-hand", "hand-t", "chip-sway", "streak", "streak-x", "streak-pay", "prompt", "dock", "kiln", "kiln-ring", "kiln-sub",
- "tray", "tray-count", "tray-list", "fx", "toast", "banner", "bn-big", "bn-small", "big-word", "reveal", "hr-brick", "hr-title", "hr-text",
+ "tray", "tray-count", "tray-lab", "wh-tabs", "tray-list", "fx", "toast", "banner", "bn-big", "bn-small", "big-word", "reveal", "hr-brick", "hr-title", "hr-text",
  "workshop", "upg-list", "rate-chip", "settings", "story", "story-card", "story-text", "story-kicker", "story-dots", "story-next",
  "hintwrap", "hint-dim", "hint-label", "hint-text", "vignette", "flash", "ov-loading", "ov-start", "ov-victory"].forEach(function (id) {
   el[id.replace(/-([a-z])/g, function (m, c) { return c.toUpperCase(); })] = $(id);
@@ -3334,18 +3436,19 @@ function renderHUD() {
   el.hudCourseNum.textContent = S.courses;
   el.hudGoal.textContent = S.endless ? "· ENDLESS" : "/ " + S.goal;
   el.progFill.style.width = (Math.min(1, S.courses / S.goal) * 100).toFixed(1) + "%";
-  el.rowNum.textContent = S.courses + 1;
+  el.rowNum.textContent = workRow();
   el.rowIn.textContent = S.tower ? "SIDE " + (curFace() + 1) + "/4 · " + Math.min(curSlot(), S.perFace) + "/" + S.perFace : Math.min(S.inCourse, S.perCourse) + "/" + S.perCourse;
   el.chipSc.classList.toggle("hidden", !(S.started && S.tier.secondChance > 0 && S.scUsed < S.tier.secondChance));
   el.chipSc.textContent = "2ND CHANCE" + (S.tier.secondChance > 1 ? " ×" + (S.tier.secondChance - S.scUsed) : "");
   el.rateChip.textContent = "RATE $" + rate() + (comboOn() ? " · CAP ×" + fmtMult(multCap()) : "");
   renderTray(); renderStreak(false); renderShop(); renderShopBadge();
 }
-function trayShown() { var n = S.stack.length; for (var i = 0; i < S.stack.length; i++) if (UI.fly[S.stack[i].uid]) n--; return n; }
+function trayShown() { var v = trayView(), n = v.length; for (var i = 0; i < v.length; i++) if (UI.fly[v[i].uid]) n--; return n; }
 // a fresh brick arcs from the kiln mouth into the storage bay, then appears on the shelf
 function flyBrick(it) {
   if (!UI.fly[it.uid]) return;
   var dest = el.trayList.querySelector('[data-uid="' + it.uid + '"]');
+  if (!dest && sorterOn()) dest = el.whTabs.querySelector('[data-wh="' + whKey(it.type) + '"]');      // sorted into a warehouse that is not on show
   if (!dest || !el.fx.animate) { finishFly(it.uid); return; }
   var kr = el.kiln.getBoundingClientRect(), dr = dest.getBoundingClientRect();
   var sx = kr.left + kr.width / 2 - 15, sy = kr.top + kr.height * 0.82 - 8, ex = dr.left + dr.width / 2 - 15, ey = dr.top + dr.height / 2 - 8.5;
@@ -3370,20 +3473,33 @@ function finishFly(uid) {
   el.tray.classList.remove("thunk"); void el.tray.offsetWidth; el.tray.classList.add("thunk");
   snd.clink();
 }
+function renderWh() {
+  var on = sorterOn(); el.whTabs.classList.toggle("hidden", !on); if (!on) return;
+  var html = "";
+  ["normal", "lead", "silver", "gold"].forEach(function (k) {
+    if (!whOpen(k)) return;
+    var c = whCount(k);
+    html += '<button class="wh-btn pressable' + (S.active === k ? " on" : "") + (c ? "" : " zero") + (UI.whPop === k ? " bump" : "") + '" data-wh="' + k + '" aria-label="' + WH_NAME[k] + ' storage"><i class="w-' + k + '"></i>' + WH_NAME[k] + "<b>" + c + "</b></button>";
+  });
+  el.whTabs.innerHTML = html; UI.whPop = null;
+}
 function renderTray() {
+  var view = trayView(), sorted = sorterOn();
   el.trayCount.textContent = trayShown();
-  var sig = S.stack.map(function (it) { return it.uid; }).join(",");
+  var sig = (sorted ? S.active + ":" + ["normal", "lead", "silver", "gold"].map(function (k) { return whOpen(k) ? whCount(k) : "-"; }).join(",") + "#" : "") + view.map(function (it) { return it.uid; }).join(",");
   if (sig === UI.traySig) return;
   UI.traySig = sig;
+  el.trayLab.textContent = sorted ? WH_NAME[S.active] + " STORAGE" : "STORAGE";
+  renderWh();
   var html = "", shown = 0, prev = UI.trayUids || {}, now = {};
-  for (var i = S.stack.length - 1; i >= 0 && shown < 8; i--, shown++) {
-    var it = S.stack[i]; now[it.uid] = 1;
+  for (var i = view.length - 1; i >= 0 && shown < 8; i--, shown++) {
+    var it = view[i]; now[it.uid] = 1;
     html += '<div class="tb t-' + it.type + (shown === 0 ? " first" : "") + (UI.fly[it.uid] ? " pend" : prev[it.uid] ? "" : " new") + '" data-uid="' + it.uid + '"' + (it.type === "normal" ? ' style="background:' + clayCss(it.seed) + '"' : "") + ">";
     if (it.type === "hot") html += '<span class="fuse"><i></i></span>';
     html += "</div>";
   }
-  if (S.stack.length > 8) html += '<span class="tb-more">+' + (S.stack.length - 8) + "</span>";
-  if (!S.stack.length) html = '<div class="tb empty"></div>';
+  if (view.length > 8) html += '<span class="tb-more">+' + (view.length - 8) + "</span>";
+  if (!view.length) html = '<div class="tb empty"></div>';
   el.trayList.innerHTML = html; UI.trayUids = now;
   if (UI.trayPop && !UI.fly[UI.trayPop]) popEl(el.trayCount);
   UI.trayPop = 0;
@@ -3456,6 +3572,7 @@ function renderShop() {
 }
 $("tree-tabs").addEventListener("click", function (e) { var b = e.target.closest("[data-tab]"); if (!b) return; UI.tab = b.getAttribute("data-tab"); UI.shopSig = ""; renderShop(); snd.pop(); });
 el.upgList.addEventListener("click", function (e) { var b = e.target.closest("[data-upg]"); if (b) buyLine(b.getAttribute("data-upg")); });
+el.whTabs.addEventListener("click", function (e) { var b = e.target.closest("[data-wh]"); if (b) selectWh(b.getAttribute("data-wh")); });
 
 // Per-frame UI: money roll, kiln ring, fuses, prompt, wind chip.
 function uiFrame(rdt) {
@@ -3492,7 +3609,7 @@ function uiFrame(rdt) {
       else if (S.swayOn) txt = "TREMOR — follow the sliding zone";
       else if (S.windOn) txt = "WIND " + (S.wind.dir > 0 ? "→" : "←") + " fast with it, slow against it";
       else if (S.courses < 2) txt = "Tap anywhere to drop";
-    } else if (C.state === "empty" && S.stack.length === 0) { txt = "Out of bricks — HOLD the KILN"; }
+    } else if (C.state === "empty" && nextIdx() < 0) { txt = (sorterOn() && S.stack.length > 0) ? WH_NAME[S.active] + " storage is empty — pick another warehouse or HOLD the KILN" : "Out of bricks — HOLD the KILN"; }
   }
   if (txt !== UI.promptTxt) { UI.promptTxt = txt; el.prompt.textContent = txt; el.prompt.classList.toggle("hidden", !txt); }
   el.prompt.classList.toggle("urgent", urgent);
@@ -3514,7 +3631,7 @@ function uiFrame(rdt) {
   } else if (!el.chipHand.classList.contains("hidden")) el.chipHand.classList.add("hidden");
   el.chipSway.classList.toggle("hidden", !(S.swayOn && S.started));
   // nothing bakes by itself any more — if the hand is empty, point at the kiln
-  if (S.started && CAM.mode === "play" && !modalPaused() && !S.shopOpen && !S.held && C.state === "empty" && S.stack.length === 0) {
+  if (S.started && CAM.mode === "play" && !modalPaused() && !S.shopOpen && !S.held && C.state === "empty" && nextIdx() < 0) {
     UI.noBrickT = (UI.noBrickT || 0) + rdt; if (UI.noBrickT > 2.5) { nudgeKiln(); UI.noBrickT = 0; }
   } else UI.noBrickT = 0;
   if (UI.streakBreakT > 0) { UI.streakBreakT -= rdt; if (UI.streakBreakT <= 0) { el.streak.classList.remove("break"); renderStreak(false); } }
@@ -3560,11 +3677,13 @@ var BEAT_END = { c5b: function () { startTower(); }, c50d: function () { finishR
 var ICO_HAND = '<svg viewBox="0 0 64 46" width="66" height="46"><g fill="#f1d0b4" stroke="#221407" stroke-width="3" stroke-linejoin="round"><rect x="10" y="24" width="44" height="16" rx="6"/><rect x="12" y="8" width="8" height="22" rx="4"/><rect x="23" y="3" width="8" height="27" rx="4"/><rect x="34" y="5" width="8" height="25" rx="4"/><rect x="45" y="11" width="8" height="19" rx="4"/></g></svg>';
 var ICO_CLOUD = '<svg viewBox="0 0 64 46" width="66" height="46"><path d="M16 38a10 10 0 0 1 2-19.800A14 14 0 0 1 45 15a11.5 11.500 0 0 1 3 23z" fill="#fff" stroke="#221407" stroke-width="3" stroke-linejoin="round"/></svg>';
 var ICO_TREMOR = '<svg viewBox="0 0 64 46" width="66" height="46"><rect x="16" y="14" width="32" height="18" fill="#c2502c" stroke="#221407" stroke-width="3"/><path d="M6 10l-3 8 5 5-3 9M58 10l3 8-5 5 3 9" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var ICO_SORT = '<svg viewBox="0 0 64 46" width="66" height="46"><g stroke="#221407" stroke-width="3" stroke-linejoin="round"><path d="M4 42V20l12-10 12 10v22z" fill="#9aa5b0"/><path d="M28 42V20l12-10 12 10v22z" fill="#f5b921"/><path d="M52 42V26l8-7v23z" fill="#33363f"/></g></svg>';
 var REVEALS = {
   hot: { cls: "hot", title: "THE KILN RUNS HOT", text: "Some bricks now come out glowing. Drop a hot brick before it cools — it's worth <b>×2</b>. Let it burn out and it's a miss." },
-  lead: { cls: "lead", title: "LEAD BRICKS", text: "Dark lead bricks now come out of the kiln. They swing <b>40% faster</b> — land one and it's worth <b>×2</b>." },
-  silver: { cls: "silver", title: "SILVER BRICKS", text: "Gleaming silver bricks now turn up in the kiln. Land one and it's worth <b>×3</b>." },
-  gold: { cls: "gold", title: "GOLD BRICKS", text: "Real gold bricks now turn up in the kiln. Land one and it's worth <b>×4</b>. Gilded Clay makes them more common." },
+  lead: { cls: "lead", title: "LEAD BRICKS", text: "Dark lead bricks now come out of the kiln. They swing <b>40% faster</b> — land one and it's worth <b>×" + TYPE_MULT.lead + "</b>, and every lead brick in a finished row adds <b>+" + ROW_ADD.lead + "× rate</b> to that row's payout." },
+  silver: { cls: "silver", title: "SILVER BRICKS", text: "Gleaming silver bricks now turn up in the kiln. Land one and it's worth <b>×" + TYPE_MULT.silver + "</b>, and each one in a finished row adds <b>+" + ROW_ADD.silver + "× rate</b>. Several in a row earn little bumps." },
+  gold: { cls: "gold", title: "GOLD BRICKS", text: "Real gold bricks now turn up in the kiln. Land one and it's worth <b>×" + TYPE_MULT.gold + "</b>, and each one in a finished row adds <b>+" + ROW_ADD.gold + "× rate</b>. Gilded Clay makes them more common." },
+  sorter: { cls: "icon", icon: ICO_SORT, title: "BRICK SORTER", text: "Bricks are now <b>sorted into a warehouse per type</b>. <b>Tap a warehouse</b> under STORAGE to choose what the crane — and your apprentices — build with. Stockpile gold, then lay a <b>whole row of one metal</b> for a pure-row bonus." },
   wind: { cls: "wind", title: "THE WIND PICKS UP", text: "The wind gusts in spells. The crane runs <b>fast with it</b> and <b>slow against it</b> — watch the arrow, time the slow side. It will come and go." },
   hand: { cls: "icon", icon: ICO_HAND, title: "HANDS!", text: "A hand is clamping onto a brick. In <b>about 10 seconds</b> it rips it free — and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to smash it. The red slot shows where." },
   mist: { cls: "icon", icon: ICO_CLOUD, title: "CLOUDS ROLL IN", text: "Clouds drift across the work site and hide the crane. <b>Judge by rhythm</b>, not by eye — they come and go, and thicken as you climb. A Sky Lantern thins them." },
@@ -3964,11 +4083,11 @@ setInterval(musicTick, 100);
 /* ---------------- AUTOSAVE ---------------- */
 var SAVE_KEY = "brickbybrick3d_save_v1", NOSAVE = false, lastSaveAt = 0;
 var SAVE_FIELDS = ["money", "earned", "laid", "best", "bestStreak", "perfects", "misses", "drops", "hits", "molded", "smashed", "stolen", "lost", "playTime",
-  "hotUnlocked", "leadUnlocked", "glassUnlocked", "workshopShown", "comboTutDone", "endless", "goal", "won", "muted", "musicOn", "shakeOn", "vibOn", "quality", "hand"];
+  "hotUnlocked", "leadUnlocked", "glassUnlocked", "workshopShown", "comboTutDone", "active", "endless", "goal", "won", "muted", "musicOn", "shakeOn", "vibOn", "quality", "hand"];
 function saveGame() {
   if (NOSAVE || !S.started || (S.courses === 0 && S.laid === 0 && S.money === 0)) return;
   try {
-    var d = { v: 1, courses: S.courses, tower: S.tower, towerStart: S.towerStart, bricks: BRICKS.length + (G.falls || 0), tier: S.tier, flags: S.flags, beats: S.beats, seenLines: S.seenLines };
+    var d = { v: 1, courses: S.courses, fill: S.fill, inCourse: S.inCourse, tower: S.tower, towerStart: S.towerStart, bricks: BRICKS.length + (G.falls || 0), tier: S.tier, flags: S.flags, beats: S.beats, seenLines: S.seenLines };
     SAVE_FIELDS.forEach(function (k) { d[k] = S[k]; });
     localStorage.setItem(SAVE_KEY, JSON.stringify(d)); lastSaveAt = performance.now();
   } catch (e) {}
@@ -3985,7 +4104,8 @@ function loadGame(d) {
   S.flags = d.flags || {}; S.beats = d.beats || {}; S.seenLines = d.seenLines || {}; S.flags.begun = true;
   if (S.flags.rimStarted) { S.flags.rimDone = true; S.flags.rimPending = false; S.goal = FINAL_GOAL; }
   var tower = !!d.tower || !!S.beats.c5b, per = 6 - S.tier.hotMortar, pf = towerPerFace(), n = d.bricks || 0;
-  var need = tower ? 4 * pf : per, rows = Math.min(d.courses, tower ? 999 : 4, Math.floor(n / need));
+  var fillMode = tower && d.fill > 0 && d.courses >= 1;                  // saved mid-way through building the tower's other three sides
+  var need = tower ? 4 * pf : per, rows = fillMode ? d.courses : Math.min(d.courses, tower ? 999 : 4, Math.floor(n / need));
   S.tower = tower; S.perFace = tower ? pf : 6; S.perCourse = tower ? 4 * pf : per; S.towerStart = Math.min(d.towerStart || 5, rows);
   if (tower) {
     var ft = new THREE.Mesh(new THREE.BoxGeometry(TW + 1.0, FOUND, TW + 1.0), toon(0x8a8478)); ft.position.set(0, FOUND / 2, -TH);
@@ -3993,17 +4113,22 @@ function loadGame(d) {
   }
   var r, s, f;
   for (r = 1; r <= rows; r++) {
-    if (tower) { for (f = 0; f < 4; f++) for (s = 0; s < pf; s++) wallAdd(r, s, pf, "normal", (r * 31 + s * 7 + f * 101) % 997, f, f * pf + s); }
+    if (tower) { for (f = 0; f < 4; f++) { if (fillMode && f > 0 && r >= d.fill) break; for (s = 0; s < pf; s++) wallAdd(r, s, pf, "normal", (r * 31 + s * 7 + f * 101) % 997, f, f * pf + s); } }
     else for (s = 0; s < per; s++) wallAdd(r, s, per, "normal", (r * 31 + s * 7) % 997);
   }
   S.courses = rows; S.inCourse = 0;
-  var left = (rows === Math.floor(n / need)) ? n - rows * need : 0;      // unfinished row comes back too
+  var left = fillMode ? 0 : (rows === Math.floor(n / need)) ? n - rows * need : 0;      // unfinished row comes back too
   for (s = 0; s < left; s++) {
     if (tower) { f = Math.floor(s / pf); wallAdd(rows + 1, s % pf, pf, "normal", ((rows + 1) * 31 + s * 7) % 997, f, s); }
     else wallAdd(rows + 1, s, per, "normal", ((rows + 1) * 31 + s * 7) % 997);
     S.inCourse++;
   }
-  if (tower) W3.orbitAng = W3.orbitT = Math.PI * 2 + ((S.courses - S.towerStart) * 4 + curFace()) * Math.PI / 2;
+  if (fillMode) {
+    S.fill = d.fill; S.inCourse = clamp(d.inCourse | 0, pf, 4 * pf - 1);
+    for (s = pf; s < S.inCourse; s++) wallAdd(S.fill, s % pf, pf, "normal", (S.fill * 31 + s * 7) % 997, Math.floor(s / pf), s);
+  }
+  if (!whOpen(S.active)) S.active = "normal";
+  if (tower) W3.orbitAng = W3.orbitT = Math.PI * 2 + towerQ() * Math.PI / 2;
   S.started = true; CAM.mode = "play"; releaseKiln();
   revealEl(el.dock);
   if (S.best >= 1) revealEl($("hud-course"));
