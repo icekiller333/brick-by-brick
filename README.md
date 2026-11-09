@@ -5,7 +5,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 ## Versions
 
 - `index.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v2.0).
+- `brick-by-brick-3d.html` — the latest version, 3D (v3.2).
 
 ## How to play
 
@@ -50,6 +50,14 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - Apprentices: the placement spot glows for a second before they place a block, pulsing as a countdown (1s, 0.5s, 0.25s).
 - Background life: below row 50, nice things float by (birds from row 10, a kite, glow bugs); past row 50, spooky things (eyes, peepers, limbs, imps, ghost-jellies).
 
+### 3D v3.2 — Nov 9, 2026 (round 2 feedback, actioned)
+
+- First 5 days' wall shortened to 6 bricks wide; tower sides lengthened to 6 (6×6 footprint, 24-brick tower).
+- Villagers gather slower at the start.
+- Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.
+- First payday highlighted with a popup card and a coin shower.
+- Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
+
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again.
