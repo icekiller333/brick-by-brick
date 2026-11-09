@@ -6,7 +6,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: tiles for the 2D original, the 3D version, and a changelog.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v7.3).
+- `brick-by-brick-3d.html` — the latest version, 3D (v8.0).
 
 ## How to play
 
@@ -59,6 +59,13 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
 
+### 3D v8.0 — Nov 9, 2026 (round 3 feedback, completed)
+
+- Brick Sorter unlock: one warehouse per brick type, with warehouse tabs inside the storage building; the active warehouse feeds the crane, and apprentices build from the warehouse you have selected.
+- Same-type streak bonuses: every lead / silver / gold brick in a finished row adds +2 / +2.5 / +3 × rate to that row's payout; a whole row of one metal pays a pure-row bonus on top.
+- Tower sides are no longer auto-built — you build them yourself.
+- Full economy rebalance: upgrade prices reflect their value, and the unlockable brick types (lead, silver, gold) are rebalanced around the more frequent per-face pay.
+
 ### 3D v7.3 — Nov 9, 2026 (round 3 feedback, most of it)
 
 - Villager text now appears below their heads; background music added — calm medieval for the first 5 rows, upbeat energetic medieval after that, a bit eerie at row 25, spooky at row 50, melty and weird (but still enjoyable) at row 75.
@@ -72,4 +79,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again.
