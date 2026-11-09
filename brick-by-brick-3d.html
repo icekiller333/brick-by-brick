@@ -167,6 +167,7 @@
       .tb.t-gold{ background:linear-gradient(180deg,#ffe27a,#f5b921 55%,#d99a06) !important; }
       .tb.t-hot{ background:linear-gradient(180deg,#ffc04d,#e2541e) !important; animation:hotGlow .5s ease-in-out infinite alternate; }
       .tb.t-glass{ background:linear-gradient(180deg,#e6fbff,#8fd9f0 60%,#5bb7d6) !important; box-shadow:inset 0 -3px 0 rgba(0,0,0,.12), 0 0 8px rgba(143,217,240,.8); }
+      .tb.t-silver{ background:linear-gradient(180deg,#f2f5f8,#c9d2da 55%,#9aa5b0) !important; }
       .tb.t-lead{ background:linear-gradient(180deg,#6b707a,#33363f) !important; }
       .tb .fuse{ position:absolute; left:-2px; right:-2px; bottom:-6px; height:3px; background:rgba(0,0,0,.35); }
       .tb .fuse i{ display:block; height:100%; background:#ff5a1f; }
@@ -227,6 +228,8 @@
       .hr-brick{ position:relative; width:56px; height:30px; margin:0 auto 10px; border:3px solid var(--line); }
       .hr-brick::after{ content:""; position:absolute; left:50%; top:0; bottom:0; width:3px; background:rgba(0,0,0,.3); }
       .hr-brick.hot{ background:linear-gradient(180deg,#ffb02e,#e2541e 72%); box-shadow:0 0 16px 5px rgba(255,120,30,.7); animation:hotGlow .6s ease-in-out infinite alternate; }
+      .hr-brick.silver{ background:linear-gradient(180deg,#f2f5f8,#c9d2da 55%,#9aa5b0); }
+      .hr-brick.gold{ background:linear-gradient(180deg,#ffe27a,#f5b921 55%,#d99a06); }
       .hr-brick.lead{ background:linear-gradient(180deg,#62676f,#33363f 75%); }
       .hr-brick.glass{ background:linear-gradient(180deg,#e6fbff,#8fd9f0 60%,#5bb7d6); box-shadow:0 0 16px 5px rgba(120,220,255,.6); }
       .hr-brick.icon{ width:70px; height:48px; border:none; background:none; box-shadow:none; }
@@ -405,6 +408,20 @@
       @media (prefers-reduced-motion: reduce){
         *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
       }
+      #tree-tabs{ display:flex; gap:6px; overflow-x:auto; margin:0 0 10px; padding-bottom:4px; -webkit-overflow-scrolling:touch; }
+      #tree-tabs.hidden{ display:none; }
+      .tab-btn{ flex:none; position:relative; padding:7px 11px; font-family:'Archivo Black',sans-serif; font-size:11px; letter-spacing:.08em; background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s); color:inherit; }
+      .tab-btn.on{ background:var(--gold, #f5b921); transform:translateY(2px); box-shadow:none; }
+      .tab-btn b{ position:absolute; top:-8px; right:-6px; min-width:17px; height:17px; padding:0 3px; background:var(--bad); color:#fff; font-size:10px; line-height:17px; text-align:center; border:2px solid var(--line); }
+      .tab-btn b:empty{ display:none; }
+      .tnode{ position:relative; }
+      .tkids{ margin-left:10px; }
+      .tkids > .tnode{ padding-left:18px; }
+      .tkids > .tnode::before{ content:""; position:absolute; left:0; top:-8px; bottom:0; border-left:3px solid var(--line); }
+      .tkids > .tnode:last-child::before{ bottom:auto; height:34px; }
+      .tkids > .tnode::after{ content:""; position:absolute; left:0; top:25px; width:15px; border-top:3px solid var(--line); }
+      .upg-row.locked{ opacity:.55; border-style:dashed; box-shadow:none; }
+      .upg-row.locked .upg-ico{ filter:grayscale(1); }
     </style>
   </head>
   <body>
@@ -488,6 +505,7 @@
         <div class="sheet">
           <div class="sheet-head"><h2>WORKSHOP</h2><span class="sub">Spend coins. Climb faster.</span><b class="rate-chip" id="rate-chip"></b>
             <button class="x-btn pressable" id="btn-shop-close" aria-label="Close workshop">✕</button></div>
+          <div id="tree-tabs"></div>
           <div id="upg-list"></div>
         </div>
       </div>
@@ -498,6 +516,7 @@
             <button class="x-btn pressable" id="btn-settings-close" aria-label="Close settings">✕</button></div>
           <div class="set-row"><span>KILN SIDE</span><button class="set-opt" id="set-hand-l">LEFT</button><button class="set-opt" id="set-hand-r">RIGHT</button></div>
           <div class="set-row"><span>SOUND</span><button class="set-opt" id="set-snd-on">ON</button><button class="set-opt" id="set-snd-off">OFF</button></div>
+          <div class="set-row"><span>MUSIC</span><button class="set-opt" id="set-mus-on">ON</button><button class="set-opt" id="set-mus-off">OFF</button></div>
           <div class="set-row"><span>SHAKE</span><button class="set-opt" id="set-shk-on">ON</button><button class="set-opt" id="set-shk-off">OFF</button></div>
           <div class="set-row"><span>VIBRATION</span><button class="set-opt" id="set-vib-on">ON</button><button class="set-opt" id="set-vib-off">OFF</button></div>
           <div class="set-row"><span>GRAPHICS</span><button class="set-opt" id="set-q-hi">HIGH</button><button class="set-opt" id="set-q-lo">FAST</button></div>
@@ -584,7 +603,7 @@ var GRAB_TIME = 10;           // seconds a hand needs to rip a brick free
 /* ----- ECONOMY (rebalanced) -----
    Money is meant to be SCARCE and every upgrade a real choice.
    - A plain brick pays BASE_PAY + 1 per 10 courses reached (the "pay raise").
-   - A streak is a gentle bonus: +5% per hit in a row, capped at ×1.8
+   - A streak is a gentle bonus: +1% per hit in a row, capped at ×1.3
      (Crowd Favor lifts the cap to ×4.0). It used to be ×10 and up.
    - Types: gold ×3, hot ×2, lead ×4, sky-glass ×5; a PERFECT drop ×1.5.
    - A finished row pays 2 × rate (doubled if clean). Smashing a hand pays 10 × rate.
@@ -592,15 +611,19 @@ var GRAB_TIME = 10;           // seconds a hand needs to rip a brick free
      smoulder on its own once you've earned it. The apprentice pays flat rate.
    The upgrade tree costs ≈28k coins in total (re-priced for the 6-wide wall and 24-brick tower
    rings so each upgrade still arrives at the same point in real time as before). */
-var TYPE_MULT = { normal: 1, gold: 3, hot: 2, lead: 4, glass: 5 };
-var BASE_PAY = 2;
+var TYPE_MULT = { normal: 1, lead: 2, silver: 3, gold: 4, hot: 2, glass: 5 };   // provisional — the full rebalance comes last
+var TYPE_NAME = { gold: "GOLD", silver: "SILVER", lead: "LEAD", hot: "HOT", glass: "GLASS" };
+var PERF_PAY = [1, 1.25, 1.5, 2];       // Perfect Eye tiers: what a PERFECT drop pays (tier 0 = perfects do not exist yet)
+var SILVER_ROW = 15;
+function typeLabel(t) { return (TYPE_NAME[t] || "") + " ×" + TYPE_MULT[t]; }
+var BASE_PAY = 1;
 var PAY_FROM_ROW = 6;         // rows 1-5 are unpaid: the town only offers to pay you once row 5 is done
 /* Income is earned in stages, each one a purchase:
    start  -> only a finished ROW pays (row bonus)
    Piece Work (shop) -> every brick pays too
    Combo Bonus (shop) -> hits in a row build a streak multiplier (Crowd Favor then raises its cap) */
-var STREAK_STEP = 0.05;       // slower climb: first cap (x1.8) now takes 17 hits in a row instead of 9
-var CAP = [1.8, 2.2, 2.7, 3.3, 4.0];
+var STREAK_STEP = 0.01;       // +1% per brick in a row; the first cap (x1.3) takes 31 hits
+var CAP = [1.3, 1.6, 2.0, 2.5, 3.0];
 var BAKE_TIMES = [1.8, 1.45, 1.15, 0.92, 0.72, 0.56];   // seconds per brick WHILE THE KILN IS HELD
 var COALS = [0, 0.2, 0.35, 0.5];                        // Banked Coals: share of the hold speed kept when you let go
 var AL_INT = [5, 3.5, 2.2, 1.4];
@@ -624,9 +647,9 @@ var S = {
   windOn: false, mistLevel: 0, swayOn: false, raid: null,
   wind: { dir: 1, phase: 0, flipAt: 0 },
   layAcc: 0, streak: 0, comboTutDone: false, scUsed: 0,
-  tier: { perBrick: 0, combo: 0, kilnSpeed: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
+  tier: { perBrick: 0, perfect: 0, lead: 0, silver: 0, gold: 0, combo: 0, kilnSpeed: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
   flags: {}, beats: {}, seenLines: {},
-  muted: false, shakeOn: true, vibOn: true, quality: "hi", hand: "r",
+  muted: false, musicOn: true, shakeOn: true, vibOn: true, quality: "hi", hand: "r",
   workshopShown: false, shopOpen: false, seenVis: null
 };
 
@@ -637,20 +660,26 @@ function perBrickOn() { return S.tier.perBrick > 0; }
 function rate() { return BASE_PAY + Math.floor(S.best / 10); }
 function multCap() { return CAP[S.tier.crowd]; }
 function streakMult(n) { return Math.min(multCap(), 1 + STREAK_STEP * Math.max(0, n - 1)); }
-function fmtMult(m) { return String(Math.round(m * 10) / 10); }
-function brickPay(mult, type, perfect) { var p = rate() * mult * TYPE_MULT[type]; if (perfect) p *= 1.5; return Math.max(1, Math.round(p)); }
+function fmtMult(m) { return String(Math.round(m * 100) / 100); }
+function fmtPay(n) { n = Math.round(n * 100) / 100; return n % 1 === 0 ? String(n) : n.toFixed(2); }   // $4 or $1.05
+function fmtMoney(n) { return fmt(Math.floor(n + 1e-6)); }                                          // HUD shows whole dollars only
+function coinsFor(amount) { return amount <= 12 ? Math.max(1, Math.round(amount)) : Math.min(24, 12 + Math.round(Math.sqrt(amount - 12))); }   // one coin per $1, then thinning out
+function brickPay(mult, type, perfect) { var p = rate() * mult * TYPE_MULT[type]; if (perfect) p *= PERF_PAY[S.tier.perfect] || 1; return Math.max(rate(), Math.round(p * 100) / 100); }
+function payable(row) { return row >= PAY_FROM_ROW || S.best >= PAY_FROM_ROW; }
 function rowBonus(clean) { return 2 * rate() * (clean ? 2 : 1); }
 function glassF() { return (C && C.item && C.item.type === "glass") ? GLASS_TOL : 1; }
 function hitTol() { return HIT_TOL * STEADY_MULT[S.tier.steady] * glassF(); }
 function almostTol() { return hitTol() * 2; }
-function perfectTol() { return PERFECT_TOL * PLUMB_MULT[S.tier.plumb] * glassF(); }
+function perfectTol() { return S.tier.perfect >= 1 ? PERFECT_TOL * PLUMB_MULT[S.tier.plumb] * glassF() : 0; }   // no Perfect Eye, no perfects
 /* Difficulty climbs with the wall: the crane quickens (0.70 → 1.40 rows/s by
    course 50, then more gently to 1.70 by course 100). */
 function heightSpeed() { var c = S.courses; return c <= 50 ? 0.7 + 0.014 * c : 1.4 + 0.006 * (Math.min(c, 100) - 50); }
 function swingSpeed() { return heightSpeed() * PREC_MULT[S.tier.precision]; }
 function windAmp() { return S.windOn ? Math.min(0.45, 0.15 + 0.01 * Math.max(0, S.courses - WIND_COURSE)) : 0; }
 function windGust() { return 0.5 + 0.5 * Math.sin(S.wind.phase); }
-function leadChance() { return S.leadUnlocked ? Math.min(0.12, 0.05 + 0.002 * (S.best - LEAD_COURSE)) : 0; }
+function leadChance() { return S.tier.lead >= 1 ? Math.min(0.12, 0.05 + 0.002 * Math.max(0, S.best - LEAD_COURSE)) : 0; }
+function silverChance() { return S.tier.silver >= 1 ? Math.min(0.10, 0.05 + 0.002 * Math.max(0, S.best - SILVER_ROW)) : 0; }
+function goldChance() { return S.tier.gold >= 1 ? 0.05 + GILD_PCT[S.tier.gilded] / 100 : 0; }
 function glassChance() { return S.glassUnlocked ? Math.min(0.10, 0.05 + 0.003 * (S.best - GLASS_COURSE)) : 0; }
 function swayAmp() { return S.swayOn ? Math.min(0.06, 0.03 + 0.0008 * Math.max(0, S.courses - TREMOR_COURSE)) * LEVEL_MULT[S.tier.level] : 0; }
 function swayOff() { var a = swayAmp(); return a ? a * Math.sin(S.time * 2.1 + 1.3) : 0; }
@@ -666,13 +695,15 @@ function targetFrac() { return baseFrac() + swayOff(); }
    3 = PERFECT, 2 = hit, 1 = almost ring (Steady Hands III), 0 = miss. */
 function dropOutcomeAt(pos) {
   var d = Math.abs(pos - targetFrac());
-  if (d <= perfectTol()) return 3;
+  var pt = perfectTol(); if (pt > 0 && d <= pt) return 3;
   if (d <= hitTol()) return 2;
   if (S.tier.steady >= 3 && d <= almostTol()) return 1;
   return 0;
 }
 
 var ICON = {
+  brick: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="10"/><path d="M12 7v10M2.5 12h19"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>',
   kiln: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 20V11a8 8 0 0 1 16 0v9z"/><path d="M9 20v-4a3 3 0 0 1 6 0v4"/><path d="M12 3v2"/></svg>',
   bellows: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8c3-4 9-4 12 0M4 12c3-3 9-3 12 0M4 16c3-2 9-2 12 0"/><path d="M18 12h4"/></svg>',
   steady: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>',
@@ -688,13 +719,13 @@ var ICON = {
   level: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="2.5" y="9" width="19" height="6" rx="1"/><circle cx="12" cy="12" r="1.6"/><path d="M8 9v2M16 9v2"/></svg>'
 };
 var LINES = [
-  { id: "perBrick", icon: "gilded", name: "Piece Work", costs: [15], gate: function () { return S.best >= PAY_FROM_ROW - 1; },
+  { id: "perBrick", icon: "gilded", name: "Piece Work", costs: [50], gate: function () { return S.best >= PAY_FROM_ROW - 1; },
     effect: function (t) { return "Every brick you lay pays $" + rate() + " (plus type and perfect bonuses)."; },
     next: function (t) { return "Get paid for every brick, not just finished rows. A plain brick pays $" + rate() + "."; } },
   { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [65], gate: function () { return S.tier.perBrick >= 1; },
-    effect: function (t) { return "Hits in a row build a streak bonus (+5% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
+    effect: function (t) { return "Hits in a row build a streak bonus (+1% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
     next: function (t) { return "Land bricks in a row to build a STREAK multiplier on every brick. Miss and it resets."; } },
-  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [15,  60,  135,  310,  610], gate: function () { return true; },
+  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [10,  60,  135,  310,  610], gate: function () { return true; },
     effect: function (t) { return "Bakes a brick every " + BAKE_TIMES[t] + "s while you hold the kiln."; },
     next: function (t) { return "Bake time " + BAKE_TIMES[t] + "s → " + BAKE_TIMES[t + 1] + "s while held." + (t === 1 ? " Something about the heat…" : ""); } },
   { id: "bellows", icon: "bellows", name: "Banked Coals", costs: [85,  240,  640], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
@@ -704,8 +735,8 @@ var LINES = [
     effect: function (t) { return t >= 3 ? "Window +60% and the ALMOST RING — near misses swing again." : "Drop window +" + Math.round((STEADY_MULT[t] - 1) * 100) + "% wider."; },
     next: function (t) { return t === 2 ? "Adds the ALMOST RING: land just outside and the brick swings again — streak safe." : "Drop window +" + Math.round((STEADY_MULT[t + 1] - 1) * 100) + "% wider — the gold zone on the crane grows."; } },
   { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [65,  195,  540], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
-    effect: function (t) { return GILD_PCT[t] + "% of bricks come out golden (×3 pay)."; },
-    next: function (t) { return GILD_PCT[t + 1] + "% of bricks come out golden — golden bricks pay ×3."; } },
+    effect: function (t) { return "+" + GILD_PCT[t] + "% more bricks come out golden (×" + TYPE_MULT.gold + " pay)."; },
+    next: function (t) { return "+" + GILD_PCT[t + 1] + "% more bricks come out golden — gold pays ×" + TYPE_MULT.gold + "."; } },
   { id: "secondChance", icon: "second", name: "Second Chance", costs: [50,  170,  480], gate: function () { return S.tier.perBrick >= 1 && S.best >= 4; },
     effect: function (t) { return "Forgives " + t + " miss" + (t > 1 ? "es" : "") + " per row."; },
     next: function (t) { return "Forgive " + (t + 1) + " miss" + (t > 0 ? "es" : "") + " per row — the brick comes back, the streak survives."; } },
@@ -729,7 +760,7 @@ var LINES = [
     next: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t + 1]) * 100) + "% — the crane gets faster as you climb."; } },
   { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [185,  540], gate: function () { return S.best >= PLUMB_COURSE; },
     effect: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t] + " wider."; },
-    next: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t + 1] + " wider — perfects pay ×1.5."; } },
+    next: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t + 1] + " wider — more perfects, more pay."; } },
   { id: "crowd", icon: "crowd", name: "Crowd Favor", costs: [300,  760,  1700,  3400], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
     effect: function (t) { return "Streak bonus caps at ×" + fmtMult(CAP[t]) + "."; },
     next: function (t) { return "Streak cap ×" + fmtMult(CAP[t]) + " → ×" + fmtMult(CAP[t + 1]) + ". The crowd wants a show."; } },
@@ -742,7 +773,40 @@ var LINES = [
   { id: "level", icon: "level", name: "Spirit Level", costs: [1200,  2550], gate: function () { return S.best >= TREMOR_COURSE; },
     effect: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t + 1]) * 100) + "% — the drop zone sways less."; } }
+  ,{ id: "perfect", icon: "star", name: "Perfect Eye", costs: [30, 140, 380],
+    effect: function (t) { return "PERFECT drops are on — they pay ×" + PERF_PAY[t] + "."; },
+    next: function (t) { return t === 0 ? "Start landing PERFECT drops: hit the white strip in the green zone for ×" + PERF_PAY[1] + " pay." : "PERFECT drops pay ×" + PERF_PAY[t + 1] + " instead of ×" + PERF_PAY[t] + "."; } },
+  { id: "lead", icon: "brick", name: "Lead Bricks", costs: [40],
+    effect: function (t) { return "Dark lead bricks (×" + TYPE_MULT.lead + " pay) come out of the kiln. They swing 40% faster."; },
+    next: function (t) { return "Unlock LEAD bricks: heavy and fast, but worth ×" + TYPE_MULT.lead + "."; } },
+  { id: "silver", icon: "brick", name: "Silver Bricks", costs: [110],
+    effect: function (t) { return "Silver bricks (×" + TYPE_MULT.silver + " pay) turn up in the kiln."; },
+    next: function (t) { return "Unlock SILVER bricks, worth ×" + TYPE_MULT.silver + "."; } },
+  { id: "gold", icon: "gilded", name: "Gold Bricks", costs: [260],
+    effect: function (t) { return "Gold bricks (×" + TYPE_MULT.gold + " pay) turn up in the kiln."; },
+    next: function (t) { return "Unlock GOLD bricks, worth ×" + TYPE_MULT.gold + ". Gilded Clay then makes them common."; } }
 ];
+/* ----- SKILL TREE: every upgrade hangs off a parent. A node opens once its parent is owned (to the tier shown) and you've reached its row. ----- */
+var TABS = [ { id: "kiln", name: "KILN" }, { id: "bricks", name: "BRICKS" }, { id: "money", name: "MONEY" }, { id: "skill", name: "SKILL" }, { id: "crew", name: "CREW" }, { id: "weather", name: "WEATHER" } ];
+var TREE = {
+  kilnSpeed: { tab: "kiln", parent: null }, bellows: { tab: "kiln", parent: "kilnSpeed", row: 6 }, hotMortar: { tab: "kiln", parent: "kilnSpeed", ptier: 2, row: 6 },
+  perBrick: { tab: "money", parent: null, row: 5 }, combo: { tab: "money", parent: "perBrick" }, crowd: { tab: "money", parent: "combo", row: 15 },
+  perfect: { tab: "money", parent: "perBrick", row: 3 }, plumb: { tab: "money", parent: "perfect", row: 12 },
+  lead: { tab: "bricks", parent: "perBrick", row: 8 }, silver: { tab: "bricks", parent: "lead", row: 15 }, gold: { tab: "bricks", parent: "silver", row: 22 }, gilded: { tab: "bricks", parent: "gold" },
+  steady: { tab: "skill", parent: "perBrick", row: 3 }, secondChance: { tab: "skill", parent: "steady", row: 4 }, precision: { tab: "skill", parent: "steady", row: 10 },
+  predictable: { tab: "skill", parent: "steady", row: 8 }, glaze: { tab: "skill", parent: "secondChance", row: 25 },
+  autoLayer: { tab: "crew", parent: "perBrick", row: 5 }, fasterApp: { tab: "crew", parent: "autoLayer" }, moreApp: { tab: "crew", parent: "autoLayer" },
+  lantern: { tab: "weather", parent: "precision", row: 40 }, level: { tab: "weather", parent: "lantern", row: 65 }
+};
+function lineById(id) { for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) return LINES[i]; return null; }
+function lineAvail(l) { return (!l.parent || S.tier[l.parent] >= l.ptier) && S.best >= l.row; }
+function lineVisible(l) { if (lineAvail(l)) return true; if (!l.parent) return true; return lineAvail(lineById(l.parent)); }   // owned/open nodes, plus a one-step peek at what comes next
+function lockReason(l) {
+  var p = l.parent ? lineById(l.parent) : null;
+  if (p && S.tier[p.id] < l.ptier) { var tn = ""; TABS.forEach(function (t) { if (t.id === p.tab && p.tab !== l.tab) tn = " (" + t.name + " tab)"; }); return "Unlock " + p.name + (l.ptier > 1 ? " tier " + l.ptier : "") + " first" + tn; }
+  return "Reach row " + l.row;
+}
+LINES.forEach(function (l) { var T = TREE[l.id]; l.tab = T.tab; l.parent = T.parent; l.ptier = T.ptier || 1; l.row = T.row || 0; l.gate = function () { return lineAvail(l); }; });
 
 /* ----- helpers ----- */
 function $(id) { return document.getElementById(id); }
@@ -1192,23 +1256,83 @@ function buildCrowd() {
   updateCrowd(0);
 }
 var _mp = new THREE.Matrix4(), _ml = new THREE.Matrix4(), _mw = new THREE.Matrix4();
-var CROWD_BY = [0, 2, 4, 6, 8, 11, 14, 18, 22, 26, 30];    // villagers on site after each finished row (best course) — a slow trickle at first, a crowd by row 10
+var CROWD_BY = [0, 1, 2, 4, 6, 9, 12, 16, 20, 25, 30];    // villagers on site after each finished row (best course) — a slow trickle at first, a crowd by row 10
 function crowdTarget() { return S.started ? (S.best >= 10 ? 30 : CROWD_BY[S.best]) : 0; }
+var TOWER_LAT = [-2.6, 2.6, -1.4, 1.4, -3.6, 3.6];
+var _qf = new THREE.Quaternion(), _mf = new THREE.Matrix4(), _mf2 = new THREE.Matrix4(), _vf = new THREE.Vector3(), _ef = new THREE.Euler(), _one = new THREE.Vector3(1, 1, 1);
+// Once the tower stands the villagers fan out around ALL four sides; each newcomer joins the next side round.
+function crowdSpot(i) {
+  var side = i % 4, k = Math.floor(i / 4), lat = TOWER_LAT[k % 6], R = 4.5 + 0.9 * Math.floor(k / 6);
+  var jx = (hash01(i * 3.1) - 0.5) * 0.35, jz = (hash01(i * 7.7) - 0.5) * 0.35;
+  if (side === 0) return { x: lat + jx, z: -TH + R + jz };
+  if (side === 1) return { x: R + jx, z: -TH + lat + jz };
+  if (side === 2) return { x: -lat + jx, z: -TH - R + jz };
+  return { x: -R + jx, z: -TH - lat + jz };
+}
+function easeOut2(u) { return 1 - (1 - u) * (1 - u); }
+// Combo reactions: every 5 bricks a few backflip, every 25 a big somersault, every 50 a triple jump.
+function crowdCombo(n) {
+  if (!W3.crowd || n < 5) return;
+  var kind = n % 50 === 0 ? "triple" : n % 25 === 0 ? "somer" : n % 5 === 0 ? "flip" : null; if (!kind) return;
+  var pool = [], i;
+  for (i = 0; i < W3.crowd.length; i++) { var d = W3.crowd[i]; if (d.on && d.s > 0.5 && !d.fx) pool.push(d); }
+  if (!pool.length) return;
+  for (i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+  var share = kind === "flip" ? Math.min(pool.length, 2 + Math.floor(Math.random() * 2)) : Math.ceil(pool.length * (kind === "somer" ? 0.4 : 0.7));
+  for (i = 0; i < share; i++) pool[i].fx = { kind: kind, t: -rand(0, kind === "flip" ? 0.15 : 0.35), dur: kind === "flip" ? 0.8 : kind === "somer" ? 1.2 : 2.1, ph: 0 };
+  if (kind !== "flip") {
+    var sr = $("streak").getBoundingClientRect();
+    popText(n + " COMBO!", sr.left + sr.width / 2, sr.bottom + 52, { cls: "gold", size: kind === "triple" ? 30 : 24, rot: -4, dur: 1300 });
+    snd.cheer(true);
+    if (kind === "triple") { snd.fanfare(); vignette("gold"); firework(rand(-5, 5), workY() + rand(4, 8), -3); flashScreen(0.18); }
+  }
+}
+function crowdPose(d, dt) {          // sets d.y / d.flipA / d.arm while a reaction plays
+  var f = d.fx; f.t += dt; d.flipA = 0;
+  if (f.t >= f.dur) { d.fx = null; return false; }
+  if (f.t < 0) return false;
+  var u = f.t / f.dur;
+  d.arm = -2.6;
+  if (f.kind === "flip") { d.y = 0.75 * Math.sin(Math.PI * u); d.flipA = -2 * Math.PI * easeOut2(u); }
+  else if (f.kind === "somer") { d.y = 1.15 * Math.sin(Math.PI * u); d.flipA = -2 * Math.PI * easeOut2(u); }      // ~3x a normal cheer hop
+  else {
+    var ph = Math.min(2, Math.floor(u * 3)), lu = u * 3 - ph, H = [0.6, 1.1, 1.9][ph];
+    d.y = H * Math.sin(Math.PI * lu);
+    if (ph === 1) d.flipA = -2 * Math.PI * easeOut2(lu);
+    if (ph === 2) d.flipA = -4 * Math.PI * easeOut2(lu);
+    if (ph !== f.ph) { f.ph = ph; EMIT_WORLD = true; emitPuffs(d.x, 0.1, d.z, 4, 0xe9dcc2, 0.4); if (ph === 2) emitConfetti(d.x, 1.2, d.z, 8, 1); EMIT_WORLD = false; }
+  }
+  return true;
+}
 function updateCrowd(dt) {
   var want = crowdTarget();
   for (var i = 0; i < W3.crowd.length; i++) {
     var d = W3.crowd[i];
     d.ph += dt * 3;
     var wantI = i < want;
-    if (d.s === undefined) { d.s = 0; d.vs = 0; d.on = false; }
-    if (wantI && !d.on && dt > 0) { d.on = true; d.jump = Math.max(d.jump, 0.7); EMIT_WORLD = true; emitPuffs(d.x, 0.1, d.z, 6, 0xe9dcc2, 0.5); EMIT_WORLD = false; }
-    if (!wantI) d.on = false;
+    if (d.s === undefined) { d.s = 0; d.vs = 0; d.on = false; d.flipA = 0; }
+    if (wantI && !d.on && dt > 0) {
+      d.on = true; d.jump = Math.max(d.jump, 0.7);
+      if (S.tower) { var sp0 = crowdSpot(i); d.x = sp0.x; d.z = sp0.z; }
+      EMIT_WORLD = true; emitPuffs(d.x, 0.1, d.z, 6, 0xe9dcc2, 0.5); EMIT_WORLD = false;
+    }
+    if (!wantI) { d.on = false; d.fx = null; }
+    var walking = false;
+    if (S.tower && d.on) {            // stroll out to a spot around the tower, facing it
+      var sp = crowdSpot(i), mdx = sp.x - d.x, mdz = sp.z - d.z, md = Math.sqrt(mdx * mdx + mdz * mdz);
+      if (md > 0.03 && dt > 0) { var st = Math.min(md, dt * (md > 0.6 ? 1.7 : 0.5 + md * 2)); d.x += mdx / md * st; d.z += mdz / md * st; walking = true; }
+      d.ry = Math.atan2(-d.x, -TH - d.z);
+    }
     d.vs += ((wantI ? 1 : 0) - d.s) * 120 * Math.min(dt, 0.033) - d.vs * 10 * Math.min(dt, 0.033);   // springy pop-in
     d.s += d.vs * Math.min(dt, 0.033); if (d.s < 0) { d.s = 0; d.vs = 0; }
     var sc = Math.max(0.0001, d.s * 1.3);
-    if (d.jump > 0) { d.jump -= dt; d.y = Math.abs(Math.sin(d.ph * 3)) * 0.35; d.arm = -0.5 + Math.sin(d.ph * 6) * 0.6; }
+    d.flipA = 0;
+    if (d.fx && crowdPose(d, dt)) { /* reaction pose applied */ }
+    else if (d.jump > 0) { d.jump -= dt; d.y = Math.abs(Math.sin(d.ph * 3)) * 0.35; d.arm = -0.5 + Math.sin(d.ph * 6) * 0.6; }
+    else if (walking) { d.y = Math.abs(Math.sin(d.ph * 4)) * 0.07; d.arm = -0.5 + Math.sin(d.ph * 4) * 0.35; }
     else { d.y = damp(d.y, 0, 10, dt); d.arm = -0.5 + Math.sin(d.ph) * 0.12; }
     _e.set(0, d.ry, 0); _q.setFromEuler(_e); _v.set(d.x, d.y, d.z); _s.set(sc, sc, sc); _mp.compose(_v, _q, _s); _s.set(1, 1, 1);
+    if (d.flipA) { _ef.set(d.flipA, 0, 0); _qf.setFromEuler(_ef); _vf.set(0, 0.5, 0); _mf.compose(_vf, _qf, _one); _mf2.makeTranslation(0, -0.5, 0); _mf.multiply(_mf2); _mp.multiply(_mf); }
     _ml.makeTranslation(0, 0.3, 0); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cBody, i, _mw);
     _ml.makeTranslation(0, 0.78, 0); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cHead, i, _mw);
     _e.set(0, 0, d.arm); _q.setFromEuler(_e); _v.set(0.2, 0.72, 0); _ml.compose(_v, _q, _s); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cArm, i, _mw);
@@ -1269,6 +1393,7 @@ function setBrickMatrix(i, dy, ky, kx) {
 }
 function brickColorHex(type, seed) {
   if (type === "gold") return _c.set(0xf7c02a);
+  if (type === "silver") return _c.set(0xc9d2da);
   if (type === "lead") return _c.set(0x4b505a);
   if (type === "hot") return _c.set(0xff7a2a);
   if (type === "glass") return _c.set(0x9fe6f7);
@@ -1283,7 +1408,7 @@ function wallAdd(row, slot, per, type, seed, face, ci) {
   W3.wall.count = W3.wallOut.count = BRICKS.length;
   W3.wall.setColorAt(i, brickColorHex(type, seed)); W3.wall.instanceColor.needsUpdate = true;
   setBrickMatrix(i);
-  if (type === "gold" || type === "glass") (W3.golds = W3.golds || []).push(i);
+  if (type === "gold" || type === "silver" || type === "glass") (W3.golds = W3.golds || []).push(i);
   if (type === "hot") animBrick(i, "cool", 0, 2.5);
   return i;
 }
@@ -1387,7 +1512,7 @@ function freeBrick(type, seed) {
 function styleFree(f, type, seed) {
   var mat = f.mesh.material;
   mat.color.copy(brickColorHex(type, seed));
-  mat.emissive.set(type === "hot" ? 0xff4a00 : type === "gold" ? 0x6a4a00 : type === "glass" ? 0x2a7a8a : 0x000000);
+  mat.emissive.set(type === "hot" ? 0xff4a00 : type === "gold" ? 0x6a4a00 : type === "silver" ? 0x2c3238 : type === "glass" ? 0x2a7a8a : 0x000000);
   mat.emissiveIntensity = type === "hot" ? 0.6 : 0.5;
   f.type = type;
 }
@@ -1621,6 +1746,40 @@ function buildCritters() {
     }
   });
 }
+
+// Tap a bird (or worse) for a little reaction — each kind answers in its own way.
+var CRIT_REACT = {
+  swallow: { dur: 0.75, word: "TWEET!", cls: "white", col: 0xffffff, boost: 0.9, snd: [[1568, 0.08, "sine", 0.12, 0], [2093, 0.1, "sine", 0.12, 0.07]] },
+  kite: { dur: 1.0, word: "WHEE!", cls: "gold", col: 0xf5b921, conf: true, snd: [[660, 0.12, "triangle", 0.1, 0], [880, 0.12, "triangle", 0.1, 0.09], [1175, 0.16, "triangle", 0.1, 0.18]] },
+  finch: { dur: 0.5, word: "PEEP!", cls: "white", col: 0xe0704a, scatter: true, snd: [[2400, 0.05, "square", 0.05, 0], [3000, 0.05, "square", 0.05, 0.06], [2600, 0.05, "square", 0.05, 0.12]] },
+  bug: { dur: 0.7, word: "✦", cls: "gold", col: 0xfff2a8, snd: [[2637, 0.18, "sine", 0.09, 0], [3520, 0.22, "sine", 0.07, 0.08]] },
+  eye: { dur: 1.1, word: "…?", cls: "red", col: 0xd42a1e, snd: [[110, 0.35, "sawtooth", 0.07, 0, 70]] },
+  peeper: { dur: 0.9, word: "EEP!", cls: "red", col: 0xb9a7ff, snd: [[900, 0.12, "square", 0.06, 0, 1500]] },
+  limb: { dur: 0.8, word: "twitch", cls: "white", col: 0x7a6a5a, snd: [[140, 0.1, "square", 0.08, 0], [120, 0.1, "square", 0.08, 0.12]] },
+  imp: { dur: 0.9, word: "HEH HEH", cls: "red", col: 0xff5a2a, snd: [[300, 0.1, "sawtooth", 0.07, 0, 200], [260, 0.1, "sawtooth", 0.07, 0.14, 180]] },
+  wisp: { dur: 1.0, word: "wooo…", cls: "white", col: 0x9fe6f7, snd: [[440, 0.7, "sine", 0.08, 0, 880]] }
+};
+var _vt = new THREE.Vector3();
+function critTap(px, py) {
+  if (!CG || !S.started) return false;
+  var best = null, bd = 1e9, bsp = null, i;
+  for (i = 0; i < CRIT.items.length; i++) {
+    var it = CRIT.items[i]; if (!it.active || it.leaving || it.s < 0.5 || it.rc) continue;
+    it.g.getWorldPosition(_vt); var wp = { x: _vt.x, y: _vt.y, z: _vt.z }, sp = toScreenW(wp.x, wp.y, wp.z);
+    if (sp.behind) continue;
+    var dx = sp.x - px, dy = sp.y - py, dd = Math.sqrt(dx * dx + dy * dy), rad = it.T.id === "kite" ? 62 : 46;
+    if (dd < rad && dd < bd) { bd = dd; best = it; bsp = { sp: sp, wp: wp }; }
+  }
+  if (!best) return false;
+  var R = CRIT_REACT[best.T.id]; best.rc = { t: 0, dur: R.dur };
+  if (R.boost) best.boost = R.boost;
+  if (R.scatter) for (i = 0; i < CRIT.items.length; i++) if (CRIT.items[i].T === best.T && CRIT.items[i].active) CRIT.items[i].boost = 1.2;
+  R.snd.forEach(function (s) { tone(s[0], s[1], s[2], s[3], s[4], s[5]); });
+  popText(R.word, bsp.sp.x, bsp.sp.y - 22, { cls: R.cls, size: 18, rise: 34, dur: 800 });
+  EMIT_WORLD = true; emitGlow(bsp.wp.x, bsp.wp.y, bsp.wp.z, 14, R.col, 2.2, 0.6, 0.12, 0, 1); if (R.conf) emitConfetti(bsp.wp.x, bsp.wp.y, bsp.wp.z, 16, 1.5); EMIT_WORLD = false;
+  haptic(8);
+  return true;
+}
 function critAllowed(T) { var c = S.courses; return S.started && c >= T.from && (T.nice ? c < 50 : c > 50); }
 function critCap(T) { return Math.min(T.cap, 1 + Math.floor((S.courses - T.from) / 6)); }
 function critSpawn(T) {
@@ -1658,7 +1817,8 @@ function updateCritters(dt) {
     it.s += (clamp(ps, 0, 1) - it.s) * Math.min(1, dt * 4);
     if (it.leaving && it.s < 0.02) { it.active = false; g.visible = false; continue; }
     if (T2.life && it.age > T2.life) it.leaving = true;
-    if (!T2.life) { it.x += it.dir * it.v * dt; if (it.dir * it.x > it.halfW + 4) { it.active = false; g.visible = false; continue; } }
+    if (it.boost > 0) it.boost -= dt;
+    if (!T2.life) { it.x += it.dir * it.v * dt * (it.boost > 0 ? 2.6 : 1); if (it.dir * it.x > it.halfW + 4) { it.active = false; g.visible = false; continue; } }
     var by = 0;
     switch (T2.id) {
       case "swallow": case "finch": { var f = Math.sin(it.ph * (T2.id === "finch" ? 14 : 11)); u.pl.rotation.z = f * 0.7; u.pr.rotation.z = -f * 0.7; by = Math.sin(it.ph * 1.1) * 0.35; break; }
@@ -1698,8 +1858,27 @@ function updateCritters(dt) {
       }
     }
     it.by = by;
-    g.position.set(it.x, ly + it.dy + by, it.z);
-    if (T2.flip) g.scale.set(it.dir * it.s, it.s, it.s); else g.scale.setScalar(Math.max(0.0001, it.s));
+    var hop = 0, rs = 1;
+    if (it.rc) {
+      var rc = it.rc; rc.t += dt; var ru = rc.t / rc.dur;
+      if (ru >= 1) { it.rc = null; if (T2.id !== "limb") g.rotation.z = 0; }
+      else {
+        var sn = Math.sin(Math.PI * ru), eo = easeOut2(ru);
+        switch (T2.id) {
+          case "swallow": g.rotation.z = it.dir * Math.PI * 2 * eo; hop = 0.6 * sn; break;
+          case "finch": hop = 0.45 * sn; it.ph += dt * 4; break;
+          case "kite": g.rotation.z = Math.sin(ru * 28) * 0.45 * (1 - ru); rs = 1 + 0.25 * sn; break;
+          case "bug": u.halo.scale.multiplyScalar(1 + 3 * (1 - ru)); u.halo.material.opacity = Math.min(1, u.halo.material.opacity + 0.6 * (1 - ru)); rs = 1 + 0.4 * sn; break;
+          case "eye": u.eb.scale.y = ru < 0.3 ? 0.08 : 1.35 - 0.35 * ((ru - 0.3) / 0.7); hop = 0.15 * sn; break;
+          case "peeper": rs = 1 + 0.45 * sn; for (k = 0; k < u.eyes.length; k++) u.eyes[k].scale.y = 1.5; if (ru > 0.8) it.leaving = true; break;
+          case "limb": hop = Math.sin(rc.t * 70) * 0.08 * (1 - ru); rs = 0.85 + 0.15 * ru; break;
+          case "imp": g.rotation.z = -it.dir * Math.PI * 2 * eo; hop = 0.7 * sn; break;
+          case "wisp": rs = 1 + 0.6 * sn; hop = 1.2 * sn; break;
+        }
+      }
+    }
+    g.position.set(it.x, ly + it.dy + by + hop, it.z);
+    if (T2.flip) g.scale.set(it.dir * it.s * rs, it.s * rs, it.s * rs); else g.scale.setScalar(Math.max(0.0001, it.s * rs));
   }
 }
 
@@ -2002,12 +2181,13 @@ var G = { uid: 1, hitStop: 0, frameT: 0, afterLand: [], falls: 0, gen: 0 };
 
 function newItem(type) { return { uid: G.uid++, type: type, fuse: type === "hot" ? HOT_FUSE : 0, seed: (S.molded * 13 + 5) % 997 }; }
 function rollBrickType() {
-  var gild = GILD_PCT[S.tier.gilded] / 100, hot = S.hotUnlocked ? 0.10 : 0, lead = S.leadUnlocked ? leadChance() : 0, glass = glassChance();
+  var gild = goldChance(), hot = S.hotUnlocked ? 0.10 : 0, silver = silverChance(), lead = leadChance(), glass = glassChance();
   var r = Math.random();
   if (r < gild) return "gold";
   if (r < gild + hot) return "hot";
-  if (r < gild + hot + lead) return "lead";
-  if (r < gild + hot + lead + glass) return "glass";
+  if (r < gild + hot + silver) return "silver";
+  if (r < gild + hot + silver + lead) return "lead";
+  if (r < gild + hot + silver + lead + glass) return "glass";
   return "normal";
 }
 // Heat rises: hot bricks always sit on top of the hand (next to load).
@@ -2036,6 +2216,7 @@ function produceBrick() {
   S.molded++;
   if (type === "hot") { snd.sizzle(); if (!S.flags.hotSeen) { S.flags.hotSeen = true; } }
   else if (type === "gold") { snd.clink(); tone(2349, 0.14, "sine", 0.06, 0.05); }
+  else if (type === "silver") { snd.clink(); tone(1976, 0.12, "sine", 0.05, 0.05); }
   else snd.clink();
   UI.trayPop = it.uid;
   kilnPuff();
@@ -2151,7 +2332,7 @@ function placeBrick(item, fromAuto, outcome, f, from) {
     pay = brickPay(mult, item.type, outcome === 3);
     if (outcome === 3) S.perfects++;
   }
-  if (row < PAY_FROM_ROW || !perBrickOn()) pay = 0;
+  if (!payable(row) || !perBrickOn()) pay = 0;
   credit(pay);
   var streakNow = fromAuto ? 0 : S.streak;
   var gen = G.gen;
@@ -2178,7 +2359,7 @@ function placeBrick(item, fromAuto, outcome, f, from) {
 }
 function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow) {
   var x = slotX(row, slot, per), y = rowY(row), z = BD / 2;
-  var col = item.type === "normal" ? (function () { var h = clayHSL(item.seed); return _c2.setHSL(h[0], h[1], h[2]).getHex(); })() : item.type === "gold" ? 0xf5b921 : item.type === "hot" ? 0xff8a2a : item.type === "glass" ? 0x9fe6f7 : 0x4b505a;
+  var col = item.type === "normal" ? (function () { var h = clayHSL(item.seed); return _c2.setHSL(h[0], h[1], h[2]).getHex(); })() : item.type === "gold" ? 0xf5b921 : item.type === "silver" ? 0xdfe6ec : item.type === "hot" ? 0xff8a2a : item.type === "glass" ? 0x9fe6f7 : 0x4b505a;
   snd.place(streakNow, outcome, item.type);
   emitChips(x, y + BH / 2, z, col, item.type === "lead" ? 12 : fromAuto ? 3 : 7, item.type === "lead" ? 1.3 : 1);
   emitPuffs(x, y - BH / 2, z, item.type === "lead" ? 9 : fromAuto ? 2 : 5, 0xe9dcc2, 0.5);
@@ -2195,21 +2376,22 @@ function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, st
   if (item.type === "hot") emitGlow(x, y, z, 18, 0xff7a2a, 2.4, 0.7, 0.14, 1.5);
   if (item.type === "lead") { emitPuffs(x, y - BH / 2, z, 6, 0xd8cdb8, 1.4, 0.3, 1.1); popText("THUD", sp.x + 30, sp.y - 6, { cls: "white", size: 15, rise: 16 }); }
   if (item.type !== "normal" && !fromAuto && pay > 0) {
-    var tl = item.type === "gold" ? "GOLD ×3" : item.type === "hot" ? "HOT ×2" : item.type === "glass" ? "GLASS ×5" : "LEAD ×4";
-    popText(tl, sp.x, sp.y + 26, { cls: item.type === "lead" ? "white" : "gold", size: 14, rise: 22, delay: 80 });
+    var tl = typeLabel(item.type);
+    popText(tl, sp.x, sp.y + 26, { cls: (item.type === "lead" || item.type === "silver") ? "white" : "gold", size: 14, rise: 22, delay: 80 });
   }
-  if (!fromAuto && mult > prevMult && (streakNow === 5 || streakNow === 10 || (mult >= multCap() && prevMult < multCap()))) {
+  if (!fromAuto && mult > prevMult && (streakNow % 10 === 0 || (mult >= multCap() && prevMult < multCap()))) {
     var sr = $("streak").getBoundingClientRect();
     popText(mult >= multCap() ? "MAX ×" + fmtMult(mult) + "!" : "×" + fmtMult(mult) + "!", sr.left + sr.width / 2 - 10, sr.bottom + 26, { cls: "gold", size: 28, rot: -6, dur: 1100 });
     crowdCheer(1.6); snd.cheer(true);
     if (streakNow >= 10) { vignette("gold"); firework(rand(-6, 6), y + rand(5, 9), -3); }
   }
   crowdPay(pay, mult, outcome, item.type, fromAuto, sp);
+  if (!fromAuto) crowdCombo(streakNow);
 }
 function crowdPay(pay, mult, outcome, type, fromAuto, sp) {
-  if (fromAuto) { if (pay > 0) spawnCoins(1, sp); return; }
+  if (fromAuto) { if (pay > 0) spawnCoins(coinsFor(pay), sp); return; }
   var special = type !== "normal";
-  if (pay > 0) spawnCoins(Math.min(12, 3 + Math.floor((mult - 1) * 3) + (special ? 3 : 0) + (outcome === 3 ? 2 : 0)), sp);
+  if (pay > 0) spawnCoins(coinsFor(pay), sp);          // one coin per $1 actually paid
   if (special || outcome === 3 || (S.streak >= 10 && S.streak % 3 === 0)) { crowdCheer(1); snd.cheer(S.streak >= 10 || type === "lead"); }
   else if (S.streak >= 5 && S.streak % 2 === 0) snd.cheer(false);
 }
@@ -2228,7 +2410,7 @@ function updateBubbles() {
     var bb = BUBBLES[i], age = now - bb.born, d = W3.crowd[bb.idx];
     if (age > bb.life || !d) { if (bb.el.parentNode) bb.el.parentNode.removeChild(bb.el); BUBBLES.splice(i, 1); continue; }
     // anchored just under the speaker's chin, tail pointing up at them — so it never covers the top courses
-    var sp = toScreenW(d.x, 0.62, d.z), x = clamp(sp.x, 100, window.innerWidth - 100), y = clamp(sp.y + 14, 60, window.innerHeight - 280);
+    var sp = toScreenW(d.x, 0.62, d.z), x = clamp(sp.x, 100, window.innerWidth - 100), y = clamp(sp.y + 14, 60, window.innerHeight - (bb.el.offsetHeight || 64) - 8);
     bb.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) translate(-50%,0)";
     bb.el.style.opacity = Math.min(1, age / 250, (bb.life - age) / 500).toFixed(2);
   }
@@ -2287,7 +2469,7 @@ function tickFalling(dt) {
 }
 function credit(amount) {
   if (!(amount > 0)) return;
-  S.money += amount; S.earned += amount;
+  S.money = Math.round((S.money + amount) * 100) / 100; S.earned += amount;
   if (!S.flags.moneyShown && S.started) { S.flags.moneyShown = true; revealEl($("hud-money")); }
   if (!S.workshopShown && S.started) {
     S.workshopShown = true;
@@ -2302,7 +2484,7 @@ function firstPayday(amount) {
     setTimeout(function () {
       var host = $("payday"); if (!host) return;
       var card = document.createElement("div"); card.className = "pd-card";
-      card.innerHTML = '<span class="pd-big">PAYDAY!</span><span class="pd-sub">The villagers are paying you for your work.</span><span class="pd-amt">+$' + fmt(amount) + '</span>';
+      card.innerHTML = '<span class="pd-big">PAYDAY!</span><span class="pd-sub">The villagers are paying you for your work.</span><span class="pd-amt">+$' + fmtPay(amount) + '</span>';
       host.appendChild(card); void card.offsetWidth; card.classList.add("show");
       snd.fanfare(); crowdCheer(2.4); flashScreen(0.25); popEl(el.hudMoney);
       var W = window.innerWidth, H = window.innerHeight, n = REDUCED ? 14 : 44;
@@ -2366,8 +2548,20 @@ function breakStreak() {
 /* ---------------- ROWS ---------------- */
 function sideDone() {
   fleeAllHands();
-  var side = curFace() + 1;
-  whenLanded(function () { snd.whoosh(); bigWord("SIDE " + side + " / 4", "gold"); });
+  var side = curFace() + 1, row = S.courses + 1, clean = S.rowMisses === 0;
+  var bonus = payable(row) ? rowBonus(clean) : 0;     // each side is a row of its own: it pays its own row bonus
+  S.rowMisses = 0; S.scUsed = 0;                              // ...and gets its own clean-row check and Second Chance
+  credit(bonus);
+  whenLanded(function () { snd.whoosh(); bigWord("SIDE " + side + " / 4", "gold"); faceFx(row, bonus, clean); });
+  saveGame();
+}
+function faceFx(row, bonus, clean) {
+  var y = rowY(row), sp = toScreen(0, y + 0.4, BD / 2);
+  popText(bonus > 0 ? "SIDE DONE! +$" + fmtPay(bonus) : "SIDE DONE!", sp.x, sp.y - 34, { cls: "green", size: 20, dur: 1050, rise: 38 });
+  if (clean && bonus > 0) popText("CLEAN ×2", sp.x, sp.y - 8, { cls: "gold", size: 14, dur: 1000, rise: 30, delay: 120 });
+  if (bonus > 0) { moneyFloat(bonus, null); spawnCoins(coinsFor(bonus), sp); }
+  snd.row(clean); camShake(0.14); crowdCheer(0.7);
+  for (var k = 0; k < 3; k++) emitPuffs(-FW() / 2 + k * FW() / 2, y - BH / 2, BD / 2, 2, 0xe9dcc2, 0.5);
 }
 function startTower() {
   if (S.tower) return;
@@ -2392,7 +2586,7 @@ function startTower() {
   renderHUD();
 }
 function completeCourse() {
-  var clean = S.rowMisses === 0, done = S.courses + 1, bonus = done >= PAY_FROM_ROW ? rowBonus(S.rowMisses === 0) : 0, isNew = done > S.best;
+  var clean = S.rowMisses === 0, done = S.courses + 1, bonus = payable(done) ? rowBonus(S.rowMisses === 0) : 0, isNew = done > S.best;
   S.courses++; S.inCourse = 0; S.scUsed = 0; S.rowMisses = 0;
   if (S.tower) { S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace; fleeAllHands(); whenLanded(function () { snd.whoosh(); }); }
   if (isNew) S.best = S.courses;
@@ -2400,14 +2594,14 @@ function completeCourse() {
   whenLanded(function () { rowFx(done, bonus, clean); });
   if (isNew) milestone(S.courses);
   updateHazards();
-  renderHUD(); checkUnlocks();
+  renderHUD(); checkUnlocks(); saveGame();
 }
 function rowFx(row, bonus, clean) {
   rowWave(row);
   var y = rowY(row), sp = toScreen(0, y + 0.4, BD / 2);
-  popText(bonus > 0 ? "ROW! +$" + fmt(bonus) : "ROW DONE!", sp.x, sp.y - 34, { cls: "green", size: 24, dur: 1150, rise: 42 });
+  popText(bonus > 0 ? "ROW! +$" + fmtPay(bonus) : "ROW DONE!", sp.x, sp.y - 34, { cls: "green", size: 24, dur: 1150, rise: 42 });
   if (clean) popText("CLEAN ROW ×2", sp.x, sp.y - 6, { cls: "gold", size: 16, dur: 1100, rise: 34, delay: 120 });
-  if (bonus > 0) { moneyFloat(bonus, null); spawnCoins(clean ? 12 : 8, sp); }
+  if (bonus > 0) { moneyFloat(bonus, null); spawnCoins(coinsFor(bonus), sp); }
   snd.row(clean); camShake(0.28); camPunch(1.4); popEl($("hud-course-num"));
   for (var k = 0; k < 4; k++) emitPuffs(-FW() / 2 + k * FW() / 3, y - BH / 2, BD / 2, 3, 0xe9dcc2, 0.6);
   crowdCheer(1.2);
@@ -2483,15 +2677,11 @@ function tickWind(dt) {
 /* ---------------- UNLOCKS & PURCHASES ---------------- */
 function lineOn(id) { for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) return LINES[i].gate(); return false; }
 function checkUnlocks() {
-  var b = S.best;
   if (!S.workshopShown) return;
-  if (!S.flags.precisionShown && b >= PRECISION_COURSE) { S.flags.precisionShown = true; toast("PRECISION GEARS unlocked — the crane speeds up as you climb; these slow it down.", 4400); snd.buy(); }
-  if (!S.flags.crowdShown && lineOn("crowd")) { S.flags.crowdShown = true; toast("CROWD FAVOR unlocked — raise your streak bonus cap.", 4000); snd.buy(); }
-  if (!S.flags.plumbShown && b >= PLUMB_COURSE) { S.flags.plumbShown = true; toast("PLUMB LINE unlocked — a wider PERFECT zone.", 3800); snd.buy(); }
-  if (!S.flags.alShown && lineOn("autoLayer")) { S.flags.alShown = true; toast("APPRENTICE for hire — they lay plain bricks while you rest.", 4000); snd.buy(); }
-  if (!S.flags.glazeShown && b >= HAND_COURSE) { S.flags.glazeShown = true; toast("SLIPPERY GLAZE unlocked — hands take longer to rip a brick free.", 4200); snd.buy(); }
-  if (!S.flags.lanternShown && b >= MIST_COURSE) { S.flags.lanternShown = true; toast("SKY LANTERN unlocked — see the crane through the clouds.", 4200); snd.buy(); }
-  if (!S.flags.levelShown && b >= TREMOR_COURSE) { S.flags.levelShown = true; toast("SPIRIT LEVEL unlocked — calm the tremors.", 4200); snd.buy(); }
+  var fresh = [];
+  LINES.forEach(function (l) { if (lineAvail(l) && !S.flags["tk_" + l.id]) { S.flags["tk_" + l.id] = true; fresh.push(l.name); } });
+  if (!S.flags.treeInit) { S.flags.treeInit = true; return; }
+  if (fresh.length) { toast("SKILL TREE: " + fresh.slice(0, 2).join(", ") + (fresh.length > 2 ? " +" + (fresh.length - 2) + " more" : "") + " unlocked", 3600); snd.buy(); }
 }
 function buyLine(id) {
   var l = null; for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) l = LINES[i];
@@ -2499,7 +2689,7 @@ function buyLine(id) {
   var cost = l.costs[S.tier[id]], row = $("upg-" + id);
   if (S.money < cost) { snd.err(); if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); } return; }
   if (row) { var bb = row.querySelector(".buy-btn"); if (bb) { var r = bb.getBoundingClientRect(); domBurst(r.left + r.width / 2, r.top + r.height / 2); popText("TIER " + (S.tier[id] + 1) + "!", r.left + r.width / 2, r.top - 12, { cls: "gold", size: 18, rise: 30 }); } }
-  S.money -= cost; S.tier[id]++;
+  S.money = Math.round((S.money - cost) * 100) / 100; S.tier[id]++;
   snd.buy(); haptic(15);
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
@@ -2512,6 +2702,10 @@ function buyLine(id) {
   } else if (id === "kilnSpeed" && S.tier.kilnSpeed === 2 && !S.hotUnlocked) {
     S.hotUnlocked = true; S.nextHot = true; enqueueReveal("hot");
   } else if (id === "kilnSpeed") toast("The kiln bakes faster while you hold it.", 2600);
+  else if (id === "lead") { S.leadUnlocked = true; enqueueReveal("lead"); }
+  else if (id === "silver") enqueueReveal("silver");
+  else if (id === "gold") enqueueReveal("gold");
+  else if (id === "perfect") toast(S.tier.perfect === 1 ? "Perfect Eye! Hit the white strip for a PERFECT — it pays ×" + PERF_PAY[1] + "." : "Perfect drops now pay ×" + PERF_PAY[S.tier.perfect] + ".", 3400);
   else if (id === "perBrick") toast("Piece Work! Every brick you lay now pays.", 3200);
   else if (id === "combo") toast("Combos on — land hits in a row for a streak bonus. Don't break it!", 3600);
   else if (id === "bellows") toast("Banked Coals: the kiln keeps baking at " + Math.round(COALS[S.tier.bellows] * 100) + "% when you let go.", 3400);
@@ -2522,13 +2716,13 @@ function buyLine(id) {
   else if (id === "predictable") toast("Predictable Placement: the crane now brings each brick in from a set distance.", 3600);
   else if (id === "secondChance") toast("Second Chance " + S.tier.secondChance + " — misses forgiven, streaks kept.", 3200);
   else if (id === "precision") toast("Precision gears: the crane slows down.", 3000);
-  else if (id === "gilded") toast(GILD_PCT[S.tier.gilded] + "% of bricks now come out golden — ×3 pay.", 3400);
+  else if (id === "gilded") toast("Gold bricks are now common — ×" + TYPE_MULT.gold + " pay.", 3400);
   else if (id === "plumb") toast("Plumb line: the white PERFECT strip is wider.", 3000);
   else if (id === "crowd") toast("The crowd roars — streak bonus now caps at ×" + fmtMult(multCap()) + ".", 3200);
   else if (id === "glaze") toast("Slippery glaze: hands now need " + grabTime() + "s to rip a brick free.", 3400);
   else if (id === "lantern") toast("The lantern burns through — the clouds thin out.", 3200);
   else if (id === "level") toast("Spirit level: the tremors shrink.", 3000);
-  renderHUD();
+  renderHUD(); saveGame();
   var nr = $("upg-" + id); if (nr) { nr.classList.remove("bought"); void nr.offsetWidth; nr.classList.add("bought"); }
 }
 
@@ -2554,6 +2748,7 @@ function updateCraneVisual(dt, rt) {
   var tx = slotX(r, Math.min(curSlot(), per - 1), per);
   var playing = S.started && CAM.mode !== "victory";
   W3.band.visible = W3.perfBand.visible = W3.marker.visible = playing;
+  W3.perfBand.visible = playing && S.tier.perfect >= 1;
   var sw = swayOff() * FW();               // the tremor slides the whole drop zone
   W3.band.scale.x = bandW; W3.band.position.x = tx + sw;
   W3.perfBand.scale.x = Math.max(0.04, 2 * perfectTol() * FW()); W3.perfBand.position.x = tx + sw;
@@ -2674,7 +2869,6 @@ function milestone(n) {
   if (n >= 2 && n <= 4) villagersJoin(n);
   if (n === 5) enqueueSeq(["c5a", "c5b"]);
   if (STORY_AT[n]) enqueueStory(STORY_AT[n]);
-  if (n === LEAD_COURSE && !S.leadUnlocked) { S.leadUnlocked = true; enqueueReveal("lead"); }
   if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; enqueueReveal("glass"); }
   if (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0) queueRaid(n);
   if (n % 10 === 0 && n !== FIRST_GOAL && n !== FINAL_GOAL) whenLanded(function () { banner("COURSE " + n, perBrickOn() ? "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE" : "PAY RAISE · ROW BONUS NOW $" + rowBonus(true)); });
@@ -2873,7 +3067,7 @@ function smashHand(h) {
   emitPuffs(h.x, h.topY, BD / 2, 6, 0xe9dcc2, 0.7);
   popText("SMASHED!", sp.x, sp.y - 44, { cls: "gold", size: 26, rot: -5, dur: 1100 });
   popText("+$" + fmt(bonus), sp.x, sp.y - 14, { cls: "green", size: 20, dur: 1000, delay: 120 });
-  moneyFloat(bonus, null); spawnCoins(6, sp);
+  moneyFloat(bonus, null); spawnCoins(coinsFor(bonus), sp);
   crowdCheer(1.6); snd.cheer(true);
 }
 function yankHand(h) {
@@ -2995,7 +3189,7 @@ function updateMist(dt) {
    ui.js — HUD, dock, DOM effects, messages, shop, settings, input,
    main loop and the test probe.
    ===================================================================== */
-var UI = { fly: {}, trayPop: 0, traySig: "", shopSig: "", shopNew: {}, moneyShown: 0, streakBreakT: 0, promptTxt: "" };
+var UI = { tab: "kiln", fly: {}, trayPop: 0, traySig: "", shopSig: "", shopNew: {}, moneyShown: 0, streakBreakT: 0, promptTxt: "" };
 var el = {};
 ["hud-course-num", "hud-goal", "prog-fill", "money-num", "hud-money", "btn-shop", "shop-new", "shop-count", "chip-row", "row-num", "row-in",
  "chip-wind", "wind-arrow", "wind-str", "chip-sc", "chip-hand", "hand-t", "chip-sway", "streak", "streak-x", "streak-pay", "prompt", "dock", "kiln", "kiln-ring", "kiln-sub",
@@ -3042,7 +3236,7 @@ function moneyFloat(amount, x, y) {
   snd.coin(); popEl(el.hudMoney);
   if (x == null) return;
   var ratio = amount / rate();
-  popText("+$" + fmt(amount), x, y, { cls: "green", size: Math.round(17 + Math.min(12, Math.log(Math.max(1, ratio)) / Math.LN2 * 2.4)), rise: 40, dur: 850 });
+  popText("+$" + fmtPay(amount), x, y, { cls: "green", size: Math.round(17 + Math.min(12, Math.log(Math.max(1, ratio)) / Math.LN2 * 2.4)), rise: 40, dur: 850 });
 }
 function bigWord(txt, cls) {
   var b = el.bigWord; b.textContent = txt; b.className = cls || "";
@@ -3200,7 +3394,7 @@ function renderStreak(pop) {
     var m = streakMult(S.streak), cap = multCap(), ratio = (m - 1) / Math.max(0.01, cap - 1);
     if (st.classList.contains("hidden") || st.classList.contains("break")) { st.classList.remove("break"); revealEl(st); }
     el.streakX.textContent = "×" + fmtMult(m);
-    el.streakPay.textContent = m >= cap ? "MAX · $" + fmt(rate() * m) + " / BRICK" : "$" + fmt(rate() * m) + " / BRICK";
+    el.streakPay.textContent = m >= cap ? "MAX · $" + fmtPay(rate() * m) + " / BRICK" : "$" + fmtPay(rate() * m) + " / BRICK";
     var sf = $("streak-fill"); if (sf) sf.style.width = (Math.min(1, ratio) * 100).toFixed(0) + "%";
     st.classList.toggle("warm", ratio >= 0.4 && ratio < 0.8); st.classList.toggle("hot", ratio >= 0.8 && m < cap); st.classList.toggle("maxed", m >= cap);
     st.style.transform = "scale(" + (1 + Math.min(0.18, ratio * 0.18)).toFixed(3) + ")";
@@ -3218,31 +3412,49 @@ function renderShopBadge() {
   el.shopCount.classList.toggle("hidden", !show);
   if (show && el.shopCount.textContent !== String(afford)) { el.shopCount.textContent = afford; popEl(el.shopCount); }
 }
+function cardHTML(l) {
+  var t = S.tier[l.id];
+  if (!lineAvail(l)) return '<div class="upg-row locked" id="upg-' + l.id + '"><div class="upg-ico">🔒</div><div class="upg-info"><div class="upg-name">' + l.name + '</div><div class="upg-desc">' + lockReason(l) + '</div></div></div>';
+  var maxed = t >= l.costs.length, cost = maxed ? 0 : l.costs[t];
+  var pips = '<span class="pips">'; for (var p = 0; p < l.costs.length; p++) pips += '<i class="' + (p < t ? "on" : "") + '"></i>'; pips += "</span>";
+  return '<div class="upg-row" id="upg-' + l.id + '" data-cost="' + cost + '"><div class="upg-ico">' + ICON[l.icon] + '</div>' +
+    '<div class="upg-info"><div class="upg-name">' + l.name + pips + (UI.shopNew[l.id] ? '<span class="upg-new">NEW</span>' : "") + "</div>" +
+    (t > 0 && !maxed ? '<div class="upg-now">NOW: ' + l.effect(t) + "</div>" : "") +
+    '<div class="upg-desc">' + (maxed ? l.effect(t) : l.next(t)) + "</div></div>" +
+    (maxed ? '<button class="buy-btn maxed" disabled>MAX</button>' : '<button class="buy-btn" data-upg="' + l.id + '">$' + fmt(cost) + "</button>") + "</div>";
+}
+function nodeHTML(l, tab) {
+  if (!lineVisible(l)) return "";
+  var kh = ""; LINES.forEach(function (k) { if (k.parent === l.id && k.tab === tab) kh += nodeHTML(k, tab); });
+  return '<div class="tnode">' + cardHTML(l) + (kh ? '<div class="tkids">' + kh + "</div>" : "") + "</div>";
+}
 function renderShop() {
   if (!S.workshopShown) return;
-  var sig = LINES.map(function (l) { return l.id + S.tier[l.id] + (l.gate() ? 1 : 0); }).join("|");
+  var shown = TABS.filter(function (tb) { return LINES.some(function (l) { return l.tab === tb.id && lineVisible(l); }); });
+  if (!shown.length) return;
+  if (!shown.some(function (tb) { return tb.id === UI.tab; })) UI.tab = shown[0].id;
+  var sig = UI.tab + "#" + LINES.map(function (l) { return l.id + S.tier[l.id] + (lineAvail(l) ? 1 : lineVisible(l) ? 2 : 0); }).join("|");
   if (sig !== UI.shopSig) {
     UI.shopSig = sig;
+    var th = "";
+    shown.forEach(function (tb) { th += '<button class="tab-btn pressable' + (tb.id === UI.tab ? " on" : "") + '" data-tab="' + tb.id + '">' + tb.name + "<b></b></button>"; });
+    $("tree-tabs").innerHTML = th; $("tree-tabs").classList.toggle("hidden", shown.length < 2);
     var html = "";
-    LINES.forEach(function (l) {
-      if (!l.gate()) return;
-      var t = S.tier[l.id], maxed = t >= l.costs.length, cost = maxed ? 0 : l.costs[t];
-      var pips = '<span class="pips">'; for (var p = 0; p < l.costs.length; p++) pips += '<i class="' + (p < t ? "on" : "") + '"></i>'; pips += "</span>";
-      html += '<div class="upg-row" id="upg-' + l.id + '" data-cost="' + cost + '"><div class="upg-ico">' + ICON[l.icon] + '</div>' +
-        '<div class="upg-info"><div class="upg-name">' + l.name + pips + (UI.shopNew[l.id] ? '<span class="upg-new">NEW</span>' : "") + "</div>" +
-        (t > 0 && !maxed ? '<div class="upg-now">NOW: ' + l.effect(t) + "</div>" : "") +
-        '<div class="upg-desc">' + (maxed ? l.effect(t) : l.next(t)) + "</div></div>" +
-        (maxed ? '<button class="buy-btn maxed" disabled>MAX</button>' : '<button class="buy-btn" data-upg="' + l.id + '">$' + fmt(cost) + "</button>") + "</div>";
-    });
+    LINES.forEach(function (l) { if (l.tab === UI.tab && (!l.parent || lineById(l.parent).tab !== UI.tab)) html += nodeHTML(l, UI.tab); });
     el.upgList.innerHTML = html;
   }
-  var rows = el.upgList.children;
+  var counts = {};
+  LINES.forEach(function (l) { var t = S.tier[l.id]; if (lineAvail(l) && t < l.costs.length && S.money >= l.costs[t]) counts[l.tab] = (counts[l.tab] || 0) + 1; });
+  var tbs = $("tree-tabs").querySelectorAll("[data-tab]");
+  for (var q = 0; q < tbs.length; q++) { var c = counts[tbs[q].getAttribute("data-tab")] || 0, bn = tbs[q].querySelector("b"); if (bn.textContent !== (c ? String(c) : "")) bn.textContent = c ? String(c) : ""; }
+  var rows = el.upgList.querySelectorAll(".upg-row");
   for (var j = 0; j < rows.length; j++) {
     var b = rows[j].querySelector("[data-upg]"); if (!b) continue;
-    var can = S.money >= parseInt(rows[j].getAttribute("data-cost"), 10);
+    var can = S.money >= parseFloat(rows[j].getAttribute("data-cost"));
     b.classList.toggle("cant", !can); rows[j].classList.toggle("afford", can);
   }
 }
+$("tree-tabs").addEventListener("click", function (e) { var b = e.target.closest("[data-tab]"); if (!b) return; UI.tab = b.getAttribute("data-tab"); UI.shopSig = ""; renderShop(); snd.pop(); });
 el.upgList.addEventListener("click", function (e) { var b = e.target.closest("[data-upg]"); if (b) buyLine(b.getAttribute("data-upg")); });
 
 // Per-frame UI: money roll, kiln ring, fuses, prompt, wind chip.
@@ -3250,8 +3462,8 @@ function uiFrame(rdt) {
   updateBubbles();
   var diff = S.money - UI.moneyShown;
   if (diff !== 0) {
-    UI.moneyShown = Math.abs(diff) < 1.5 ? S.money : UI.moneyShown + diff * Math.min(1, rdt * 12);
-    el.moneyNum.textContent = fmt(UI.moneyShown);
+    UI.moneyShown = Math.abs(diff) < 0.5 ? S.money : UI.moneyShown + diff * Math.min(1, rdt * 12);
+    el.moneyNum.textContent = fmtMoney(UI.moneyShown);
   }
   el.kilnRing.style.strokeDashoffset = (119.4 * (1 - clamp(S.moldT, 0, 1))).toFixed(1);
   el.kilnSub.textContent = S.held ? "STOKING!" : "HOLD";
@@ -3275,7 +3487,7 @@ function uiFrame(rdt) {
     if (C.state === "swing" && C.item && C.item.type === "hot") { txt = "HOT BRICK — drop it in " + Math.max(0, Math.ceil(C.item.fuse)) + "s!"; urgent = C.item.fuse < 3; }
     else if (hh) { txt = "HAND! Land a brick on the red slot — " + handNeed(hh) + " to go"; urgent = hh.timer < 3; }
     else if (C.state === "swing" && C.item) {
-      if (C.item.type === "lead") txt = "LEAD — heavy, fast, pays ×4";
+      if (C.item.type === "lead") txt = "LEAD — heavy, fast, pays ×" + TYPE_MULT.lead;
       else if (C.item.type === "glass") txt = "GLASS — fragile, tight window, pays ×5";
       else if (S.swayOn) txt = "TREMOR — follow the sliding zone";
       else if (S.windOn) txt = "WIND " + (S.wind.dir > 0 ? "→" : "←") + " fast with it, slow against it";
@@ -3350,7 +3562,9 @@ var ICO_CLOUD = '<svg viewBox="0 0 64 46" width="66" height="46"><path d="M16 38
 var ICO_TREMOR = '<svg viewBox="0 0 64 46" width="66" height="46"><rect x="16" y="14" width="32" height="18" fill="#c2502c" stroke="#221407" stroke-width="3"/><path d="M6 10l-3 8 5 5-3 9M58 10l3 8-5 5 3 9" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var REVEALS = {
   hot: { cls: "hot", title: "THE KILN RUNS HOT", text: "Some bricks now come out glowing. Drop a hot brick before it cools — it's worth <b>×2</b>. Let it burn out and it's a miss." },
-  lead: { cls: "lead", title: "LEAD BRICKS", text: "Heavier clay up here. Dark lead bricks swing <b>40% faster</b> — land one and it's worth <b>×4</b>." },
+  lead: { cls: "lead", title: "LEAD BRICKS", text: "Dark lead bricks now come out of the kiln. They swing <b>40% faster</b> — land one and it's worth <b>×2</b>." },
+  silver: { cls: "silver", title: "SILVER BRICKS", text: "Gleaming silver bricks now turn up in the kiln. Land one and it's worth <b>×3</b>." },
+  gold: { cls: "gold", title: "GOLD BRICKS", text: "Real gold bricks now turn up in the kiln. Land one and it's worth <b>×4</b>. Gilded Clay makes them more common." },
   wind: { cls: "wind", title: "THE WIND PICKS UP", text: "The wind gusts in spells. The crane runs <b>fast with it</b> and <b>slow against it</b> — watch the arrow, time the slow side. It will come and go." },
   hand: { cls: "icon", icon: ICO_HAND, title: "HANDS!", text: "A hand is clamping onto a brick. In <b>about 10 seconds</b> it rips it free — and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to smash it. The red slot shows where." },
   mist: { cls: "icon", icon: ICO_CLOUD, title: "CLOUDS ROLL IN", text: "Clouds drift across the work site and hide the crane. <b>Judge by rhythm</b>, not by eye — they come and go, and thicken as you climb. A Sky Lantern thins them." },
@@ -3486,7 +3700,7 @@ function showVictory() {
   $("st-laid").textContent = fmt(S.laid); $("st-time").textContent = fmtTime(S.playTime);
   $("st-streak").textContent = S.bestStreak; $("st-perfect").textContent = S.perfects;
   $("st-acc").textContent = (S.drops ? Math.round(S.hits / S.drops * 100) : 100) + "%";
-  $("st-money").textContent = "$" + fmt(S.earned);
+  $("st-money").textContent = "$" + fmtMoney(S.earned);
   $("st-smash").textContent = S.smashed; $("st-stolen").textContent = S.lost;
   releaseKiln(); showPanel(el.ovVictory); snd.fanfare();
 }
@@ -3510,7 +3724,7 @@ $("btn-shop").addEventListener("click", function () { audio(); openShop(); });
 $("btn-shop-close").addEventListener("click", function () { closeShop(); snd.pop(); });
 el.workshop.addEventListener("click", function (e) { if (e.target === el.workshop) closeShop(); });
 function syncSettings() {
-  var pairs = [["set-hand-l", S.hand === "l"], ["set-hand-r", S.hand === "r"], ["set-snd-on", !S.muted], ["set-snd-off", S.muted], ["set-shk-on", S.shakeOn], ["set-shk-off", !S.shakeOn],
+  var pairs = [["set-hand-l", S.hand === "l"], ["set-hand-r", S.hand === "r"], ["set-snd-on", !S.muted], ["set-snd-off", S.muted], ["set-mus-on", S.musicOn], ["set-mus-off", !S.musicOn], ["set-shk-on", S.shakeOn], ["set-shk-off", !S.shakeOn],
     ["set-vib-on", S.vibOn], ["set-vib-off", !S.vibOn], ["set-q-hi", S.quality === "hi"], ["set-q-lo", S.quality !== "hi"]];
   pairs.forEach(function (p) { $(p[0]).classList.toggle("on", p[1]); });
   $("app").classList.toggle("hand-r", S.hand === "r"); $("app").classList.toggle("hand-l", S.hand === "l");
@@ -3522,6 +3736,7 @@ $("btn-settings-close").addEventListener("click", function () { closeSettings();
 el.settings.addEventListener("click", function (e) { if (e.target === el.settings) closeSettings(); });
 function setOpt(id, fn) { $(id).addEventListener("click", function () { fn(); syncSettings(); snd.pop(); }); }
 setOpt("set-hand-l", function () { S.hand = "l"; }); setOpt("set-hand-r", function () { S.hand = "r"; });
+setOpt("set-mus-on", function () { S.musicOn = true; }); setOpt("set-mus-off", function () { S.musicOn = false; });
 setOpt("set-snd-on", function () { S.muted = false; }); setOpt("set-snd-off", function () { S.muted = true; humStop(); });
 setOpt("set-shk-on", function () { S.shakeOn = true; camShake(0.4); }); setOpt("set-shk-off", function () { S.shakeOn = false; CAM.trauma = 0; });
 setOpt("set-vib-on", function () { S.vibOn = true; haptic(20); }); setOpt("set-vib-off", function () { S.vibOn = false; });
@@ -3552,6 +3767,7 @@ document.addEventListener("visibilitychange", function () { if (document.hidden)
 $("app").addEventListener("pointerdown", function (e) {
   if (e.target.closest("[data-ui]") || e.target.closest("button")) return;
   audio();
+  critTap(e.clientX, e.clientY);          // a tap on a bird makes it react — the tap still counts as a drop
   tryDrop(e.timeStamp);
 });
 $("app").addEventListener("contextmenu", function (e) { e.preventDefault(); });
@@ -3624,14 +3840,190 @@ function boot() {
   requestAnimationFrame(frame);
   var ldLines = ["FIRING THE KILN…", "MIXING THE MORTAR…", "STACKING THE BRICKS…"], ldI = 0;
   var ldT = setInterval(function () { var m = $("ld-msg"); if (m) { ldI = (ldI + 1) % ldLines.length; m.textContent = ldLines[ldI]; } }, 430);
-  setTimeout(function () { clearInterval(ldT); hidePanel(el.ovLoading, 300); showPanel(el.ovStart); }, 1350);
+  setTimeout(function () { clearInterval(ldT); hidePanel(el.ovLoading, 300); showPanel(el.ovStart); decorateStart(); }, 1350);
 }
 $("btn-begin").addEventListener("click", function () {
   if (S.flags.begun) return;
   S.flags.begun = true; audio(); snd.pop();
   hidePanel(el.ovStart, 300);
-  finishOpening();          // straight to the kiln — the story waits until the first row is done
+  var sv = readSave();
+  if (sv) { try { loadGame(sv); } catch (err) { console.error(err); finishOpening(); } }
+  else finishOpening();          // straight to the kiln — the story waits until the first row is done
 });
+
+
+/* ---------------- MUSIC (procedural, no audio files) ----------------
+   Five moods that follow your best row: 0-4 calm medieval, 5-24 upbeat medieval, 25-49 eerie,
+   50-74 spooky, 75+ melty and strange (but pleasant). Moods crossfade; MUSIC_VOL is the master level. */
+var MUSIC_VOL = 1.0;
+var MUS = { bus: null, gains: {}, mood: -1, step: 0, next: 0, on: false, fi: 4 };
+function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+function moodFor(c) { return c >= 75 ? 4 : c >= 50 ? 3 : c >= 25 ? 2 : c >= 5 ? 1 : 0; }
+function mNote(dest, type, f, t, dur, vol, o) {
+  o = o || {};
+  var osc = AC.createOscillator(), g = AC.createGain(), last = osc, a = o.att || 0.005;
+  osc.type = type; osc.frequency.setValueAtTime(f, t);
+  if (o.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(20, f * o.slide), t + (o.slideT || dur));
+  if (o.det) osc.detune.value = o.det;
+  if (o.lp) { var lf = AC.createBiquadFilter(); lf.type = "lowpass"; lf.frequency.setValueAtTime(o.lp, t); if (o.lpEnd) lf.frequency.exponentialRampToValueAtTime(o.lpEnd, t + dur); osc.connect(lf); last = lf; }
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + a);
+  if (o.sus) g.gain.setValueAtTime(vol, Math.max(t + a, t + dur - (o.rel || 0.5)));
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  last.connect(g); g.connect(dest);
+  if (o.vib) { var lfo = AC.createOscillator(), lg = AC.createGain(); lfo.frequency.value = o.vibRate || 5; lg.gain.value = o.vib; lfo.connect(lg); lg.connect(osc.detune); lfo.start(t); lfo.stop(t + dur + 0.05); }
+  osc.start(t); osc.stop(t + dur + 0.05);
+}
+function mPluck(d, f, t, vol, dur) { mNote(d, "triangle", f, t, dur || 0.9, vol, { lp: 2800, lpEnd: 500 }); mNote(d, "sawtooth", f, t, (dur || 0.9) * 0.6, vol * 0.22, { lp: 1800, lpEnd: 400 }); }
+function mFlute(d, f, t, dur, vol) { mNote(d, "sine", f, t, dur, vol, { att: 0.06, vib: 12, vibRate: 5.2, sus: true, rel: Math.min(0.15, dur * 0.4) }); mNote(d, "sine", f * 2, t, dur, vol * 0.18, { att: 0.08, sus: true, rel: Math.min(0.15, dur * 0.4) }); }
+function mPad(d, f, t, dur, vol, det, extra) {
+  var at = Math.min(1.4, dur * 0.3);
+  [-1, 1].forEach(function (s) { var o = { att: at, sus: true, rel: Math.min(1.4, dur * 0.35), det: s * det }; for (var k in extra) o[k] = extra[k]; mNote(d, "triangle", f, t, dur, vol, o); });
+}
+function mBell(d, f, t, vol, dur) { mNote(d, "sine", f, t, dur, vol, { att: 0.004 }); mNote(d, "sine", f * 2.76, t, dur * 0.5, vol * 0.35, { att: 0.004 }); mNote(d, "sine", f * 5.4, t, dur * 0.25, vol * 0.12, { att: 0.004 }); }
+function mThump(d, t, vol, f0, f1) { var o = AC.createOscillator(), g = AC.createGain(); o.type = "sine"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + 0.12);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32); o.connect(g); g.connect(d); o.start(t); o.stop(t + 0.35); }
+function mNoise(d, t, dur, vol, ftype, f0, f1) {
+  if (!noiseBuf) { var n = AC.sampleRate; noiseBuf = AC.createBuffer(1, n, n); var dd = noiseBuf.getChannelData(0); for (var i = 0; i < n; i++) dd[i] = Math.random() * 2 - 1; }
+  var s = AC.createBufferSource(); s.buffer = noiseBuf; var f = AC.createBiquadFilter(); f.type = ftype; f.frequency.setValueAtTime(f0, t); if (f1) f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  if (ftype === "bandpass") f.Q.value = 3;
+  var g = AC.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + Math.min(0.02, dur / 3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(d); s.start(t, Math.random() * 0.4); s.stop(t + dur + 0.02);
+}
+var CALM_PROG = [[50, 53, 57], [48, 52, 55], [50, 53, 57], [45, 48, 52], [46, 50, 53], [48, 52, 55], [50, 53, 57], [50, 53, 57]];
+var UP_PROG = [[50, 53, 57], [48, 52, 55], [46, 50, 53], [48, 52, 55], [50, 53, 57], [48, 52, 55], [53, 57, 60], [45, 49, 52]];
+var EE_PROG = [[50, 53, 57], [51, 55, 58], [50, 53, 57], [47, 50, 53]];
+var ME_PROG = [[53, 57, 60, 64], [55, 59, 62, 66], [52, 55, 59, 62], [57, 60, 64, 67]];
+var D_DOR = [62, 64, 65, 67, 69, 71, 72, 74, 76];
+var PHR = [[74, 0, 72, 74, 76, 0, 74, 72], [69, 71, 72, 0, 74, 72, 71, 69], [74, 0, 72, 74, 76, 0, 74, 72], [72, 74, 76, 77, 76, 74, 72, 0]];
+var MOODS = [
+  { bpm: 70, step: function (s, t, sd, d) {            // CALM: lute arpeggios, a lone flute, a low drone
+    var bar = Math.floor(s / 8), st = s % 8, ch = CALM_PROG[bar % 8];
+    mPluck(d, mtof(ch[[0, 2, 1, 2, 0, 2, 1, 2][st]] + 12), t, st === 0 ? 0.085 : 0.055, 1.1);
+    if (st === 0 || st === 4) mPluck(d, mtof(ch[0] - 12), t, 0.09, 1.6);
+    if (st === 0) mPad(d, mtof(38), t, sd * 8, 0.04, 4);
+    if ((st === 0 || st === 3 || st === 6) && Math.random() < (st === 0 ? 0.7 : 0.4)) { MUS.fi = clamp(MUS.fi + pick([-2, -1, -1, 1, 1, 2]), 0, 8); mFlute(d, mtof(D_DOR[MUS.fi]), t, sd * (st === 0 ? 4 : 2.4), 0.05); }
+  } },
+  { bpm: 132, step: function (s, t, sd, d) {           // UPBEAT: jig-like strumming, drum and tambourine, a lively flute
+    var bar = Math.floor(s / 8), st = s % 8, ch = UP_PROG[bar % 8];
+    if ([1, 0, 1, 1, 1, 0, 1, 1][st]) for (var k = 0; k < 3; k++) mPluck(d, mtof(ch[k] + 12), t + k * 0.012, st % 4 === 0 ? 0.07 : 0.05, 0.5);
+    if (st === 0 || st === 4 || st === 6) mPluck(d, mtof(ch[0] - 12), t, 0.1, 0.5);
+    if (st === 0 || st === 4) mThump(d, t, 0.22, 120, 48);
+    if (st === 2 || st === 6) mNoise(d, t, 0.09, 0.07, "highpass", 5000);
+    if (st % 2 === 1) mNoise(d, t, 0.03, 0.025, "highpass", 8000);
+    var n = PHR[bar % 4][st]; if (n) mFlute(d, mtof(n), t, sd * 1.7, 0.06);
+  } },
+  { bpm: 56, step: function (s, t, sd, d) {            // EERIE: detuned pads, sparse music-box bells, a drooping lute
+    var bar = Math.floor(s / 8), st = s % 8, ch = EE_PROG[bar % 4];
+    if (st === 0) { ch.forEach(function (n) { mPad(d, mtof(n), t, sd * 8, 0.032, 9); }); mPad(d, mtof(38), t, sd * 8, 0.045, 3); }
+    if (st === 0 && bar % 2 === 0) mNote(d, "triangle", mtof(ch[0]), t, 2.4, 0.07, { lp: 1200, slide: 0.97 });
+    if (st % 2 === 0 && Math.random() < 0.28) mBell(d, mtof(pick([74, 75, 77, 79, 81, 82, 84])) * (Math.random() < 0.25 ? 0.985 : 1), t, 0.04, 2.4);
+    if (st === 0 && bar % 4 === 2) mNoise(d, t, sd * 7, 0.04, "bandpass", 300, 1500);
+  } },
+  { bpm: 64, step: function (s, t, sd, d) {            // SPOOKY: tritone drone, a heartbeat, clashing bells, a sliding choir, creaks
+    var bar = Math.floor(s / 8), st = s % 8;
+    if (st === 0) {
+      mNote(d, "sawtooth", mtof(38), t, sd * 8, 0.05, { lp: 180, att: 1.5, sus: true, rel: 1.5 }); mNote(d, "sawtooth", mtof(44), t, sd * 8, 0.035, { lp: 200, att: 2.0, sus: true, rel: 1.5 });
+      mThump(d, t, 0.22, 90, 38); mThump(d, t + sd * 0.85, 0.15, 90, 38);
+    }
+    if (st === 4) { mThump(d, t, 0.1, 90, 38); mThump(d, t + sd * 0.85, 0.07, 90, 38); }
+    if (st % 2 === 1 && Math.random() < 0.3) { var pr = pick([[74, 75], [68, 69], [62, 63], [80, 81]]); mBell(d, mtof(pr[0]), t, 0.04, 2.8); mBell(d, mtof(pr[1]), t + 0.05, 0.03, 2.8); }
+    if (st === 0 && bar % 4 === 0) [57, 60, 63].forEach(function (n) { mNote(d, "sine", mtof(n), t, sd * 14, 0.028, { att: 2, sus: true, rel: 3, slide: 0.944, vib: 15, vibRate: 4.5 }); });
+    if (st === 4 && Math.random() < 0.4) { var up = Math.random() < 0.5; mNoise(d, t, 0.9, 0.035, "bandpass", up ? 500 : 1400, up ? 1400 : 500); }
+  } },
+  { bpm: 88, step: function (s, t, sd, d) {            // MELTY: wobbling lydian pads, drooping bell-plucks, a soft heartbeat
+    var bar = Math.floor(s / 8), st = s % 8, ch = ME_PROG[bar % 4];
+    if (st === 0) ch.forEach(function (n) { mPad(d, mtof(n), t, sd * 8, 0.03, 14, { vib: 20, vibRate: 0.35 }); });
+    if (st === 0 || st === 4) mNote(d, "sine", mtof(ch[0] - 12) * 1.06, t, sd * 3.6, 0.1, { slide: 1 / 1.06, slideT: 0.35, att: 0.02 });
+    if (Math.random() < 0.75) { var f = mtof(ch[Math.floor(Math.random() * 4)] + 12 * (1 + Math.floor(Math.random() * 2))); mNote(d, "triangle", f, t, sd * 2.2, 0.05, { slide: 0.965, lp: 2400, att: 0.01 }); if (Math.random() < 0.12) mNote(d, "sine", f * 1.5, t, 0.25, 0.035, { slide: 1.25, att: 0.01 }); }
+    if (st === 0 || st === 4) mThump(d, t, 0.12, 95, 48);
+    if (st === 2 || st === 6) mNoise(d, t, 0.2, 0.03, "bandpass", 3500, 2500);
+  } }
+];
+function musicSwitch(m, now) {
+  var first = MUS.mood < 0;
+  if (MUS.mood >= 0 && MUS.gains[MUS.mood]) MUS.gains[MUS.mood].gain.setTargetAtTime(0, now, 0.8);
+  if (!MUS.gains[m]) { var g = AC.createGain(); g.gain.value = 0; g.connect(MUS.bus); MUS.gains[m] = g; }
+  MUS.gains[m].gain.cancelScheduledValues(now); MUS.gains[m].gain.setTargetAtTime(1, now, first ? 1.6 : 0.9);
+  MUS.mood = m; MUS.step = 0; MUS.next = now + 0.15; MUS.fi = 4;
+}
+function musicTick() {
+  if (!AC || !BUS) return;
+  if (!MUS.bus) { MUS.bus = AC.createGain(); MUS.bus.gain.value = 0; MUS.bus.connect(BUS); }
+  var on = !S.muted && S.musicOn && S.started && !document.hidden, now = AC.currentTime;
+  if (on !== MUS.on) { MUS.on = on; MUS.bus.gain.setTargetAtTime(on ? MUSIC_VOL : 0, now, on ? 0.6 : 0.25); if (on) MUS.next = now + 0.1; }
+  if (!on) return;
+  var want = moodFor(S.best);
+  if (want !== MUS.mood) musicSwitch(want, now);
+  var M = MOODS[MUS.mood], sd = 60 / M.bpm / 2;
+  if (MUS.next < now - 0.5) MUS.next = now + 0.05;                  // fell behind (tab was hidden): restart the clock
+  while (MUS.next < now + 0.35) { try { M.step(MUS.step, MUS.next, sd, MUS.gains[MUS.mood]); } catch (e) {} MUS.step++; MUS.next += sd; }
+}
+setInterval(musicTick, 100);
+
+/* ---------------- AUTOSAVE ---------------- */
+var SAVE_KEY = "brickbybrick3d_save_v1", NOSAVE = false, lastSaveAt = 0;
+var SAVE_FIELDS = ["money", "earned", "laid", "best", "bestStreak", "perfects", "misses", "drops", "hits", "molded", "smashed", "stolen", "lost", "playTime",
+  "hotUnlocked", "leadUnlocked", "glassUnlocked", "workshopShown", "comboTutDone", "endless", "goal", "won", "muted", "musicOn", "shakeOn", "vibOn", "quality", "hand"];
+function saveGame() {
+  if (NOSAVE || !S.started || (S.courses === 0 && S.laid === 0 && S.money === 0)) return;
+  try {
+    var d = { v: 1, courses: S.courses, tower: S.tower, towerStart: S.towerStart, bricks: BRICKS.length + (G.falls || 0), tier: S.tier, flags: S.flags, beats: S.beats, seenLines: S.seenLines };
+    SAVE_FIELDS.forEach(function (k) { d[k] = S[k]; });
+    localStorage.setItem(SAVE_KEY, JSON.stringify(d)); lastSaveAt = performance.now();
+  } catch (e) {}
+}
+function readSave() { try { var s = localStorage.getItem(SAVE_KEY); var d = s ? JSON.parse(s) : null; return d && d.v === 1 ? d : null; } catch (e) { return null; } }
+// The wall is rebuilt from how many bricks were standing: a tower needs all four sides, so a big
+// partial tower may come back a few rows lower. Money, upgrades, story and settings come back exactly.
+function loadGame(d) {
+  SAVE_FIELDS.forEach(function (k) { if (d[k] !== undefined) S[k] = d[k]; });
+  var k2; for (k2 in d.tier) if (S.tier[k2] !== undefined) S.tier[k2] = d.tier[k2];
+  if (d.tier && d.tier.perfect === undefined) S.tier.perfect = 1;                         // perfects used to be free
+  if (S.leadUnlocked && !S.tier.lead) S.tier.lead = 1;
+  if (S.tier.gilded > 0 && !S.tier.gold) { S.tier.gold = 1; S.tier.silver = Math.max(S.tier.silver, 1); S.tier.lead = Math.max(S.tier.lead, 1); }
+  S.flags = d.flags || {}; S.beats = d.beats || {}; S.seenLines = d.seenLines || {}; S.flags.begun = true;
+  if (S.flags.rimStarted) { S.flags.rimDone = true; S.flags.rimPending = false; S.goal = FINAL_GOAL; }
+  var tower = !!d.tower || !!S.beats.c5b, per = 6 - S.tier.hotMortar, pf = towerPerFace(), n = d.bricks || 0;
+  var need = tower ? 4 * pf : per, rows = Math.min(d.courses, tower ? 999 : 4, Math.floor(n / need));
+  S.tower = tower; S.perFace = tower ? pf : 6; S.perCourse = tower ? 4 * pf : per; S.towerStart = Math.min(d.towerStart || 5, rows);
+  if (tower) {
+    var ft = new THREE.Mesh(new THREE.BoxGeometry(TW + 1.0, FOUND, TW + 1.0), toon(0x8a8478)); ft.position.set(0, FOUND / 2, -TH);
+    ft.receiveShadow = true; outline(ft, 0.05); scene.add(ft);
+  }
+  var r, s, f;
+  for (r = 1; r <= rows; r++) {
+    if (tower) { for (f = 0; f < 4; f++) for (s = 0; s < pf; s++) wallAdd(r, s, pf, "normal", (r * 31 + s * 7 + f * 101) % 997, f, f * pf + s); }
+    else for (s = 0; s < per; s++) wallAdd(r, s, per, "normal", (r * 31 + s * 7) % 997);
+  }
+  S.courses = rows; S.inCourse = 0;
+  var left = (rows === Math.floor(n / need)) ? n - rows * need : 0;      // unfinished row comes back too
+  for (s = 0; s < left; s++) {
+    if (tower) { f = Math.floor(s / pf); wallAdd(rows + 1, s % pf, pf, "normal", ((rows + 1) * 31 + s * 7) % 997, f, s); }
+    else wallAdd(rows + 1, s, per, "normal", ((rows + 1) * 31 + s * 7) % 997);
+    S.inCourse++;
+  }
+  if (tower) W3.orbitAng = W3.orbitT = Math.PI * 2 + ((S.courses - S.towerStart) * 4 + curFace()) * Math.PI / 2;
+  S.started = true; CAM.mode = "play"; releaseKiln();
+  revealEl(el.dock);
+  if (S.best >= 1) revealEl($("hud-course"));
+  if (S.flags.moneyShown) revealEl($("hud-money"));
+  if (S.workshopShown) revealEl($("btn-shop"));
+  try { applyQuality(); } catch (e) {}
+  syncSettings(); updateHazards(); renderHUD(); checkUnlocks();
+  toast("Welcome back — your progress was saved.", 2800);
+}
+function decorateStart() {
+  var sv = readSave(); if (!sv) return;
+  var b = $("btn-begin"); b.textContent = "CONTINUE";
+  var n = document.createElement("button"); n.textContent = "New game"; n.className = "cta-btn";
+  n.style.cssText = "margin-top:10px;font-size:13px;padding:8px 16px;opacity:.75;background:transparent;box-shadow:none;border:2px solid currentColor";
+  n.addEventListener("click", function () { if (confirm("Start over? Your saved progress will be erased.")) { NOSAVE = true; try { localStorage.removeItem(SAVE_KEY); } catch (e) {} location.reload(); } });
+  b.parentNode.insertBefore(n, b.nextSibling);
+}
+setInterval(function () { if (!document.hidden) saveGame(); }, 12000);
+document.addEventListener("visibilitychange", function () { if (document.hidden) saveGame(); });
+window.addEventListener("pagehide", saveGame);
 
 /* ---------------- TEST PROBE ---------------- */
 window.__bb = {
