@@ -4,12 +4,13 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 ## Versions
 
-- `index.html` — the 2D original, fastest to load.
+- `index.html` — the landing page: tiles for the 2D original, the 3D version, and a changelog.
+- `brick-by-brick-2d.html` — the 2D original, fastest to load.
 - `brick-by-brick-3d.html` — the latest version, 3D (v7.3).
 
 ## How to play
 
-Open either file in a browser. Mold bricks in the kiln, place them to build courses, earn money per brick and per row, buy upgrades, and chase combos. Reach 50 courses to win, then keep building in endless mode.
+Open `index.html` in a browser and pick a version. Mold bricks in the kiln, place them to build courses, earn money per brick and per row, buy upgrades, and chase combos. Reach 50 courses to win, then keep building in endless mode.
 
 Made for a November game jam.
 
@@ -71,4 +72,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`.
