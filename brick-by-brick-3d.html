@@ -186,7 +186,7 @@
       .pop-text.gold{ color:#ffd94d; } .pop-text.green{ color:#8ff0a4; } .pop-text.red{ color:#ff6b5b; } .pop-text.white{ color:#fff; }
       .vbubble{ position:absolute; left:0; top:0; z-index:43; max-width:190px; pointer-events:none; background:#fffaf0; color:#221407; border:3px solid #221407; box-shadow:3px 3px 0 #221407;
         padding:6px 9px; font-weight:800; font-size:12.5px; line-height:1.25; will-change:transform; }
-      .vbubble::after{ content:""; position:absolute; left:50%; bottom:-8px; width:10px; height:10px; margin-left:-5px; background:#fffaf0; border:3px solid #221407; border-top:0; border-left:0; transform:rotate(45deg); }
+      .vbubble::after{ content:""; position:absolute; left:50%; top:-8px; width:10px; height:10px; margin-left:-5px; background:#fffaf0; border:3px solid #221407; border-bottom:0; border-right:0; transform:rotate(45deg); }
       .coin{ position:absolute; width:18px; height:18px; border-radius:50%; z-index:41; pointer-events:none; left:0; top:0; will-change:transform;
         background:radial-gradient(circle at 35% 30%, #fffbd0 0 14%, #ffd94d 16% 55%, #e0a30a 58%); border:2px solid #7a5200;
         box-shadow:inset 0 0 0 2px rgba(255,255,255,.35), 0 0 8px 2px rgba(255,217,77,.65); }
@@ -206,6 +206,16 @@
       #banner .bn-big{ display:block; font-family:'Archivo Black',sans-serif; font-size:26px; letter-spacing:.04em; color:var(--gold); }
       #banner .bn-small{ display:block; font-weight:800; font-size:11.5px; letter-spacing:.1em; }
       @keyframes bannerSweep{ 0%{ transform:translateX(-110%) } 14%{ transform:translateX(0) } 82%{ transform:translateX(0) } 100%{ transform:translateX(110%) } }
+      #payday{ position:absolute; inset:0; z-index:47; pointer-events:none; overflow:hidden; }
+      #payday .pd-card{ position:absolute; left:50%; top:22%; width:min(84vw,340px); text-align:center; background:var(--panel); color:var(--ink); border:4px solid var(--line);
+        box-shadow:6px 6px 0 var(--shadowc); padding:12px 14px 14px; opacity:0; transform:translate(-50%,-30px) scale(.6); }
+      #payday .pd-card.show{ animation:pdCard 3.6s cubic-bezier(.2,.9,.2,1) forwards; }
+      #payday .pd-big{ display:block; font-family:'Archivo Black',sans-serif; font-size:34px; letter-spacing:.04em; color:#ffd94d; -webkit-text-stroke:2px #221407; text-shadow:3px 3px 0 #221407; }
+      #payday .pd-sub{ display:block; font-weight:800; font-size:13px; line-height:1.3; margin-top:2px; }
+      #payday .pd-amt{ display:inline-block; margin-top:8px; font-family:'Archivo Black',sans-serif; font-size:30px; color:#1f6b36; background:#d9f5df; border:3px solid #221407; padding:2px 14px; box-shadow:3px 3px 0 #221407; }
+      #payday .coin{ position:absolute; z-index:1; }
+      @keyframes pdCard{ 0%{ opacity:0; transform:translate(-50%,-30px) scale(.6) } 9%{ opacity:1; transform:translate(-50%,0) scale(1.12) } 15%{ transform:translate(-50%,0) scale(1) }
+        82%{ opacity:1; transform:translate(-50%,0) scale(1) } 100%{ opacity:0; transform:translate(-50%,-26px) scale(.96) } }
       #big-word{ position:absolute; left:50%; top:40%; z-index:44; pointer-events:none; font-family:'Archivo Black',sans-serif; font-size:52px; color:#ff4a3a;
         -webkit-text-stroke:2px #221407; text-shadow:4px 4px 0 #221407; opacity:0; transform:translate(-50%,-50%) rotate(-6deg); white-space:nowrap; }
       #big-word.show{ animation:bigWord .75s ease-out; }
@@ -466,6 +476,7 @@
       <div id="big-word"></div>
       <div id="toast"></div>
       <div id="banner"><span class="bn-big" id="bn-big"></span><span class="bn-small" id="bn-small"></span></div>
+      <div id="payday" aria-hidden="true"></div>
       <div id="reveal" class="hidden" data-ui>
         <div class="hr-brick" id="hr-brick"></div>
         <div class="hr-title" id="hr-title"></div>
@@ -579,8 +590,8 @@ var GRAB_TIME = 10;           // seconds a hand needs to rip a brick free
    - A finished row pays 2 × rate (doubled if clean). Smashing a hand pays 10 × rate.
    - The kiln only bakes while you HOLD it. Banked Coals (shop) lets it
      smoulder on its own once you've earned it. The apprentice pays flat rate.
-   The upgrade tree costs ≈31k coins in total; a strong player earns ≈30k
-   over the whole 100 courses, so the tree is nearly — never quite — complete. */
+   The upgrade tree costs ≈28k coins in total (re-priced for the 6-wide wall and 24-brick tower
+   rings so each upgrade still arrives at the same point in real time as before). */
 var TYPE_MULT = { normal: 1, gold: 3, hot: 2, lead: 4, glass: 5 };
 var BASE_PAY = 2;
 var PAY_FROM_ROW = 6;         // rows 1-5 are unpaid: the town only offers to pay you once row 5 is done
@@ -603,7 +614,7 @@ var LEVEL_MULT = [1, 0.6, 0.3];          // Spirit Level: how much of the tremor
 
 var S = {
   started: false, won: false, endless: false, goal: FIRST_GOAL,
-  molded: 0, laid: 0, drops: 0, hits: 0, courses: 0, best: 0, inCourse: 0, perCourse: 8, tower: false, towerStart: 0, perFace: 4,
+  molded: 0, laid: 0, drops: 0, hits: 0, courses: 0, best: 0, inCourse: 0, perCourse: 6, tower: false, towerStart: 0, perFace: 6,
   money: 0, earned: 0, misses: 0, perfects: 0, bestStreak: 0, rowMisses: 0, smashed: 0, stolen: 0, lost: 0,
   time: 0, playTime: 0, lastAct: 0,
   moldT: 0, held: false,
@@ -677,58 +688,58 @@ var ICON = {
   level: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="2.5" y="9" width="19" height="6" rx="1"/><circle cx="12" cy="12" r="1.6"/><path d="M8 9v2M16 9v2"/></svg>'
 };
 var LINES = [
-  { id: "perBrick", icon: "gilded", name: "Piece Work", costs: [25], gate: function () { return S.best >= PAY_FROM_ROW - 1; },
+  { id: "perBrick", icon: "gilded", name: "Piece Work", costs: [15], gate: function () { return S.best >= PAY_FROM_ROW - 1; },
     effect: function (t) { return "Every brick you lay pays $" + rate() + " (plus type and perfect bonuses)."; },
     next: function (t) { return "Get paid for every brick, not just finished rows. A plain brick pays $" + rate() + "."; } },
-  { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [70], gate: function () { return S.tier.perBrick >= 1; },
+  { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [65], gate: function () { return S.tier.perBrick >= 1; },
     effect: function (t) { return "Hits in a row build a streak bonus (+5% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
     next: function (t) { return "Land bricks in a row to build a STREAK multiplier on every brick. Miss and it resets."; } },
-  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [20, 65, 160, 360, 720], gate: function () { return true; },
+  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [15,  60,  135,  310,  610], gate: function () { return true; },
     effect: function (t) { return "Bakes a brick every " + BAKE_TIMES[t] + "s while you hold the kiln."; },
     next: function (t) { return "Bake time " + BAKE_TIMES[t] + "s → " + BAKE_TIMES[t + 1] + "s while held." + (t === 1 ? " Something about the heat…" : ""); } },
-  { id: "bellows", icon: "bellows", name: "Banked Coals", costs: [90, 280, 750], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
+  { id: "bellows", icon: "bellows", name: "Banked Coals", costs: [85,  240,  640], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
     effect: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t] * 100) + "% speed."; },
     next: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t + 1] * 100) + "% speed — bricks while your hands are busy."; } },
-  { id: "steady", icon: "steady", name: "Steady Hands", costs: [50, 170, 480], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
+  { id: "steady", icon: "steady", name: "Steady Hands", costs: [45,  145,  410], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return t >= 3 ? "Window +60% and the ALMOST RING — near misses swing again." : "Drop window +" + Math.round((STEADY_MULT[t] - 1) * 100) + "% wider."; },
     next: function (t) { return t === 2 ? "Adds the ALMOST RING: land just outside and the brick swings again — streak safe." : "Drop window +" + Math.round((STEADY_MULT[t + 1] - 1) * 100) + "% wider — the gold zone on the crane grows."; } },
-  { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [70, 230, 640], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
+  { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [65,  195,  540], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return GILD_PCT[t] + "% of bricks come out golden (×3 pay)."; },
     next: function (t) { return GILD_PCT[t + 1] + "% of bricks come out golden — golden bricks pay ×3."; } },
-  { id: "secondChance", icon: "second", name: "Second Chance", costs: [55, 200, 560], gate: function () { return S.tier.perBrick >= 1 && S.best >= 4; },
+  { id: "secondChance", icon: "second", name: "Second Chance", costs: [50,  170,  480], gate: function () { return S.tier.perBrick >= 1 && S.best >= 4; },
     effect: function (t) { return "Forgives " + t + " miss" + (t > 1 ? "es" : "") + " per row."; },
     next: function (t) { return "Forgive " + (t + 1) + " miss" + (t > 0 ? "es" : "") + " per row — the brick comes back, the streak survives."; } },
-  { id: "autoLayer", icon: "apprentice", name: "Apprentice", costs: [110], gate: function () { return S.tier.perBrick >= 1 && S.best >= 5; },
+  { id: "autoLayer", icon: "apprentice", name: "Apprentice", costs: [105], gate: function () { return S.tier.perBrick >= 1 && S.best >= 5; },
     effect: function (t) { return "An apprentice lays a plain brick when you pause or your hand overflows. Flat rate, never touches specials."; },
     next: function (t) { return "Hire an apprentice: lays a plain brick every " + AL_INT[0] + "s when you pause or hold 4+. The slot glows and counts down before they place it."; } },
-  { id: "fasterApp", icon: "precision", name: "Faster Apprentices", costs: [300, 720, 1500], gate: function () { return S.tier.autoLayer >= 1; },
+  { id: "fasterApp", icon: "precision", name: "Faster Apprentices", costs: [255,  610,  1280], gate: function () { return S.tier.autoLayer >= 1; },
     effect: function (t) { return "Apprentices lay every " + AL_INT[t] + "s."; },
     next: function (t) { return "Apprentices lay every " + AL_INT[t] + "s → " + AL_INT[t + 1] + "s."; } },
-  { id: "moreApp", icon: "crowd", name: "More Apprentices", costs: [450, 1100], gate: function () { return S.tier.autoLayer >= 1; },
+  { id: "moreApp", icon: "crowd", name: "More Apprentices", costs: [380,  940], gate: function () { return S.tier.autoLayer >= 1; },
     effect: function (t) { return "Each trip lays " + (1 + t) + " bricks at once."; },
     next: function (t) { return "Each trip lays " + (2 + t) + " bricks at once instead of " + (1 + t) + " (needs that many plain bricks in hand)."; } },
-  { id: "predictable", icon: "plumb", name: "Predictable Placement", costs: [350], gate: function () { return S.tier.perBrick >= 1 && S.best >= 8; },
+  { id: "predictable", icon: "plumb", name: "Predictable Placement", costs: [300], gate: function () { return S.tier.perBrick >= 1 && S.best >= 8; },
     effect: function (t) { return "The crane arm brings each brick in a set distance from the slot, so you get about the same time to place it."; },
     next: function (t) { return "The crane always brings the next brick in from a set distance from the slot — about the same time to place every brick, however fast it climbs."; } },
-  { id: "hotMortar", icon: "mortar", name: "Hot Mortar", costs: [240, 800], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
-    effect: function (t) { return S.tower ? "Tower sides need " + [4, 3, 2][t] + " bricks." : "Rows need " + (8 - t) + " bricks."; },
-    next: function (t) { return S.tower ? "Tower sides need " + [4, 3, 2][t + 1] + " bricks instead of " + [4, 3, 2][t] + " — climb faster." : "Rows need " + (7 - t) + " bricks instead of " + (8 - t) + " — climb faster."; } },
-  { id: "precision", icon: "precision", name: "Precision Gears", costs: [150, 450, 1100], gate: function () { return S.flags.precisionShown; },
+  { id: "hotMortar", icon: "mortar", name: "Hot Mortar", costs: [205,  680], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
+    effect: function (t) { return S.tower ? "Tower sides need " + [6, 5, 4][t] + " bricks." : "Rows need " + (6 - t) + " bricks."; },
+    next: function (t) { return S.tower ? "Tower sides need " + [6, 5, 4][t + 1] + " bricks instead of " + [6, 5, 4][t] + " — climb faster." : "Rows need " + (5 - t) + " bricks instead of " + (6 - t) + " — climb faster."; } },
+  { id: "precision", icon: "precision", name: "Precision Gears", costs: [130,  380,  940], gate: function () { return S.flags.precisionShown; },
     effect: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t + 1]) * 100) + "% — the crane gets faster as you climb."; } },
-  { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [220, 640], gate: function () { return S.best >= PLUMB_COURSE; },
+  { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [185,  540], gate: function () { return S.best >= PLUMB_COURSE; },
     effect: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t] + " wider."; },
     next: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t + 1] + " wider — perfects pay ×1.5."; } },
-  { id: "crowd", icon: "crowd", name: "Crowd Favor", costs: [350, 900, 2000, 4000], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
+  { id: "crowd", icon: "crowd", name: "Crowd Favor", costs: [300,  760,  1700,  3400], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
     effect: function (t) { return "Streak bonus caps at ×" + fmtMult(CAP[t]) + "."; },
     next: function (t) { return "Streak cap ×" + fmtMult(CAP[t]) + " → ×" + fmtMult(CAP[t + 1]) + ". The crowd wants a show."; } },
-  { id: "glaze", icon: "glaze", name: "Slippery Glaze", costs: [300, 800, 1900], gate: function () { return S.best >= HAND_COURSE; },
+  { id: "glaze", icon: "glaze", name: "Slippery Glaze", costs: [255,  680,  1620], gate: function () { return S.best >= HAND_COURSE; },
     effect: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s to rip a brick free."; },
     next: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s → " + (GRAB_TIME + GLAZE_ADD[t + 1]) + "s to rip a brick free — more time to smash them."; } },
-  { id: "lantern", icon: "lantern", name: "Sky Lantern", costs: [700, 1600, 3200], gate: function () { return S.best >= MIST_COURSE; },
+  { id: "lantern", icon: "lantern", name: "Sky Lantern", costs: [600,  1360,  2700], gate: function () { return S.best >= MIST_COURSE; },
     effect: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t + 1]) * 100) + "% — see the crane through the weather."; } },
-  { id: "level", icon: "level", name: "Spirit Level", costs: [1400, 3000], gate: function () { return S.best >= TREMOR_COURSE; },
+  { id: "level", icon: "level", name: "Spirit Level", costs: [1200,  2550], gate: function () { return S.best >= TREMOR_COURSE; },
     effect: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t + 1]) * 100) + "% — the drop zone sways less."; } }
 ];
@@ -836,15 +847,15 @@ function humStop() {
    world.js — the Three.js scene: toon-shaded wall with ink outlines,
    day→dusk→night sky, the hole, town + crowd, crane, particles, camera.
    ===================================================================== */
-var WALL_W = 8, PITCH = 0.5, BH = 0.44, BD = 0.62, GAP = 0.08, FOUND = 0.22, OUTLINE = 0.032;
+var WALL_W = 6, PITCH = 0.5, BH = 0.44, BD = 0.62, GAP = 0.08, FOUND = 0.22, OUTLINE = 0.032;
 /* ----- TOWER (from the row-5 ask) -----
-   The tower is a 4x4 footprint standing behind the middle of your wall. Face 0 is the front (in line with
+   The tower is a 6x6 footprint (same width as the wall) standing behind the middle of your wall. Face 0 is the front (in line with
    the wall), then right, back, left. A course is a full ring: 4 sides x perFace bricks, and the camera
    walks round to each side as you finish the one before. Gameplay code works in "face-local" space
    (x along the side, z out of it) inside W3.orbit; faceToWorld() places bricks on the real side. */
-var TW = 4, TH = TW / 2, TOWER_CUT = 4.6;
+var TW = 6, TH = TW / 2, TOWER_CUT = 4.6;
 function FW() { return S.tower ? TW : WALL_W; }
-function towerPerFace() { return [4, 3, 2][S.tier.hotMortar] || 2; }
+function towerPerFace() { return [6, 5, 4][S.tier.hotMortar] || 4; }
 function perFace() { return S.tower ? S.perFace : S.perCourse; }
 function curFace() { return S.tower ? Math.min(3, Math.floor(S.inCourse / S.perFace)) : 0; }
 function curSlot() { return S.tower ? S.inCourse - curFace() * S.perFace : S.inCourse; }
@@ -1181,7 +1192,7 @@ function buildCrowd() {
   updateCrowd(0);
 }
 var _mp = new THREE.Matrix4(), _ml = new THREE.Matrix4(), _mw = new THREE.Matrix4();
-var CROWD_BY = [0, 4, 8, 12, 16, 20, 22, 24, 26, 28, 30];    // villagers on site after each finished row (best course)
+var CROWD_BY = [0, 2, 4, 6, 8, 11, 14, 18, 22, 26, 30];    // villagers on site after each finished row (best course) — a slow trickle at first, a crowd by row 10
 function crowdTarget() { return S.started ? (S.best >= 10 ? 30 : CROWD_BY[S.best]) : 0; }
 function updateCrowd(dt) {
   var want = crowdTarget();
@@ -1213,9 +1224,9 @@ function buildKiln() {
   W3.kilnMouthMat = new THREE.MeshBasicMaterial({ color: 0x5a1a06 });
   var mouth = new THREE.Mesh(new THREE.CircleGeometry(0.42, 16, 0, Math.PI), W3.kilnMouthMat);
   mouth.position.set(0, 0.3, 1.08); mouth.userData.keep = true; k.add(mouth);
-  k.position.set(-8.8, 0, -2.2); k.rotation.y = 0.6;
+  k.position.set(-7.8, 0, -2.2); k.rotation.y = 0.6;
   scene.add(k); W3.kiln = k; bake(k);
-  W3.kilnChimney = new THREE.Vector3(-8.8 + 0.05, 2.0, -2.2 - 0.4);
+  W3.kilnChimney = new THREE.Vector3(-7.8 + 0.05, 2.0, -2.2 - 0.4);
   // brick pallet beside the wall
   var pal = new THREE.Group();
   add(pal, new THREE.BoxGeometry(1.6, 0.15, 1.1), toon(0x9a6a3e), 0, 0.08, 0, 0.04);
@@ -1223,7 +1234,7 @@ function buildKiln() {
     var bb = add(pal, roundedBox(0.7, 0.3, 0.45, 0.04, 2), toon(0xb84a28), (i % 2) * 0.75 - 0.37, 0.3 + Math.floor(i / 2) * 0.32, 0, 0.03);
     bb.rotation.y = rand(-0.08, 0.08);
   }
-  pal.position.set(8.6, 0, -2.0); pal.rotation.y = -0.4; scene.add(pal); bake(pal);
+  pal.position.set(7.6, 0, -2.0); pal.rotation.y = -0.4; scene.add(pal); bake(pal);
 }
 
 /* ---------- the wall (instanced bricks + instanced outlines) ---------- */
@@ -2216,8 +2227,9 @@ function updateBubbles() {
   for (var i = BUBBLES.length - 1; i >= 0; i--) {
     var bb = BUBBLES[i], age = now - bb.born, d = W3.crowd[bb.idx];
     if (age > bb.life || !d) { if (bb.el.parentNode) bb.el.parentNode.removeChild(bb.el); BUBBLES.splice(i, 1); continue; }
-    var sp = toScreenW(d.x, 1.75, d.z), x = clamp(sp.x, 100, window.innerWidth - 100);
-    bb.el.style.transform = "translate(" + x.toFixed(1) + "px," + (sp.y - 8).toFixed(1) + "px) translate(-50%,-100%)";
+    // anchored just under the speaker's chin, tail pointing up at them — so it never covers the top courses
+    var sp = toScreenW(d.x, 0.62, d.z), x = clamp(sp.x, 100, window.innerWidth - 100), y = clamp(sp.y + 14, 60, window.innerHeight - 280);
+    bb.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) translate(-50%,0)";
     bb.el.style.opacity = Math.min(1, age / 250, (bb.life - age) / 500).toFixed(2);
   }
 }
@@ -2230,8 +2242,9 @@ var HOLE_TALK = {
 function villagersJoin(n) {
   var lines = HOLE_TALK[n]; if (!lines) return;
   var from = CROWD_BY[n - 1] || 0, to = CROWD_BY[n] || from;
+  var second = to - from >= 2 ? from + 1 : Math.max(0, from - 1);     // never let both lines come from one villager
   villagerSay(from, lines[0], 700);
-  villagerSay(Math.min(to - 1, from + 1), lines[1], 2200);
+  villagerSay(second, lines[1], 2200);
 }
 function crowdCheer(sec) { for (var i = 0; i < W3.crowd.length; i++) W3.crowd[i].jump = Math.max(W3.crowd[i].jump, sec * rand(0.7, 1.1)); }
 function tickFalling(dt) {
@@ -2279,8 +2292,37 @@ function credit(amount) {
   if (!S.workshopShown && S.started) {
     S.workshopShown = true;
     revealEl($("btn-shop")); $("btn-shop").classList.add("shop-pulse");
-    enqueueHint("shop", "First payday! The WORKSHOP is open — spend your coins.", "btn-shop", true);
+    firstPayday(amount);          // popup + coin shower; the WORKSHOP hint follows once it clears
   }
+}
+// The first time the villagers pay you is easy to miss in the action, so it gets its own moment:
+// a PAYDAY card, a shower of coins from the top of the screen, a cheer from the crowd — then the shop hint.
+function firstPayday(amount) {
+  whenLanded(function () {
+    setTimeout(function () {
+      var host = $("payday"); if (!host) return;
+      var card = document.createElement("div"); card.className = "pd-card";
+      card.innerHTML = '<span class="pd-big">PAYDAY!</span><span class="pd-sub">The villagers are paying you for your work.</span><span class="pd-amt">+$' + fmt(amount) + '</span>';
+      host.appendChild(card); void card.offsetWidth; card.classList.add("show");
+      snd.fanfare(); crowdCheer(2.4); flashScreen(0.25); popEl(el.hudMoney);
+      var W = window.innerWidth, H = window.innerHeight, n = REDUCED ? 14 : 44;
+      for (var i = 0; i < n; i++) (function (i) {
+        var c = document.createElement("div"); c.className = "coin";
+        var x = rand(8, W - 26), delay = rand(0, 1300), dur = rand(1100, 1800), spin = rand(-260, 260);
+        c.style.left = x + "px"; c.style.top = "-30px"; host.appendChild(c);
+        var a = c.animate([
+          { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+          { transform: "translate(" + rand(-24, 24).toFixed(0) + "px," + (H * 0.55).toFixed(0) + "px) rotate(" + (spin / 2).toFixed(0) + "deg)", opacity: 1, offset: 0.55 },
+          { transform: "translate(" + rand(-36, 36).toFixed(0) + "px," + (H + 40) + "px) rotate(" + spin.toFixed(0) + "deg)", opacity: 1 }
+        ], { duration: dur, delay: delay, easing: "cubic-bezier(.45,0,.9,.6)", fill: "backwards" });
+        fxKill(c, a, dur + delay + 300);
+        setTimeout(function () { snd.clink(); }, delay + dur * 0.8);
+      })(i);
+      for (var k = 0; k < 6; k++) setTimeout(function () { snd.coin(); }, 150 + k * 170);
+      fxKill(card, null, 3900);
+      setTimeout(function () { enqueueHint("shop", "The WORKSHOP is open — spend your coins.", "btn-shop", true); }, 3700);
+    }, 600);
+  });
 }
 
 /* ---------------- MISSES ---------------- */
@@ -2462,7 +2504,7 @@ function buyLine(id) {
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
     else {
-      S.perCourse = 8 - S.tier.hotMortar;
+      S.perCourse = 6 - S.tier.hotMortar;
       refitWallRow(S.courses + 1, S.perCourse);
       toast("Hot mortar! Rows now take " + S.perCourse + " bricks.", 3400);
       if (S.inCourse >= S.perCourse) completeCourse();
@@ -3632,7 +3674,7 @@ window.__bb = {
   spawnHand: spawnHand, queueRaid: queueRaid, hazards: hazardsFor, updateHazards: updateHazards,
   startTower: startTower, orbit: function () { return { ang: W3.orbitAng, t: W3.orbitT, turning: CAM.turning, face: curFace(), slot: curSlot() }; },
   startRim: startRim, startVictory: startVictory, milestone: milestone,
-  setTier: function (id, t) { S.tier[id] = t; if (id === "hotMortar") S.perCourse = 8 - t; renderHUD(); },
+  setTier: function (id, t) { S.tier[id] = t; if (id === "hotMortar") S.perCourse = 6 - t; renderHUD(); },
   money: function (m) { S.money = m; S.earned += m; renderHUD(); },
   grabNow: function () { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && HANDS[i].state === "grip") HANDS[i].timer = 0.01; },
   handNeed: handNeed, nearestHand: nearestHand, handCount: handCount
