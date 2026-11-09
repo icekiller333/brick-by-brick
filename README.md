@@ -5,7 +5,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 ## Versions
 
 - `index.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v3.2).
+- `brick-by-brick-3d.html` — the latest version, 3D (v7.3).
 
 ## How to play
 
@@ -58,6 +58,17 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
 
+### 3D v7.3 — Nov 9, 2026 (round 3 feedback, most of it)
+
+- Villager text now appears below their heads; background music added — calm medieval for the first 5 rows, upbeat energetic medieval after that, a bit eerie at row 25, spooky at row 50, melty and weird (but still enjoyable) at row 75.
+- Crowd builds 1 person on day 2, 2 on day 3, 4 on day 4, 6 on day 5; automatic saving added.
+- Tower: villagers spread around every side, and pay per row now means per row per face (one full side, one layer).
+- Upgrade prices reflect their value: Hotter Kiln first upgrade $10, Piece Work (pay per brick) $50; initial pay per brick is $1.
+- Combo celebrations: backflips every 5, triple-height somersaults every 25, triple jumps every 50.
+- Silver added as an unlockable brick type; unlock order lead → silver → gold; all buyable unlocks now chained in a visual skill-tree tab interface.
+- Perfects as a paid upgrade; the coin shower now shows the actual amount paid; birds and things flying by are tappable with per-type reactions; the streak rises 0.01 per brick.
+- Still open: Brick Sorter with separate warehouses per brick type, apprentices pulling from the selected warehouse (round 3 items 16, 17, 20); same-type streak bonuses, whole-row bonus, gold +3 / lead +2 row bonuses (18, 19, 21–23); tower sides built by hand instead of auto-built (5); the full economy rebalance (7, 8, 27), since those prices depend on the above.
+
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again.
