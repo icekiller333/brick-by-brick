@@ -343,7 +343,7 @@
       .ld-bar i{ display:block; height:100%; width:0; background:linear-gradient(90deg,#f5b921,#e0704a); animation:ldFill 1.3s ease-in-out forwards; }
       @keyframes ldFill{ to{ width:100% } }
       /* start: a glowing "something" in the sky, drifting bricks, a punchier title */
-      #ov-start{ overflow:hidden; background:linear-gradient(180deg, rgba(20,12,4,0) 20%, rgba(20,12,4,.5) 100%); }
+      #ov-start{ overflow:hidden; background:linear-gradient(180deg, rgba(40,16,80,0) 20%, rgba(30,10,56,.55) 100%); }
       #ov-start .title-wrap, #ov-start .cta-btn, #ov-start .start-how{ position:relative; z-index:2; }
       #ov-start .st-glow{ position:absolute; z-index:1; left:50%; top:6%; width:170px; height:170px; margin-left:-85px; border-radius:50%; pointer-events:none;
         background:radial-gradient(circle, #fff 0 7%, rgba(255,255,255,.8) 11%, rgba(255,246,200,.3) 38%, rgba(255,246,200,0) 70%); animation:holePulse 3s ease-in-out infinite; }
@@ -355,7 +355,43 @@
       #ov-start .st-float i:nth-child(5){ left:70%; animation-delay:2.6s; background:#e0704a } #ov-start .st-float i:nth-child(6){ left:84%; animation-delay:4.2s }
       #ov-start .st-float i:nth-child(7){ left:46%; animation-delay:5.3s; background:#f5b921 }
       @keyframes stFloat{ 0%{ transform:translateY(0) rotate(0); opacity:0 } 12%{ opacity:.9 } 100%{ transform:translateY(-75vh) rotate(170deg); opacity:0 } }
-      .title-kick{ font-weight:800; font-size:11.5px; letter-spacing:.3em; color:#fff; text-shadow:0 2px 0 #221407; margin-bottom:10px; animation:fadeIn .6s .55s both; }
+      .title-kick{ display:inline-block; font-weight:800; font-size:12.5px; letter-spacing:.24em; color:#ffe9a8; text-shadow:0 2px 0 #221407; margin-bottom:12px; padding:7px 14px 6px;
+        background:rgba(24,14,4,.72); border:2px solid #221407; box-shadow:3px 3px 0 #221407; animation:fadeIn .6s .55s both; }
+
+      /* ---------- story cards ---------- */
+      #cards{ position:absolute; inset:0; z-index:68; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding:calc(14px + var(--safe-t)) 16px calc(14px + var(--safe-b));
+        background:radial-gradient(ellipse at 50% 30%, rgba(96,56,170,.55), rgba(14,8,30,.9)); animation:fadeIn .25s ease; touch-action:none; user-select:none; -webkit-user-select:none; overflow:hidden; }
+      #cards.closing{ animation:fadeOut .24s ease forwards; pointer-events:none; }
+      #cards::before{ content:""; position:absolute; inset:0; pointer-events:none; opacity:.6;
+        background:radial-gradient(circle at 20% 25%, #fff 0 1px, transparent 2px), radial-gradient(circle at 78% 18%, #ffe9a0 0 1.5px, transparent 2.5px), radial-gradient(circle at 64% 72%, #aef6ff 0 1px, transparent 2px), radial-gradient(circle at 12% 80%, #ffb0e0 0 1.5px, transparent 2.5px), radial-gradient(circle at 88% 55%, #fff 0 1px, transparent 2px); }
+      #cards-deck{ position:relative; width:min(92vw,400px); touch-action:none; }
+      .cd{ background:var(--panel); border:4px solid var(--line); box-shadow:var(--shadow); }
+      .cd-ghost{ position:absolute; inset:0; background:var(--panel2); }
+      .cd-ghost.g1{ transform:translate(7px,9px) rotate(2.2deg); } .cd-ghost.g2{ transform:translate(-8px,15px) rotate(-3deg); opacity:.85; }
+      #cards-deck.last .cd-ghost{ display:none; }
+      .cd-front{ position:relative; cursor:grab; will-change:transform; }
+      .cd-front:active{ cursor:grabbing; }
+      .cd-front.enter{ animation:cdIn .38s cubic-bezier(.2,1.2,.3,1); }
+      @keyframes cdIn{ from{ transform:translateY(26px) scale(.92) rotate(-2.5deg); opacity:0 } to{ transform:none; opacity:1 } }
+      .cd-pic{ position:relative; aspect-ratio:440 / 340; background:#3a2a60; border-bottom:4px solid var(--line); overflow:hidden; }
+      .cd-pic img{ display:block; width:100%; height:100%; object-fit:cover; pointer-events:none; animation:cdBob 3.2s ease-in-out infinite; transform-origin:50% 60%; }
+      @keyframes cdBob{ 0%,100%{ transform:scale(1.02) translateY(0) } 50%{ transform:scale(1.035) translateY(-3px) } }
+      .cd-nopic{ width:100%; height:100%; display:grid; place-items:center; font-size:84px; }
+      .cd-tag{ position:absolute; left:10px; bottom:10px; font-family:'Archivo Black',sans-serif; font-size:13px; letter-spacing:.1em; color:#221407; background:var(--gold); border:3px solid #221407; box-shadow:3px 3px 0 #221407; padding:4px 10px; transform:rotate(-3deg); }
+      .cd-tag.elder{ background:#c9a8ff; }
+      .cd-body{ padding:13px 16px 16px; }
+      .cd-kicker{ font-size:11px; font-weight:800; letter-spacing:.16em; color:var(--clay-d); margin:0 0 6px; }
+      .cd-text{ margin:0; font-weight:700; font-size:17px; line-height:1.45; }
+      .cd-chip{ display:inline-flex; flex-direction:column; align-items:center; margin-top:12px; padding:7px 18px 6px; background:var(--clay); color:#fff; border:3px solid var(--line); box-shadow:var(--shadow-s); animation:kilnNudge .9s ease-in-out infinite; }
+      .cd-chip b{ font-family:'Archivo Black',sans-serif; font-size:16px; letter-spacing:.06em; } .cd-chip small{ font-size:9px; font-weight:800; letter-spacing:.2em; }
+      #cards-foot{ position:relative; z-index:2; width:min(92vw,400px); display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:8px; }
+      #cards-dots{ display:flex; gap:7px; } #cards-dots i{ width:10px; height:10px; border:2px solid #fff; background:transparent; transform:rotate(45deg); } #cards-dots i.on{ background:var(--gold); border-color:var(--gold); }
+      #cards-hint{ font-size:11px; font-weight:800; letter-spacing:.3em; color:#fff; opacity:.85; animation:cdHint 1.4s ease-in-out infinite; text-shadow:0 2px 0 #221407; }
+      @keyframes cdHint{ 0%,100%{ transform:translateX(-7px) } 50%{ transform:translateX(7px) } }
+      #settings{ z-index:72; }
+      #ov-start .st-settings{ position:absolute; z-index:5; top:calc(12px + var(--safe-t)); right:calc(12px + var(--safe-r)); width:44px; height:44px; padding:0; display:grid; place-items:center;
+        background:var(--panel); color:var(--ink); border:3px solid var(--line); box-shadow:var(--shadow-s); }
+      #ov-start .st-settings svg{ width:22px; height:22px; }
       #ov-start .t-brick{ display:inline-block; animation:tBob 2.4s ease-in-out infinite; text-shadow:5px 5px 0 #221407, 0 0 22px rgba(255,140,60,.8); }
       @keyframes tBob{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-5px) } }
       #btn-begin{ font-size:24px; padding:15px 54px; letter-spacing:.06em; }
@@ -565,8 +601,14 @@
           <h1 class="title">BRICK<br />BY <span class="t-brick">BRICK</span></h1>
           <p class="tagline">Tap. Stack. Climb. And try not to look up.</p>
         </div>
+        <button class="st-settings pressable" id="btn-settings-start" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
         <button class="cta-btn" id="btn-begin">START</button>
         <p class="start-how"><b>Hold</b> the kiln to bake · <b>tap anywhere</b> to drop · sound on</p>
+      </div>
+
+      <div id="cards" class="hidden" data-ui>
+        <div id="cards-deck"><div class="cd cd-ghost g2"></div><div class="cd cd-ghost g1"></div></div>
+        <div id="cards-foot"><div id="cards-dots" aria-hidden="true"></div><button class="cta-btn" id="cards-next">NEXT</button><div id="cards-hint">‹ SWIPE ›</div></div>
       </div>
 
       <div class="overlay hidden" id="ov-victory" data-ui>
@@ -658,7 +700,7 @@ var LEVEL_MULT = [1, 0.6, 0.3];          // Spirit Level: how much of the tremor
 
 var S = {
   started: false, won: false, endless: false, goal: FIRST_GOAL,
-  molded: 0, laid: 0, drops: 0, hits: 0, courses: 0, best: 0, inCourse: 0, perCourse: 6, tower: false, towerStart: 0, perFace: 6,
+  molded: 0, laid: 0, drops: 0, hits: 0, courses: 0, best: 0, inCourse: 0, perCourse: 5, tower: false, towerStart: 0, perFace: 5,
   money: 0, earned: 0, misses: 0, perfects: 0, bestStreak: 0, rowMisses: 0, smashed: 0, stolen: 0, lost: 0,
   time: 0, playTime: 0, lastAct: 0,
   moldT: 0, held: false,
@@ -750,9 +792,9 @@ var LINES = [
   { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [70], gate: function () { return S.tier.perBrick >= 1; },
     effect: function (t) { return "Hits in a row build a streak bonus (+1% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
     next: function (t) { return "Land bricks in a row to build a STREAK multiplier on every brick. Miss and it resets."; } },
-  { id: "kilnSpeed", icon: "kiln", name: "Hotter Kiln", costs: [10,  70,  160,  300,  460], gate: function () { return true; },
+  { id: "kilnSpeed", noNow: true, icon: "kiln", name: "Hotter Kiln", costs: [10,  70,  160,  300,  460], gate: function () { return true; },
     effect: function (t) { return "Bakes a brick every " + BAKE_TIMES[t] + "s while you hold the kiln."; },
-    next: function (t) { return "Bake time " + BAKE_TIMES[t] + "s → " + BAKE_TIMES[t + 1] + "s while held." + (t === 1 ? " Something about the heat…" : ""); } },
+    next: function (t) { return "Bakes every " + BAKE_TIMES[t] + "s → " + BAKE_TIMES[t + 1] + "s while held." + (t === 1 ? " Something about the heat…" : ""); } },
   { id: "bellows", icon: "bellows", name: "Banked Coals", costs: [100,  190,  320], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
     effect: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t] * 100) + "% speed."; },
     next: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t + 1] * 100) + "% speed — bricks while your hands are busy."; } },
@@ -768,39 +810,39 @@ var LINES = [
   { id: "autoLayer", icon: "apprentice", name: "Apprentice", costs: [160], gate: function () { return S.tier.perBrick >= 1 && S.best >= 5; },
     effect: function (t) { return S.tier.sorter > 0 ? "An apprentice lays bricks from the warehouse you have selected when you pause or hold 4+. Flat rate — but metal rows still pay their bonuses." : "An apprentice lays a plain brick when you pause or your hand overflows. Flat rate, never touches specials."; },
     next: function (t) { return "Hire an apprentice: lays a plain brick every " + AL_INT[0] + "s when you pause or hold 4+. The slot glows and counts down before they place it."; } },
-  { id: "fasterApp", icon: "precision", name: "Faster Apprentices", costs: [200,  350,  525], gate: function () { return S.tier.autoLayer >= 1; },
+  { id: "fasterApp", noNow: true, icon: "precision", name: "Faster Apprentices", costs: [200,  350,  525], gate: function () { return S.tier.autoLayer >= 1; },
     effect: function (t) { return "Apprentices lay every " + AL_INT[t] + "s."; },
     next: function (t) { return "Apprentices lay every " + AL_INT[t] + "s → " + AL_INT[t + 1] + "s."; } },
-  { id: "moreApp", icon: "crowd", name: "More Apprentices", costs: [300,  525], gate: function () { return S.tier.autoLayer >= 1; },
+  { id: "moreApp", noNow: true, icon: "crowd", name: "More Apprentices", costs: [300,  525], gate: function () { return S.tier.autoLayer >= 1; },
     effect: function (t) { return "Each trip lays " + (1 + t) + " bricks at once."; },
-    next: function (t) { return "Each trip lays " + (2 + t) + " bricks at once instead of " + (1 + t) + " (needs that many plain bricks in hand)."; } },
+    next: function (t) { return "Each trip lays " + (2 + t) + " bricks instead of " + (1 + t) + " (needs that many plain bricks in hand)."; } },
   { id: "predictable", icon: "plumb", name: "Predictable Placement", costs: [100], gate: function () { return S.tier.perBrick >= 1 && S.best >= 8; },
     effect: function (t) { return "The crane arm brings each brick in a set distance from the slot, so you get about the same time to place it."; },
     next: function (t) { return "The crane always brings the next brick in from a set distance from the slot — about the same time to place every brick, however fast it climbs."; } },
-  { id: "hotMortar", icon: "mortar", name: "Hot Mortar", costs: [160,  420], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
-    effect: function (t) { return S.tower ? "Tower sides need " + [6, 5, 4][t] + " bricks." : "Rows need " + (6 - t) + " bricks."; },
-    next: function (t) { return S.tower ? "Tower sides need " + [6, 5, 4][t + 1] + " bricks instead of " + [6, 5, 4][t] + " — climb faster." : "Rows need " + (5 - t) + " bricks instead of " + (6 - t) + " — climb faster."; } },
+  { id: "hotMortar", noNow: true, icon: "mortar", name: "Hot Mortar", costs: [160,  420], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
+    effect: function (t) { return S.tower ? "Tower sides need " + [5, 4, 3][t] + " bricks." : "Rows need " + (5 - t) + " bricks."; },
+    next: function (t) { return S.tower ? "Tower sides drop to " + [5, 4, 3][t + 1] + " bricks — climb faster." : "Rows drop to " + (4 - t) + " bricks — climb faster."; } },
   { id: "precision", icon: "precision", name: "Precision Gears", costs: [100,  210,  400], gate: function () { return S.flags.precisionShown; },
     effect: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t + 1]) * 100) + "% — the crane gets faster as you climb."; } },
   { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [100,  240], gate: function () { return S.best >= PLUMB_COURSE; },
     effect: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t] + " wider."; },
     next: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t + 1] + " wider — more perfects, more pay."; } },
-  { id: "crowd", icon: "crowd", name: "Crowd Favor", costs: [95,  160,  280,  420], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
+  { id: "crowd", noNow: true, icon: "crowd", name: "Crowd Favor", costs: [95,  160,  280,  420], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
     effect: function (t) { return "Streak bonus caps at ×" + fmtMult(CAP[t]) + "."; },
     next: function (t) { return "Streak cap ×" + fmtMult(CAP[t]) + " → ×" + fmtMult(CAP[t + 1]) + ". The crowd wants a show."; } },
-  { id: "glaze", icon: "glaze", name: "Slippery Glaze", costs: [170,  260,  400], gate: function () { return S.best >= HAND_COURSE; },
+  { id: "glaze", noNow: true, icon: "glaze", name: "Slippery Glaze", costs: [170,  260,  400], gate: function () { return S.best >= HAND_COURSE; },
     effect: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s to rip a brick free."; },
-    next: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s → " + (GRAB_TIME + GLAZE_ADD[t + 1]) + "s to rip a brick free — more time to smash them."; } },
+    next: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s → " + (GRAB_TIME + GLAZE_ADD[t + 1]) + "s to rip a brick free."; } },
   { id: "lantern", icon: "lantern", name: "Sky Lantern", costs: [280,  400,  525], gate: function () { return S.best >= MIST_COURSE; },
     effect: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t + 1]) * 100) + "% — see the crane through the weather."; } },
   { id: "level", icon: "level", name: "Spirit Level", costs: [550,  725], gate: function () { return S.best >= TREMOR_COURSE; },
     effect: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Tremors shrink by " + Math.round((1 - LEVEL_MULT[t + 1]) * 100) + "% — the drop zone sways less."; } }
-  ,{ id: "perfect", icon: "star", name: "Perfect Eye", costs: [35, 110, 230],
+  ,{ id: "perfect", noNow: true, icon: "star", name: "Perfect Eye", costs: [35, 110, 230],
     effect: function (t) { return "PERFECT drops are on — they pay ×" + PERF_PAY[t] + "."; },
-    next: function (t) { return t === 0 ? "Start landing PERFECT drops: hit the white strip in the green zone for ×" + PERF_PAY[1] + " pay." : "PERFECT drops pay ×" + PERF_PAY[t + 1] + " instead of ×" + PERF_PAY[t] + "."; } },
+    next: function (t) { return t === 0 ? "Start landing PERFECT drops: hit the white strip in the green zone for ×" + PERF_PAY[1] + " pay." : "PERFECT drops pay ×" + PERF_PAY[t] + " → ×" + PERF_PAY[t + 1] + "."; } },
   { id: "lead", icon: "brick", name: "Lead Bricks", costs: [100],
     effect: function (t) { return "Lead bricks (×" + TYPE_MULT.lead + " pay, swing 40% faster) come out of the kiln. Each one in a finished row adds +" + ROW_ADD.lead + "× rate to that row's payout."; },
     next: function (t) { return "Unlock LEAD bricks: heavy and fast, worth ×" + TYPE_MULT.lead + " — and +" + ROW_ADD.lead + "× rate on every row they sit in. A run of lead earns bumps."; } },
@@ -939,15 +981,15 @@ function humStop() {
    world.js — the Three.js scene: toon-shaded wall with ink outlines,
    day→dusk→night sky, the hole, town + crowd, crane, particles, camera.
    ===================================================================== */
-var WALL_W = 6, PITCH = 0.5, BH = 0.44, BD = 0.62, GAP = 0.08, FOUND = 0.22, OUTLINE = 0.032;
+var WALL_W = 5, PITCH = 0.5, BH = 0.44, BD = 0.62, GAP = 0.08, FOUND = 0.22, OUTLINE = 0.032;
 /* ----- TOWER (from the row-5 ask) -----
    The tower is a 6x6 footprint (same width as the wall) standing behind the middle of your wall. Face 0 is the front (in line with
    the wall), then right, back, left. A course is a full ring: 4 sides x perFace bricks, and the camera
    walks round to each side as you finish the one before. Gameplay code works in "face-local" space
    (x along the side, z out of it) inside W3.orbit; faceToWorld() places bricks on the real side. */
-var TW = 6, TH = TW / 2, TOWER_CUT = 4.6;
+var TW = 5, TH = TW / 2, TOWER_CUT = 4.6;
 function FW() { return S.tower ? TW : WALL_W; }
-function towerPerFace() { return [6, 5, 4][S.tier.hotMortar] || 4; }
+function towerPerFace() { return [5, 4, 3][S.tier.hotMortar] || 3; }
 function perFace() { return S.tower ? S.perFace : S.perCourse; }
 function curFace() { return S.tower ? Math.min(3, Math.floor(S.inCourse / S.perFace)) : 0; }
 function curSlot() { return S.tower ? S.inCourse - curFace() * S.perFace : S.inCourse; }
@@ -978,6 +1020,23 @@ function toon(color, extra) {
   return new THREE.MeshToonMaterial(o);
 }
 var OUT_MAT = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
+/* ---------- see-through scenery ----------
+   Anything standing between the camera and the wall / tower (houses, trees, villagers, the kiln…) drops to ~50% alpha, so the bricks you are
+   working on are never fully hidden. Done in the shader: each fragment asks "does the view ray, carried on past me, hit the build box?" */
+var FADE = { uBMin: { value: new THREE.Vector3(-9, -9, -9) }, uBMax: { value: new THREE.Vector3(-9, -9, -9) }, uCam: { value: new THREE.Vector3() }, uAmt: { value: 0.5 } };
+function fadable(mat) {
+  mat.transparent = true;
+  mat.onBeforeCompile = function (sh) {
+    sh.uniforms.uBMin = FADE.uBMin; sh.uniforms.uBMax = FADE.uBMax; sh.uniforms.uCam = FADE.uCam; sh.uniforms.uAmt = FADE.uAmt;
+    sh.vertexShader = "varying vec3 vWP;\n" + sh.vertexShader.replace("#include <project_vertex>",
+      "#include <project_vertex>\n vec4 wp0 = vec4(transformed, 1.0);\n#ifdef USE_INSTANCING\n wp0 = instanceMatrix * wp0;\n#endif\n vWP = (modelMatrix * wp0).xyz;");
+    sh.fragmentShader = "varying vec3 vWP; uniform vec3 uBMin; uniform vec3 uBMax; uniform vec3 uCam; uniform float uAmt;\n" + sh.fragmentShader.replace("#include <dithering_fragment>",
+      "#include <dithering_fragment>\n { vec3 dv = vWP - uCam; float dd = length(dv); vec3 rd = dv / max(dd, 0.0001); vec3 iv = 1.0 / (rd + vec3(0.00001));\n  vec3 t1 = (uBMin - uCam) * iv; vec3 t2 = (uBMax - uCam) * iv; vec3 tn = min(t1, t2); vec3 tf = max(t1, t2);\n  float t0 = max(max(tn.x, tn.y), tn.z); float t3 = min(min(tf.x, tf.y), tf.z);\n  if (t3 > max(t0, 0.0) && t0 > dd + 0.05) gl_FragColor.a *= uAmt; }");
+  };
+  mat.customProgramCacheKey = function () { return "fade1"; };
+  return mat;
+}
+var FADE_OUT = fadable(new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide }));
 // Inverted-hull outline: a slightly larger back-face shell in ink.
 function outline(mesh, t) {
   var g = mesh.geometry; if (!g.boundingBox) g.computeBoundingBox();
@@ -1053,7 +1112,7 @@ function bake(root, opts) {
   // drop now-empty groups
   var empties = []; root.traverse(function (o) { if (o !== root && !o.isMesh && o.children.length === 0 && !(o.userData && o.userData.keep)) empties.push(o); });
   empties.forEach(function (o) { if (o.parent) o.parent.remove(o); });
-  if (!BAKE_TOON) { BAKE_TOON = toon(0xffffff, { vertexColors: true }); BAKE_BASIC = new THREE.MeshBasicMaterial({ vertexColors: true }); BAKE_OUT = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide, vertexColors: false }); }
+  if (!BAKE_TOON) { BAKE_TOON = fadable(toon(0xffffff, { vertexColors: true })); BAKE_BASIC = fadable(new THREE.MeshBasicMaterial({ vertexColors: true })); BAKE_OUT = FADE_OUT; }
   var res = {};
   if (fill.length) { res.fill = new THREE.Mesh(mergeInto(fill), BAKE_TOON); res.fill.receiveShadow = true; res.fill.castShadow = !!opts.cast; root.add(res.fill); }
   if (basic.length) { res.basic = new THREE.Mesh(mergeInto(basic), opts.basicMat || BAKE_BASIC); root.add(res.basic); }
@@ -1112,11 +1171,11 @@ function initWorld() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xffe3ae, 60, 260);
+  scene.fog = new THREE.Fog(0xffd9e0, 60, 260);
   camera = new THREE.PerspectiveCamera(40, 1, 0.1, 900);
   camera.position.set(6, 6, 22);
 
-  W3.hemi = new THREE.HemisphereLight(0xfff4e0, 0x7a6040, 0.78); scene.add(W3.hemi);
+  W3.hemi = new THREE.HemisphereLight(0xf6eeff, 0x6a5f8a, 0.78); scene.add(W3.hemi);
   W3.sun = new THREE.DirectionalLight(0xfff1d6, 0.95);
   W3.sun.castShadow = true;
   W3.sun.shadow.mapSize.set(1024, 1024);
@@ -1125,7 +1184,7 @@ function initWorld() {
   scene.add(W3.sun); scene.add(W3.sun.target);
   W3.amb = new THREE.AmbientLight(0xffffff, 0.12); scene.add(W3.amb);
 
-  buildSky(); buildGround(); buildTown(); buildCrowd(); buildKiln();
+  buildSky(); buildGround(); buildTown(); buildMagic(); buildCrowd(); buildKiln();
   buildWall(); buildCrane(); buildHole(); buildClouds(); buildCritters();
   buildParticles(); buildFree();
   buildMist(); buildHands(); buildDebris();
@@ -1166,10 +1225,10 @@ function resizeWorld() {
 
 /* ---------- sky: gradient dome that walks day → dusk → night ---------- */
 var SKY_KEYS = [
-  { p: 0.0, top: [0.37, 0.76, 0.93], hor: [1.0, 0.89, 0.68], sun: [1.0, 0.95, 0.84], hemi: 0.78 },
-  { p: 0.45, top: [0.27, 0.52, 0.82], hor: [1.0, 0.72, 0.52], sun: [1.0, 0.82, 0.6], hemi: 0.7 },
-  { p: 0.75, top: [0.19, 0.12, 0.36], hor: [0.84, 0.38, 0.45], sun: [1.0, 0.6, 0.45], hemi: 0.55 },
-  { p: 1.0, top: [0.06, 0.05, 0.17], hor: [0.36, 0.2, 0.44], sun: [0.75, 0.7, 1.0], hemi: 0.45 }
+  { p: 0.0, top: [0.42, 0.55, 0.95], hor: [1.0, 0.82, 0.86], sun: [1.0, 0.93, 0.86], hemi: 0.8 },
+  { p: 0.45, top: [0.3, 0.3, 0.74], hor: [1.0, 0.6, 0.72], sun: [1.0, 0.78, 0.7], hemi: 0.72 },
+  { p: 0.75, top: [0.17, 0.08, 0.4], hor: [0.9, 0.35, 0.62], sun: [1.0, 0.6, 0.6], hemi: 0.56 },
+  { p: 1.0, top: [0.05, 0.03, 0.2], hor: [0.32, 0.15, 0.52], sun: [0.75, 0.7, 1.0], hemi: 0.45 }
 ];
 function skyAt(p) {
   for (var i = 0; i < SKY_KEYS.length - 1; i++) {
@@ -1208,16 +1267,55 @@ function buildSky() {
   scene.add(W3.sunDisc);
 }
 
+/* ---------- magic in the air: fireflies, a rune circle under the build site, dragons & griffins in the sky ---------- */
+var FL = { cur: null, t: 3, n: 0 };
+function buildMagic() {
+  var n = 90, pos = new Float32Array(n * 3), base = [];
+  for (var i = 0; i < n; i++) { var b = { x: rand(-24, 24), y: rand(0.3, 5.5), z: rand(-26, 12), ph: rand(0, 6.28) }; base.push(b); pos[i * 3] = b.x; pos[i * 3 + 1] = b.y; pos[i * 3 + 2] = b.z; }
+  var geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  var pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xfff0a0, size: 5, sizeAttenuation: false, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
+  pts.frustumCulled = false; scene.add(pts); W3.motes = { pts: pts, base: base };
+  var rune = new THREE.Group(); rune.position.y = 0.03; scene.add(rune); W3.rune = rune;
+  var rm = new THREE.MeshBasicMaterial({ color: 0x9fe8ff, transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide });
+  [[7.5, 7.8, 64, 0], [5.6, 5.7, 6, 0], [5.6, 5.7, 6, Math.PI / 6], [3.9, 4.0, 48, 0]].forEach(function (r) { var m = new THREE.Mesh(new THREE.RingGeometry(r[0], r[1], r[2]), rm); m.rotation.set(-Math.PI / 2, 0, r[3]); rune.add(m); });
+  W3.dragon = buildDragon(); W3.griffin = buildGriffin();
+  [W3.dragon, W3.griffin].forEach(function (c) { c.visible = false; scene.add(c); });
+  W3.dragon.scale.setScalar(3.4); W3.griffin.scale.setScalar(3.0);
+}
+function updateMagic(dt) {
+  if (!W3.motes) return;
+  var p = W3.motes.pts.geometry.attributes.position, b = W3.motes.base, t = W3.t;
+  for (var i = 0; i < b.length; i++) { p.setXYZ(i, b[i].x + Math.sin(t * 0.3 + b[i].ph * 2) * 0.6, b[i].y + Math.sin(t * 0.6 + b[i].ph) * 0.4, b[i].z + Math.cos(t * 0.25 + b[i].ph) * 0.5); }
+  p.needsUpdate = true;
+  W3.rune.rotation.y += dt * 0.12; W3.rune.children.forEach(function (m, k) { m.material.opacity = 0.45 + Math.sin(t * 1.3 + k) * 0.1; });
+  // a dragon or a griffin crosses the sky now and then, far behind the build site
+  var ok = S.started || CAM.mode === "title", c = FL.cur;
+  if (!c) {
+    FL.t -= dt;
+    if (FL.t <= 0 && ok) {
+      FL.n++; var kind = FL.n % 2 ? W3.dragon : W3.griffin, dir = Math.random() < 0.5 ? 1 : -1;
+      FL.cur = { g: kind, dir: dir, x: -dir * 80, z: -rand(60, 90), off: rand(-1, 12), v: rand(8, 12), ph: rand(0, 6), t: 0 };
+      kind.visible = true; kind.rotation.y = dir > 0 ? 0 : Math.PI;
+    }
+    return;
+  }
+  c.t += dt; c.x += c.dir * c.v * dt;
+  var y = (CAM.ly || 6) + c.off + Math.sin(c.t * 0.7 + c.ph) * 1.6;
+  c.g.position.set(c.x, y, c.z); c.g.rotation.z = Math.sin(c.t * 0.9 + c.ph) * 0.1 * c.dir; c.g.rotation.x = Math.sin(c.t * 0.6) * 0.05;
+  c.g.userData.wings.forEach(function (w) { w.w.rotation.x = -w.sz * (Math.sin(c.t * (c.g === W3.dragon ? 5.5 : 7) + w.sz * 0.0) * 0.75 + 0.15); });
+  if (Math.abs(c.x) > 85) { c.g.visible = false; FL.cur = null; FL.t = rand(14, 30); }
+}
+
 /* ---------- ground, town, crowd, kiln ---------- */
 function buildGround() {
-  var g = new THREE.Mesh(new THREE.CircleGeometry(420, 48), toon(0x6a9744));
+  var g = new THREE.Mesh(new THREE.CircleGeometry(420, 48), toon(0x5fa56d));
   g.rotation.x = -Math.PI / 2; g.receiveShadow = true; scene.add(g);
   var dirt = new THREE.Mesh(new THREE.CircleGeometry(7.5, 40), toon(0x8a5e38));
   dirt.rotation.x = -Math.PI / 2; dirt.position.y = 0.01; dirt.receiveShadow = true; scene.add(dirt);
   var road = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 120), toon(0xc9a77a));
   road.rotation.x = -Math.PI / 2; road.position.set(0, 0.015, 66); road.receiveShadow = true; scene.add(road);
   // gentle hills on the horizon
-  var hillMat = toon(0x5d8a3a), hills = new THREE.Group(); scene.add(hills);
+  var hillMat = toon(0x4f8f9a), hills = new THREE.Group(); scene.add(hills);
   for (var i = 0; i < 9; i++) {
     var r = rand(30, 60);
     var h = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), hillMat);
@@ -1229,37 +1327,84 @@ function buildGround() {
 }
 function buildTown() {
   var town = new THREE.Group(); scene.add(town);
-  var roofCols = [0x9c3a1e, 0x6b4a8a, 0x2f6f8f, 0x8a5a33, 0xb5432a];
-  var wallCols = [0xfff2d8, 0xf1d9b5, 0xe8e0d0, 0xffe1c0, 0xd9e7d0];
+  var roofCols = [0x6b3fb0, 0x2f8f9a, 0xc2417a, 0x3f5fc0, 0x8a3fa0, 0xd0802a];
+  var wallCols = [0xf4e6ff, 0xe6f0e0, 0xffe9d0, 0xe0e6ff, 0xffeaf0];
+  var glowCols = [0xaef6ff, 0xffe9a0, 0xffb0e0, 0xb8ffc8];
+  var capCols = [0xd0415a, 0xb050d0, 0x3f9fd0, 0xe0702a];
   // The town rings the build site but leaves the sky behind the wall clear.
   var spots = [[-12, -3], [-16, 3], [-13, -11], [12, -4], [16, 2], [13, -12], [-21, -8], [21, -9], [-7, -27], [6, -29], [-15, 11], [15, 10], [-26, 2], [26, 3], [-1, -34], [-19, -20], [19, -21]];
+  function win(g, x, y, z, col, ry) { var w = add(g, new THREE.CylinderGeometry(0.26, 0.26, 0.06, 10), new THREE.MeshBasicMaterial({ color: col }), x, y, z, false); w.rotation.set(Math.PI / 2, 0, 0); if (ry) w.rotation.z = ry; return w; }
+  function winBox(g, x, y, z, col) { return add(g, new THREE.BoxGeometry(0.3, 0.5, 0.06), new THREE.MeshBasicMaterial({ color: col }), x, y, z, false); }
   for (var i = 0; i < spots.length; i++) {
-    var grp = new THREE.Group();
-    var w = rand(2, 3.2), d = rand(2, 3), h = rand(1.6, 2.6);
-    add(grp, new THREE.BoxGeometry(w, h, d), toon(wallCols[i % wallCols.length]), 0, h / 2, 0, 0.06);
-    var roof = add(grp, new THREE.ConeGeometry(Math.max(w, d) * 0.78, h * 0.7, 4), toon(roofCols[i % roofCols.length]), 0, h + h * 0.35, 0, 0.06);
-    roof.rotation.y = Math.PI / 4;
-    add(grp, new THREE.BoxGeometry(0.5, 0.9, 0.05), toon(0x5a3a22), 0, 0.45, d / 2 + 0.03, false);
-    add(grp, new THREE.BoxGeometry(0.45, 0.45, 0.05), new THREE.MeshBasicMaterial({ color: 0xffe9a0 }), w * 0.25, h * 0.6, d / 2 + 0.03, false);
-    add(grp, new THREE.BoxGeometry(0.45, 0.45, 0.05), new THREE.MeshBasicMaterial({ color: 0xffe9a0 }), -w * 0.25, h * 0.6, d / 2 + 0.03, false);
+    var grp = new THREE.Group(), kind = i % 3, rc = roofCols[i % roofCols.length], wc = wallCols[i % wallCols.length], gc = glowCols[i % glowCols.length];
+    if (kind === 0) {                  // witch's cottage: round, squat, with a crooked hat of a roof
+      var r = rand(1.2, 1.6), h = rand(1.6, 2.2);
+      add(grp, new THREE.CylinderGeometry(r, r * 1.08, h, 10), toon(wc), 0, h / 2, 0, 0.06);
+      var roof = add(grp, new THREE.ConeGeometry(r * 1.5, h * 1.3, 10), toon(rc), 0, h + h * 0.55, 0, 0.07); roof.rotation.z = rand(-0.1, 0.1);
+      add(grp, new THREE.ConeGeometry(r * 0.32, h * 0.6, 7), toon(rc), r * 0.12, h * 2.05, 0, 0.04).rotation.z = 0.55;     // the bent tip
+      add(grp, new THREE.BoxGeometry(0.34, 0.9, 0.34), toon(0x7a6a8a), r * 0.65, h * 1.5, -0.2, 0.04);
+      add(grp, new THREE.BoxGeometry(0.5, 0.9, 0.1), toon(0x5a3a22), 0, 0.45, r * 1.0, false);
+      win(grp, 0, 0.95, r * 1.03, 0xffe9a0); win(grp, -r * 0.62, h * 0.66, r * 0.8, gc, 0.5); win(grp, r * 0.62, h * 0.66, r * 0.8, gc, -0.5);
+    } else if (kind === 1) {           // mushroom house
+      var cap = capCols[i % capCols.length], cr = rand(1.7, 2.1);
+      add(grp, new THREE.CylinderGeometry(0.8, 1.0, 1.9, 10), toon(0xf6ecd8), 0, 0.95, 0, 0.06);
+      var cp = add(grp, new THREE.SphereGeometry(cr, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2), toon(cap), 0, 1.75, 0, 0.07); cp.scale.y = 0.7;
+      for (var q = 0; q < 8; q++) { var aa = q * 0.85, pp = 0.35 + (q % 3) * 0.3; add(grp, new THREE.SphereGeometry(0.2 + (q % 2) * 0.06, 7, 6), toon(0xffffff), Math.sin(pp) * Math.cos(aa) * cr * 0.93, 1.75 + Math.cos(pp) * cr * 0.7 * 0.95, Math.sin(pp) * Math.sin(aa) * cr * 0.93, false); }
+      add(grp, new THREE.BoxGeometry(0.5, 0.9, 0.1), toon(0x5a3a22), 0, 0.45, 0.93, false); win(grp, 0, 1.15, 0.97, gc);
+    } else {                           // wizard-style stacked tower house
+      add(grp, new THREE.CylinderGeometry(1.0, 1.25, 2.2, 8), toon(wc), 0, 1.1, 0, 0.06);
+      add(grp, new THREE.CylinderGeometry(1.5, 1.5, 0.18, 8), toon(0xe0b040), 0, 2.25, 0, 0.04);
+      add(grp, new THREE.CylinderGeometry(0.8, 0.95, 1.8, 8), toon(wc), 0, 3.2, 0, 0.06);
+      add(grp, new THREE.ConeGeometry(1.2, 2.6, 8), toon(rc), 0, 5.4, 0, 0.07);
+      add(grp, new THREE.OctahedronGeometry(0.3, 0), toon(0xffd23a), 0, 6.9, 0, 0.03);
+      add(grp, new THREE.BoxGeometry(0.5, 0.9, 0.1), toon(0x5a3a22), 0, 0.45, 1.2, false); winBox(grp, 0, 1.5, 1.12, gc); winBox(grp, 0, 3.2, 0.82, gc);
+    }
     grp.position.set(spots[i][0], 0, spots[i][1]);
     grp.rotation.y = Math.atan2(-spots[i][0], -spots[i][1]) + rand(-0.3, 0.3);
     town.add(grp);
   }
-  // trees
-  var leaf = toon(0x4f8a3a), trunk = toon(0x6b4423);
-  for (var t = 0; t < 22; t++) {
-    var a = rand(-Math.PI, Math.PI), r = rand(9, 34);
-    var x = Math.sin(a) * r, z = -Math.cos(a) * r * 0.9;
+  // the WIZARD'S TOWER, away in the back: twisting up out of the hills, a glowing orb floating above its hat
+  var wz = new THREE.Group(); wz.position.set(-8, 0, -52); town.add(wz);
+  add(wz, new THREE.CylinderGeometry(3.4, 4.2, 12, 10), toon(0x9a90c8), 0, 6, 0, 0.14);
+  add(wz, new THREE.CylinderGeometry(4.6, 4.6, 0.7, 10), toon(0xe0b040), 0, 12.2, 0, 0.08);
+  add(wz, new THREE.CylinderGeometry(2.5, 3.2, 11, 10), toon(0xb0a6dc), 0.4, 18.2, 0, 0.12);
+  add(wz, new THREE.CylinderGeometry(3.7, 3.7, 0.6, 10), toon(0xe0b040), 0.4, 23.9, 0, 0.08);
+  add(wz, new THREE.CylinderGeometry(1.8, 2.3, 8, 10), toon(0x9a90c8), 0.8, 28, 0, 0.1);
+  add(wz, new THREE.ConeGeometry(3.3, 9, 10), toon(0x4a2f9a), 0.8, 36.5, 0, 0.14).rotation.z = 0.06;
+  add(wz, new THREE.ConeGeometry(0.9, 3, 7), toon(0x4a2f9a), 1.9, 42.2, 0, 0.06).rotation.z = 0.7;
+  add(wz, new THREE.TorusGeometry(1.2, 0.22, 8, 16, Math.PI * 1.4), toon(0xffd23a), 0.8, 35, 3.2, 0.05).rotation.z = 0.5;
+  var orb = add(wz, new THREE.SphereGeometry(1.1, 12, 10), new THREE.MeshBasicMaterial({ color: 0xaef6ff }), 3, 45.5, 0, false);
+  [[5, 3.85], [9, 3.65], [15, 3.1], [20, 2.85], [27, 2.2], [32, 2.0]].forEach(function (q, k) { add(wz, new THREE.BoxGeometry(0.7, 1.3, 0.2), new THREE.MeshBasicMaterial({ color: k % 2 ? 0xffb0e0 : 0xffe9a0 }), (k % 2 ? 0.9 : -0.9) + (k > 3 ? 0.8 : 0), q[0] + 0.5, q[1], false); });
+  // trees: blossom trees, glowing crystals, toadstools, twisted pines
+  var trunk = toon(0x6b4423);
+  for (var t = 0; t < 26; t++) {
+    var a = rand(-Math.PI, Math.PI), rd = rand(9, 34);
+    var x = Math.sin(a) * rd, z = -Math.cos(a) * rd * 0.9;
     if (Math.abs(x) < 10.5 && z > -24) continue;
-    var tr = new THREE.Group();
-    add(tr, new THREE.CylinderGeometry(0.14, 0.18, 0.9, 6), trunk, 0, 0.45, 0, 0.04);
-    var s = rand(0.8, 1.3);
-    add(tr, new THREE.ConeGeometry(0.8 * s, 1.8 * s, 7), leaf, 0, 0.9 + 0.9 * s, 0, 0.05);
+    var tr = new THREE.Group(), s = rand(0.8, 1.3), tk = t % 4;
+    if (tk === 0) {
+      add(tr, new THREE.CylinderGeometry(0.14, 0.2, 1.1 * s, 6), trunk, 0, 0.55 * s, 0, 0.04).rotation.z = rand(-0.15, 0.15);
+      var bl = [0xe58ac0, 0xb78af0, 0x8ae0c0][t % 3];
+      add(tr, new THREE.SphereGeometry(0.85 * s, 9, 7), toon(bl), 0, 1.5 * s, 0, 0.05); add(tr, new THREE.SphereGeometry(0.6 * s, 8, 6), toon(bl), 0.5 * s, 1.15 * s, 0.2, 0.04); add(tr, new THREE.SphereGeometry(0.55 * s, 8, 6), toon(bl), -0.45 * s, 1.9 * s, -0.1, 0.04);
+    } else if (tk === 1) {
+      var cc = [0x9ff0ff, 0xff9ae6, 0xb8ff9a][t % 3];
+      for (var c = 0; c < 4; c++) { var cr2 = add(tr, new THREE.ConeGeometry(0.2 * s, (0.8 + c * 0.3) * s, 5), new THREE.MeshBasicMaterial({ color: cc }), (c - 1.5) * 0.28 * s, (0.4 + c * 0.15) * s, (c % 2) * 0.2, false); cr2.rotation.z = (c - 1.5) * 0.2; }
+    } else if (tk === 2) {
+      add(tr, new THREE.CylinderGeometry(0.12, 0.16, 0.7 * s, 6), toon(0xf6ecd8), 0, 0.35 * s, 0, 0.03);
+      var tc = add(tr, new THREE.SphereGeometry(0.55 * s, 10, 7, 0, Math.PI * 2, 0, Math.PI / 2), toon(capCols[t % 4]), 0, 0.7 * s, 0, 0.04); tc.scale.y = 0.8;
+      add(tr, new THREE.SphereGeometry(0.07 * s, 5, 4), toon(0xffffff), 0.2 * s, 1.0 * s, 0.15 * s, false);
+    } else {
+      add(tr, new THREE.CylinderGeometry(0.14, 0.18, 0.9, 6), trunk, 0, 0.45, 0, 0.04);
+      for (var l = 0; l < 3; l++) add(tr, new THREE.ConeGeometry((0.85 - l * 0.22) * s, 1.0 * s, 7), toon(l % 2 ? 0x4a9a8a : 0x3a7f8a), 0, (1.0 + l * 0.6) * s, 0, 0.05).rotation.z = (l - 1) * 0.1;
+    }
     tr.position.set(x, 0, z); town.add(tr);
   }
-  // windows glow warmer as evening falls (one shared tint)
-  W3.windowMat = new THREE.MeshBasicMaterial({ vertexColors: true });
+  // floating lanterns & drifting orbs
+  for (var o = 0; o < 16; o++) { var oa = rand(-Math.PI, Math.PI), orr = rand(8, 30); var lx = Math.sin(oa) * orr, lz = -Math.cos(oa) * orr * 0.9;
+    if (Math.abs(lx) < 8 && lz > -20) continue;
+    add(town, new THREE.SphereGeometry(0.2, 8, 6), new THREE.MeshBasicMaterial({ color: glowCols[o % 4] }), lx, rand(2.5, 6), lz, false); }
+  // windows & crystals glow warmer as evening falls (one shared tint)
+  W3.windowMat = fadable(new THREE.MeshBasicMaterial({ vertexColors: true }));
   bake(town, { basicMat: W3.windowMat });
 }
 function buildCrowd() {
@@ -1271,6 +1416,15 @@ function buildCrowd() {
   W3.cBody = instPart(new THREE.CylinderGeometry(0.17, 0.22, 0.6, 8), N, 0.03);
   W3.cHead = instPart(new THREE.SphereGeometry(0.16, 10, 8), N, 0.03);
   W3.cArm = instPart(new THREE.BoxGeometry(0.08, 0.42, 0.08), N, 0.025);
+  // small magical details that creep in as the rows climb: wizard hats, horns, hooves (satyrs) and glowing auras
+  W3.cHat = instPart(new THREE.ConeGeometry(0.17, 0.36, 8), N, 0.025);
+  W3.cBrim = instPart(new THREE.CylinderGeometry(0.25, 0.25, 0.03, 10), N, 0.02);
+  W3.cHorn = instPart(new THREE.ConeGeometry(0.05, 0.22, 6), N * 2, 0.02);
+  W3.cHoof = instPart(new THREE.BoxGeometry(0.1, 0.09, 0.13), N * 2, 0.02);
+  [W3.cBody, W3.cHead, W3.cArm, W3.cHat, W3.cBrim, W3.cHorn, W3.cHoof].forEach(function (ip) { ip.fill.material = fadable(ip.fill.material); ip.out.material = FADE_OUT; });
+  W3.cAura = new THREE.InstancedMesh(new THREE.SphereGeometry(0.46, 12, 9), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false }), N);
+  W3.cAura.frustumCulled = false; W3.cAura.instanceMatrix.setUsage(THREE.DynamicDrawUsage); W3.cAura.setColorAt(0, _c.set(0xffffff)); W3.cAura.renderOrder = 5; scene.add(W3.cAura);
+  var hatCols = [0x5b3fa0, 0x2f5fb0, 0x1f7a6a, 0x9a3a7a, 0x3b3b8a], auraCols = [0x7fe8ff, 0xff8ff0, 0xffe27a, 0xa9ff9a], hornCols = [0xf3ead2, 0xd9cbb0, 0xb89a6a];
   for (var i = 0; i < N; i++) {
     var side = i % 2 ? 1 : -1, k = Math.floor(i / 2);
     var x = side * (2.5 + (k % 4) * 0.62 + rand(-0.15, 0.15));          // flank the wall base, inside the portrait frame
@@ -1278,9 +1432,16 @@ function buildCrowd() {
     W3.cBody.fill.setColorAt(i, _c.set(shirts[i % shirts.length]));
     W3.cHead.fill.setColorAt(i, _c.set(skins[(i * 7) % skins.length]));
     W3.cArm.fill.setColorAt(i, _c.set(skins[(i * 7) % skins.length]));
-    W3.crowd.push({ x: x, z: z, ry: Math.atan2(-x * 0.6, 6 - z), y: 0, ph: Math.random() * 6.28, jump: 0, arm: -0.5 });
+    var r1 = hash01(i * 5.3 + 1), r2 = hash01(i * 9.1 + 2), r3 = hash01(i * 3.7 + 3), r4 = hash01(i * 6.9 + 4);
+    var mg = { hat: r1 < 0.5 ? 6 + Math.floor(r1 * 30) : 999, aura: r2 < 0.4 ? 14 + Math.floor(r2 * 50) : 999, horn: r3 < 0.35 ? 18 + Math.floor(r3 * 55) : 999, hoof: r4 < 0.3 ? 24 + Math.floor(r4 * 60) : 999, a: { hat: 0, aura: 0, horn: 0, hoof: 0 } };
+    if (mg.hoof < 999) mg.horn = Math.min(mg.horn, mg.hoof);                 // satyrs always have their horns
+    W3.cHat.fill.setColorAt(i, _c.set(hatCols[i % hatCols.length])); W3.cBrim.fill.setColorAt(i, _c.set(hatCols[i % hatCols.length]));
+    W3.cAura.setColorAt(i, _c.set(auraCols[(i * 3) % auraCols.length]));
+    W3.cHorn.fill.setColorAt(i * 2, _c.set(hornCols[i % 3])); W3.cHorn.fill.setColorAt(i * 2 + 1, _c.set(hornCols[i % 3]));
+    W3.cHoof.fill.setColorAt(i * 2, _c.set(0x2a1a10)); W3.cHoof.fill.setColorAt(i * 2 + 1, _c.set(0x2a1a10));
+    W3.crowd.push({ x: x, z: z, ry: Math.atan2(-x * 0.6, 6 - z), y: 0, ph: Math.random() * 6.28, jump: 0, arm: -0.5, mg: mg, shirt: shirts[i % shirts.length], fur: false });
   }
-  W3.cBody.fill.instanceColor.needsUpdate = W3.cHead.fill.instanceColor.needsUpdate = W3.cArm.fill.instanceColor.needsUpdate = true;
+  [W3.cBody, W3.cHead, W3.cArm, W3.cHat, W3.cBrim, W3.cHorn, W3.cHoof].forEach(function (ip) { ip.fill.instanceColor.needsUpdate = true; }); W3.cAura.instanceColor.needsUpdate = true;
   updateCrowd(0);
 }
 var _mp = new THREE.Matrix4(), _ml = new THREE.Matrix4(), _mw = new THREE.Matrix4();
@@ -1332,6 +1493,29 @@ function crowdPose(d, dt) {          // sets d.y / d.flipA / d.arm while a react
   }
   return true;
 }
+var _mgS = new THREE.Matrix4(), _mgV = new THREE.Vector3(), _mgQ = new THREE.Quaternion(), _mgE = new THREE.Euler(), _mgO = new THREE.Vector3(1, 1, 1);
+function mgPlace(ip, idx, mp, x, y, z, rz, k) {         // part placed relative to the villager's own transform, scaled by k (0 hides it)
+  _mgE.set(0, 0, rz || 0); _mgQ.setFromEuler(_mgE); _mgV.set(x, y, z); _mgO.set(k, k, k);
+  _mgS.compose(_mgV, _mgQ, _mgO); _mw.multiplyMatrices(mp, _mgS); setInst(ip, idx, _mw);
+}
+function crowdMagic(d, i, dt, sc) {
+  var mg = d.mg, b = S.best, kk = Math.min(1, dt * 5), on = d.on ? 1 : 0, was, k;
+  var keys = ["hat", "aura", "horn", "hoof"], tgt;
+  for (var q = 0; q < 4; q++) {
+    var key = keys[q]; tgt = (on && b >= mg[key]) ? 1 : 0; was = mg.a[key];
+    mg.a[key] = dt > 0 ? lerp(was, tgt, Math.max(kk, 0.0001)) : tgt;
+    if (was < 0.05 && mg.a[key] >= 0.05 && tgt && dt > 0) {           // the moment a villager turns a little magical: a puff of sparkles
+      EMIT_WORLD = true; emitGlow(d.x, 0.9, d.z, 10, key === "hat" ? 0xb79bff : key === "aura" ? 0x7fe8ff : 0xffe27a, 1.6, 0.9, 0.5, -0.2, 0.6); EMIT_WORLD = false;
+    }
+  }
+  if (mg.a.hoof > 0.5 && !d.fur) { d.fur = true; W3.cBody.fill.setColorAt(i, _c.set(0x8a5a33)); }
+  var g = sc;
+  k = mg.a.hat * g; mgPlace(W3.cHat, i, _mp, 0, 1.06, 0, 0.12, k); mgPlace(W3.cBrim, i, _mp, 0, 0.9, 0, 0.12, k);
+  k = mg.a.horn * g; mgPlace(W3.cHorn, i * 2, _mp, -0.1, 0.96, 0, 0.5, k); mgPlace(W3.cHorn, i * 2 + 1, _mp, 0.1, 0.96, 0, -0.5, k);
+  k = mg.a.hoof * g; mgPlace(W3.cHoof, i * 2, _mp, -0.1, 0.04, 0.12, 0, k); mgPlace(W3.cHoof, i * 2 + 1, _mp, 0.1, 0.04, 0.12, 0, k);
+  k = mg.a.aura * g * (1.0 + Math.sin(W3.t * 2.4 + i) * 0.08); _mgE.set(0, 0, 0); _mgQ.setFromEuler(_mgE);
+  _mgV.set(0, 0.6, 0); _mgO.set(k, k * 1.25, k); _mgS.compose(_mgV, _mgQ, _mgO); _mw.multiplyMatrices(_mp, _mgS); W3.cAura.setMatrixAt(i, _mw);
+}
 function updateCrowd(dt) {
   var want = crowdTarget();
   for (var i = 0; i < W3.crowd.length; i++) {
@@ -1363,9 +1547,12 @@ function updateCrowd(dt) {
     if (d.flipA) { _ef.set(d.flipA, 0, 0); _qf.setFromEuler(_ef); _vf.set(0, 0.5, 0); _mf.compose(_vf, _qf, _one); _mf2.makeTranslation(0, -0.5, 0); _mf.multiply(_mf2); _mp.multiply(_mf); }
     _ml.makeTranslation(0, 0.3, 0); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cBody, i, _mw);
     _ml.makeTranslation(0, 0.78, 0); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cHead, i, _mw);
+    crowdMagic(d, i, dt, sc);
     _e.set(0, 0, d.arm); _q.setFromEuler(_e); _v.set(0.2, 0.72, 0); _ml.compose(_v, _q, _s); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cArm, i, _mw);
   }
   flushInst(W3.cBody); flushInst(W3.cHead); flushInst(W3.cArm);
+  flushInst(W3.cHat); flushInst(W3.cBrim); flushInst(W3.cHorn); flushInst(W3.cHoof);
+  W3.cAura.instanceMatrix.needsUpdate = true; if (W3.cBody.fill.instanceColor) W3.cBody.fill.instanceColor.needsUpdate = true;
 }
 function buildKiln() {
   var k = new THREE.Group();
@@ -2100,8 +2287,15 @@ function toScreen(x, y, z) {
 }
 
 /* ---------- per-frame world update ---------- */
+function updateFadeBox() {
+  if (!S.started || CAM.mode === "title" || CAM.mode === "victory") { FADE.uBMax.value.set(-9, -9, -9); FADE.uBMin.value.set(-9, -9, -9); return; }
+  var hw = TW / 2 + 0.35, top = workY() + 1.3;
+  FADE.uBMin.value.set(-hw, -0.3, S.tower ? -TW - 0.35 : -0.55);
+  FADE.uBMax.value.set(hw, top, 0.55);
+  camera.getWorldPosition(FADE.uCam.value);
+}
 function updateWorld(dt, rt) {
-  W3.t += dt;
+  W3.t += dt; updateFadeBox(); updateMagic(dt);
   var prog = Math.min(1, S.courses / FINAL_GOAL);
   var sk = skyAt(prog);
   W3.sky.material.uniforms.uTop.value.setRGB(sk.top[0], sk.top[1], sk.top[2]);
@@ -2187,7 +2381,10 @@ function updateHole(dt, prog) {
   W3.hole.position.copy(camera.position).addScaledVector(_v, dist);
   W3.hole.quaternion.copy(camera.quaternion);
   var sc = Math.max(0.01, tanT * dist / 10);
-  W3.hole.scale.setScalar(sc * (1 + Math.sin(W3.t * 1.3) * 0.02));
+  var hWant = S.courses >= 1 || CAM.mode === "victory" ? 1 : 0;
+  W3.holeShow = W3.holeShow == null ? hWant : damp(W3.holeShow, hWant, 0.7, dt);       // row 1: nothing. Row 2: a pinprick opens
+  W3.hole.visible = W3.holeShow > 0.02;
+  W3.hole.scale.setScalar(sc * (1 + Math.sin(W3.t * 1.3) * 0.02) * clamp(W3.holeShow, 0, 1));
   W3.silMat.opacity = lerp(0.35, 0.9, p1);
   for (var i = 0; i < W3.sils.length; i++) {
     var s = W3.sils[i]; s.position.x = -4 + i * 4 + Math.sin(W3.t * 0.8 + s.userData.ph) * 0.5;
@@ -2487,38 +2684,62 @@ function crowdPay(pay, mult, outcome, type, fromAuto, sp) {
   if (special || outcome === 3 || (S.streak >= 10 && S.streak % 3 === 0)) { crowdCheer(1); snd.cheer(S.streak >= 10 || type === "lead"); }
   else if (S.streak >= 5 && S.streak % 2 === 0) snd.cheer(false);
 }
-var BUBBLES = [];
-function villagerSay(idx, text, delayMs) {
-  setTimeout(function () {
-    var d = W3.crowd[idx]; if (!d || el.fx.childElementCount > 90) return;
-    var b = document.createElement("div"); b.className = "vbubble"; b.textContent = text; b.style.opacity = "0"; el.fx.appendChild(b);
-    BUBBLES.push({ el: b, idx: idx, born: performance.now(), life: 4600 });
-    snd.pop();
-  }, delayMs || 0);
+var SAYQ = [], curBubble = null, nextSayAt = 0, SAID = {};
+function villagerSay(idx, text) {
+  SAYQ.push({ idx: idx, text: text });
+  while (SAYQ.length > 3) SAYQ.shift();                       // never a backlog: only the freshest few lines
 }
+// A bubble waits its turn while any tutorial hint, story card, reveal or panel is up — so it can never cover a "tap this" prompt.
+function bubblesBlocked() { return !S.started || !!activeMsg || panelsBusy() || S.shopOpen || CAM.mode !== "play" || !!(el.story && !el.story.classList.contains("hidden")); }
+function dropBubble() { if (curBubble) { if (curBubble.el.parentNode) curBubble.el.parentNode.removeChild(curBubble.el); curBubble = null; } }
 function updateBubbles() {
   var now = performance.now();
-  for (var i = BUBBLES.length - 1; i >= 0; i--) {
-    var bb = BUBBLES[i], age = now - bb.born, d = W3.crowd[bb.idx];
-    if (age > bb.life || !d) { if (bb.el.parentNode) bb.el.parentNode.removeChild(bb.el); BUBBLES.splice(i, 1); continue; }
-    // anchored just under the speaker's chin, tail pointing up at them — so it never covers the top courses
-    var sp = toScreenW(d.x, 0.62, d.z), x = clamp(sp.x, 100, window.innerWidth - 100), y = clamp(sp.y + 14, 60, window.innerHeight - (bb.el.offsetHeight || 64) - 8);
-    bb.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) translate(-50%,0)";
-    bb.el.style.opacity = Math.min(1, age / 250, (bb.life - age) / 500).toFixed(2);
+  if (curBubble && bubblesBlocked()) { dropBubble(); nextSayAt = now + 900; }
+  if (!curBubble && SAYQ.length && now >= nextSayAt && !bubblesBlocked()) {
+    var q = SAYQ.shift(), d = W3.crowd[q.idx];
+    if (d) {
+      var b = document.createElement("div"); b.className = "vbubble"; b.textContent = q.text; b.style.opacity = "0"; el.fx.appendChild(b);
+      curBubble = { el: b, idx: q.idx, born: now, life: 1500 + q.text.length * 42 };
+      snd.pop();
+    }
   }
+  if (!curBubble) return;
+  var bb = curBubble, age = now - bb.born, dd = W3.crowd[bb.idx];
+  if (age > bb.life || !dd) { dropBubble(); nextSayAt = now + 450; return; }       // fade out, then a beat of quiet, then the next voice
+  // under the speaker's chin, but kept above the kiln/storage dock and the prompt line so it never hides an instruction
+  var H = window.innerHeight, bh = bb.el.offsetHeight || 40;
+  var sp = toScreenW(dd.x, 0.62, dd.z), x = clamp(sp.x, 100, window.innerWidth - 100), y = clamp(sp.y + 14, 96, H - 270 - bh);
+  bb.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) translate(-50%,0)";
+  bb.el.style.opacity = Math.min(1, age / 280, (bb.life - age) / 450).toFixed(2);
 }
-// the villagers who just turned up say their piece (non-blocking speech bubbles)
-var HOLE_TALK = {
-  2: ["Is it just me, or is that hole getting bigger?", "It wasn't there yesterday. I'd swear it."],
-  3: ["Something's moving in there. See the shapes?", "My dog won't stop barking at it."],
-  4: ["Do you hear that? It's humming.", "Whoever's up there… they're watching us."]
+// Shorter, sweeter, a bit silly. Rows 1-4 are the story of the hole; after that the town just chats — and gets stranger.
+var SAY_ROW = {
+  1: ["Saw a tiny hole open up in the sky. Came to look!", "Also: nice wall. Very brick."],
+  2: ["That hole's bigger now. I think.", "My cow won't stop staring at it."],
+  3: ["Something moved in there!", "Or I need more sleep. Both, probably."],
+  4: ["It hums. Hear that?", "I'm choosing not to."]
 };
-function villagersJoin(n) {
-  var lines = HOLE_TALK[n]; if (!lines) return;
-  var from = CROWD_BY[n - 1] || 0, to = CROWD_BY[n] || from;
-  var second = to - from >= 2 ? from + 1 : Math.max(0, from - 1);     // never let both lines come from one villager
-  villagerSay(from, lines[0], 700);
-  villagerSay(second, lines[1], 2200);
+var SAY_POOL = [
+  { min: 1, lines: ["Nice row!", "Straight as a die!", "I'd have used more bricks. Just saying.", "Is that mortar or mud? Both?", "Bet you can't do it blindfolded.", "Whoever invented bricks: genius.", "Look at him go!", "My cousin builds walls too. Worse."] },
+  { min: 5, lines: ["A tower! Fancy.", "Mind the corners!", "How tall? Asking for my neck.", "Four walls and a dream.", "Drafty up there, I bet.", "Drop one. I'll cheer either way."] },
+  { min: 11, lines: ["The hole winked at me.", "Something up there just waved.", "That shadow in the hole? Polite.", "Is it getting weird? It's getting weird.", "Did the hole just hum a tune?"] },
+  { min: 20, lines: ["That cloud blinked. Clouds don't blink.", "The sky is watching. Rude.", "I swear that bird was reading.", "Something sparkled. On purpose."] }
+];
+function pickSay() {
+  var all = [], n = S.courses;
+  for (var i = 0; i < SAY_POOL.length; i++) if (n >= SAY_POOL[i].min) for (var j = 0; j < SAY_POOL[i].lines.length; j++) { var w = i === SAY_POOL.length - 1 || SAY_POOL[i + 1] && n < SAY_POOL[i + 1].min ? 3 : 1; for (var k = 0; k < w; k++) all.push(SAY_POOL[i].lines[j]); }
+  var fresh = all.filter(function (t) { return !SAID[t]; });
+  if (!fresh.length) { SAID = {}; fresh = all; }
+  var t = fresh[Math.floor(Math.random() * fresh.length)]; SAID[t] = 1; return t;
+}
+// After every finished row — wall, back-fill or tower — somebody in the crowd has something to say.
+function villagersReact(rowN, special) {
+  var n = Math.max(1, Math.min(W3.crowd.length, S.best >= 10 ? 30 : (CROWD_BY[S.best] || 1)));
+  var first = Math.floor(Math.random() * n), second = (first + 1 + Math.floor(Math.random() * Math.max(1, n - 1))) % n;
+  var lines = special && SAY_ROW[rowN];
+  if (lines) { villagerSay(first, lines[0]); villagerSay(n > 1 ? second : first, lines[1]); }
+  else villagerSay(first, pickSay());
+  nextSayAt = Math.max(nextSayAt, performance.now() + (rowN === 1 && special ? 1800 : 900));
 }
 function crowdCheer(sec) { for (var i = 0; i < W3.crowd.length; i++) W3.crowd[i].jump = Math.max(W3.crowd[i].jump, sec * rand(0.7, 1.1)); }
 function tickFalling(dt) {
@@ -2644,7 +2865,7 @@ function sideDone() {
   var side = curFace() + 1, row = workRow(), clean = S.rowMisses === 0;
   var tb = rowTypeBonus(row), bonus = (payable(row) ? rowBonus(clean) : 0) + tb.bonus;     // each side is a row of its own: it pays its own row + metal bonuses
   S.rowMisses = 0; S.scUsed = 0; S.rowT = freshRowT();                                  // ...and gets its own clean-row check, Second Chance and metal ledger
-  credit(bonus);
+  credit(bonus); if (S.courses >= 5 && Math.random() < 0.4) villagersReact(S.courses, false);
   whenLanded(function () { snd.whoosh(); bigWord("SIDE " + side + " / 4", "gold"); faceFx(row, bonus, clean); typeRowFx(tb); });
   saveGame();
 }
@@ -2679,7 +2900,7 @@ function completeCourse() {
   var clean = S.rowMisses === 0, filling = S.fill > 0, done = filling ? S.fill : S.courses + 1;
   var tb = rowTypeBonus(done), bonus = (payable(done) ? rowBonus(clean) : 0) + tb.bonus, isNew = !filling && done > S.best;
   S.scUsed = 0; S.rowMisses = 0; S.rowT = freshRowT();
-  if (filling) {                    // a row of the tower's back-fill: the three new sides are done, step up to the next row down below
+  if (filling) { villagersReact(done, false);                    // a row of the tower's back-fill: the three new sides are done, step up to the next row down below
     S.fill++; var allUp = S.fill > S.towerStart; if (allUp) S.fill = 0;
     S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace; S.inCourse = S.fill > 0 ? S.perFace : 0;
     fleeAllHands(); credit(bonus);
@@ -2690,6 +2911,7 @@ function completeCourse() {
   S.courses++; S.inCourse = 0;
   if (S.tower) { S.perFace = towerPerFace(); S.perCourse = 4 * S.perFace; fleeAllHands(); whenLanded(function () { snd.whoosh(); }); }
   if (isNew) S.best = S.courses;
+  villagersReact(S.courses, !S.tower && isNew);
   credit(bonus);
   whenLanded(function () { rowFx(done, bonus, clean); typeRowFx(tb); });
   if (isNew) milestone(S.courses);
@@ -2795,7 +3017,7 @@ function buyLine(id) {
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
     else {
-      S.perCourse = 6 - S.tier.hotMortar;
+      S.perCourse = 5 - S.tier.hotMortar;
       refitWallRow(S.courses + 1, S.perCourse);
       toast("Hot mortar! Rows now take " + S.perCourse + " bricks.", 3400);
       if (S.inCourse >= S.perCourse) completeCourse();
@@ -2962,14 +3184,14 @@ function updateHazards() {
 }
 
 /* ---------- milestones: story, reveals, raids, banners ---------- */
-var STORY_AT = { 10: "c10", 25: "c25", 30: "c30", 35: "c35", 40: "c40", 45: "c45", 48: "c48", 55: "c55", 60: "c60", 65: "c65", 70: "c70", 75: "c75", 80: "c80", 85: "c85", 90: "c90", 95: "c95" };
+var STORY_AT = { 25: "c25", 30: "c30", 35: "c35", 40: "c40", 45: "c45", 48: "c48", 55: "c55", 60: "c60", 65: "c65", 70: "c70", 75: "c75", 80: "c80", 85: "c85", 90: "c90", 95: "c95" };
 function milestone(n) {
   if (n === 1) {
     enqueueStory("row1");
     revealEl($("hud-course"));
   }
-  if (n >= 2 && n <= 4) villagersJoin(n);
-  if (n === 5) enqueueSeq(["c5a", "c5b"]);
+  if (n === 5 && !S.beats.c5b) { S.beats.c5a = S.beats.c5b = true; enqueueCards("elder", CARDS_ELDER, function () { startTower(); }); }
+  if (n === 10 && !S.flags.goalShown) enqueueSeq(["c10a", "c10b"]);
   if (STORY_AT[n]) enqueueStory(STORY_AT[n]);
   if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; enqueueReveal("glass"); }
   if (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0) queueRaid(n);
@@ -3434,6 +3656,8 @@ function nudgeKiln() {
 /* ---------------- HUD ---------------- */
 function renderHUD() {
   el.hudCourseNum.textContent = S.courses;
+  var gk = !!(S.flags.goalShown || S.flags.rimStarted);
+  el.hudGoal.classList.toggle("hidden", !gk); el.progFill.parentNode.classList.toggle("hidden", !gk);
   el.hudGoal.textContent = S.endless ? "· ENDLESS" : "/ " + S.goal;
   el.progFill.style.width = (Math.min(1, S.courses / S.goal) * 100).toFixed(1) + "%";
   el.rowNum.textContent = workRow();
@@ -3535,7 +3759,7 @@ function cardHTML(l) {
   var pips = '<span class="pips">'; for (var p = 0; p < l.costs.length; p++) pips += '<i class="' + (p < t ? "on" : "") + '"></i>'; pips += "</span>";
   return '<div class="upg-row" id="upg-' + l.id + '" data-cost="' + cost + '"><div class="upg-ico">' + ICON[l.icon] + '</div>' +
     '<div class="upg-info"><div class="upg-name">' + l.name + pips + (UI.shopNew[l.id] ? '<span class="upg-new">NEW</span>' : "") + "</div>" +
-    (t > 0 && !maxed ? '<div class="upg-now">NOW: ' + l.effect(t) + "</div>" : "") +
+    (t > 0 && !maxed && !l.noNow ? '<div class="upg-now">NOW: ' + l.effect(t) + "</div>" : "") +
     '<div class="upg-desc">' + (maxed ? l.effect(t) : l.next(t)) + "</div></div>" +
     (maxed ? '<button class="buy-btn maxed" disabled>MAX</button>' : '<button class="buy-btn" data-upg="' + l.id + '">$' + fmt(cost) + "</button>") + "</div>";
 }
@@ -3640,12 +3864,13 @@ function uiFrame(rdt) {
 
 /* ---------------- MESSAGES: story first, hints second ---------------- */
 var BEATS = {
-  start: "You woke to the whole town outside, pointing up. There's a HOLE in the sky — a pinprick of white light, with silhouettes moving inside it.",
-  mold: "Every head turns to you, the town wall maker. The verdict is unanimous: this is your divine task.",
-  row1: "Word got around. A few villagers have wandered over, all staring up at a hole in the sky — a pinprick of white light. Not your problem. You're the wall maker, and the wall is the job. Keep laying bricks.",
+  start: "Another morning, another wall. You're the town's wall maker, and the kiln is already warm.",
+  mold: "Hold the kiln to bake a brick. Tap to lay it. That's the whole job \u2014 and you're good at it.",
+  row1: "One row down! A villager wandered over to watch. Nobody asked them to. Keep laying bricks.",
   c5a: "The villagers have been creeping closer all morning, necks craned at the hole. \u201cWall maker!\u201d calls one. \u201cWe can\u2019t tell what that is from down here. Build closer \u2014 get us a proper look.\u201d",
   c5b: "A murmur, then a decision. \u201cNot a wall,\u201d says the eldest. \u201cA tower. Build us a tower up toward that hole \u2014 and we\u2019ll pay you for every finished row.\u201d",
-  c10: "You can almost hear voices drifting down through the hole. They sound like they're counting.",
+  c10a: "The tower stands five rows high, right on top of your five-row wall. You turn to the crowd. \u201cSo\u2026 how tall should this thing be? What\u2019s enough?\u201d",
+  c10b: "The villagers huddle. Loudly. The eldest holds up fingers, runs out of fingers, borrows someone else\u2019s. \u201cFifty,\u201d they decide. \u201cFifty rows. That ought to do it.\u201d",
   c25: "Hands are starting to grab at the wall. Huge pale hands reach down through the hole, clamp onto a brick and pull — and everything laid after it falls. Drop a brick on top of a hand to smash it.",
   c30: "The hands are getting bolder. Whatever is up there does not want this wall finished.",
   c35: "The silhouettes are waving their arms now. Not cheering — warning. You still can't make out the words.",
@@ -3669,11 +3894,11 @@ var BEATS = {
   c100b: "Light runs the whole length of the wall — yours and theirs — and the two halves are one. The tear doesn't seal. It opens. And the hands unclench, and let go.",
   c100c: "The silhouettes step through. They aren't giants, and they aren't gods. They're people — builders, like you — and down in the town, nobody is pointing anymore."
 };
-var KICKERS = { start: "MORNING", mold: "MORNING", row1: "ROW ONE · LOOK UP", c5a: "ROW FIVE · THE TOWN ASKS", c5b: "ROW FIVE · THE TOWN ASKS", c10: "COURSE 10", c25: "COURSE 25 · THE HANDS", c30: "COURSE 30", c35: "COURSE 35", c40: "COURSE 40 · THE CLOUDS", c45: "COURSE 45", c48: "COURSE 48",
+var KICKERS = { start: "MORNING", mold: "MORNING", row1: "ROW ONE", c5a: "ROW FIVE · THE TOWN ASKS", c5b: "ROW FIVE · THE TOWN ASKS", c10a: "THE TOWER IS FIVE HIGH", c10b: "HOW TALL IS ENOUGH?", c25: "COURSE 25 · THE HANDS", c30: "COURSE 30", c35: "COURSE 35", c40: "COURSE 40 · THE CLOUDS", c45: "COURSE 45", c48: "COURSE 48",
   c50a: "COURSE 50", c50b: "COURSE 50", c50c: "COURSE 50 · THE TRUTH", c50d: "COURSE 50 · NOT THE END", c55: "COURSE 55", c60: "COURSE 60", c65: "COURSE 65 · THE TREMORS", c70: "COURSE 70", c75: "COURSE 75",
   c80: "COURSE 80 · SKY GLASS", c85: "COURSE 85", c90: "COURSE 90", c95: "COURSE 95", c100a: "COURSE 100", c100b: "COURSE 100", c100c: "COURSE 100" };
-var CTAS = { row1: "BACK TO WORK", c5b: "TAKE THE JOB", c50d: "BUILD HIGHER", c100c: "STEP THROUGH" };
-var BEAT_END = { c5b: function () { startTower(); }, c50d: function () { finishRim(); }, c100c: function () { showVictory(); } };
+var CTAS = { c10b: "FIFTY IT IS", row1: "BACK TO WORK", c5b: "TAKE THE JOB", c50d: "BUILD HIGHER", c100c: "STEP THROUGH" };
+var BEAT_END = { c10b: function () { S.flags.goalShown = true; revealEl($("hud-goal")); popEl($("hud-course-num")); renderHUD(); banner("THE GOAL", "BUILD TO ROW 50"); }, c5b: function () { startTower(); }, c50d: function () { finishRim(); }, c100c: function () { showVictory(); } };
 var ICO_HAND = '<svg viewBox="0 0 64 46" width="66" height="46"><g fill="#f1d0b4" stroke="#221407" stroke-width="3" stroke-linejoin="round"><rect x="10" y="24" width="44" height="16" rx="6"/><rect x="12" y="8" width="8" height="22" rx="4"/><rect x="23" y="3" width="8" height="27" rx="4"/><rect x="34" y="5" width="8" height="25" rx="4"/><rect x="45" y="11" width="8" height="19" rx="4"/></g></svg>';
 var ICO_CLOUD = '<svg viewBox="0 0 64 46" width="66" height="46"><path d="M16 38a10 10 0 0 1 2-19.800A14 14 0 0 1 45 15a11.5 11.500 0 0 1 3 23z" fill="#fff" stroke="#221407" stroke-width="3" stroke-linejoin="round"/></svg>';
 var ICO_TREMOR = '<svg viewBox="0 0 64 46" width="66" height="46"><rect x="16" y="14" width="32" height="18" fill="#c2502c" stroke="#221407" stroke-width="3"/><path d="M6 10l-3 8 5 5-3 9M58 10l3 8-5 5 3 9" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -3697,7 +3922,7 @@ function panelsBusy() {
 }
 function storyActive() { return !!(activeMsg && activeMsg.kind === "story"); }
 function modalPaused() {
-  return !el.settings.classList.contains("hidden") || storyActive() || !!(activeMsg && activeMsg.kind === "reveal") || !el.ovVictory.classList.contains("hidden");
+  return !el.settings.classList.contains("hidden") || storyActive() || cardsActive() || !!(activeMsg && activeMsg.kind === "reveal") || !el.ovVictory.classList.contains("hidden");
 }
 function actionFrozen() { return modalPaused() || S.shopOpen || CAM.mode === "victory" || CAM.mode === "rim" || CAM.mode === "tower"; }
 function setStoryContent(m) {
@@ -3715,6 +3940,7 @@ function pumpMsg() {
   if (panelsBusy()) return;
   var m = msgQ.shift(); activeMsg = m;
   if (m.kind === "story") { el.story.classList.remove("closing", "hidden"); setStoryContent(m); releaseKiln(); }
+  else if (m.kind === "cards") openCards(m);
   else if (m.kind === "reveal") showReveal(m.id);
   else showHint(m);
 }
@@ -3807,6 +4033,411 @@ function showReveal(id) {
 function hideReveal() { clearTimeout(revealTimer); hidePanel(el.reveal, 200); }
 el.reveal.addEventListener("click", function () { snd.pop(); if (activeMsg && activeMsg.kind === "reveal") endMsg(); });
 
+/* =====================================================================
+   CHARACTERS (Three.js) — Edgar the gnoll, the Elder satyr, and the sky creatures.
+   Portraits are drawn once to still images for the story cards.
+   ===================================================================== */
+function pmesh(par, geo, col, x, y, z, o) {
+  o = o || {};
+  var mat = o.basic ? new THREE.MeshBasicMaterial({ color: col, transparent: !!o.alpha, opacity: o.alpha || 1, side: o.dbl ? THREE.DoubleSide : THREE.FrontSide })
+                    : toon(col, o.dbl ? { side: THREE.DoubleSide } : null);
+  var m = new THREE.Mesh(geo, mat);
+  m.position.set(x || 0, y || 0, z || 0);
+  if (o.r) m.rotation.set(o.r[0], o.r[1], o.r[2]);
+  if (o.s) m.scale.set(o.s[0], o.s[1], o.s[2]);
+  par.add(m);
+  if (!o.basic && o.ol !== 0 && !o.dbl) outline(m, o.ol || 0.022);
+  return m;
+}
+function glyphSprite(ch, col, size) {
+  var c = document.createElement("canvas"); c.width = c.height = 128; var x = c.getContext("2d");
+  x.font = "900 92px 'Archivo Black', 'Arial Black', sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+  x.lineWidth = 14; x.lineJoin = "round"; x.strokeStyle = "#221407"; x.strokeText(ch, 64, 70); x.fillStyle = col; x.fillText(ch, 64, 70);
+  var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthTest: false }));
+  sp.scale.set(size, size, 1); sp.renderOrder = 20; return sp;
+}
+function brickProp(par, x, y, z, ry, col) {
+  var b = new THREE.Group(); b.position.set(x, y, z); b.rotation.y = ry || 0; par.add(b);
+  pmesh(b, new THREE.BoxGeometry(0.5, 0.24, 0.32), col || 0xc2502c, 0, 0, 0, { ol: 0.02 });
+  pmesh(b, new THREE.BoxGeometry(0.2, 0.02, 0.12), 0xe58a62, 0, 0.125, 0, { ol: 0 });
+  return b;
+}
+function wallProp(par, x, z, cols, rows, gapAt) {
+  var g = new THREE.Group(); g.position.set(x, 0, z); par.add(g);
+  var cs = [0xc2502c, 0xd0603a, 0xb54626, 0xe0704a];
+  for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+    if (gapAt && gapAt[0] === r && gapAt[1] === c) continue;
+    var off = (r % 2) * 0.27;
+    pmesh(g, new THREE.BoxGeometry(0.52, 0.25, 0.4), cs[(r * 3 + c) % cs.length], -cols * 0.27 + c * 0.55 + off + 0.27, 0.13 + r * 0.27, 0, { ol: 0.015 });
+  }
+  return g;
+}
+function kilnProp(par, x, z, s) {
+  var k = new THREE.Group(); k.position.set(x, 0, z); k.scale.setScalar(s || 1); par.add(k);
+  pmesh(k, new THREE.CylinderGeometry(1.0, 1.05, 0.25, 16), 0x7a6a5a, 0, 0.12, 0);
+  pmesh(k, new THREE.SphereGeometry(0.95, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), 0xb04a24, 0, 0.25, 0, { ol: 0.04 });
+  pmesh(k, new THREE.CylinderGeometry(0.16, 0.2, 0.55, 8), 0x6a3a22, 0.4, 1.15, -0.2);
+  pmesh(k, new THREE.BoxGeometry(0.55, 0.5, 0.1), 0xffa030, 0, 0.55, 0.88, { basic: true });
+  pmesh(k, new THREE.SphereGeometry(0.22, 8, 6), 0xffd060, 0, 0.5, 0.92, { basic: true });
+  for (var i = 0; i < 3; i++) pmesh(k, new THREE.SphereGeometry(0.16 + i * 0.05, 8, 6), 0xffffff, 0.45 + i * 0.1, 1.6 + i * 0.35, -0.2, { basic: true, alpha: 0.7 - i * 0.18 });
+  return k;
+}
+function coinProp(par, x, y, z, r) {
+  var c = pmesh(par, new THREE.CylinderGeometry(r, r, r * 0.22, 16), 0xffd23a, x, y, z, { r: [Math.PI / 2, 0, 0], ol: 0.015 });
+  pmesh(c, new THREE.CylinderGeometry(r * 0.7, r * 0.7, r * 0.26, 14), 0xf0a812, 0, 0, 0, { ol: 0 });
+  return c;
+}
+
+/* ---------- Edgar: a D&D-style gnoll, hyena head, in a builder's cap ---------- */
+function buildGnoll(o) {
+  o = o || {};
+  var g = new THREE.Group(), fur = 0xd2a55f, furL = 0xeed39a, dk = 0x5b3a22, spot = 0x7d5128, tun = 0x2f8f9a;
+  [-1, 1].forEach(function (sx) {
+    pmesh(g, new THREE.CylinderGeometry(0.15, 0.12, 0.62, 10), fur, sx * 0.2, 0.42, 0);
+    pmesh(g, new THREE.BoxGeometry(0.27, 0.12, 0.42), dk, sx * 0.2, 0.06, 0.07);
+    pmesh(g, new THREE.SphereGeometry(0.04, 6, 5), spot, sx * 0.2, 0.5, 0.13, { ol: 0 });
+    pmesh(g, new THREE.SphereGeometry(0.035, 6, 5), spot, sx * 0.17, 0.32, 0.1, { ol: 0 });
+  });
+  pmesh(g, new THREE.CylinderGeometry(0.34, 0.46, 0.86, 14), tun, 0, 1.1, 0);
+  pmesh(g, new THREE.CylinderGeometry(0.47, 0.47, 0.09, 14), 0x4a2f1a, 0, 0.78, 0, { ol: 0.012 });
+  pmesh(g, new THREE.BoxGeometry(0.16, 0.12, 0.03), 0xf5b921, 0, 0.78, 0.47, { ol: 0.012 });
+  pmesh(g, new THREE.BoxGeometry(0.18, 0.26, 0.05), 0x4a2f1a, -0.3, 0.62, 0.38, { ol: 0.01, r: [0, 0.5, 0] });     // tool pouch
+  pmesh(g, new THREE.ConeGeometry(0.11, 0.55, 8), fur, 0, 0.6, -0.5, { r: [-2.0, 0, 0] });                          // tail
+  function arm(sx, rz, rx) {
+    var a = new THREE.Group(); a.position.set(sx * 0.45, 1.46, 0); a.rotation.set(rx || 0, 0, rz); g.add(a);
+    pmesh(a, new THREE.CylinderGeometry(0.1, 0.085, 0.62, 10), fur, 0, -0.31, 0);
+    pmesh(a, new THREE.SphereGeometry(0.115, 10, 8), furL, 0, -0.66, 0);
+    pmesh(a, new THREE.SphereGeometry(0.03, 6, 5), spot, 0.05, -0.2, 0.07, { ol: 0 });
+    return a;
+  }
+  var aR = arm(1, o.armR == null ? 0.25 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.25 : o.armL, o.armLx || 0);
+  var h = new THREE.Group(); h.position.set(0, 1.88, 0.02); h.rotation.z = o.tilt || 0; h.rotation.y = o.turn || 0; g.add(h);
+  pmesh(h, new THREE.SphereGeometry(0.34, 18, 14), fur, 0, 0, 0, { ol: 0.026 });
+  pmesh(h, new THREE.CylinderGeometry(0.13, 0.2, 0.5, 12), furL, 0, -0.08, 0.4, { r: [Math.PI / 2, 0, 0] });
+  pmesh(h, new THREE.BoxGeometry(0.14, 0.07, 0.46), dk, 0, 0.07, 0.4, { ol: 0 });
+  pmesh(h, new THREE.SphereGeometry(0.075, 10, 8), 0x1a1008, 0, 0.02, 0.66, { ol: 0.012 });
+  var mouth = o.mouth || "smile";
+  if (mouth === "grin") {
+    pmesh(h, new THREE.BoxGeometry(0.22, 0.05, 0.42), 0x3a0f10, 0, -0.19, 0.4, { ol: 0 });
+    pmesh(h, new THREE.BoxGeometry(0.2, 0.06, 0.4), furL, 0, -0.25, 0.37, { ol: 0.012, r: [0.18, 0, 0] });
+    pmesh(h, new THREE.SphereGeometry(0.07, 8, 6), 0xe87a8a, 0, -0.205, 0.46, { ol: 0, s: [1.2, 0.5, 1.6] });
+    [-0.07, 0.07].forEach(function (tx) {
+      pmesh(h, new THREE.ConeGeometry(0.028, 0.08, 5), 0xffffff, tx, -0.165, 0.58, { ol: 0, r: [Math.PI, 0, 0] });
+      pmesh(h, new THREE.ConeGeometry(0.026, 0.07, 5), 0xffffff, tx, -0.225, 0.56, { ol: 0 });
+    });
+  } else if (mouth === "open") {
+    pmesh(h, new THREE.BoxGeometry(0.2, 0.08, 0.34), 0x3a0f10, 0, -0.2, 0.4, { ol: 0 });
+    pmesh(h, new THREE.BoxGeometry(0.19, 0.05, 0.34), furL, 0, -0.27, 0.36, { ol: 0.01, r: [0.28, 0, 0] });
+  } else {
+    pmesh(h, new THREE.BoxGeometry(0.2, 0.025, 0.4), 0x3a0f10, 0, -0.17, 0.4, { ol: 0 });
+    pmesh(h, new THREE.ConeGeometry(0.026, 0.07, 5), 0xffffff, 0.08, -0.205, 0.56, { ol: 0, r: [Math.PI, 0, 0] });
+  }
+  [-1, 1].forEach(function (sx) {
+    pmesh(h, new THREE.SphereGeometry(0.085, 10, 8), 0xffffff, sx * 0.16, 0.09, 0.27, { ol: 0.012, s: [1, 1.1, 0.6] });
+    pmesh(h, new THREE.SphereGeometry(0.056, 10, 8), 0xf2c200, sx * 0.17, 0.09, 0.31, { ol: 0, s: [1, 1.1, 0.6] });
+    pmesh(h, new THREE.SphereGeometry(0.03, 8, 6), 0x111111, sx * 0.175 + (o.look || 0) * 0.015, 0.09, 0.33, { ol: 0, s: [0.8, 1.4, 0.6] });
+    var br = o.brow == null ? 0.1 : o.brow;
+    pmesh(h, new THREE.BoxGeometry(0.15, 0.04, 0.04), dk, sx * 0.16, 0.21 + (o.browUp || 0), 0.29, { ol: 0, r: [0, 0, sx * br] });
+    pmesh(h, new THREE.SphereGeometry(0.15, 10, 8), fur, sx * 0.3, 0.37, -0.03, { ol: 0.02, s: [0.6, 1.2, 0.5], r: [0, 0, -sx * 0.3] });
+    pmesh(h, new THREE.SphereGeometry(0.09, 8, 6), 0xe58a8a, sx * 0.31, 0.36, 0.0, { ol: 0, s: [0.5, 1, 0.4], r: [0, 0, -sx * 0.3] });
+    pmesh(h, new THREE.SphereGeometry(0.03, 6, 5), spot, sx * 0.24, -0.02, 0.22, { ol: 0 });
+    pmesh(h, new THREE.SphereGeometry(0.025, 6, 5), spot, sx * 0.2, 0.0, 0.26, { ol: 0 });
+  });
+  for (var k = 0; k < 7; k++) pmesh(h, new THREE.ConeGeometry(0.07 - k * 0.004, 0.3 - k * 0.012, 6), dk, 0, 0.3 - k * 0.12, -0.27 - k * 0.015, { ol: 0.012, r: [-2.3 + k * 0.05, 0, 0] });
+  if (!o.nocap) {
+    pmesh(h, new THREE.CylinderGeometry(0.22, 0.25, 0.13, 14), 0xc2502c, 0, 0.3, 0.0, { ol: 0.018 });
+    pmesh(h, new THREE.SphereGeometry(0.2, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0xd0603a, 0, 0.33, 0, { ol: 0.018 });
+    pmesh(h, new THREE.BoxGeometry(0.3, 0.03, 0.2), 0x8f2f1a, 0, 0.27, 0.27, { ol: 0.012, r: [0.15, 0, 0] });
+  }
+  return { group: g, head: h, aR: aR, aL: aL };
+}
+
+/* ---------- The Elder: a little old satyr — enormous scarf, enormous horns ---------- */
+function hornChain(par, sign, y0, long) {
+  var n = 14, pts = [], i;
+  for (i = 0; i <= n; i++) {
+    var t = i / n;
+    pts.push(new THREE.Vector3(sign * (0.13 + 0.5 * Math.sin(t * 1.5) * long), y0 + 1.0 * t * long, -0.12 * t + 0.18 * Math.sin(t * 3.2) * long));
+  }
+  for (i = 0; i < n; i++) {
+    var a = pts[i], b = pts[i + 1], d = new THREE.Vector3().subVectors(b, a), len = d.length();
+    var rad = 0.075 * (1 - i / (n + 2)) + 0.012;
+    var seg = pmesh(par, new THREE.CylinderGeometry(rad * 0.86, rad, len * 1.08, 7), i % 3 === 0 ? 0xcfc09c : 0xeee2c4, (a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2, { ol: 0.012 });
+    seg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
+  }
+}
+function buildSatyr(o) {
+  o = o || {};
+  var g = new THREE.Group(), fur = 0x9a7b58, furD = 0x6d5238, skin = 0xe3b88e, robe = 0x6f4d8f, trim = 0xe0b040;
+  [-1, 1].forEach(function (sx) {
+    pmesh(g, new THREE.CylinderGeometry(0.14, 0.1, 0.55, 9), fur, sx * 0.17, 0.78, 0.02, { r: [-0.55, 0, 0] });
+    pmesh(g, new THREE.CylinderGeometry(0.085, 0.07, 0.55, 9), fur, sx * 0.17, 0.36, -0.1, { r: [0.5, 0, 0] });
+    pmesh(g, new THREE.BoxGeometry(0.15, 0.1, 0.2), 0x2a1a10, sx * 0.17, 0.05, 0.02, { ol: 0.014 });
+  });
+  var tor = new THREE.Group(); tor.rotation.x = 0.2; tor.position.set(0, 0.95, 0); g.add(tor);
+  pmesh(tor, new THREE.CylinderGeometry(0.31, 0.42, 0.9, 12), robe, 0, 0.45, 0);
+  pmesh(tor, new THREE.CylinderGeometry(0.43, 0.43, 0.07, 12), trim, 0, 0.1, 0, { ol: 0.01 });
+  pmesh(tor, new THREE.CylinderGeometry(0.34, 0.34, 0.06, 12), trim, 0, 0.88, 0, { ol: 0.01 });
+  var scarf = new THREE.Group(); scarf.position.set(0, 0.95, 0.02); tor.add(scarf);
+  var sc = [0xd0452a, 0xf2b630, 0xd0452a, 0xf2b630];
+  for (var k = 0; k < 4; k++) pmesh(scarf, new THREE.TorusGeometry(0.3 + (k % 2) * 0.02, 0.1, 8, 18), sc[k], 0, 0.05 - k * 0.07, 0, { r: [Math.PI / 2, 0, 0], ol: 0.012 });
+  pmesh(scarf, new THREE.BoxGeometry(0.2, 0.95, 0.07), 0xd0452a, 0.2, -0.45, 0.28, { ol: 0.014, r: [0, 0, 0.12] });
+  pmesh(scarf, new THREE.BoxGeometry(0.2, 0.05, 0.075), 0xf2b630, 0.22, -0.8, 0.28, { ol: 0.01, r: [0, 0, 0.12] });
+  pmesh(scarf, new THREE.BoxGeometry(0.18, 0.7, 0.07), 0xf2b630, -0.28, -0.3, 0.2, { ol: 0.014, r: [0, 0.3, -0.2] });
+  function arm(sx, rz, rx) {
+    var a = new THREE.Group(); a.position.set(sx * 0.4, 0.82, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
+    pmesh(a, new THREE.CylinderGeometry(0.1, 0.12, 0.6, 9), robe, 0, -0.3, 0);
+    pmesh(a, new THREE.SphereGeometry(0.095, 8, 6), skin, 0, -0.64, 0);
+    return a;
+  }
+  var aR = arm(1, o.armR == null ? 0.35 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.35 : o.armL, o.armLx || 0);
+  var h = new THREE.Group(); h.position.set(0, 1.0, 0.1); tor.add(h);
+  pmesh(h, new THREE.SphereGeometry(0.27, 16, 12), skin, 0, 0, 0, { ol: 0.024 });
+  pmesh(h, new THREE.SphereGeometry(0.08, 10, 8), 0xd9a07a, 0, -0.03, 0.27, { ol: 0.014 });
+  [-1, 1].forEach(function (sx) {
+    pmesh(h, new THREE.BoxGeometry(0.1, 0.022, 0.03), 0x3a2a1a, sx * 0.1, 0.045, 0.245, { ol: 0, r: [0, 0, -sx * 0.15] });
+    pmesh(h, new THREE.ConeGeometry(0.07, 0.24, 6), 0xffffff, sx * 0.11, 0.115, 0.23, { ol: 0.01, r: [0, 0, -sx * 1.35] });
+    pmesh(h, new THREE.ConeGeometry(0.075, 0.4, 6), skin, sx * 0.34, 0.06, -0.02, { ol: 0.014, r: [0, 0, -sx * 1.45] });
+    pmesh(h, new THREE.SphereGeometry(0.075, 8, 6), 0xf0a0a0, sx * 0.16, -0.06, 0.2, { ol: 0, s: [1, 0.7, 0.5] });
+    hornChain(h, sx, 0.15, o.horns || 1);
+  });
+  pmesh(h, new THREE.ConeGeometry(0.22, 0.95, 9), 0xf7f3ea, 0, -0.62, 0.12, { ol: 0.02, r: [Math.PI, 0, 0] });
+  pmesh(h, new THREE.SphereGeometry(0.18, 10, 8), 0xf7f3ea, 0, -0.12, 0.13, { ol: 0.016, s: [1.25, 0.8, 0.8] });
+  pmesh(h, new THREE.BoxGeometry(0.32, 0.07, 0.08), 0xffffff, 0, -0.09, 0.28, { ol: 0.01 });
+  if (o.mouth) pmesh(h, new THREE.BoxGeometry(0.09, 0.05, 0.04), 0x5a2a2a, 0, -0.17, 0.29, { ol: 0 });
+  // staff with a glowing crystal
+  var st = new THREE.Group(); st.position.set(0.62, 0, 0.1); st.rotation.z = -0.08; g.add(st);
+  pmesh(st, new THREE.CylinderGeometry(0.04, 0.055, 1.95, 8), 0x6b4a2a, 0, 0.97, 0);
+  pmesh(st, new THREE.OctahedronGeometry(0.17, 0), 0x9afcff, 0, 2.08, 0, { basic: true });
+  pmesh(st, new THREE.SphereGeometry(0.3, 12, 8), 0x9afcff, 0, 2.08, 0, { basic: true, alpha: 0.25 });
+  pmesh(st, new THREE.TorusGeometry(0.17, 0.035, 6, 12), 0x6b4a2a, 0, 1.93, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });
+  if (o.pouch) {
+    var pg = new THREE.Group(); pg.position.set(-0.1, 1.2, 0.8); g.add(pg);
+    pmesh(pg, new THREE.SphereGeometry(0.2, 12, 9), 0x8a5a33, 0, 0, 0, { s: [1, 1.1, 1] });
+    pmesh(pg, new THREE.CylinderGeometry(0.1, 0.14, 0.1, 10), 0x6b4423, 0, 0.2, 0);
+    coinProp(pg, 0.0, 0.3, 0.05, 0.09); coinProp(pg, 0.12, 0.34, -0.02, 0.07);
+  }
+  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
+}
+
+/* ---------- sky creatures ---------- */
+function wingShape(span, chord) {
+  var s = new THREE.Shape();
+  s.moveTo(0.3, 0); s.lineTo(-0.15 * chord, span); s.lineTo(-0.7 * chord, span * 0.62); s.lineTo(-0.95 * chord, span * 0.82);
+  s.lineTo(-1.3 * chord, span * 0.38); s.lineTo(-1.65 * chord, span * 0.5); s.lineTo(-1.5 * chord, 0); s.closePath();
+  return new THREE.ShapeGeometry(s);
+}
+function buildDragon() {
+  var g = new THREE.Group(), body = new THREE.Group(); g.add(body);
+  var green = 0x35a878, belly = 0xf3d98a, red = 0xd8456a;
+  var segs = [[0, 0, 0.62], [-0.85, 0.02, 0.7], [-1.7, 0, 0.6], [-2.45, -0.08, 0.46], [-3.1, -0.2, 0.34], [-3.65, -0.36, 0.24], [-4.1, -0.55, 0.15]];
+  segs.forEach(function (s, i) {
+    pmesh(body, new THREE.SphereGeometry(s[2], 10, 8), green, s[0], s[1], 0, { ol: 0.045 });
+    if (i < 4) pmesh(body, new THREE.SphereGeometry(s[2] * 0.62, 8, 6), belly, s[0], s[1] - s[2] * 0.42, 0, { ol: 0 });
+    if (i < 6) pmesh(body, new THREE.ConeGeometry(0.1, 0.3, 5), red, s[0], s[1] + s[2] * 0.95, 0, { ol: 0.02 });
+  });
+  pmesh(body, new THREE.SphereGeometry(0.45, 10, 8), green, 0.8, 0.25, 0, { ol: 0.04 });
+  pmesh(body, new THREE.SphereGeometry(0.42, 10, 8), green, 1.4, 0.55, 0, { ol: 0.04 });
+  pmesh(body, new THREE.BoxGeometry(0.75, 0.32, 0.46), green, 1.98, 0.5, 0, { ol: 0.03 });
+  pmesh(body, new THREE.BoxGeometry(0.6, 0.12, 0.4), belly, 1.95, 0.32, 0, { ol: 0 });
+  [-1, 1].forEach(function (sz) {
+    pmesh(body, new THREE.SphereGeometry(0.09, 8, 6), 0xfff2a0, 1.55, 0.78, sz * 0.3, { basic: true });
+    pmesh(body, new THREE.ConeGeometry(0.09, 0.5, 6), belly, 1.25, 0.98, sz * 0.18, { ol: 0.02, r: [0, 0, 1.0] });
+  });
+  var wings = [];
+  [-1, 1].forEach(function (sz) {
+    var w = new THREE.Group(); w.position.set(-0.2, 0.55, sz * 0.4); body.add(w);
+    var wp = new THREE.Group(); wp.rotation.x = sz * Math.PI / 2; w.add(wp);
+    var mem = new THREE.Mesh(wingShape(2.9, 1.0), toon(red, { side: THREE.DoubleSide })); wp.add(mem);
+    pmesh(wp, new THREE.CylinderGeometry(0.05, 0.07, 2.9, 6), 0x7a2a44, 0.08, 1.45, 0.02, { r: [0, 0, 0.1], ol: 0.01 });
+    wings.push({ w: w, sz: sz });
+  });
+  g.userData.wings = wings;
+  return g;
+}
+function buildGriffin() {
+  var g = new THREE.Group(), body = new THREE.Group(); g.add(body);
+  var gold = 0xd9a441, cream = 0xf3ece0, brown = 0x8a5a33;
+  pmesh(body, new THREE.SphereGeometry(0.62, 12, 9), gold, -0.7, 0, 0, { ol: 0.04, s: [1.15, 0.95, 0.95] });
+  pmesh(body, new THREE.SphereGeometry(0.6, 12, 9), cream, 0.25, 0.08, 0, { ol: 0.04 });
+  pmesh(body, new THREE.SphereGeometry(0.42, 10, 8), cream, 0.8, 0.5, 0, { ol: 0.04 });
+  pmesh(body, new THREE.ConeGeometry(0.17, 0.5, 6), 0xf2b630, 1.28, 0.46, 0, { ol: 0.025, r: [0, 0, -1.45] });
+  [-1, 1].forEach(function (sz) {
+    pmesh(body, new THREE.SphereGeometry(0.07, 8, 6), 0x222222, 0.98, 0.6, sz * 0.26, { basic: true });
+    pmesh(body, new THREE.ConeGeometry(0.1, 0.34, 5), cream, 0.65, 0.92, sz * 0.2, { ol: 0.02, r: [0, 0, 0.2] });
+    pmesh(body, new THREE.CylinderGeometry(0.07, 0.06, 0.55, 6), 0xf2b630, 0.45, -0.55, sz * 0.2, { ol: 0.018 });
+    pmesh(body, new THREE.CylinderGeometry(0.1, 0.08, 0.5, 6), gold, -1.0, -0.5, sz * 0.22, { ol: 0.02 });
+  });
+  pmesh(body, new THREE.CylinderGeometry(0.06, 0.05, 1.1, 6), gold, -1.7, 0.0, 0, { ol: 0.02, r: [0, 0, 1.2] });
+  pmesh(body, new THREE.SphereGeometry(0.2, 8, 6), brown, -2.25, -0.25, 0, { ol: 0.025 });
+  var wings = [];
+  [-1, 1].forEach(function (sz) {
+    var w = new THREE.Group(); w.position.set(-0.1, 0.45, sz * 0.42); body.add(w);
+    var wp = new THREE.Group(); wp.rotation.x = sz * Math.PI / 2; w.add(wp);
+    for (var k = 0; k < 7; k++) {
+      var f = new THREE.Group(); f.rotation.z = 0.35 - k * 0.22; wp.add(f);
+      var L = 2.5 - Math.abs(k - 1.5) * 0.18;
+      pmesh(f, new THREE.BoxGeometry(0.3, L, 0.06), k % 2 ? cream : brown, 0, L / 2, 0, { ol: 0.015 });
+    }
+    wings.push({ w: w, sz: sz });
+  });
+  g.userData.wings = wings;
+  return g;
+}
+
+/* ---------- portrait scenes -> still images ---------- */
+function portraitBackdrop(sc, theme) {
+  var top = theme === "dusk" ? 0x5a3a9a : 0x7fa8ff, hor = theme === "dusk" ? 0xff9ab8 : 0xffd9b8;
+  var gm = new THREE.ShaderMaterial({ depthWrite: false, uniforms: { uT: { value: new THREE.Color(top) }, uH: { value: new THREE.Color(hor) } },
+    vertexShader: "varying vec2 vU; void main(){ vU=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }",
+    fragmentShader: "uniform vec3 uT; uniform vec3 uH; varying vec2 vU; void main(){ gl_FragColor=vec4(mix(uH,uT,pow(vU.y,0.9)),1.0); }" });
+  var p = new THREE.Mesh(new THREE.PlaneGeometry(44, 13), gm); p.position.set(0, 1.4, -18); sc.add(p);
+  var gr = new THREE.Mesh(new THREE.CircleGeometry(40, 32), toon(theme === "dusk" ? 0x4f8a78 : 0x66b278)); gr.rotation.x = -Math.PI / 2; sc.add(gr);
+  [[-9, 0x5a9aa8, 5], [8, 0x8a7fc8, 4.5], [0, 0x6aa8a0, 6]].forEach(function (h, i) {
+    var m = new THREE.Mesh(new THREE.SphereGeometry(h[2], 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), toon(h[1])); m.position.set(h[0], -0.4, -15 - i); m.scale.y = 0.6; sc.add(m);
+  });
+  var tw = new THREE.Group(); tw.position.set(-4.4, 0, -13); sc.add(tw);
+  pmesh(tw, new THREE.CylinderGeometry(0.75, 1.0, 6.5, 10), 0x9a90c8, 0, 3.25, 0, { ol: 0.05 });
+  pmesh(tw, new THREE.CylinderGeometry(1.25, 1.25, 0.25, 10), 0xe0b040, 0, 5.2, 0, { ol: 0.03 });
+  pmesh(tw, new THREE.ConeGeometry(1.2, 3.2, 10), 0x5a3aa0, 0, 8.3, 0, { ol: 0.05 });
+  pmesh(tw, new THREE.SphereGeometry(0.35, 10, 8), 0xaef6ff, 0, 10.3, 0, { basic: true });
+  [[2.5, 0xffe9a0], [4, 0xffb0e0]].forEach(function (w) { pmesh(tw, new THREE.BoxGeometry(0.22, 0.4, 0.1), w[1], 0, w[0], 0.9, { basic: true }); });
+  [[6.5, 0xd0415a], [9.2, 0x3f9fd0]].forEach(function (c, i) {
+    var hs = new THREE.Group(); hs.position.set(c[0] - 1 + i * 3, 0, -11 + i); sc.add(hs);
+    pmesh(hs, new THREE.CylinderGeometry(0.8, 0.9, 1.3, 9), 0xf4e6ff, 0, 0.65, 0, { ol: 0.04 });
+    pmesh(hs, new THREE.ConeGeometry(1.2, 1.7, 9), c[1], 0, 2.1, 0, { ol: 0.04, r: [0, 0, 0.08] });
+    pmesh(hs, new THREE.BoxGeometry(0.2, 0.28, 0.1), 0xffe9a0, 0, 0.7, 0.85, { basic: true });
+  });
+  [[-6, 4.2], [6.5, 3.4]].forEach(function (c) {
+    var cl = new THREE.Group(); cl.position.set(c[0], c[1], -12); sc.add(cl);
+    [[0, 0, 1], [1.1, -0.1, 0.8], [-1.0, -0.15, 0.75]].forEach(function (q) { pmesh(cl, new THREE.SphereGeometry(q[2], 10, 8), 0xffffff, q[0], q[1], 0, { ol: 0.03 }); });
+  });
+  for (var i = 0; i < 18; i++) pmesh(sc, new THREE.SphereGeometry(0.035 + Math.random() * 0.03, 6, 5), i % 3 ? 0xfff3a0 : 0xaef6ff, (Math.random() - 0.5) * 8, 0.5 + Math.random() * 3.5, -1 - Math.random() * 5, { basic: true });
+  return sc;
+}
+var PORTRAITS = {
+  edgar_wave: { theme: "day", build: function (sc) { var e = buildGnoll({ armR: 2.45, armL: -0.2, mouth: "grin", tilt: 0.05 }); e.group.position.x = -0.15; sc.add(e.group);
+    var gf = buildGriffin(); gf.scale.setScalar(0.5); gf.position.set(3.2, 4.4, -6); gf.rotation.y = Math.PI; gf.rotation.z = 0.1; sc.add(gf); } },
+  edgar_wall: { theme: "day", build: function (sc) { wallProp(sc, 0.5, -1.2, 7, 7); var e = buildGnoll({ armR: 1.7, armL: -1.7, mouth: "grin", brow: 0.15 }); e.group.position.set(-1.0, 0, 0.3); e.group.rotation.y = 0.3; sc.add(e.group);
+    for (var i = 0; i < 5; i++) pmesh(sc, new THREE.SphereGeometry(0.05, 6, 5), 0xffd23a, -2 + i * 1.0, 2.6 + (i % 2) * 0.5, 0.4, { basic: true }); } },
+  edgar_kiln: { theme: "day", build: function (sc) { kilnProp(sc, 1.45, -0.4, 1.0); var e = buildGnoll({ armR: 1.45, armL: -0.25, mouth: "grin", turn: 0.35 }); e.group.position.set(-0.85, 0, 0.2); e.group.rotation.y = 0.35; sc.add(e.group);
+    brickProp(sc, -1.9, 0.14, 0.5, 0.3); brickProp(sc, -1.5, 0.14, 1.0, -0.3); brickProp(sc, -1.7, 0.4, 0.65, 0.1); } },
+  edgar_place: { theme: "day", build: function (sc) { var w = wallProp(sc, 0.3, -0.6, 6, 3, [2, 3]);
+    pmesh(w, new THREE.BoxGeometry(0.58, 0.31, 0.46), 0x7cf08a, 0.3, 0.67, 0, { basic: true, alpha: 0.4 });
+    var e = buildGnoll({ armR: 0.2, armL: -0.2, armRx: -1.35, armLx: -1.35, mouth: "open", brow: 0.2 }); e.group.position.set(-0.7, 0, 0.5); sc.add(e.group); brickProp(sc, -0.7, 1.2, 1.15, 0); } },
+  edgar_proud: { theme: "day", build: function (sc) { var e = buildGnoll({ armR: 0.75, armL: -0.75, mouth: "grin", tilt: -0.04 }); sc.add(e.group);
+    var dr = buildDragon(); dr.scale.setScalar(0.38); dr.position.set(-3.2, 4.3, -5); dr.rotation.z = 0.12; sc.add(dr); dr.userData.wings.forEach(function (w) { w.w.rotation.x = -w.sz * 0.5; }); } },
+  elder_talk: { theme: "dusk", build: function (sc) { var s = buildSatyr({ mouth: true, armR: 0.3, armL: -1.3, armLx: -0.5 }); s.group.position.x = -0.2; s.group.rotation.y = 0.15; sc.add(s.group); } },
+  edgar_shrug: { theme: "dusk", build: function (sc) { var e = buildGnoll({ armR: 1.25, armL: -1.25, mouth: "flat", brow: -0.25, tilt: 0.12, look: -1 }); e.group.position.x = -0.1; sc.add(e.group);
+    var q = glyphSprite("?", "#ffd94d", 0.9); q.position.set(0.95, 2.95, 0.3); sc.add(q); var q2 = glyphSprite("?", "#ffffff", 0.55); q2.position.set(-0.8, 3.05, 0.3); sc.add(q2); } },
+  elder_pay: { theme: "dusk", build: function (sc) { var s = buildSatyr({ mouth: true, pouch: true, armR: 0.3, armL: -0.3, armLx: -1.2, horns: 1.05 }); s.group.position.x = -0.2; s.group.rotation.y = -0.1; sc.add(s.group); } },
+  edgar_grin: { theme: "dusk", build: function (sc) { var e = buildGnoll({ armR: 2.4, armL: -0.25, mouth: "grin", brow: 0.2, tilt: -0.06 }); e.group.position.x = -0.1; sc.add(e.group); coinProp(e.group, 0.55, 2.62, 0.1, 0.2);
+    var d = glyphSprite("$", "#8ff0a4", 0.8); d.position.set(-0.95, 2.85, 0.3); sc.add(d); var d2 = glyphSprite("$", "#ffd94d", 0.55); d2.position.set(1.15, 3.2, 0.3); sc.add(d2); } }
+};
+var PORT_IMG = {};
+function renderPortraits(keys) {
+  var todo = keys.filter(function (k) { return !PORT_IMG[k] && PORTRAITS[k]; });
+  if (!todo.length) return;
+  var W = 440, H = 340, rr;
+  try { rr = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); } catch (e) { return; }
+  rr.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); rr.setSize(W, H, false);
+  var cam = new THREE.PerspectiveCamera(32, W / H, 0.1, 100); cam.position.set(0, 1.75, 6.6); cam.lookAt(0, 1.3, 0);
+  todo.forEach(function (k) {
+    try {
+      var sc = new THREE.Scene(), P = PORTRAITS[k];
+      portraitBackdrop(sc, P.theme); P.build(sc);
+      sc.add(new THREE.AmbientLight(0xffffff, 0.95)); var dl = new THREE.DirectionalLight(0xfff1d6, 1.35); dl.position.set(-3, 5, 5); sc.add(dl);
+      rr.render(sc, cam); PORT_IMG[k] = rr.domElement.toDataURL("image/jpeg", 0.9);
+    } catch (err) { console.error("portrait", k, err); }
+  });
+  try { rr.dispose(); rr.forceContextLoss(); } catch (e2) {}
+}
+
+/* =====================================================================
+   STORY CARDS — swipeable, with a Three.js portrait on each. Used for Edgar's intro and the Elder at row 5.
+   ===================================================================== */
+var KILN_CHIP = '<div class="cd-chip"><b>KILN</b><small>HOLD</small></div>';
+var CARDS_INTRO = [
+  { who: "EDGAR", pic: "edgar_wave", kicker: "MEET EDGAR", text: "Hey, this is you. You\u2019re Edgar." },
+  { who: "EDGAR", pic: "edgar_wall", kicker: "WHAT EDGAR LOVES", text: "Edgar loves building walls. Tall ones, straight ones, ones with a little personality." },
+  { who: "EDGAR", pic: "edgar_kiln", kicker: "STEP ONE", text: "First, he bakes the bricks. See the KILN button? Hold it down and the bricks come out.", extra: KILN_CHIP },
+  { who: "EDGAR", pic: "edgar_place", kicker: "STEP TWO", text: "Then he places them. Tap when the brick swings over its slot, and drop it right in." },
+  { who: "EDGAR", pic: "edgar_proud", kicker: "TODAY", text: "The town needs a wall. Just a wall. Lay a row, then another, and see where it takes you.", cta: "LET\u2019S BUILD" }
+];
+var CARDS_ELDER = [
+  { who: "THE ELDER", pic: "elder_talk", kicker: "ROW FIVE", text: "\u201cEdgar. A word. That is a very fine wall. But what this town needs is a TOWER.\u201d" },
+  { who: "EDGAR", pic: "edgar_shrug", kicker: "ROW FIVE", text: "\u201cI don\u2019t know\u2026 I\u2019m more of a wall guy.\u201d" },
+  { who: "THE ELDER", pic: "elder_pay", kicker: "ROW FIVE", text: "\u201cWell, I\u2019ll pay you. For every finished row.\u201d" },
+  { who: "EDGAR", pic: "edgar_grin", kicker: "ROW FIVE", text: "\u201cWell, not only do I like walls, I also like money. And I guess a tower is just four walls.\u201d", cta: "TAKE THE JOB" }
+];
+var CARDS = { seq: null, i: 0, m: null, drag: null, busy: false };
+var elCards = $("cards"), elDeck = $("cards-deck"), elCdNext = $("cards-next"), elCdDots = $("cards-dots"), elCdHint = $("cards-hint");
+function enqueueCards(id, seq, done) { msgQ.push({ kind: "cards", id: id, seq: seq, done: done }); pumpMsg(); }
+function cardsActive() { return !!(activeMsg && activeMsg.kind === "cards"); }
+function openCards(m) {
+  CARDS.m = m; CARDS.seq = m.seq; CARDS.i = 0; CARDS.busy = false;
+  releaseKiln();
+  try { renderPortraits(m.seq.map(function (c) { return c.pic; })); } catch (e) {}
+  showPanel(elCards); renderCard(true);
+}
+function renderCard(first) {
+  var c = CARDS.seq[CARDS.i], n = CARDS.seq.length, img = PORT_IMG[c.pic];
+  var pic = img ? '<img alt="" draggable="false" src="' + img + '" />' : '<div class="cd-nopic">' + (c.who === "EDGAR" ? "\uD83D\uDC3A" : "\uD83D\uDC10") + "</div>";
+  elDeck.querySelector(".cd-front") && elDeck.removeChild(elDeck.querySelector(".cd-front"));
+  var f = document.createElement("div"); f.className = "cd cd-front enter"; f.id = "cd-front";
+  f.innerHTML = '<div class="cd-pic">' + pic + '<div class="cd-tag ' + (c.who === "EDGAR" ? "" : "elder") + '">' + c.who + "</div></div>" +
+    '<div class="cd-body"><div class="cd-kicker">' + c.kicker + '</div><p class="cd-text">' + c.text + "</p>" + (c.extra || "") + "</div>";
+  elDeck.appendChild(f);
+  var dots = ""; for (var k = 0; k < n; k++) dots += '<i class="' + (k === CARDS.i ? "on" : "") + '"></i>';
+  elCdDots.innerHTML = dots;
+  elCdNext.textContent = c.cta || "NEXT";
+  elCdHint.classList.toggle("hidden", CARDS.i > 0 || n < 2);
+  elDeck.classList.toggle("last", CARDS.i === n - 1);
+  if (!first) { snd.pop(); haptic(8); }
+  CARDS.busy = false;
+}
+function advanceCards(dir) {
+  if (CARDS.busy || !cardsActive()) return;
+  CARDS.busy = true;
+  var f = $("cd-front");
+  if (f) { f.classList.remove("enter"); f.style.transition = "transform .26s ease-in, opacity .26s ease-in"; f.style.transform = "translateX(" + (dir * window.innerWidth * 0.85) + "px) rotate(" + (dir * 16) + "deg)"; f.style.opacity = "0"; }
+  snd.whoosh();
+  setTimeout(function () {
+    if (!cardsActive()) { CARDS.busy = false; return; }
+    if (CARDS.i >= CARDS.seq.length - 1) { CARDS.busy = false; closeCards(); return; }
+    CARDS.i++; renderCard(false);
+  }, 240);
+}
+function closeCards() {
+  var m = activeMsg; if (!m || m.kind !== "cards") return;
+  activeMsg = null; hidePanel(elCards, 240);
+  if (m.done) setTimeout(m.done, 200);
+  setTimeout(pumpMsg, 280);
+}
+elCdNext.addEventListener("click", function () { advanceCards(-1); });
+elDeck.addEventListener("pointerdown", function (e) {
+  if (CARDS.busy || !$("cd-front")) return;
+  CARDS.drag = { x: e.clientX, dx: 0, id: e.pointerId }; try { elDeck.setPointerCapture(e.pointerId); } catch (er) {}
+  $("cd-front").classList.remove("enter"); $("cd-front").style.transition = "none";
+});
+elDeck.addEventListener("pointermove", function (e) {
+  var d = CARDS.drag; if (!d || e.pointerId !== d.id) return;
+  d.dx = e.clientX - d.x; var f = $("cd-front"); if (f) f.style.transform = "translateX(" + d.dx + "px) rotate(" + (d.dx / 18) + "deg)";
+});
+function endDrag(e) {
+  var d = CARDS.drag; if (!d || (e && e.pointerId !== d.id)) return; CARDS.drag = null;
+  var f = $("cd-front"), adx = Math.abs(d.dx);
+  if (adx > 70) advanceCards(d.dx > 0 ? 1 : -1);
+  else if (adx < 6) advanceCards(-1);
+  else if (f) { f.style.transition = "transform .22s cubic-bezier(.2,1.4,.4,1)"; f.style.transform = ""; }
+}
+elDeck.addEventListener("pointerup", endDrag);
+elDeck.addEventListener("pointercancel", endDrag);
+document.addEventListener("keydown", function (e) {
+  if (!cardsActive()) return;
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === " " || e.key === "Enter") { e.preventDefault(); e.stopPropagation(); advanceCards(e.key === "ArrowRight" ? 1 : -1); }
+}, true);
+
 /* ---------------- opening / victory ---------------- */
 function finishOpening() {
   openingPending = false;
@@ -3851,6 +4482,7 @@ function syncSettings() {
 function openSettings() { clearHintForPanel(); releaseKiln(); syncSettings(); showPanel(el.settings); snd.pop(); }
 function closeSettings() { hidePanel(el.settings, 180, pumpMsg); }
 $("btn-settings").addEventListener("click", function () { audio(); openSettings(); });
+$("btn-settings-start").addEventListener("click", function () { audio(); openSettings(); });
 $("btn-settings-close").addEventListener("click", function () { closeSettings(); snd.pop(); });
 el.settings.addEventListener("click", function (e) { if (e.target === el.settings) closeSettings(); });
 function setOpt(id, fn) { $(id).addEventListener("click", function () { fn(); syncSettings(); snd.pop(); }); }
@@ -3959,7 +4591,7 @@ function boot() {
   requestAnimationFrame(frame);
   var ldLines = ["FIRING THE KILN…", "MIXING THE MORTAR…", "STACKING THE BRICKS…"], ldI = 0;
   var ldT = setInterval(function () { var m = $("ld-msg"); if (m) { ldI = (ldI + 1) % ldLines.length; m.textContent = ldLines[ldI]; } }, 430);
-  setTimeout(function () { clearInterval(ldT); hidePanel(el.ovLoading, 300); showPanel(el.ovStart); decorateStart(); }, 1350);
+  setTimeout(function () { clearInterval(ldT); hidePanel(el.ovLoading, 300); showPanel(el.ovStart); decorateStart(); setTimeout(function () { try { renderPortraits(["edgar_wave", "edgar_wall", "edgar_kiln", "edgar_place", "edgar_proud"]); } catch (e) {} }, 150); setTimeout(function () { try { renderPortraits(["elder_talk", "edgar_shrug", "elder_pay", "edgar_grin"]); } catch (e) {} }, 4500); }, 1350);
 }
 $("btn-begin").addEventListener("click", function () {
   if (S.flags.begun) return;
@@ -3967,7 +4599,7 @@ $("btn-begin").addEventListener("click", function () {
   hidePanel(el.ovStart, 300);
   var sv = readSave();
   if (sv) { try { loadGame(sv); } catch (err) { console.error(err); finishOpening(); } }
-  else finishOpening();          // straight to the kiln — the story waits until the first row is done
+  else { openingPending = true; enqueueCards("intro", CARDS_INTRO, null); }          // meet Edgar, then straight to the kiln
 });
 
 
@@ -4102,11 +4734,12 @@ function loadGame(d) {
   if (S.leadUnlocked && !S.tier.lead) S.tier.lead = 1;
   if (S.tier.gilded > 0 && !S.tier.gold) { S.tier.gold = 1; S.tier.silver = Math.max(S.tier.silver, 1); S.tier.lead = Math.max(S.tier.lead, 1); }
   S.flags = d.flags || {}; S.beats = d.beats || {}; S.seenLines = d.seenLines || {}; S.flags.begun = true;
+  if ((d.best || d.courses || 0) >= 10) S.flags.goalShown = true;
   if (S.flags.rimStarted) { S.flags.rimDone = true; S.flags.rimPending = false; S.goal = FINAL_GOAL; }
-  var tower = !!d.tower || !!S.beats.c5b, per = 6 - S.tier.hotMortar, pf = towerPerFace(), n = d.bricks || 0;
+  var tower = !!d.tower || !!S.beats.c5b, per = 5 - S.tier.hotMortar, pf = towerPerFace(), n = d.bricks || 0;
   var fillMode = tower && d.fill > 0 && d.courses >= 1;                  // saved mid-way through building the tower's other three sides
   var need = tower ? 4 * pf : per, rows = fillMode ? d.courses : Math.min(d.courses, tower ? 999 : 4, Math.floor(n / need));
-  S.tower = tower; S.perFace = tower ? pf : 6; S.perCourse = tower ? 4 * pf : per; S.towerStart = Math.min(d.towerStart || 5, rows);
+  S.tower = tower; S.perFace = tower ? pf : 5; S.perCourse = tower ? 4 * pf : per; S.towerStart = Math.min(d.towerStart || 5, rows);
   if (tower) {
     var ft = new THREE.Mesh(new THREE.BoxGeometry(TW + 1.0, FOUND, TW + 1.0), toon(0x8a8478)); ft.position.set(0, FOUND / 2, -TH);
     ft.receiveShadow = true; outline(ft, 0.05); scene.add(ft);
@@ -4191,7 +4824,7 @@ window.__bb = {
   spawnHand: spawnHand, queueRaid: queueRaid, hazards: hazardsFor, updateHazards: updateHazards,
   startTower: startTower, orbit: function () { return { ang: W3.orbitAng, t: W3.orbitT, turning: CAM.turning, face: curFace(), slot: curSlot() }; },
   startRim: startRim, startVictory: startVictory, milestone: milestone,
-  setTier: function (id, t) { S.tier[id] = t; if (id === "hotMortar") S.perCourse = 6 - t; renderHUD(); },
+  setTier: function (id, t) { S.tier[id] = t; if (id === "hotMortar") S.perCourse = 5 - t; renderHUD(); },
   money: function (m) { S.money = m; S.earned += m; renderHUD(); },
   grabNow: function () { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && HANDS[i].state === "grip") HANDS[i].timer = 0.01; },
   handNeed: handNeed, nearestHand: nearestHand, handCount: handCount
