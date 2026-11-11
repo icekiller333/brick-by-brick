@@ -6,7 +6,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: tiles for the 2D original, the 3D version, and a changelog.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v8.0).
+- `brick-by-brick-3d.html` — the latest version, 3D (v11.1).
 
 ## How to play
 
@@ -59,6 +59,20 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
 
+### 3D v11.1 — Nov 10, 2026 (round 4 feedback, actioned)
+
+- Upgrade text de-duplicated (e.g., kiln heating no longer repeats itself).
+- Tower reworked to 5×5; objects hiding bricks drop to ~50% transparency so bricks stay visible.
+- Villagers keep speaking after every finished row, even while the tower is being rebuilt.
+- The 50-row goal is no longer shown at first — you're just a guy building a wall. Once the wall is 5 high and the tower is rebuilt to 5 high (total 10), you ask the villagers how many is enough and they say 50; past 50 it extends (course 100).
+- Settings button on the main menu is clickable again; "A Tiny Wall Building Game" is readable against the background.
+- Edgar intro cards on Start: Edgar is a gnoll from D&D (Three.js) — "Hey, this is you — you're Edgar," he loves building walls, first he makes the bricks (kiln shown), then he places them, then you play.
+- Fantasy revamp: buildings more fantasy-esque, a wizard's tower in the background, dragons and griffins flying by, kept magical and mystical.
+- The hole's story smoothed out: no hole on row 1; on row 2 a tiny hole appears and someone mentions they saw a hole in the sky — that's why the villager appears.
+- Crowd messages now appear one at a time, fading away in a chain so they don't compete; pop-ups no longer block the kiln instructions; messages rewritten shorter, sweeter, snappier, with humor.
+- People around the tower grow more magical as the rows go on (wizard hats, glowing auras, horns, hooves, satyr bodies).
+- At row 5, the elder cards return: a little satyr old man with a big scarf and long horns — "Well, I'll pay you," and Edgar: "Not only do I like walls, I also like money — and I guess a tower is just four walls."
+
 ### 3D v8.0 — Nov 9, 2026 (round 3 feedback, completed)
 
 - Brick Sorter unlock: one warehouse per brick type, with warehouse tabs inside the storage building; the active warehouse feeds the crane, and apprentices build from the warehouse you have selected.
@@ -79,4 +93,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again.
