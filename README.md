@@ -6,7 +6,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: tiles for the 2D original, the 3D version, and a changelog.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v11.1).
+- `brick-by-brick-3d.html` — the latest version, 3D (v14.2).
 
 ## How to play
 
@@ -59,6 +59,21 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
 
+### 3D v14.2 — Nov 11, 2026 (rounds 5 and 6 feedback, actioned)
+
+- Upgrade famine fixed: new early upgrades Tip Jar, Lucky Brick, Hot Gloves, Coin Pouch, Cheer Bonus, Apprentice's Stool; the early game is very slow, and the earliest upgrades are speed, then storage.
+- Storage now starts as a tiny shed holding 1 brick, upgradeable to 2, 3, 4, 5, 6, 7, 8, maxing out at ~16.
+- Brick-setting-into-place animation added (0.5s), with an upgrade ladder 0.4s → 0.3s → 0.2s → 0.1s → instantaneous.
+- Two more miss animations — an explosion and a 3D twirl toward the camera before the brick falls away — playing randomly, never the same one back to back.
+- Mini kiln upgrade: a second, slower source of bricks that outputs higher-quality types more often.
+- Tower-side rotation is much snappier.
+- Circular tower upgrade: in the skill tree, unlocked once you've gotten the bricks down to three on a side — the square tower becomes a cylinder, one row per level, ~10–12 bricks per row.
+- You now click your storage to load a brick, so background things and easter eggs are clickable again.
+- Intro cards: swipe left to move forward, right to go back; the kiln card shows the real in-game kiln graphic — press and hold to bake, a mini tutorial that reinforces the one at game start; "tap anywhere" text moved to the top of the screen.
+- Once all five tower rows are built and you start building higher, the citizens do subtle little dancing animations so they're not static.
+- Buildings show little characters going in and out of houses, smoke from chimneys, lights in windows.
+- Reset progress from the settings menu; the settings menu is cleaned up with cards and a better layout; the skill-tree UI/UX is vastly improved with good information design so it's clear what you're supposed to be doing.
+
 ### 3D v11.1 — Nov 10, 2026 (round 4 feedback, actioned)
 
 - Upgrade text de-duplicated (e.g., kiln heating no longer repeats itself).
@@ -93,4 +108,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again.
