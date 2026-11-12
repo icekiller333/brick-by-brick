@@ -6,7 +6,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: tiles for the 2D original, the 3D version, and a changelog.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v14.2).
+- `brick-by-brick-3d.html` — the latest version, 3D (v16.3).
 
 ## How to play
 
@@ -59,6 +59,21 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
 
+### 3D v16.3 — Nov 11, 2026 (round 7 feedback, actioned)
+
+- Double gear button on the main menu fixed — the in-game gear is hidden on the title screen, which has its own gear.
+- Settings cards are clickable anywhere to toggle the setting.
+- Flying creatures are now tappable — the dragon and griffin (and other fly-bys) react when tapped.
+- People never go transparent — villagers stay solid; only buildings and scenery fade when they're in front of the tower or wall.
+- Speech bubble tails are on the bottom, not the top, and the bubbles are anchored to the people — the tail slides to stay on the speaker.
+- Row-5 story cards: no more misclick-swipe on the first card — cards animate in and aren't clickable during the animation.
+- The top-left number is gone as a row counter — it's now a HEIGHT counter that only appears once the goal to get to 50 is revealed.
+- You can start baking another brick even if your storage is full — the finished brick waits in the kiln until there's room in the storage.
+- The storage shed is narrower and starts just big enough for one brick, widening as Bigger Storage is bought.
+- Backgrounds are fuller and more magical when moving around the tower.
+- The next-block highlight animates in only once the turn to the new side has been made.
+- People around the tower move, so it doesn't feel static.
+
 ### 3D v14.2 — Nov 11, 2026 (rounds 5 and 6 feedback, actioned)
 
 - Upgrade famine fixed: new early upgrades Tip Jar, Lucky Brick, Hot Gloves, Coin Pouch, Cheer Bonus, Apprentice's Stool; the early game is very slow, and the earliest upgrades are speed, then storage.
@@ -108,4 +123,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again.
