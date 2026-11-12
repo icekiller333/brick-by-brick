@@ -158,14 +158,16 @@
       @keyframes kilnNudge{ 0%,100%{ filter:drop-shadow(0 0 0 rgba(245,185,33,0)) } 50%{ filter:drop-shadow(0 0 12px rgba(245,185,33,.95)) } }
       #tray{ position:relative; flex:0 1 auto; width:178px; min-width:150px; padding-top:30px; }
       #tray .t-roof{ position:absolute; left:-6px; right:-6px; top:0; width:calc(100% + 12px); height:38px; overflow:visible; pointer-events:none; filter:drop-shadow(3px 3px 0 var(--shadowc)); }
-      #tray .t-sign{ position:absolute; left:50%; top:13px; transform:translateX(-50%); display:flex; align-items:baseline; gap:6px; color:#fff; z-index:2;
-        font-weight:800; font-size:9px; letter-spacing:.16em; text-shadow:0 1px 0 rgba(0,0,0,.55); white-space:nowrap; pointer-events:none; }
-      #tray-count{ font-family:'Archivo Black',sans-serif; font-size:19px; letter-spacing:0; line-height:1; }
+      #tray .t-sign{ position:absolute; left:50%; top:9px; transform:translateX(-50%); display:flex; align-items:center; gap:7px; color:#f4e6c8; z-index:2;
+        padding:3px 9px 3px 8px; background:linear-gradient(180deg,#3a2314,#24140a); border:3px solid var(--line); box-shadow:0 3px 0 rgba(0,0,0,.35), inset 0 1px 0 rgba(255,220,160,.25);
+        font-weight:800; font-size:8.5px; letter-spacing:.1em; text-shadow:0 1px 0 #000; white-space:nowrap; pointer-events:none; max-width:calc(100% + 8px); }
+      #tray-count{ font-family:'Archivo Black',sans-serif; font-size:17px; letter-spacing:0; line-height:1; color:#ffd24d; text-shadow:0 2px 0 #000, 0 0 0 #000; }
       #tray .t-bay{ position:relative; border:4px solid var(--line); background:linear-gradient(180deg,#2b1810,#4a2f1c); padding:8px 8px 10px; min-height:62px;
         box-shadow:var(--shadow-s), inset 0 -6px 0 #8a7358; }
       #tray.thunk{ animation:thunk .22s ease-out; transform-origin:50% 100%; }
       @keyframes thunk{ 0%{ transform:scaleY(.94) } 100%{ transform:none } }
       #tray{ cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+      #tray.tight #tray-lab{ display:none; } #tray.tight .t-sign{ gap:0; padding:3px 7px; }
       #tray.small .tb{ width:21px; height:12px; } #tray.small #tray-list{ gap:4px 3px; }
       .tb.slot{ background:transparent !important; border:2px dashed rgba(217,199,164,.32); box-shadow:none; animation:none; } .tb.slot::after{ display:none; }
       .tb.lucky{ box-shadow:0 0 0 2px #7dff8a, 0 0 10px #7dff8a, inset 0 -3px 0 rgba(0,0,0,.2); }
@@ -200,8 +202,19 @@
       .tb.t-glass{ background:linear-gradient(180deg,#e6fbff,#8fd9f0 60%,#5bb7d6) !important; box-shadow:inset 0 -3px 0 rgba(0,0,0,.12), 0 0 8px rgba(143,217,240,.8); }
       .tb.t-silver{ background:linear-gradient(180deg,#f2f5f8,#c9d2da 55%,#9aa5b0) !important; }
       .tb.t-lead{ background:linear-gradient(180deg,#6b707a,#33363f) !important; }
-      .tb .fuse{ position:absolute; left:-2px; right:-2px; bottom:-6px; height:3px; background:rgba(0,0,0,.35); }
-      .tb .fuse i{ display:block; height:100%; background:#ff5a1f; }
+      .tb .fuse{ position:absolute; left:-2px; right:-2px; bottom:-9px; height:6px; background:#1d0f06; border:1px solid #000; border-radius:2px; overflow:hidden; box-shadow:0 1px 0 rgba(255,220,160,.25); }
+      .tb .fuse i{ display:block; height:100%; background:linear-gradient(90deg,#ff3a1a,#ffb02e); }
+      .tb.t-hot::before{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,#9b7b6a,#5b4338); opacity:calc(1 - var(--heat,1)); pointer-events:none; }
+      .tb.urgent .fuse i{ background:linear-gradient(90deg,#ff1a1a,#ff6a2a); }
+      #tray #tray-list{ row-gap:11px; }
+      #hopper{ position:absolute; right:0; top:-22px; z-index:4; display:flex; align-items:center; gap:3px; padding:3px 6px; background:linear-gradient(180deg,#3a2314,#24140a); border:3px solid var(--line); box-shadow:var(--shadow-s); color:#f4e6c8; font-weight:800; font-size:8px; letter-spacing:.12em; pointer-events:none; }
+      #hopper.hidden{ display:none; } #hopper span{ margin-right:3px; }
+      #hopper .tb{ width:15px; height:9px; border-width:2px; } #hopper .tb::after{ display:none; } #hopper .tb.new{ animation:none; }
+      #hot-bar{ position:absolute; z-index:41; width:84px; height:14px; margin-left:-42px; pointer-events:none; border:3px solid var(--line); background:#1d0f06; box-shadow:var(--shadow-s); }
+      #hot-bar.hidden{ display:none; }
+      #hot-bar i{ display:block; height:100%; background:linear-gradient(90deg,#ff3a1a,#ffb02e); }
+      #hot-bar b{ position:absolute; left:-22px; top:-6px; font-size:17px; line-height:1; filter:drop-shadow(0 2px 0 rgba(0,0,0,.5)); }
+      #hot-bar.urgent{ animation:tbShake .15s linear infinite; } #hot-bar.urgent i{ background:linear-gradient(90deg,#ff1a1a,#ff6a2a); }
       .tb.urgent{ animation:hotGlow .2s ease-in-out infinite alternate, tbShake .15s linear infinite; }
       @keyframes tbShake{ 0%,100%{ translate:0 0 } 25%{ translate:-1.5px 0 } 75%{ translate:1.5px 0 } }
       @keyframes hotGlow{ from{ filter:brightness(1) } to{ filter:brightness(1.3) } }
@@ -287,6 +300,37 @@
       .sheet-head .sub{ font-size:11px; font-weight:700; color:var(--muted); flex:1; }
       .rate-chip{ flex:none; font-size:11px; font-weight:800; letter-spacing:.06em; border:2px solid var(--line); background:var(--panel2); padding:3px 7px; white-space:nowrap; }
       .x-btn{ width:38px; height:38px; flex:none; padding:0; font-weight:800; font-size:16px; background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s); }
+      .sheet-head .x-btn{ position:absolute; top:-9px; right:-9px; width:42px; height:42px; font-size:18px; color:#fff; background:linear-gradient(180deg,#ee6a52,#c2402a); text-shadow:0 2px 0 rgba(0,0,0,.45); z-index:3; }
+      .sheet-head{ padding-right:44px; }
+      .forge{ position:relative; display:flex; align-items:center; gap:6px; margin:0 0 10px; padding:0 12px 0 0; overflow:hidden; min-height:96px; cursor:pointer; -webkit-tap-highlight-color:transparent;
+        background:radial-gradient(130px 70px at 118px 58px, rgba(255,140,40,.38), rgba(255,140,40,0) 70%), linear-gradient(180deg,#3a2314,#21120a); border:3px solid var(--line); box-shadow:var(--shadow-s); }
+      .forge svg{ width:192px; height:96px; flex:none; display:block; }
+      .fg-txt{ min-width:0; text-align:left; }
+      .fg-title{ font-family:'Archivo Black',sans-serif; font-size:15px; letter-spacing:.05em; color:#ffd24d; text-shadow:0 2px 0 #000; line-height:1.1; }
+      .fg-sub{ margin-top:4px; font-size:11px; font-weight:700; color:#e9d8b5; line-height:1.3; }
+      .fg-clang{ position:absolute; left:96px; top:4px; font-family:'Archivo Black',sans-serif; font-size:20px; color:#fff; -webkit-text-stroke:1.5px #221407; text-shadow:2px 2px 0 #221407; opacity:0; pointer-events:none; transform-origin:0 100%; }
+      .e-arm{ transform-origin:92px 50px; animation:eIdle 2.8s ease-in-out infinite; }
+      @keyframes eIdle{ 0%{ transform:rotate(-30deg) } 46%{ transform:rotate(-46deg) } 57%{ transform:rotate(1deg); animation-timing-function:ease-out } 63%{ transform:rotate(-14deg) } 100%{ transform:rotate(-30deg) } }
+      .e-glow{ transform-origin:146px 38px; animation:eGlow 1.3s ease-in-out infinite alternate; }
+      @keyframes eGlow{ from{ opacity:.55 } to{ opacity:1 } }
+      .e-spk circle{ opacity:0; }
+      .e-spk circle:nth-child(-n+4){ animation:eSparkIdle 2.8s linear infinite; }
+      @keyframes eSparkIdle{ 0%,57%{ transform:translate(0,0) scale(.4); opacity:0 } 58%{ transform:translate(0,0) scale(1); opacity:1 } 76%,100%{ transform:translate(calc(var(--dx) * .5),calc(var(--dy) * .5 + 12px)) scale(.2); opacity:0 } }
+      .forge.hit{ animation:fgJolt .8s both; }
+      .forge.hit .e-arm{ animation:eHit .8s both; }
+      @keyframes eHit{ 0%{ transform:rotate(-30deg) } 38%{ transform:rotate(-66deg); animation-timing-function:cubic-bezier(.6,0,1,.6) } 50%{ transform:rotate(3deg) } 58%{ transform:rotate(-22deg) } 66%{ transform:rotate(-2deg) } 100%{ transform:rotate(-30deg) } }
+      .forge.hit .e-spk circle{ animation:eSpark .75s cubic-bezier(.1,.6,.4,1) .4s both; }
+      @keyframes eSpark{ 0%{ transform:translate(0,0) scale(1.1); opacity:1 } 100%{ transform:translate(var(--dx),calc(var(--dy) + 30px)) scale(.15); opacity:0 } }
+      .e-anvil{ transform-origin:140px 70px; } .forge.hit .e-anvil{ animation:eSquash .8s both; }
+      @keyframes eSquash{ 0%,49%{ transform:none } 52%{ transform:scale(1.05,.9) } 66%{ transform:scale(.99,1.02) } 100%{ transform:none } }
+      .forge.hit .e-iron{ animation:eFlash .8s both; } .forge.hit .e-glow{ animation:eBlast .8s both; }
+      @keyframes eFlash{ 0%,49%{ filter:none } 52%{ filter:brightness(2.2) } 100%{ filter:none } }
+      @keyframes eBlast{ 0%,49%{ transform:scale(1) } 52%{ transform:scale(1.5); opacity:1 } 100%{ transform:scale(1) } }
+      @keyframes fgJolt{ 0%,49%{ transform:none } 52%{ transform:translateY(2px) } 62%{ transform:translateY(-1px) } 100%{ transform:none } }
+      .forge.hit .fg-clang{ animation:fgClang .8s both; }
+      @keyframes fgClang{ 0%,48%{ opacity:0; transform:scale(.3) rotate(-8deg) } 54%{ opacity:1; transform:scale(1.3) rotate(-8deg) } 80%{ opacity:1; transform:scale(1) rotate(-6deg) } 100%{ opacity:0; transform:translateY(-14px) scale(1) rotate(-6deg) } }
+      @media (max-width:420px){ .forge svg{ width:168px; height:84px; } .forge{ min-height:84px; } .fg-sub{ display:none; } .fg-title{ font-size:14px; } .fg-clang{ left:82px; top:2px; font-size:17px; } }
+      @media (prefers-reduced-motion:reduce){ .forge, .forge *{ animation:none !important; } .e-arm{ transform:rotate(-22deg); } }
       .upg-row{ display:flex; align-items:center; gap:10px; padding:8px 9px; margin-bottom:8px; background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s); transition:background .2s ease; }
       .upg-row.afford{ background:linear-gradient(90deg, var(--panel), rgba(245,185,33,.2)); }
       .upg-row.afford .buy-btn{ animation:buyGlow 1.4s ease-in-out infinite; }
@@ -399,6 +443,22 @@
       .ld-bar{ position:relative; width:190px; height:12px; margin-top:12px; border:3px solid #221407; background:rgba(255,255,255,.55); }
       .ld-bar i{ display:block; height:100%; width:0; background:linear-gradient(90deg,#f5b921,#e0704a); animation:ldFill 1.3s ease-in-out forwards; }
       @keyframes ldFill{ to{ width:100% } }
+      /* loading finale: the finished wall detonates, bricks fly out in every direction, then the title screen takes over */
+      .ld-row i.fly{ animation:ldZoom var(--bt,.6s) cubic-bezier(.4,0,.8,.7) forwards; will-change:transform,opacity; }
+      @keyframes ldZoom{ 0%{ transform:perspective(500px) translate3d(0,0,0) rotate(0); opacity:1 } 14%{ transform:perspective(500px) translate3d(0,0,-40px) rotate(0) scale(.88); opacity:1; animation-timing-function:cubic-bezier(.2,.6,.6,1) } 72%{ opacity:1 } 100%{ transform:perspective(500px) translate3d(var(--bx),var(--by),var(--bz)) rotate(var(--br)); opacity:0 } }
+      @keyframes ldBX{ from{ translate:0 0 } to{ translate:var(--bx) 0 } }
+      @keyframes ldBY{ 0%{ transform:translateY(0) rotate(0) scale(1); animation-timing-function:cubic-bezier(.1,.7,.4,1) }
+        30%{ transform:translateY(var(--by)) rotate(calc(var(--br) * .45)) scale(1.25); animation-timing-function:cubic-bezier(.5,0,.9,.6) }
+        100%{ transform:translateY(calc(var(--by) + 760px)) rotate(var(--br)) scale(.8) } }
+      #ov-loading.boom .ld-msg, #ov-loading.boom .ld-bar{ opacity:0; transition:opacity .12s; }
+      #ov-loading.boom .ld-title{ animation:ldKick .55s ease-out both; }
+      @keyframes ldKick{ 0%{ transform:scale(1) } 18%{ transform:scale(1.18) rotate(-2deg) } 40%{ transform:scale(.97) rotate(1.5deg) } 100%{ transform:scale(1) rotate(0) } }
+      .ld-flash{ position:absolute; inset:0; background:#fff7d6; pointer-events:none; animation:ldFlash .45s ease-out .12s both; z-index:3; }
+      @keyframes ldFlash{ 0%{ opacity:.95 } 100%{ opacity:0 } }
+      .ld-ring{ position:absolute; width:40px; height:40px; margin:-20px 0 0 -20px; border-radius:50%; border:6px solid #fff; box-shadow:0 0 0 3px #f5b921, 0 0 30px 6px rgba(255,170,60,.9); pointer-events:none; animation:ldRing .6s cubic-bezier(.1,.7,.3,1) forwards; z-index:2; }
+      @keyframes ldRing{ from{ transform:scale(.3); opacity:1 } to{ transform:scale(22); opacity:0 } }
+      .ld-spark{ position:absolute; width:9px; height:9px; margin:-4px 0 0 -4px; border-radius:50%; background:#ffd94d; box-shadow:0 0 8px 2px rgba(255,170,60,.9); pointer-events:none; z-index:2; animation:ldSpark var(--st,.7s) ease-out forwards; }
+      @keyframes ldSpark{ from{ transform:translate(0,0) scale(1); opacity:1 } to{ transform:translate(var(--sx),var(--sy)) scale(.2); opacity:0 } }
       /* start: a glowing "something" in the sky, drifting bricks, a punchier title */
       #ov-start{ overflow:hidden; background:linear-gradient(180deg, rgba(40,16,80,0) 20%, rgba(30,10,56,.55) 100%); }
       #ov-start .title-wrap, #ov-start .cta-btn, #ov-start .start-how{ position:relative; z-index:2; }
@@ -627,6 +687,7 @@
           <span class="k-sign"><span class="k-lab">KILN</span><span class="k-sub" id="kiln-sub">HOLD</span></span>
         </button>
         <div id="tray">
+          <div id="hopper" class="hidden" aria-hidden="true"></div>
           <svg class="t-roof" viewBox="0 0 100 38" preserveAspectRatio="none" aria-hidden="true">
             <polygon points="1,36 50,3 99,36" fill="#8e3418" stroke="#221407" stroke-width="4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
             <path d="M14 27H86M28 16H72" stroke="#221407" stroke-opacity=".3" stroke-width="2" vector-effect="non-scaling-stroke"/>
@@ -637,6 +698,7 @@
       </div>
 
       <div id="fx"></div>
+      <div id="hot-bar" class="hidden" aria-hidden="true"><b>🔥</b><i></i></div>
       <div id="big-word"></div>
       <div id="toast"></div>
       <div id="banner"><span class="bn-big" id="bn-big"></span><span class="bn-small" id="bn-small"></span></div>
@@ -652,6 +714,56 @@
         <div class="sheet">
           <div class="sheet-head"><h2>WORKSHOP</h2><span class="sub">Tap a card for details.</span><b class="rate-chip" id="rate-chip"></b>
             <button class="x-btn pressable" id="btn-shop-close" aria-label="Close workshop">✕</button></div>
+          <div class="forge" id="forge" aria-hidden="true">
+            <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="fgSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#aab2bd"/><stop offset=".55" stop-color="#6b727d"/><stop offset="1" stop-color="#3f444d"/></linearGradient>
+                <linearGradient id="fgIron" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".5" stop-color="#ff9a2e"/><stop offset="1" stop-color="#e2441a"/></linearGradient>
+                <radialGradient id="fgGlow"><stop offset="0" stop-color="#ffb347" stop-opacity=".95"/><stop offset="1" stop-color="#ff6a1a" stop-opacity="0"/></radialGradient>
+              </defs>
+              <g transform="translate(0 10)">
+                <ellipse class="e-glow" cx="146" cy="38" rx="46" ry="28" fill="url(#fgGlow)"/>
+                <ellipse cx="100" cy="89" rx="94" ry="4" fill="#000" opacity=".3"/>
+                <rect x="112" y="70" width="58" height="18" rx="3" fill="#8a5a33" stroke="#221407" stroke-width="3"/>
+                <path d="M118 75h46M118 81h46" stroke="#221407" stroke-opacity=".3" stroke-width="2"/>
+                <g class="e-anvil"><path d="M104 44Q114 41 126 41H170V49H156Q153 51 153 56V60H164V70H118V60H130V56Q130 51 124 49Q112 49 104 44Z" fill="url(#fgSteel)" stroke="#221407" stroke-width="3" stroke-linejoin="round"/><path d="M128 44H166" stroke="#e8edf2" stroke-width="2" stroke-linecap="round" opacity=".8"/></g>
+                <g class="e-iron"><rect x="130" y="35" width="30" height="6" rx="2" fill="url(#fgIron)" stroke="#221407" stroke-width="2"/></g>
+                <path d="M58 66Q47 61 45 70Q52 70 58 73Z" fill="#d2a55f" stroke="#221407" stroke-width="2.5" stroke-linejoin="round"/>
+                <path d="M66 54L98 57" stroke="#221407" stroke-width="12" stroke-linecap="round"/><path d="M66 54L98 57" stroke="#d2a55f" stroke-width="7.5" stroke-linecap="round"/>
+                <path d="M99 56L131 39M99 59L131 41" stroke="#221407" stroke-width="5" stroke-linecap="round"/><path d="M99 56L131 39M99 59L131 41" stroke="#8a919b" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="99" cy="57" r="5.5" fill="#eed39a" stroke="#221407" stroke-width="2.5"/>
+                <rect x="66" y="72" width="9" height="14" rx="3" fill="#d2a55f" stroke="#221407" stroke-width="2.5"/><rect x="80" y="72" width="9" height="14" rx="3" fill="#d2a55f" stroke="#221407" stroke-width="2.5"/>
+                <path d="M63 84h15v5H63zM78 84h17v5H78z" fill="#5b3a22" stroke="#221407" stroke-width="2.5" stroke-linejoin="round"/>
+                <path d="M62 46Q77 40 94 46L98 74H58Z" fill="#2f8f9a" stroke="#221407" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M76 54H96L98 80H73Z" fill="#8a5a33" stroke="#221407" stroke-width="2.5" stroke-linejoin="round"/>
+                <rect x="58" y="68" width="40" height="5" fill="#4a2f1a" stroke="#221407" stroke-width="2"/><rect x="82" y="66.5" width="7" height="8" fill="#f5b921" stroke="#221407" stroke-width="1.5"/>
+                <path d="M68 30L62 21L70 24L69 14L76 20" fill="#5b3a22" stroke="#221407" stroke-width="2" stroke-linejoin="round"/>
+                <circle cx="80" cy="30" r="13" fill="#d2a55f" stroke="#221407" stroke-width="3"/>
+                <path d="M86 30Q100 29 103 35Q101 41 88 40Z" fill="#eed39a" stroke="#221407" stroke-width="3" stroke-linejoin="round"/>
+                <circle cx="102" cy="33" r="3" fill="#1a1008"/><path d="M90 38Q96 40 101 37" stroke="#3a0f10" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M96.5 38.6l1.7 3.4 1.6-3.8z" fill="#fff" stroke="#221407" stroke-width="1"/>
+                <circle cx="86" cy="26" r="4" fill="#fff" stroke="#221407" stroke-width="2"/><circle cx="87.4" cy="26.4" r="2.2" fill="#f2c200"/><circle cx="88" cy="26.5" r="1.1" fill="#111"/>
+                <path d="M81 21Q86 19 91 22" stroke="#5b3a22" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <circle cx="83" cy="34" r="1.3" fill="#7d5128"/><circle cx="78" cy="35" r="1.2" fill="#7d5128"/>
+                <path d="M67 24Q68 10 82 10Q93 10 94 22Z" fill="#d0603a" stroke="#221407" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M90 21Q104 19 108 22Q100 25 91 25Z" fill="#8f2f1a" stroke="#221407" stroke-width="2.5" stroke-linejoin="round"/>
+                <ellipse cx="70" cy="12" rx="4.2" ry="7" transform="rotate(-22 70 12)" fill="#d2a55f" stroke="#221407" stroke-width="2.5"/><ellipse cx="70.4" cy="13" rx="1.8" ry="4" transform="rotate(-22 70 12)" fill="#e58a8a"/>
+                <g class="e-arm"><g transform="rotate(-12.8 92 50)">
+                  <rect x="90" y="45.5" width="26" height="9" rx="4.5" fill="#d2a55f" stroke="#221407" stroke-width="2.5"/>
+                  <circle cx="92" cy="50" r="6.5" fill="#2f8f9a" stroke="#221407" stroke-width="2.5"/>
+                  <rect x="116" y="48.3" width="30" height="3.8" rx="1.5" fill="#8a5a33" stroke="#221407" stroke-width="1.8"/>
+                  <circle cx="118" cy="50" r="5.5" fill="#eed39a" stroke="#221407" stroke-width="2.5"/>
+                  <rect x="141" y="42" width="15" height="16" rx="2" fill="url(#fgSteel)" stroke="#221407" stroke-width="2.5"/>
+                </g></g>
+                <g class="e-spk" transform="translate(146 36)">
+                  <circle r="2" fill="#ffd94d" style="--dx:-30px;--dy:-26px"/><circle r="1.6" fill="#fff6c8" style="--dx:-14px;--dy:-36px"/><circle r="2" fill="#ff9a2e" style="--dx:8px;--dy:-34px"/><circle r="1.6" fill="#ffd94d" style="--dx:26px;--dy:-24px"/>
+                  <circle r="2" fill="#ff9a2e" style="--dx:-38px;--dy:-8px"/><circle r="1.6" fill="#fff6c8" style="--dx:36px;--dy:-10px"/><circle r="2" fill="#ffd94d" style="--dx:-22px;--dy:-44px"/><circle r="1.8" fill="#ff9a2e" style="--dx:18px;--dy:-44px"/>
+                  <circle r="1.6" fill="#fff6c8" style="--dx:-44px;--dy:-18px"/><circle r="2" fill="#ffd94d" style="--dx:44px;--dy:-20px"/><circle r="1.6" fill="#ff9a2e" style="--dx:-4px;--dy:-48px"/><circle r="1.8" fill="#fff6c8" style="--dx:30px;--dy:-38px"/>
+                </g>
+              </g>
+            </svg>
+            <div class="fg-txt"><div class="fg-title">EDGAR’S FORGE</div><div class="fg-sub">Forging something. Probably.</div></div>
+            <b class="fg-clang">CLANG!</b>
+          </div>
           <div id="shop-guide"></div>
           <div id="tree-tabs"></div>
           <div id="upg-list"></div>
@@ -811,8 +923,9 @@ var PAY_FROM_ROW = 6;         // rows 1-5 are unpaid: the town only offers to pa
 var STREAK_STEP = 0.01;       // +1% per brick in a row; the first cap (x1.3) takes 31 hits
 var CAP = [1.3, 1.6, 2.0, 2.5, 3.0];
 var BAKE_TIMES = [4.5, 3.8, 3.2, 2.7, 2.25, 1.9, 1.6, 1.35, 1.15, 0.95, 0.78, 0.62];   // seconds per brick WHILE THE KILN IS HELD — the early game is deliberately slow
+var HOPPER_CAP = [1, 2, 3, 4, 5];                                  // Hopper: bricks one tap loads onto the crane (the rest follow by themselves after each drop)
 var STORE_CAP = [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16];         // Bigger Storage: how many bricks the shed holds
-var PLACE_TIMES = [0.5, 0.4, 0.3, 0.2, 0.1, 0];                   // Swift Setting: seconds a brick takes to set into its slot (0 = instant)
+var PLACE_TIMES = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0];                   // Swift Setting: seconds a brick takes to set into its slot (0 = instant)
 var FUSE_ADD = [0, 4, 8];                                         // Hot Gloves: extra seconds a hot brick stays hot
 var TIP_ADD = [0, 1, 2, 3];                                       // Tip Jar: flat $ dropped in per finished row
 var LUCKY_P = [0, 0.05, 0.09, 0.14];                              // Lucky Brick: chance a baked brick is lucky
@@ -839,13 +952,14 @@ var S = {
   time: 0, playTime: 0, lastAct: 0,
   moldT: 0, held: false,
   stack: [],           // bottom → top; the LAST item loads onto the crane next
+  hopper: [],          // bricks already riding in the crane's hopper, waiting to swing out after each drop
   crane: { item: null, state: "empty", pos: 0, dir: 1, t: 0, lock: 0 },
-  hotUnlocked: false, nextHot: false, leadUnlocked: false, glassUnlocked: false,
+  hotUnlocked: false, nextHot: false, nextDemo: null, leadUnlocked: false, glassUnlocked: false,
   windOn: false, mistLevel: 0, swayOn: false, raid: null,
   wind: { dir: 1, phase: 0, flipAt: 0 },
   layAcc: 0, streak: 0, comboTutDone: false, scUsed: 0,
   fill: 0, active: "normal", rowT: { lead: 0, silver: 0, gold: 0, n: 0 }, run: { t: null, n: 0 },
-  tier: { perBrick: 0, perfect: 0, lead: 0, silver: 0, gold: 0, sorter: 0, combo: 0, kilnSpeed: 0, roundTower: 0, storage: 0, placeSpeed: 0, miniKiln: 0, tipJar: 0, luckyBrick: 0, hotGloves: 0, coinPouch: 0, cheerBonus: 0, stool: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
+  tier: { hopper: 0, perBrick: 0, perfect: 0, lead: 0, silver: 0, gold: 0, sorter: 0, combo: 0, kilnSpeed: 0, roundTower: 0, storage: 0, placeSpeed: 0, miniKiln: 0, tipJar: 0, luckyBrick: 0, hotGloves: 0, coinPouch: 0, cheerBonus: 0, stool: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
   flags: {}, beats: {}, seenLines: {},
   muted: false, musicOn: true, shakeOn: true, vibOn: true, quality: "hi", shadow: IS_MOBILE ? "low" : "hi", hand: "r",
   workshopShown: false, shopOpen: false, seenVis: null
@@ -853,6 +967,7 @@ var S = {
 
 // "best" = highest course ever reached. Pay and unlocks follow it, so a hand
 // tearing rows off the wall never takes your pay raise or your shop away.
+function hopperCap() { return HOPPER_CAP[S.tier.hopper || 0]; }
 function storeCap() { return STORE_CAP[S.tier.storage]; }
 function storeFull() { return S.stack.length >= storeCap(); }
 function placeTime() { return PLACE_TIMES[S.tier.placeSpeed]; }
@@ -920,6 +1035,7 @@ var ICON = {
   crowd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="7" cy="8" r="2.5"/><circle cx="17" cy="8" r="2.5"/><circle cx="12" cy="6" r="2.5"/><path d="M3 20v-3a4 4 0 0 1 8 0M13 20v-3a4 4 0 0 1 8 0"/></svg>',
   glaze: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3c4 5.5 6 8.5 6 11.5a6 6 0 0 1-12 0C6 11.5 8 8.5 12 3z"/></svg>',
   lantern: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6M8 6h8l1.5 3v8L15 20H9l-2.5-3V9z"/><path d="M12 10v5"/></svg>',
+  hopper: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 4h18l-6.5 8v6l-5 2.5V12z"/><path d="M7 4v0"/></svg>',
   sorter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 21V9l4.5-4L12 9v12M12 21V9l4.5-4L21 9v12"/><path d="M6 21v-5h3v5M15 21v-5h3v5"/></svg>',
   level: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="2.5" y="9" width="19" height="6" rx="1"/><circle cx="12" cy="12" r="1.6"/><path d="M8 9v2M16 9v2"/></svg>'
 };
@@ -993,8 +1109,8 @@ var LINES = [
   { id: "sorter", icon: "sorter", name: "Brick Sorter", costs: [170],
     effect: function (t) { return "Bricks are sorted into a warehouse per type. Tap a warehouse to pick what the crane AND your apprentices build with. A whole row of one metal pays a pure-row bonus."; },
     next: function (t) { return "Sort lead, silver and gold into their own warehouses and choose which one you build from — stockpile gold, then lay a pure gold row for a big bonus."; } },
-  { id: "placeSpeed", noNow: true, icon: "precision", name: "Swift Setting", costs: [18, 45, 90, 160, 260], gate: function () { return true; },
-    effect: function (t) { return t >= 5 ? "Bricks snap into place instantly." : "Bricks take " + PLACE_TIMES[t] + "s to set into their slot."; },
+  { id: "placeSpeed", noNow: true, icon: "precision", name: "Swift Setting", costs: [12, 24, 40, 62, 90, 125, 165, 215, 270, 330], gate: function () { return true; },
+    effect: function (t) { return t >= 10 ? "Bricks snap into place instantly." : "Bricks take " + PLACE_TIMES[t] + "s to set into their slot."; },
     next: function (t) { return "Bricks set into place faster: " + PLACE_TIMES[t] + "s → " + (PLACE_TIMES[t + 1] === 0 ? "instant" : PLACE_TIMES[t + 1] + "s") + ". Less waiting between drops."; } },
   { id: "storage", noNow: true, icon: "sorter", name: "Bigger Storage", costs: [14, 30, 52, 80, 115, 160, 215, 280, 380, 500, 650], gate: function () { return true; },
     effect: function (t) { return "The shed holds " + STORE_CAP[t] + " brick" + (STORE_CAP[t] > 1 ? "s" : "") + "."; },
@@ -1017,6 +1133,9 @@ var LINES = [
   { id: "luckyBrick", icon: "star", name: "Lucky Brick", costs: [30, 70, 130], gate: function () { return true; },
     effect: function (t) { return Math.round(LUCKY_P[t] * 100) + "% of bricks come out LUCKY — they sparkle green and pay a coin bonus when laid."; },
     next: function (t) { return Math.round(LUCKY_P[t + 1] * 100) + "% of baked bricks are LUCKY: lay one for a coin bonus (5× rate)."; } },
+  { id: "hopper", noNow: true, icon: "hopper", name: "Hopper", costs: [70, 140, 240, 380], gate: function () { return true; },
+    effect: function (t) { return "One tap loads " + HOPPER_CAP[t] + " bricks onto the crane — the next one swings out by itself after every drop."; },
+    next: function (t) { return t === 0 ? "A hopper on the crane: one tap on the shed loads " + HOPPER_CAP[1] + " bricks, and the next swings out by itself after each drop." : "One tap loads " + HOPPER_CAP[t] + " → " + HOPPER_CAP[t + 1] + " bricks. Fewer taps, more building."; } },
   { id: "stool", icon: "apprentice", name: "Apprentice's Stool", costs: [55, 130, 250], gate: function () { return true; },
     effect: function (t) { return "Apprentices earn ×" + STOOL[t] + " on every brick."; },
     next: function (t) { return "A stool lets the apprentice reach — their bricks pay ×" + STOOL[t + 1] + " (now ×" + STOOL[t] + ")."; } },
@@ -1027,7 +1146,7 @@ var LINES = [
 /* ----- SKILL TREE: every upgrade hangs off a parent. A node opens once its parent is owned (to the tier shown) and you've reached its row. ----- */
 var TABS = [ { id: "kiln", name: "KILN" }, { id: "bricks", name: "BRICKS" }, { id: "money", name: "MONEY" }, { id: "skill", name: "SKILL" }, { id: "crew", name: "CREW" }, { id: "weather", name: "WEATHER" } ];
 var TREE = {
-  kilnSpeed: { tab: "kiln", parent: null }, placeSpeed: { tab: "kiln", parent: "kilnSpeed", ptier: 1 }, storage: { tab: "kiln", parent: "kilnSpeed", ptier: 2 }, miniKiln: { tab: "kiln", parent: "storage", ptier: 3, row: 8 }, hotGloves: { tab: "kiln", parent: "kilnSpeed", ptier: 3, row: 6 }, roundTower: { tab: "kiln", parent: "hotMortar", ptier: 2, row: 6 },
+  kilnSpeed: { tab: "kiln", parent: null }, placeSpeed: { tab: "kiln", parent: "kilnSpeed", ptier: 1 }, storage: { tab: "kiln", parent: "kilnSpeed", ptier: 2 }, hopper: { tab: "kiln", parent: "storage", ptier: 3, row: 7 }, miniKiln: { tab: "kiln", parent: "storage", ptier: 3, row: 8 }, hotGloves: { tab: "kiln", parent: "kilnSpeed", ptier: 3, row: 6 }, roundTower: { tab: "kiln", parent: "hotMortar", ptier: 2, row: 6 },
   tipJar: { tab: "money", parent: null, row: 5 }, coinPouch: { tab: "money", parent: "tipJar", ptier: 1, row: 8 }, cheerBonus: { tab: "money", parent: "coinPouch", ptier: 1, row: 10 }, luckyBrick: { tab: "bricks", parent: null, row: 7 }, stool: { tab: "crew", parent: "autoLayer", ptier: 1, row: 6 },
   bellows: { tab: "kiln", parent: "kilnSpeed", row: 6 }, hotMortar: { tab: "kiln", parent: "kilnSpeed", ptier: 2, row: 6 },
   perBrick: { tab: "money", parent: null, row: 5 }, combo: { tab: "money", parent: "perBrick" }, crowd: { tab: "money", parent: "combo", row: 15 },
@@ -1624,7 +1743,7 @@ function buildWonders() {
     add(b, new THREE.ConeGeometry(1.2, 1.8, 10), T(c[0]), 0, -2.9, 0, 0.08).rotation.x = Math.PI;
     add(b, new THREE.BoxGeometry(0.9, 0.7, 0.9), T(0x8a5a33), 0, -4.8, 0, 0.06);
     for (var rp = 0; rp < 4; rp++) add(b, new THREE.BoxGeometry(0.05, 1.7, 0.05), new THREE.MeshBasicMaterial({ color: 0x221407 }), (rp % 2 ? 0.4 : -0.4), -3.9, (rp < 2 ? 0.4 : -0.4), false);
-    wFlat(b); scene.add(b); WON.balloons.push({ g: b, a: c[1], r: 30 + n * 6, y: 15 + n * 3.5, sp: 0.018 + n * 0.004, ph: n });
+    wFlat(b); scene.add(b); WON.balloons.push({ g: b, a: c[1], r: 30 + n * 6, y: 15 + n * 3.5, sp: 0.018 + n * 0.004, ph: n, col: c[0], hide: 0, pop: 1 });
   });
   // ---- the ground: flowers, tufts, glowing mushrooms, ponds, a ring of rune stones ----
   var N1 = 240, N2 = 360, N3 = 80, m4 = new THREE.Matrix4(), q4 = new THREE.Quaternion(), s4 = new THREE.Vector3(), v4 = new THREE.Vector3(), col = new THREE.Color();
@@ -1683,7 +1802,10 @@ function updateWonders(dt) {
   WON.obeam.material.opacity = 0.1 + 0.07 * Math.sin(t * 0.9 + 1);
   for (i = 0; i < WON.rb.children.length; i++) WON.rb.children[i].material.opacity = 0.5 + 0.14 * Math.sin(t * 0.8 + i * 0.4);
   for (i = 0; i < WON.small.length; i++) { o = WON.small[i]; o.g.position.y = o.y + Math.sin(t * o.sp + o.ph) * 0.8; o.g.rotation.y += dt * 0.05; }
-  for (i = 0; i < WON.balloons.length; i++) { o = WON.balloons[i]; o.a += dt * o.sp * 57.3 * 0.2; var bp = wpolar(o.a * 57.3 / 5 + o.ph * 70, o.r); o.g.position.set(bp.x, o.y + Math.sin(t * 0.4 + o.ph * 2) * 1.2, bp.z); o.g.rotation.y = t * 0.1 + o.ph; }
+  for (i = 0; i < WON.balloons.length; i++) { o = WON.balloons[i];
+    if (o.hide > 0) { o.hide -= dt; if (o.hide <= 0) { o.g.visible = true; o.pop = 0.001; } else continue; }
+    if (o.pop < 1) { o.pop = Math.min(1, o.pop + dt * 1.4); var pk = o.pop - 1; o.g.scale.setScalar(Math.max(0.001, 1 + 2.7 * pk * pk * pk + 1.7 * pk * pk)); }
+    o.a += dt * o.sp * 57.3 * 0.2; var bp = wpolar(o.a * 57.3 / 5 + o.ph * 70, o.r); o.g.position.set(bp.x, o.y + Math.sin(t * 0.4 + o.ph * 2) * 1.2, bp.z); o.g.rotation.y = t * 0.1 + o.ph; }
   for (i = 0; i < WON.ponds.length; i++) WON.ponds[i].sp.material.opacity = 0.2 + 0.14 * Math.sin(t * 1.4 + WON.ponds[i].ph);
   for (i = 0; i < WON.runes.length; i++) WON.runes[i].material.opacity = 0.2 + 0.4 * Math.max(0, Math.sin(t * 1.8 - i * 0.52));
   WON.gm.material.color.setScalar(0.8 + 0.2 * Math.sin(t * 2.2)); WON.fl.material.color.setScalar(0.92 + 0.08 * Math.sin(t * 1.3));
@@ -1940,6 +2062,11 @@ function crowdPose(d, dt) {          // sets d.y / d.flipA / d.arm while a react
   if (f.t < 0) return false;
   var u = f.t / f.dur;
   d.arm = -2.6;
+  if (f.kind === "bonk") {                                      // hand clamped to the head, a hop, then a dizzy wobble
+    d.y = 0.32 * Math.sin(Math.PI * Math.min(1, u * 3)); d.tilt = Math.sin(f.t * 26) * 0.3 * (1 - u); d.lat = Math.sin(f.t * 19) * 0.05 * (1 - u); d.arm = -2.9;
+    if (Math.random() < dt * 16 && u < 0.8) { EMIT_WORLD = true; emitGlow(d.x + rand(-0.22, 0.22), 1.55, d.z + rand(-0.22, 0.22), 1, 0xffe27a, 0.5, 0.7, 0.1, -0.4); EMIT_WORLD = false; }
+    return true;
+  }
   if (f.kind === "flip") { d.y = 0.75 * Math.sin(Math.PI * u); d.flipA = -2 * Math.PI * easeOut2(u); }
   else if (f.kind === "somer") { d.y = 1.15 * Math.sin(Math.PI * u); d.flipA = -2 * Math.PI * easeOut2(u); }      // ~3x a normal cheer hop
   else {
@@ -2491,8 +2618,70 @@ function skyTap(px, py) {
   camShake(0.12); haptic(14); flashScreen && flashScreen(0.1, 140);
   return true;
 }
+var RAIN = null;
+function ensureRain() {
+  if (RAIN) return RAIN;
+  RAIN = { ip: instPart(W3.brickGeo, 56, OUTLINE), n: 56, i: 0, p: [] };
+  for (var k = 0; k < RAIN.n; k++) { RAIN.p.push({ life: 0 }); _m.makeScale(0, 0, 0); setInst(RAIN.ip, k, _m); RAIN.ip.fill.setColorAt(k, _c.set(0xffffff)); }
+  RAIN.ip.fill.instanceColor.needsUpdate = true; flushInst(RAIN.ip);
+  return RAIN;
+}
+function rainBricks(x, y, z, n) {
+  var R = ensureRain();
+  for (var k = 0; k < n; k++) {
+    var i = R.i = (R.i + 1) % R.n, q = R.p[i], a = Math.random() * Math.PI * 2, sp = rand(2, 6.5);
+    q.x = x + Math.cos(a) * 0.6; q.y = y + rand(-0.8, 0.6); q.z = z + Math.sin(a) * 0.6;
+    q.vx = Math.cos(a) * sp; q.vz = Math.sin(a) * sp; q.vy = rand(1, 8);
+    q.rx = rand(0, 6); q.ry = rand(0, 6); q.rz = rand(0, 6); q.wx = rand(-7, 7); q.wy = rand(-7, 7); q.wz = rand(-7, 7);
+    q.s = rand(0.8, 1.15); q.life = q.max = rand(3.4, 4.6); q.bounced = false;
+    if (Math.random() < 0.2) _c.set(0xf5b921); else { var h = clayHSL(Math.floor(Math.random() * 997)); _c.setHSL(h[0], h[1], h[2]); }
+    R.ip.fill.setColorAt(i, _c);
+  }
+  R.ip.fill.instanceColor.needsUpdate = true;
+}
+function updateRain(dt) {
+  if (!RAIN) return;
+  var any = false;
+  for (var i = 0; i < RAIN.n; i++) {
+    var q = RAIN.p[i]; if (q.life <= 0) continue;
+    any = true; q.life -= dt; q.vy -= 15 * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt; q.rx += q.wx * dt; q.ry += q.wy * dt; q.rz += q.wz * dt;
+    if (q.y < 0.25) {
+      q.y = 0.25; q.vx *= 0.5; q.vz *= 0.5; q.wx *= 0.4; q.wy *= 0.4; q.wz *= 0.4;
+      if (!q.bounced) { q.bounced = true; q.vy = Math.abs(q.vy) * 0.3; EMIT_WORLD = true; emitPuffs(q.x, 0.2, q.z, 3, 0xd8cdb8, 0.5); EMIT_WORLD = false; } else q.vy = 0;
+    }
+    var k = q.life < 0.6 ? Math.max(0.001, q.life / 0.6) : 1, sc = q.s * k;
+    _e.set(q.rx, q.ry, q.rz); _q.setFromEuler(_e); _v.set(q.x, q.y, q.z); _s.set(sc, sc, sc); _m.compose(_v, _q, _s); setInst(RAIN.ip, i, _m);
+    if (q.life <= 0) { _m.makeScale(0, 0, 0); setInst(RAIN.ip, i, _m); }
+  }
+  if (any) flushInst(RAIN.ip);
+}
+// Tap a hot-air balloon: it pops and rains bricks.
+function balloonTap(px, py) {
+  if (!S.started || !WON || !WON.ok || !WON.balloons) return false;
+  var best = null, bd = 1e9, H = window.innerHeight;
+  for (var i = 0; i < WON.balloons.length; i++) {
+    var o = WON.balloons[i]; if (!o.g.visible || o.hide > 0 || o.pop < 0.6) continue;
+    var wp = o.g.position, sp = toScreenW(wp.x, wp.y - 0.4, wp.z); if (sp.behind) continue;
+    var dist = Math.max(10, camera.position.distanceTo(wp)), ppu = H / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * dist), r = clamp(3.2 * ppu, 48, 150);
+    var dx = sp.x - px, dy = sp.y - py, dd = Math.sqrt(dx * dx + dy * dy);
+    if (dd < r && dd < bd) { bd = dd; best = o; }
+  }
+  if (!best) return false;
+  var bp = best.g.position, bx = bp.x, by = bp.y, bz = bp.z, bsp = toScreenW(bx, by, bz);
+  best.g.visible = false; best.hide = 22;
+  EMIT_WORLD = true;
+  emitPuffs(bx, by, bz, 10, best.col, 3.2, 0.5, 2.4); emitGlow(bx, by, bz, 34, 0xfff0b0, 9, 0.7, 0.4, -2, 1); emitConfetti(bx, by, bz, 34, 2.5);
+  EMIT_WORLD = false;
+  rainBricks(bx, by, bz, 22);
+  noiseBurst(0.3, 0.22, 700); tone(520, 0.12, "sine", 0.1, 0, 140); tone(1040, 0.08, "triangle", 0.06, 0.02, 300);
+  for (var c = 0; c < 6; c++) tone(900 + Math.random() * 900, 0.08, "triangle", 0.05, 0.35 + c * 0.12 + Math.random() * 0.08);      // bricks clinking down
+  popText("POP!", clamp(bsp.x, 50, window.innerWidth - 50), Math.max(100, bsp.y - 10), { cls: "gold", size: 30, rise: 46, rot: -5, dur: 1100 });
+  camShake(0.12); haptic([10, 20, 10]); flashScreen(0.08, 120);
+  return true;
+}
 function critTap(px, py) {
   if (skyTap(px, py)) return true;
+  if (balloonTap(px, py)) return true;
   if (!CG || !S.started) return false;
   var best = null, bd = 1e9, bsp = null, i;
   for (i = 0; i < CRIT.items.length; i++) {
@@ -2752,6 +2941,7 @@ function updateParticles(dt) {
     _e.set(p.rx, p.ry, p.rz); _q.setFromEuler(_e); _v.set(p.x, p.y, p.z); var cs = Math.min(1, p.life * 2); _s.set(cs, cs, cs); _m.compose(_v, _q, _s); CONF.mesh.setMatrixAt(i, _m);
   }
   CONF.mesh.instanceMatrix.needsUpdate = true;
+  updateRain(dt);
 }
 
 /* ---------- camera ---------- */
@@ -3024,9 +3214,11 @@ function tickKiln(dt) {
 function produceBrick(mini) {
   var type = S.shopOpen ? "normal" : rollBrickType();
   if (mini && !S.shopOpen) for (var q = 1; q < MINI_TRIES[S.tier.miniKiln]; q++) { var t2 = rollBrickType(); if ((TYPE_RANK[t2] || 0) > (TYPE_RANK[type] || 0)) type = t2; }
+  var demoLucky = false;
   if (!mini && !S.shopOpen && S.nextHot) { type = "hot"; S.nextHot = false; }
+  else if (!mini && !S.shopOpen && S.nextDemo) { if (S.nextDemo === "lucky") demoLucky = true; else type = S.nextDemo; S.nextDemo = null; }    // show off the new brick type: the first one is guaranteed
   var it = newItem(type);
-  if (!S.shopOpen && Math.random() < LUCKY_P[S.tier.luckyBrick]) it.lucky = true;
+  if (!S.shopOpen && (demoLucky || Math.random() < LUCKY_P[S.tier.luckyBrick])) it.lucky = true;
   if (storeFull()) {                                // baked, but there is no shelf for it: it stays in the kiln until there is room
     S.kilnWait = it; S.moldT = 1; kilnPuff(); tone(660, 0.12, "triangle", 0.07, 0); tone(880, 0.16, "triangle", 0.06, 0.1); haptic(10);
     if (!S.flags.kilnWaitSeen) { S.flags.kilnWaitSeen = true; toast("Shed's full — the finished brick waits in the kiln.", 3200); }
@@ -3066,6 +3258,7 @@ function tickCrane(dt, frozen) {
   if (C.lock > 0) C.lock -= dt;
   if (C.state === "empty") {
     C.t -= dt;
+    if (!frozen && C.t <= 0 && G.falls === 0 && S.hopper.length && !G.reload) { loadCrane(true); return; }     // the hopper feeds the crane by itself
     if (!frozen && C.t <= 0 && G.falls === 0 && (G.reload || G.wantLoad)) {      // bricks only load when you tap the storage (or a forgiven miss comes back)
       ensureActive(); var ni = nextIdx();
       if (ni < 0) { G.reload = false; G.wantLoad = false; }
@@ -3083,17 +3276,32 @@ function tapStorage() {
   if (!S.started || modalPaused() || actionFrozen()) return;
   audio(); S.lastAct = S.time;
   if (C.state !== "empty") return;                 // the crane already has a brick
+  if (S.hopper.length) { if (C.t <= 0 && G.falls === 0) loadCrane(true); return; }      // the hopper is already feeding it
   ensureActive();
   var ni = nextIdx();
   if (ni < 0) { snd.err(); haptic(12); nudgeKiln(); el.tray.classList.remove("shake"); void el.tray.offsetWidth; el.tray.classList.add("shake"); return; }
   if (C.t > 0 || G.falls > 0 || UI.fly[S.stack[ni].uid]) { G.wantLoad = true; return; }     // queued: loads the moment the last brick has set
   loadCrane();
 }
-function loadCrane() {
-  var ni = nextIdx(); if (ni < 0) return;
+function fillHopper() {                    // one tap pulls up to hopperCap()-1 more bricks out of the shed into the hopper
+  var want = hopperCap() - 1, moved = 0;
+  while (S.hopper.length < want) {
+    ensureActive(); var hi = nextIdx();
+    if (hi < 0 || UI.fly[S.stack[hi].uid]) break;
+    S.hopper.push(S.stack.splice(hi, 1)[0]); moved++;
+  }
+  if (moved) {
+    UI.traySig = "";
+    for (var q = 0; q < moved; q++) tone(520 + q * 140, 0.07, "triangle", 0.07, 0.05 + q * 0.07);
+    var tr = el.tray.getBoundingClientRect(); popText("HOPPER ×" + (S.hopper.length + 1), tr.left + tr.width / 2, tr.top - 26, { cls: "gold", size: 15, rise: 26, dur: 900 });
+  }
+}
+function loadCrane(fromHopper) {
+  var item, ni;
+  if (fromHopper) { if (!S.hopper.length) return; item = S.hopper.shift(); }
+  else { ni = nextIdx(); if (ni < 0) return; item = S.stack.splice(ni, 1)[0]; }
   dismissHint("load"); S.flags.loadTaught = true;
   el.tray.classList.remove("thunk"); void el.tray.offsetWidth; el.tray.classList.add("thunk");
-  var item = S.stack.splice(ni, 1)[0];
   C.item = item; C.state = "swing"; C.lock = 0.12; C.loadT = 0;
   var fromRight = Math.random() < 0.5;
   C.pos = fromRight ? 1 : 0; C.dir = fromRight ? -1 : 1;
@@ -3104,6 +3312,7 @@ function loadCrane() {
   }
   C.free = freeBrick(item.type, item.seed);
   snd.load();
+  if (!fromHopper) fillHopper();
   renderHUD();
   if (!S.flags.dropTaught) { S.flags.dropTaught = true; enqueueHint("drop", "Tap ANYWHERE when the brick is over the glowing slot.", null); }
 }
@@ -3349,16 +3558,57 @@ function tickFalling(dt) {
         releaseFree(f); FALLING.splice(i, 1); continue;
       }
       continue;
-    } else if (a.kind === "boom") {            // a short stagger... then it blows apart
-      a.vy -= 26 * dt; f.mesh.position.x += a.vx * dt; f.mesh.position.y += a.vy * dt; f.mesh.position.z += a.vz * dt; f.mesh.rotation.z += a.rz * dt;
-      var pulse = 1 + 0.18 * Math.sin(a.t * 60) * Math.min(1, a.t / 0.2); f.mesh.scale.set(pulse, pulse, pulse);
-      if (a.t >= 0.22) {
+    } else if (a.kind === "boom") {            // it is flung up into the air, swelling and flashing... and blows at the top of the arc
+      a.vy -= 15 * dt; f.mesh.position.x += a.vx * dt; f.mesh.position.y += a.vy * dt; f.mesh.position.z += a.vz * dt; f.mesh.rotation.z += a.rz * dt; f.mesh.rotation.x += (a.rx || 0) * dt;
+      var arm = Math.min(1, a.t / 0.5), flick = Math.sin(a.t * 55) > 0 ? 1 : 0;
+      var pulse = 1 + 0.32 * arm + 0.1 * Math.sin(a.t * 60) * arm; f.mesh.scale.set(pulse, pulse, pulse);
+      f.mesh.material.emissive.set(flick && arm > 0.4 ? 0xffe9a0 : 0xff4a00); f.mesh.material.emissiveIntensity = 0.3 + 0.9 * arm;
+      if (Math.random() < dt * 40) emitGlow(f.mesh.position.x, f.mesh.position.y - 0.1, f.mesh.position.z, 1, 0xffc04d, 0.9, 0.4, 0.1, 1);      // the fizzing fuse trail
+      if (a.vy <= 0 && a.t >= 0.3 || a.t >= 0.8) {
         var bx = f.mesh.position.x, by = f.mesh.position.y, bz = f.mesh.position.z;
         emitChips(bx, by, bz, a.col, 34, 2.4); emitChips(bx, by, bz, 0xffd36b, 12, 1.8);
         emitGlow(bx, by, bz, 26, 0xff8a2a, 4.2, 0.55, 0.2, 1); emitPuffs(bx, by, bz, 12, 0x4a4038, 1.6, 0.8, 1.6);
         camShake(0.85); flashScreen(0.22); snd.crash(); noiseBurst(0.35, 0.22, 500);
         releaseFree(f); FALLING.splice(i, 1); continue;
       }
+      continue;
+    } else if (a.kind === "bonk") {            // lobbed at a villager's head: thonk, "ow", and it ricochets off
+      var m2 = f.mesh;
+      if (!a.hit) {
+        var vd = W3.crowd[a.idx];
+        if (!vd || !vd.on) { a.hit = true; a.vy = 2; a.vx = a.dir || 1; a.vz = 1; a.fall = true; }
+        else {
+          _vf.set(vd.x, (vd.y || 0) + 1.3, vd.z); W3.orbit.worldToLocal(_vf);
+          var e5 = u * u * 0.4 + u * 0.6;
+          m2.position.set(lerp(a.sx, _vf.x, e5), lerp(a.sy, _vf.y, u) + Math.sin(u * Math.PI) * 1.1, lerp(a.sz, _vf.z, e5));
+          m2.rotation.z = a.t * a.spin; m2.rotation.x = a.t * 3;
+          if (u >= 1) {
+            a.hit = true; a.vy = 5.2; a.vx = (Math.random() < 0.5 ? -1 : 1) * rand(1.2, 2.2); a.vz = rand(0.6, 1.6); a.spin *= 1.6;
+            vd.fx = { kind: "bonk", t: 0, dur: 1.5, ph: 0 };
+            snd.crash(); noiseBurst(0.08, 0.25, 280); tone(190, 0.1, "square", 0.1, 0, 80); tone(640, 0.2, "triangle", 0.1, 0.05, 300);
+            camShake(0.28); camPunch(0.15);
+            emitChips(m2.position.x, m2.position.y, m2.position.z, a.col, 10, 1.1); emitGlow(m2.position.x, m2.position.y, m2.position.z, 12, 0xffe27a, 2, 0.5, 0.12, 1);
+            var osp = toScreenW(vd.x, 1.5, vd.z); popText("OW!", osp.x, osp.y - 8, { cls: "red", size: 26, rise: 34, rot: -6 });
+            dropBubble(); SAYQ.length = 0; SAYQ.push({ idx: a.idx, text: pick(["Ow!", "OW! My head!", "Ouch! Hey!", "Oof! Mind the bricks!"]) }); nextSayAt = 0;
+          }
+        }
+        if (!a.hit) continue;
+      }
+      a.vy -= 26 * dt; m2.position.x += (a.vx || 0) * dt; m2.position.y += a.vy * dt; m2.position.z += (a.vz || 0) * dt; m2.rotation.z += a.spin * dt;
+      if (m2.position.y < 0.3 || a.t > 3) {
+        if (m2.position.y < 0.6) { emitChips(m2.position.x, 0.3, m2.position.z, 0xc2502c, 8, 0.9); emitPuffs(m2.position.x, 0.2, m2.position.z, 5, 0xd8cdb8, 0.7); }
+        releaseFree(f); FALLING.splice(i, 1); continue;
+      }
+      continue;
+    } else if (a.kind === "leaf") {            // the brick goes thin and green, and the wind carries it off like a leaf
+      var lt = a.t, m3 = f.mesh, mu = Math.min(1, lt / 0.35), D = a.dir;
+      m3.material.color.setRGB(lerp(a.c0.r, a.c1.r, mu), lerp(a.c0.g, a.c1.g, mu), lerp(a.c0.b, a.c1.b, mu)); m3.material.emissive.set(0x1c3a08); m3.material.emissiveIntensity = 0.3;
+      var shrink = lt > 2.3 ? Math.max(0.001, 1 - (lt - 2.3) / 0.6) : 1;
+      m3.scale.set(lerp(1, 0.78, mu) * shrink, lerp(1, 0.1, mu) * shrink, lerp(1, 0.95, mu) * shrink);
+      m3.position.set(a.sx + D * (1.6 * lt + 1.6 * lt * lt) + Math.sin(lt * 4 + a.ph) * 0.12, a.sy + 0.25 + lt * 0.7 + Math.sin(lt * 3.3 + a.ph) * 0.4, a.sz + lt * 1.4 + Math.sin(lt * 2.2) * 0.35);
+      m3.rotation.set(Math.sin(lt * 4.2 + a.ph) * 1.0, lt * 2.4, Math.sin(lt * 3 + a.ph) * 0.9 - D * 0.5);
+      if (Math.random() < dt * 24) emitGlow(m3.position.x, m3.position.y, m3.position.z, 1, 0x9ad65a, 0.4, 0.7, 0.07, 0.3);
+      if (lt >= 2.9) { releaseFree(f); FALLING.splice(i, 1); continue; }
       continue;
     } else if (a.kind === "twirl") {           // spins out toward the camera, then drops away
       var tw = 0.55;
@@ -3445,17 +3695,39 @@ function poofBack(item, f, word) {
   S.stack.push(item); settleStack();
   C.t = 0.3; G.reload = true;
 }
+function pickBonkTarget(f) {
+  if (!W3.crowd || !S.started) return null;
+  var W = window.innerWidth, H = window.innerHeight, bs = toScreen(f.mesh.position.x, f.mesh.position.y, f.mesh.position.z), pool = [];
+  for (var i = 0; i < W3.crowd.length; i++) {
+    var d = W3.crowd[i]; if (!d.on || d.s < 0.9 || d.fx || (d.dnLeft || 0) > 0) continue;
+    var sp = toScreenW(d.x, 1.2, d.z); if (sp.behind || sp.x < 40 || sp.x > W - 40 || sp.y < 110 || sp.y > H - 230) continue;
+    pool.push({ i: i, dist: Math.abs(sp.x - bs.x) + Math.abs(sp.y - bs.y) * 0.3 });
+  }
+  if (!pool.length) return null;
+  pool.sort(function (a, b) { return a.dist - b.dist; });
+  return pool[Math.floor(Math.random() * Math.min(3, pool.length))].i;
+}
 function missFx(item, f) {
   S.misses++; S.rowMisses++;
   breakStreak();
-  snd.miss(); haptic([30, 40, 30]);
-  camShake(0.5); vignette("miss"); bigWord("MISS!");
+  var kind = null, bonk = f ? pickBonkTarget(f) : null;
   if (f) {
-    var kinds = ["tumble", "boom", "twirl"], kind;
-    do { kind = kinds[Math.floor(Math.random() * kinds.length)]; } while (kind === G.lastMiss);
+    var kinds = ["tumble", "boom", "twirl"]; if (bonk !== null) kinds.push("bonk", "bonk");        // ow: more likely whenever a villager is standing handy
+    if (Math.random() < 0.07 && G.lastMiss !== "leaf") kind = "leaf";                       // rare: the brick turns into a leaf and the wind takes it
+    else do { kind = kinds[Math.floor(Math.random() * kinds.length)]; } while (kind === G.lastMiss);
     G.lastMiss = kind;
+  }
+  snd.miss(); haptic([30, 40, 30]);
+  camShake(kind === "leaf" ? 0.1 : kind === "bonk" ? 0.25 : 0.5); vignette("miss"); bigWord(kind === "leaf" ? "BLOWN AWAY!" : "MISS!");
+  if (f) {
     var col = brickColorHex(item.type, item.seed).getHex();
-    if (kind === "boom") f.anim = { kind: "boom", t: 0, vx: C.dir * 0.8, vy: 2.2, vz: 0.5, rz: -C.dir * 3, col: col };
+    if (kind === "boom") { snd.whoosh(); f.anim = { kind: "boom", t: 0, vx: C.dir * 0.7, vy: 7.4, vz: 0.4, rz: -C.dir * 5, rx: rand(-3, 3), col: col }; }
+    else if (kind === "bonk") { snd.whoosh(); f.anim = { kind: "bonk", t: 0, dur: 0.8, sx: f.mesh.position.x, sy: f.mesh.position.y, sz: f.mesh.position.z, idx: bonk, spin: -C.dir * rand(8, 13), col: col }; }
+    else if (kind === "leaf") {
+      snd.whoosh(); var c0 = f.mesh.material.color;
+      f.anim = { kind: "leaf", t: 0, dir: C.dir || 1, sx: f.mesh.position.x, sy: f.mesh.position.y, sz: f.mesh.position.z, c0: { r: c0.r, g: c0.g, b: c0.b }, c1: { r: 0.42 + Math.random() * 0.4, g: 0.62 + Math.random() * 0.18, b: 0.14 }, ph: Math.random() * 6 };
+      emitPuffs(f.mesh.position.x, f.mesh.position.y, f.mesh.position.z, 8, 0xe9f3d0, 0.8, 0.5);
+    }
     else if (kind === "twirl") { snd.whoosh(); f.anim = { kind: "twirl", t: 0, sx: f.mesh.position.x, sy: f.mesh.position.y, sz: f.mesh.position.z, zFar: Math.min(CAM.D * 0.5, 10), vy: 4.5, col: col }; }
     else f.anim = { kind: "miss", t: 0, vx: C.dir * rand(1.2, 2.4), vy: 1.6, vz: 0.6, rx: rand(-2, 2), rz: -C.dir * rand(4, 8), ty: rowY(workRow()) - PITCH, bounced: false };
     FALLING.push(f);
@@ -3607,6 +3879,13 @@ function tickFuses(dt) {
     else { S.stack.splice(i, 1); bigWord("BURNT OUT!"); missFx(hb, null); }
     renderHUD(); break;
   }
+  for (var hq = S.hopper.length - 1; hq >= 0; hq--) {
+    var hh = S.hopper[hq]; if (hh.type !== "hot") continue;
+    hh.fuse -= dt; if (hh.fuse > 0) continue;
+    if (S.scUsed < S.tier.secondChance) { S.scUsed++; hh.fuse = hotFuse(); bigWord("2ND CHANCE!", "gold"); }
+    else { S.hopper.splice(hq, 1); bigWord("BURNT OUT!"); missFx(hh, null); }
+    renderHUD(); break;
+  }
   var top = C.item && C.item.type === "hot" ? C.item : null;
   if (top && top.fuse < 3) { var whole = Math.ceil(top.fuse * 4); if (whole !== G.lastFuseQ) { G.lastFuseQ = whole; snd.fuse(); } }
 }
@@ -3627,6 +3906,13 @@ function checkUnlocks() {
   if (!S.flags.treeInit) { S.flags.treeInit = true; return; }
   if (fresh.length) { toast("SKILL TREE: " + fresh.slice(0, 2).join(", ") + (fresh.length > 2 ? " +" + (fresh.length - 2) + " more" : "") + " unlocked", 3600); snd.buy(); }
 }
+var forgeT = 0;
+function forgeStrike() {                              // Edgar swings his hammer: the iron flares, sparks fly, the anvil rings
+  var fg = $("forge"); if (!fg || !S.shopOpen) return;
+  fg.classList.remove("hit"); void fg.offsetWidth; fg.classList.add("hit");
+  clearTimeout(forgeT); forgeT = setTimeout(function () { fg.classList.remove("hit"); }, 900);
+  setTimeout(function () { tone(1480, 0.32, "triangle", 0.07, 0, 1250); tone(2960, 0.16, "sine", 0.04, 0.01); tone(220, 0.1, "square", 0.05, 0, 110); noiseBurst(0.05, 0.12, 3200); haptic(12); }, 400);
+}
 function buyLine(id) {
   var l = null; for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) l = LINES[i];
   if (!l || !l.gate() || S.tier[id] >= l.costs.length) return;
@@ -3634,7 +3920,7 @@ function buyLine(id) {
   if (S.money < cost) { snd.err(); if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); } return; }
   if (row) { var bb = row.querySelector(".buy-btn"); if (bb) { var r = bb.getBoundingClientRect(); domBurst(r.left + r.width / 2, r.top + r.height / 2); popText("TIER " + (S.tier[id] + 1) + "!", r.left + r.width / 2, r.top - 12, { cls: "gold", size: 18, rise: 30 }); } }
   S.money = Math.round((S.money - cost) * 100) / 100; S.tier[id]++;
-  snd.buy(); haptic(15);
+  snd.buy(); haptic(15); forgeStrike();
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
     else {
@@ -3646,9 +3932,9 @@ function buyLine(id) {
   } else if (id === "kilnSpeed" && S.tier.kilnSpeed === 2 && !S.hotUnlocked) {
     S.hotUnlocked = true; S.nextHot = true; enqueueReveal("hot");
   } else if (id === "kilnSpeed") toast("The kiln bakes faster while you hold it.", 2600);
-  else if (id === "lead") { S.leadUnlocked = true; enqueueReveal("lead"); }
-  else if (id === "silver") enqueueReveal("silver");
-  else if (id === "gold") enqueueReveal("gold");
+  else if (id === "lead") { S.leadUnlocked = true; if (S.tier.lead === 1) S.nextDemo = "lead"; enqueueReveal("lead"); }
+  else if (id === "silver") { if (S.tier.silver === 1) S.nextDemo = "silver"; enqueueReveal("silver"); }
+  else if (id === "gold") { if (S.tier.gold === 1) S.nextDemo = "gold"; enqueueReveal("gold"); }
   else if (id === "sorter") { S.active = "normal"; UI.traySig = ""; enqueueReveal("sorter"); }
   else if (id === "perfect") toast(S.tier.perfect === 1 ? "Perfect Eye! Hit the white strip for a PERFECT — it pays ×" + PERF_PAY[1] + "." : "Perfect drops now pay ×" + PERF_PAY[S.tier.perfect] + ".", 3400);
   else if (id === "perBrick") toast("Piece Work! Every brick you lay now pays.", 3200);
@@ -3674,7 +3960,8 @@ function buyLine(id) {
   else if (id === "tipJar") toast("Tip Jar: every finished row now drops +$" + TIP_ADD[S.tier.tipJar] + " in the jar.", 3000);
   else if (id === "coinPouch") toast("Coin Pouch: brick and row pay +" + Math.round((POUCH[S.tier.coinPouch] - 1) * 100) + "%.", 3000);
   else if (id === "cheerBonus") toast("Cheer Bonus: clean rows earn extra from the crowd.", 3000);
-  else if (id === "luckyBrick") toast("Lucky bricks! Watch for the green sparkle.", 3000);
+  else if (id === "hopper") toast(S.tier.hopper === 1 ? "Hopper fitted! One tap now loads " + hopperCap() + " bricks." : "Hopper upgraded — one tap loads " + hopperCap() + " bricks.", 3200);
+  else if (id === "luckyBrick") { if (S.tier.luckyBrick === 1) S.nextDemo = "lucky"; toast("Lucky bricks! Your next brick is guaranteed lucky.", 3000); }
   else if (id === "roundTower") startRound();
   else if (id === "stool") toast("Apprentice's Stool: apprentices now earn ×" + STOOL[S.tier.stool] + ".", 3000);
   renderHUD(); saveGame();
@@ -3752,8 +4039,10 @@ function updateCraneVisual(dt, rt) {
     var hot = C.item && C.item.type === "hot";
     if (hot) {
       var urgency = C.item.fuse < 3 ? 1 : 0;
-      m.material.emissiveIntensity = 0.45 + 0.35 * Math.sin(rt * (urgency ? 22 : 9));
-      if (Math.random() < dt * 18) emitGlow(hx + rand(-0.4, 0.4), wy + 1.2, 0.1, 1, 0xffa22e, 0.8, 0.7, 0.13, 2.5);
+      var heat = clamp(C.item.fuse / hotFuse(), 0, 1);
+      m.material.color.setRGB(lerp(0.5, 1, heat), lerp(0.36, 0.48, heat), lerp(0.31, 0.16, heat));
+      m.material.emissiveIntensity = Math.max(0, 0.12 + 0.33 * heat + 0.2 * heat * Math.sin(rt * (urgency ? 22 : 9)));
+      if (Math.random() < dt * 18 * heat) emitGlow(hx + rand(-0.4, 0.4), wy + 1.2, 0.1, 1, 0xffa22e, 0.8, 0.7, 0.13, 2.5);
     } else if (C.item && C.item.type === "gold") {
       m.material.emissiveIntensity = 0.35 + 0.25 * Math.sin(rt * 6);
     } else m.material.emissiveIntensity = 0.5;
@@ -3831,7 +4120,7 @@ function milestone(n) {
   if (n === 5 && !S.beats.c5b) { S.beats.c5a = S.beats.c5b = true; enqueueCards("elder", CARDS_ELDER, function () { startTower(); }); }
   if (n === 10 && !S.flags.goalShown) enqueueSeq(["c10a", "c10b"]);
   if (STORY_AT[n]) enqueueStory(STORY_AT[n]);
-  if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; enqueueReveal("glass"); }
+  if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; S.nextDemo = "glass"; enqueueReveal("glass"); }
   if (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0) queueRaid(n);
   if (n % 10 === 0 && n !== FIRST_GOAL && n !== FINAL_GOAL) whenLanded(function () { banner("COURSE " + n, perBrickOn() ? "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE" : "PAY RAISE · ROW BONUS NOW $" + rowBonus(true)); });
   else if (n === FIRST_GOAL - 1 || n === FINAL_GOAL - 1) toast("Course " + n + " — one more.", 3000);
@@ -4175,7 +4464,7 @@ var UI = { tab: "all", fly: {}, trayPop: 0, traySig: "", shopSig: "", shopNew: {
 var el = {};
 ["hud-course-num", "hud-goal", "prog-fill", "money-num", "hud-money", "btn-shop", "shop-new", "shop-count", "chip-row", "row-num", "row-in",
  "chip-wind", "wind-arrow", "wind-str", "chip-sc", "chip-hand", "hand-t", "chip-sway", "streak", "streak-x", "streak-pay", "prompt", "dock", "kiln", "kiln-ring", "kiln-sub",
- "k-mini", "mini-ring", "tray", "tray-count", "tray-lab", "wh-tabs", "tray-list", "fx", "toast", "banner", "bn-big", "bn-small", "big-word", "reveal", "hr-brick", "hr-title", "hr-text",
+ "k-mini", "mini-ring", "tray", "tray-count", "tray-lab", "wh-tabs", "tray-list", "fx", "hot-bar", "toast", "banner", "bn-big", "bn-small", "big-word", "reveal", "hr-brick", "hr-title", "hr-text",
  "workshop", "upg-list", "rate-chip", "settings", "story", "story-card", "story-text", "story-kicker", "story-dots", "story-next",
  "hintwrap", "hint-dim", "hint-label", "hint-text", "vignette", "flash", "ov-loading", "ov-start", "ov-victory"].forEach(function (id) {
   el[id.replace(/-([a-z])/g, function (m, c) { return c.toUpperCase(); })] = $(id);
@@ -4370,14 +4659,25 @@ function renderWh() {
 // The shed starts just big enough for one brick and widens as Bigger Storage is bought.
 function trayWidth() {
   var cap = storeCap(), small = cap > 4, bw = small ? 21 : 30, gap = small ? 3 : 4;
-  var cols = cap <= 3 ? cap : cap <= 4 ? 2 : cap <= 6 ? 3 : cap <= 8 ? 4 : cap <= 10 ? 5 : 6;
-  return Math.max(sorterOn() ? 150 : 104, 24 + cols * bw + (cols - 1) * gap + 6);
+  var cols = cap <= 2 ? 1 : cap <= 4 ? 2 : cap <= 6 ? 3 : cap <= 8 ? 4 : cap <= 10 ? 5 : 6;      // 1 brick: a thin shed · 2: they stack · 3-4: it widens to two columns
+  return Math.max(sorterOn() ? 150 : 56, 24 + cols * bw + (cols - 1) * gap + 6);
+}
+function renderHopper() {
+  var hp = $("hopper"); if (!hp) return;
+  var on = S.tier.hopper > 0, sig = on ? S.hopper.map(function (b) { return b.uid; }).join(",") + "|" + hopperCap() : "";
+  if (sig === UI.hopSig) return; UI.hopSig = sig;
+  hp.classList.toggle("hidden", !on); if (!on) return;
+  var h = "<span>HOPPER</span>";
+  for (var i = 0; i < S.hopper.length; i++) { var b = S.hopper[i]; h += '<i class="tb t-' + b.type + '"' + (b.type === "normal" ? ' style="background:' + clayCss(b.seed) + '"' : "") + "></i>"; }
+  for (var j = S.hopper.length; j < hopperCap() - 1; j++) h += '<i class="tb slot"></i>';
+  hp.innerHTML = h;
 }
 function renderTray() {
+  renderHopper();
   var view = trayView(), sorted = sorterOn();
   var tw = trayWidth() + "px"; if (el.tray.style.width !== tw) el.tray.style.width = tw;
   el.trayCount.textContent = trayCountText();
-  el.tray.classList.toggle("small", storeCap() > 4);
+  el.tray.classList.toggle("small", storeCap() > 4); el.tray.classList.toggle("tight", !sorterOn() && storeCap() <= 4);
   var sig = "c" + storeCap() + ":" + (sorted ? S.active + ":" + ["normal", "lead", "silver", "gold"].map(function (k) { return whOpen(k) ? whCount(k) : "-"; }).join(",") + "#" : "") + view.map(function (it) { return it.uid; }).join(",");
   if (sig === UI.traySig) return;
   UI.traySig = sig;
@@ -4536,7 +4836,15 @@ function uiFrame(rdt) {
     if (!it) continue;
     var bar = fuses[i].querySelector(".fuse i"); if (bar) bar.style.width = (clamp(it.fuse / hotFuse(), 0, 1) * 100).toFixed(1) + "%";
     fuses[i].classList.toggle("urgent", it.fuse < 3);
+    fuses[i].style.setProperty("--heat", clamp(it.fuse / hotFuse(), 0, 1).toFixed(3));
   }
+  // cooling bar floating over the hot brick on the hook
+  var hbEl = el.hotBar;
+  if (S.started && C.item && C.item.type === "hot" && C.state === "swing" && CAM.mode === "play") {
+    var hpt = hookPoint(), hsp = toScreen(hpt.x, hpt.y + 0.55, hpt.z), hr = clamp(C.item.fuse / hotFuse(), 0, 1);
+    hbEl.classList.remove("hidden"); hbEl.style.left = hsp.x.toFixed(0) + "px"; hbEl.style.top = (hsp.y - 14).toFixed(0) + "px";
+    hbEl.lastChild.style.width = (hr * 100).toFixed(1) + "%"; hbEl.classList.toggle("urgent", C.item.fuse < 3);
+  } else if (!hbEl.classList.contains("hidden")) hbEl.classList.add("hidden");
   // hot vignette while a hot brick is on the hook
   var hotOn = S.started && C.item && C.item.type === "hot";
   if (hotOn && el.vignette.className !== "hot" && el.vignette.className !== "miss") el.vignette.className = "hot";
@@ -4554,7 +4862,7 @@ function uiFrame(rdt) {
       else if (S.windOn) txt = "WIND " + (S.wind.dir > 0 ? "→" : "←") + " fast with it, slow against it";
       else if (S.courses < 2) txt = "Tap anywhere to drop";
     } else if (C.state === "empty" && nextIdx() >= 0 && S.flags.loadTaught && S.time - S.lastAct > 2.5) { txt = "TAP the STORAGE to load a brick"; }
-    else if (C.state === "empty" && nextIdx() < 0) { txt = (sorterOn() && S.stack.length > 0) ? WH_NAME[S.active] + " storage is empty — pick another warehouse or HOLD the KILN" : "Out of bricks — HOLD the KILN"; }
+    else if (C.state === "empty" && nextIdx() < 0 && !S.hopper.length) { txt = (sorterOn() && S.stack.length > 0) ? WH_NAME[S.active] + " storage is empty — pick another warehouse or HOLD the KILN" : "Out of bricks — HOLD the KILN"; }
   }
   if (txt !== UI.promptTxt) { UI.promptTxt = txt; el.prompt.textContent = txt; el.prompt.classList.toggle("hidden", !txt); }
   el.prompt.classList.toggle("urgent", urgent);
@@ -5277,6 +5585,7 @@ function openShop() {
 }
 function closeShop() { S.shopOpen = false; hidePanel(el.workshop, 180, pumpMsg); renderHUD(); }
 $("btn-shop").addEventListener("click", function () { audio(); openShop(); });
+$("forge").addEventListener("click", forgeStrike);
 $("btn-shop-close").addEventListener("click", function () { closeShop(); snd.pop(); });
 el.workshop.addEventListener("click", function (e) { if (e.target === el.workshop) closeShop(); });
 function shadowLevelSetting() { return S.shadow || (IS_MOBILE ? "low" : "hi"); }
@@ -5422,7 +5731,39 @@ function boot() {
   requestAnimationFrame(frame);
   var ldLines = ["FIRING THE KILN…", "MIXING THE MORTAR…", "STACKING THE BRICKS…"], ldI = 0;
   var ldT = setInterval(function () { var m = $("ld-msg"); if (m) { ldI = (ldI + 1) % ldLines.length; m.textContent = ldLines[ldI]; } }, 430);
-  setTimeout(function () { clearInterval(ldT); hidePanel(el.ovLoading, 300); showPanel(el.ovStart); $("app").classList.add("on-title"); decorateStart(); setTimeout(function () { try { renderPortraits(["edgar_wave", "edgar_wall", "edgar_kiln", "edgar_place", "edgar_proud"]); } catch (e) {} }, 150); }, 1350);
+  var finishLoad = function () { hidePanel(el.ovLoading, 300); showPanel(el.ovStart); $("app").classList.add("on-title"); decorateStart(); setTimeout(function () { try { renderPortraits(["edgar_wave", "edgar_wall", "edgar_kiln", "edgar_place", "edgar_proud"]); } catch (e) {} }, 150); };
+  setTimeout(function () {                      // the wall is finished: BOOM, then the menu
+    clearInterval(ldT);
+    if (REDUCED) { finishLoad(); return; }
+    try { explodeLoader(); } catch (e) { finishLoad(); return; }
+    setTimeout(finishLoad, 700);
+  }, 1350);
+}
+function explodeLoader() {
+  var ov = el.ovLoading, wall = ov.querySelector(".ld-wall"), wr = wall.getBoundingClientRect(), orr = ov.getBoundingClientRect();
+  var cx = wr.left + wr.width / 2 - orr.left, cy = wr.top + wr.height / 2 - orr.top, W = orr.width;
+  var bricks = ov.querySelectorAll(".ld-row i");
+  for (var i = 0; i < bricks.length; i++) {
+    var b = bricks[i], r = b.getBoundingClientRect(), dx = r.left + r.width / 2 - orr.left - cx, dy = r.top + r.height / 2 - orr.top - cy;
+    var ang = Math.atan2(dy, dx || 0.01) + (Math.random() - 0.5) * 0.7, dist = 70 + Math.random() * 90;
+    b.style.setProperty("--bx", (Math.cos(ang) * dist + dx * 0.8).toFixed(0) + "px");
+    b.style.setProperty("--by", (Math.sin(ang) * dist + dy * 0.8 - 20).toFixed(0) + "px");
+    b.style.setProperty("--bz", (390 + Math.random() * 80).toFixed(0) + "px");
+    b.style.setProperty("--br", ((Math.random() < 0.5 ? -1 : 1) * (60 + Math.random() * 200)).toFixed(0) + "deg");
+    b.style.setProperty("--bt", (0.5 + Math.random() * 0.15).toFixed(2) + "s");
+    b.classList.add("fly");
+  }
+  ov.classList.add("boom");
+  var fl = document.createElement("div"); fl.className = "ld-flash"; ov.appendChild(fl);
+  var ring = document.createElement("div"); ring.className = "ld-ring"; ring.style.left = cx + "px"; ring.style.top = cy + "px"; ov.appendChild(ring);
+  for (var k = 0; k < 18; k++) {
+    var sp = document.createElement("div"), a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 190; sp.className = "ld-spark";
+    sp.style.left = cx + "px"; sp.style.top = cy + "px"; sp.style.setProperty("--sx", (Math.cos(a) * d).toFixed(0) + "px"); sp.style.setProperty("--sy", (Math.sin(a) * d).toFixed(0) + "px"); sp.style.setProperty("--st", (0.5 + Math.random() * 0.4).toFixed(2) + "s");
+    ov.appendChild(sp);
+  }
+  var lm = $("ld-msg"); if (lm) lm.textContent = "";
+  try { if (AC && AC.state === "running") { snd.crash(); noiseBurst(0.4, 0.2, 600); } } catch (e) {}
+  if (navigator.vibrate && S.vibOn) { try { navigator.vibrate([30, 40, 50]); } catch (e) {} }
 }
 $("btn-begin").addEventListener("click", function () {
   if (S.flags.begun) return;
@@ -5546,7 +5887,7 @@ setInterval(musicTick, 100);
 /* ---------------- AUTOSAVE ---------------- */
 var SAVE_KEY = "brickbybrick3d_save_v1", NOSAVE = false, lastSaveAt = 0;
 var SAVE_FIELDS = ["money", "earned", "laid", "best", "bestStreak", "perfects", "misses", "drops", "hits", "molded", "smashed", "stolen", "lost", "playTime",
-  "hotUnlocked", "leadUnlocked", "glassUnlocked", "workshopShown", "comboTutDone", "active", "endless", "goal", "won", "muted", "musicOn", "shakeOn", "vibOn", "quality", "shadow", "hand"];
+  "hotUnlocked", "nextDemo", "leadUnlocked", "glassUnlocked", "workshopShown", "comboTutDone", "active", "endless", "goal", "won", "muted", "musicOn", "shakeOn", "vibOn", "quality", "shadow", "hand"];
 function saveGame() {
   if (NOSAVE || !S.started || (S.courses === 0 && S.laid === 0 && S.money === 0)) return;
   try {
