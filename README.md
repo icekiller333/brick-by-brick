@@ -6,7 +6,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: tiles for the 2D original, the 3D version, and a changelog.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v17.4).
+- `brick-by-brick-3d.html` — the latest version, 3D (v18.5).
 
 ## How to play
 
@@ -58,6 +58,15 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
+
+### 3D v18.5 — Nov 11, 2026 (round 9 feedback, actioned)
+
+- Screen flashes fixed (best-supported causes — couldn't be reproduced): the dragon and griffin are now anchored to the camera and stay on the horizon; balloons, floating islands, and giant mushrooms shrink away when the camera gets close and grow back slowly; clouds thin out near the camera; villagers step out of shot if the camera gets within 7 units. Butterflies were deliberately left alone — they still drift near the camera.
+- Speech bubbles only come from villagers you can actually see — on screen, in front of the camera, not hidden behind the tower or wall. A line passes to a visible speaker or is dropped, and a bubble fades out if the camera turns its speaker out of view. The bonked villager still says "Ow!".
+- The load-a-brick tutorial hint and the shed pulse now stay until the first brick is loaded, instead of vanishing after 6.5 seconds.
+- Placement grades: NICE!, GOOD!, and PERFECT! pop above the brick at the moment you tap — GOOD is the middle 60% of the drop window, NICE is the rest of the hit zone, PERFECT is the white strip. PERFECT still needs the Perfect Eye upgrade, so early on the best you can earn is GOOD.
+- New $4 starter upgrade, Warm-Up: shaves 0.2s off the kiln's opening bake time (4.5s → 4.3s), and only applies until you buy Hotter Kiln, so no other upgrade changed. It's also the workshop tutorial — the Shop button pulses once you hold $4, the workshop opens showing only this one card with a big BUY button and a "TAP TO BUY" arrow (a progress bar if you're under $4), and buying it gives confetti, a fanfare, "WORKSHOP UNLOCKED!", and a YAY banner before the full workshop fades in. Old saves skip the lesson and get Warm-Up for free.
+- Butterflies: the flock was a flat 36 (14 on low quality); it now ramps from 3 on row 1 to 29 by row 10 (about 19% under the old max), 2 to 11 on low quality, and butterflies grow in and shrink out instead of popping.
 
 ### 3D v17.4 — Nov 11, 2026 (round 8 feedback, actioned)
 
@@ -137,4 +146,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again.

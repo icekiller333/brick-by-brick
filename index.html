@@ -96,8 +96,8 @@
     <a class="tile t3d" href="brick-by-brick-3d.html">
       <span class="icon">🏰</span>
       <h2>3D Version</h2>
-      <p>The latest build (v17.4) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
-      <span class="tag">LATEST — v17.4</span>
+      <p>The latest build (v18.5) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
+      <span class="tag">LATEST — v18.5</span>
     </a>
     <button class="tile tlog" id="logBtn" aria-expanded="false" aria-controls="changelog" type="button">
       <span class="icon">📜</span>
@@ -109,6 +109,16 @@
 
   <section id="changelog" aria-label="Changelog">
     <h2>Changelog</h2>
+
+    <h3>3D v18.5 — Nov 11, 2026 (round 9 feedback, actioned)</h3>
+    <ul>
+      <li>Screen flashes fixed (best-supported causes — couldn't be reproduced): the dragon and griffin are now anchored to the camera and stay on the horizon; balloons, floating islands, and giant mushrooms shrink away when the camera gets close and grow back slowly; clouds thin out near the camera; villagers step out of shot if the camera gets within 7 units. Butterflies were deliberately left alone.</li>
+      <li>Speech bubbles only come from villagers you can actually see — on screen, in front of the camera, not hidden behind the tower or wall. A line passes to a visible speaker or is dropped, and a bubble fades out if the camera turns its speaker out of view. The bonked villager still says "Ow!".</li>
+      <li>The load-a-brick tutorial hint and the shed pulse now stay until the first brick is loaded, instead of vanishing after 6.5 seconds.</li>
+      <li>Placement grades: NICE!, GOOD!, and PERFECT! pop above the brick at the moment you tap — GOOD is the middle 60% of the drop window, NICE is the rest of the hit zone, PERFECT is the white strip. PERFECT still needs the Perfect Eye upgrade, so early on the best you can earn is GOOD.</li>
+      <li>New $4 starter upgrade, Warm-Up: shaves 0.2s off the kiln's opening bake time (4.5s → 4.3s), and only applies until you buy Hotter Kiln, so no other upgrade changed. It's also the workshop tutorial — the Shop button pulses once you hold $4, the workshop opens showing only this one card with a big BUY button and a "TAP TO BUY" arrow (a progress bar if you're under $4), and buying it gives confetti, a fanfare, "WORKSHOP UNLOCKED!", and a YAY banner before the full workshop fades in. Old saves skip the lesson and get Warm-Up for free.</li>
+      <li>Butterflies: the flock was a flat 36 (14 on low quality); it now ramps from 3 on row 1 to 29 by row 10 (about 19% under the old max), 2 to 11 on low quality, and butterflies grow in and shrink out instead of popping.</li>
+    </ul>
 
     <h3>3D v17.4 — Nov 11, 2026 (round 8 feedback, actioned)</h3>
     <ul>
