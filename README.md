@@ -63,7 +63,7 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 ### 3D v51.13 — Nov 14, 2026 (round 13 feedback, actioned — gold version)
 
 - Round 13's last two items: once the sky-glass course is reached, plain bricks become glass — they pay ×2 with a half-width drop zone (`GLASS_TOL` 0.65 → 0.5, `TYPE_MULT.glass` 5 → 2, `typeMult()` pays normal bricks ×2 once glass is unlocked, `glassChance()` now returns 0 so there is no separate rare glass roll), and normal bricks render as glass once unlocked. Walls now start at 6 bricks across (`perCourse` 5 → 6), with Hot Mortar dropping them to 5 then 4, and tower sides are 6/5/4 (`towerPerFace` [5,4,3] → [6,5,4]).
-- One discrepancy to check: the round tower ring is 4 × the side length — 24 bricks around at tier 0 (20, then 16) — not 12 as the round 13 item said. Everything else from round 13 is in.
+- The round tower ring is 4 × the side length — 24 bricks around at tier 0 (20, then 16). Ken confirmed 16 as the smallest is fine (12 was just his guess at the feel).
 
 ### 3D v47.12 — Nov 14, 2026 (round 13 feedback, most of it — 5 of 7)
 
