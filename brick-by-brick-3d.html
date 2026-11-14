@@ -200,6 +200,7 @@
       .tb.t-gold{ background:linear-gradient(180deg,#ffe27a,#f5b921 55%,#d99a06) !important; }
       .tb.t-hot{ background:linear-gradient(180deg,#ffc04d,#e2541e) !important; animation:hotGlow .5s ease-in-out infinite alternate; }
       .tb.t-glass{ background:linear-gradient(180deg,#e6fbff,#8fd9f0 60%,#5bb7d6) !important; box-shadow:inset 0 -3px 0 rgba(0,0,0,.12), 0 0 8px rgba(143,217,240,.8); }
+      body.glass-on .tb.t-normal{ background:linear-gradient(180deg,#e6fbff,#8fd9f0 60%,#5bb7d6) !important; box-shadow:inset 0 -3px 0 rgba(0,0,0,.12), 0 0 8px rgba(143,217,240,.8); }
       .tb.t-silver{ background:linear-gradient(180deg,#f2f5f8,#c9d2da 55%,#9aa5b0) !important; }
       .tb.t-lead{ background:linear-gradient(180deg,#6b707a,#33363f) !important; }
       .tb .fuse{ position:absolute; left:-2px; right:-2px; bottom:-9px; height:6px; background:#1d0f06; border:1px solid #000; border-radius:2px; overflow:hidden; box-shadow:0 1px 0 rgba(255,220,160,.25); }
@@ -977,7 +978,7 @@ var HAND_COURSE = 25, MIST_COURSE = 40, HEAVY_MIST_COURSE = 45, TREMOR_COURSE = 
 var HOT_FUSE = 6;            // seconds a hot brick stays hot
 var HIT_TOL = 0.085;          // accepted half-width of the drop window, fraction of a row
 var PERFECT_TOL = HIT_TOL * 0.25;
-var GLASS_TOL = 0.65;         // sky-glass bricks: the drop window is this much of normal
+var GLASS_TOL = 0.5;          // glass bricks: the drop zone is half the width of a normal drop zone (placement only, layout unchanged)
 var GRAB_TIME = 7;            // seconds a hand needs to rip a brick free (30% quicker than the old 10s)
 
 /* ----- ECONOMY (rebalanced) -----
@@ -993,7 +994,9 @@ var GRAB_TIME = 7;            // seconds a hand needs to rip a brick free (30% q
    - The kiln only bakes while you HOLD it. Banked Coals (shop) lets it
      smoulder on its own once you've earned it. The apprentice pays flat rate.
    Pay now arrives every finished SIDE (4× as often on the tower), so the tree was re-priced against that faster income. */
-var TYPE_MULT = { normal: 1, lead: 1.5, silver: 2, gold: 2.5, hot: 2, glass: 5 };
+var TYPE_MULT = { normal: 1, lead: 1.5, silver: 2, gold: 2.5, hot: 2, glass: 2 };
+// plain bricks become glass (×2, half-width drop zone) once the sky-glass course is reached
+function typeMult(type) { return (type === "normal" && S.glassUnlocked) ? 2 : TYPE_MULT[type]; }
 var TYPE_NAME = { gold: "GOLD", silver: "SILVER", lead: "LEAD", hot: "HOT", glass: "GLASS" };
 var ROW_ADD = { lead: 1.25, silver: 1.75, gold: 2.25 }; // × rate: each metal brick in a finished row (side) adds this to that row's payout
 var PURE_ADD = { lead: 3, silver: 5, gold: 8 };         // × rate: a row that is ALL one metal pays this on top
@@ -1037,7 +1040,7 @@ var LEVEL_MULT = [1, 0.6, 0.3];          // Spirit Level: how much of the tremor
 
 var S = {
   started: false, won: false, endless: false, goal: FIRST_GOAL,
-  molded: 0, laid: 0, drops: 0, hits: 0, courses: 0, best: 0, inCourse: 0, perCourse: 5, tower: false, towerStart: 0, perFace: 5,
+  molded: 0, laid: 0, drops: 0, hits: 0, courses: 0, best: 0, inCourse: 0, perCourse: 6, tower: false, towerStart: 0, perFace: 5,
   money: 0, earned: 0, misses: 0, perfects: 0, bestStreak: 0, rowMisses: 0, smashed: 0, stolen: 0, lost: 0,
   time: 0, playTime: 0, lastAct: 0,
   moldT: 0, held: false,
@@ -1073,12 +1076,12 @@ function fmtMult(m) { return String(Math.round(m * 100) / 100); }
 function fmtPay(n) { n = Math.round(n * 100) / 100; return n % 1 === 0 ? String(n) : n.toFixed(2); }   // $4 or $1.05
 function fmtMoney(n) { return fmt(Math.floor(n + 1e-6)); }                                          // HUD shows whole dollars only
 function coinsFor(amount) { return amount <= 12 ? Math.max(1, Math.round(amount)) : Math.min(24, 12 + Math.round(Math.sqrt(amount - 12))); }   // one coin per $1, then thinning out
-function brickPay(mult, type, perfect) { if (rate() <= BASE_PAY) return BASE_PAY; var p = rate() * mult * TYPE_MULT[type]; if (perfect) p *= PERF_PAY[S.tier.perfect] || 1; return Math.max(rate(), Math.round(p * POUCH[S.tier.coinPouch] * 100) / 100); }
+function brickPay(mult, type, perfect) { if (rate() <= BASE_PAY) return BASE_PAY; var p = rate() * mult * typeMult(type); if (perfect) p *= PERF_PAY[S.tier.perfect] || 1; return Math.max(rate(), Math.round(p * POUCH[S.tier.coinPouch] * 100) / 100); }
 function payable(row) { return row >= PAY_FROM_ROW || S.best >= PAY_FROM_ROW || S.tower; }   // the tower is a paid job from the first side
 function workRow() { return S.fill > 0 ? S.fill : S.courses + 1; }     // the row the crane is working on (the tower fill starts back at row 1)
 function towerQ() { return (S.fill > 0 ? S.fill - 1 : S.courses) * 4 + curFace(); }   // quarter-turns the camera has walked round the tower
 function rowBonus(clean) { return round2((2 * rate() * (clean ? 2 : 1) + TIP_ADD[S.tier.tipJar] + (clean ? CHEER_ADD[S.tier.cheerBonus] * rate() : 0)) * POUCH[S.tier.coinPouch]); }
-function glassF() { return (C && C.item && C.item.type === "glass") ? GLASS_TOL : 1; }
+function glassF() { return (C && C.item && (C.item.type === "glass" || (C.item.type === "normal" && S.glassUnlocked))) ? GLASS_TOL : 1; }
 function hitTol() { return HIT_TOL * STEADY_MULT[S.tier.steady] * glassF(); }
 function almostTol() { return hitTol() * 2; }
 function perfectTol() { return S.tier.perfect >= 1 ? PERFECT_TOL * PLUMB_MULT[S.tier.plumb] * glassF() : 0; }   // no Perfect Eye, no perfects
@@ -1091,7 +1094,7 @@ function windGust() { return 0.5 + 0.5 * Math.sin(S.wind.phase); }
 function leadChance() { return S.tier.lead >= 1 ? Math.min(0.12, 0.05 + 0.002 * Math.max(0, S.best - LEAD_COURSE)) : 0; }
 function silverChance() { return S.tier.silver >= 1 ? Math.min(0.10, 0.05 + 0.002 * Math.max(0, S.best - SILVER_ROW)) : 0; }
 function goldChance() { return S.tier.gold >= 1 ? 0.05 + GILD_PCT[S.tier.gilded] / 100 : 0; }
-function glassChance() { return S.glassUnlocked ? Math.min(0.10, 0.05 + 0.003 * (S.best - GLASS_COURSE)) : 0; }
+function glassChance() { return 0; }   // plain bricks are glass now, so there is no separate rare glass roll
 function swayAmp() { return S.swayOn ? Math.min(0.06, 0.03 + 0.0008 * Math.max(0, S.courses - TREMOR_COURSE)) * LEVEL_MULT[S.tier.level] : 0; }
 function swayOff() { var a = swayAmp(); return a ? a * Math.sin(S.time * 2.1 + 1.3) : 0; }
 /* WARM-UP: the very first upgrade. $4, and it doubles as the workshop tutorial (see renderStarterTut).
@@ -1201,8 +1204,8 @@ var LINES = [
     effect: function (t) { return "The crane arm brings each brick in a set distance from the slot, so you get about the same time to place it."; },
     next: function (t) { return "The crane always brings the next brick in from a set distance from the slot — about the same time to place every brick, however fast it climbs."; } },
   { id: "hotMortar", noNow: true, icon: "mortar", name: "Hot Mortar", costs: [160,  420], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
-    effect: function (t) { return S.tower ? "Tower sides need " + [5, 4, 3][t] + " bricks." : "Rows need " + (5 - t) + " bricks."; },
-    next: function (t) { return S.tower ? "Tower sides drop to " + [5, 4, 3][t + 1] + " bricks — climb faster." : "Rows drop to " + (4 - t) + " bricks — climb faster."; } },
+    effect: function (t) { return S.tower ? "Tower sides need " + [6, 5, 4][t] + " bricks." : "Rows need " + (6 - t) + " bricks."; },
+    next: function (t) { return S.tower ? "Tower sides drop to " + [6, 5, 4][t + 1] + " bricks — climb faster." : "Rows drop to " + (5 - t) + " bricks — climb faster."; } },
   { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [100,  240], gate: function () { return S.best >= PLUMB_COURSE; },
     effect: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t] + " wider."; },
     next: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t + 1] + " wider — more perfects, more pay."; } },
@@ -1420,7 +1423,7 @@ var WALL_W = 5, PITCH = 0.5, BH = 0.44, BD = 0.62, GAP = 0.08, FOUND = 0.22, OUT
    (x along the side, z out of it) inside W3.orbit; faceToWorld() places bricks on the real side. */
 var TW = 5, TH = TW / 2, TOWER_CUT = 4.6;
 function FW() { return S.tower ? TW : WALL_W; }
-function towerPerFace() { return [5, 4, 3][S.tier.hotMortar] || 3; }
+function towerPerFace() { return [6, 5, 4][S.tier.hotMortar] || 4; }
 function perFace() { return S.tower && !roundOn() ? S.perFace : S.perCourse; }
 function curFace() { return S.tower && !roundOn() ? Math.min(3, Math.floor(S.inCourse / S.perFace)) : 0; }
 function curSlot() { return S.tower && !roundOn() ? S.inCourse - curFace() * S.perFace : S.inCourse; }
@@ -2810,7 +2813,7 @@ function brickColorHex(type, seed) {
   if (type === "silver") return _c.set(0xc9d2da);
   if (type === "lead") return _c.set(0x4b505a);
   if (type === "hot") return _c.set(0xff7a2a);
-  if (type === "glass") return _c.set(0x9fe6f7);
+  if (type === "glass" || (type === "normal" && S.glassUnlocked)) return _c.set(0x9fe6f7);
   var h = clayHSL(seed); return _c.setHSL(h[0], h[1], h[2]);
 }
 var WALL_CH = 256;          // bricks per wall chunk
@@ -4168,7 +4171,7 @@ function luckyFx(amt, row, slot, per) {
 }
 function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow, bump, runN) {
   var x = slotX(row, slot, per), y = rowY(row), z = BD / 2;
-  var col = item.type === "normal" ? (function () { var h = clayHSL(item.seed); return _c2.setHSL(h[0], h[1], h[2]).getHex(); })() : item.type === "gold" ? 0xf5b921 : item.type === "silver" ? 0xdfe6ec : item.type === "hot" ? 0xff8a2a : item.type === "glass" ? 0x9fe6f7 : 0x4b505a;
+  var col = item.type === "normal" && S.glassUnlocked ? 0x9fe6f7 : item.type === "normal" ? (function () { var h = clayHSL(item.seed); return _c2.setHSL(h[0], h[1], h[2]).getHex(); })() : item.type === "gold" ? 0xf5b921 : item.type === "silver" ? 0xdfe6ec : item.type === "hot" ? 0xff8a2a : item.type === "glass" ? 0x9fe6f7 : 0x4b505a;
   snd.place(streakNow, outcome, item.type);
   emitChips(x, y + BH / 2, z, col, item.type === "lead" ? 12 : fromAuto ? 3 : 7, item.type === "lead" ? 1.3 : 1);
   emitPuffs(x, y - BH / 2, z, item.type === "lead" ? 9 : fromAuto ? 2 : 5, 0xe9dcc2, 0.5);
@@ -4879,7 +4882,7 @@ function buyLine(id) {
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
     else {
-      S.perCourse = 5 - S.tier.hotMortar;
+      S.perCourse = 6 - S.tier.hotMortar;
       refitWallRow(S.courses + 1, S.perCourse);
       toast("Hot mortar! Rows now take " + S.perCourse + " bricks.", 3400);
       if (S.inCourse >= S.perCourse) completeCourse();
@@ -5613,6 +5616,7 @@ function nudgeKiln() {
 
 /* ---------------- HUD ---------------- */
 function renderHUD() {
+  document.body.classList.toggle("glass-on", !!S.glassUnlocked);
   var gk = !!(S.flags.goalShown || S.flags.rimStarted), hc = $("hud-course");
   if (gk && hc.classList.contains("hidden") && !UI.hgtOn) { UI.hgtOn = true; revealEl(hc); }      // the HEIGHT counter appears the moment the goal is revealed
   if (el.hudCourseNum.textContent !== String(S.courses)) { el.hudCourseNum.textContent = S.courses; if (UI.hgtOn) { hc.classList.remove("up"); void hc.offsetWidth; hc.classList.add("up"); } }
@@ -7435,7 +7439,7 @@ function loadGame(d) {
   S.flags = d.flags || {}; S.beats = d.beats || {}; S.seenLines = d.seenLines || {}; S.flags.begun = true;
   if ((d.best || d.courses || 0) >= 10) S.flags.goalShown = true;
   if (S.flags.rimStarted) { S.flags.rimDone = true; S.flags.rimPending = false; S.goal = FINAL_GOAL; }
-  var tower = !!d.tower || !!S.beats.c5b, per = 5 - S.tier.hotMortar, pf = towerPerFace(), n = d.bricks || 0;
+  var tower = !!d.tower || !!S.beats.c5b, per = 6 - S.tier.hotMortar, pf = towerPerFace(), n = d.bricks || 0;
   var fillMode = tower && d.fill > 0 && d.courses >= 1;                  // saved mid-way through building the tower's other three sides
   var need = tower ? 4 * pf : per, rows = fillMode ? d.courses : Math.min(d.courses, tower ? 999 : 4, Math.floor(n / need));
   S.tower = tower; S.perFace = tower ? pf : 5; S.perCourse = tower ? 4 * pf : per; S.towerStart = Math.min(d.towerStart || 5, rows);
@@ -7524,7 +7528,7 @@ window.__bb = {
   spawnHand: spawnHand, queueRaid: queueRaid, hazards: hazardsFor, updateHazards: updateHazards,
   startTower: startTower, orbit: function () { return { ang: W3.orbitAng, t: W3.orbitT, turning: CAM.turning, face: curFace(), slot: curSlot() }; },
   startRim: startRim, startVictory: startVictory, milestone: milestone,
-  setTier: function (id, t) { S.tier[id] = t; if (id === "hotMortar") S.perCourse = 5 - t; renderHUD(); },
+  setTier: function (id, t) { S.tier[id] = t; if (id === "hotMortar") S.perCourse = 6 - t; renderHUD(); },
   money: function (m) { S.money = m; S.earned += m; renderHUD(); },
   grabNow: function () { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && HANDS[i].state === "grip") HANDS[i].timer = 0.01; },
   handNeed: handNeed, nearestHand: nearestHand, handCount: handCount
