@@ -232,9 +232,10 @@
       .vbubble{ position:absolute; left:0; top:0; z-index:43; max-width:190px; pointer-events:none; background:#fffaf0; color:#221407; border:3px solid #221407; box-shadow:3px 3px 0 #221407;
         padding:6px 9px; font-weight:800; font-size:12.5px; line-height:1.25; will-change:transform; }
       .vbubble::after{ content:""; position:absolute; left:var(--tx,50%); bottom:-8px; width:10px; height:10px; margin-left:-5px; background:#fffaf0; border:3px solid #221407; border-top:0; border-left:0; transform:rotate(45deg); }
-      .coin{ position:absolute; width:18px; height:18px; border-radius:50%; z-index:41; pointer-events:none; left:0; top:0; will-change:transform;
+      .coin{ position:absolute; width:24px; height:24px; border-radius:50%; z-index:41; pointer-events:none; left:0; top:0; will-change:transform;
         background:radial-gradient(circle at 35% 30%, #fffbd0 0 14%, #ffd94d 16% 55%, #e0a30a 58%); border:2px solid #7a5200;
         box-shadow:inset 0 0 0 2px rgba(255,255,255,.35), 0 0 8px 2px rgba(255,217,77,.65); }
+      .plus-badge{ position:absolute; z-index:43; pointer-events:none; opacity:0; white-space:nowrap; transform:translate(-50%,0); font-family:'Archivo Black',sans-serif; font-size:19px; line-height:1; color:#8dff98; -webkit-text-stroke:1px #0b3a12; text-shadow:0 2px 0 #0b3a12, 0 0 10px rgba(125,255,138,.55); }
       .coin-glint{ position:absolute; width:30px; height:30px; margin:-15px 0 0 -15px; border-radius:50%; z-index:42; pointer-events:none;
         background:radial-gradient(circle, #fff 0 20%, rgba(255,230,120,.8) 40%, rgba(255,217,77,0) 70%); }
       .confetti{ position:absolute; width:8px; height:12px; z-index:41; pointer-events:none; left:0; top:0; }
@@ -261,10 +262,11 @@
       #payday .coin{ position:absolute; z-index:1; }
       @keyframes pdCard{ 0%{ opacity:0; transform:translate(-50%,-30px) scale(.6) } 9%{ opacity:1; transform:translate(-50%,0) scale(1.12) } 15%{ transform:translate(-50%,0) scale(1) }
         82%{ opacity:1; transform:translate(-50%,0) scale(1) } 100%{ opacity:0; transform:translate(-50%,-26px) scale(.96) } }
-      #big-word{ position:absolute; left:50%; top:40%; z-index:44; pointer-events:none; font-family:'Archivo Black',sans-serif; font-size:52px; color:#ff4a3a;
+      #big-word{ position:absolute; left:50%; top:40%; z-index:44; pointer-events:none; font-family:'Archivo Black',sans-serif; font-size:min(52px, 9vw); color:#ff4a3a; text-align:center;
         -webkit-text-stroke:2px #221407; text-shadow:4px 4px 0 #221407; opacity:0; transform:translate(-50%,-50%) rotate(-6deg); white-space:nowrap; }
       #big-word.show{ animation:bigWord .75s ease-out; }
       #big-word.gold{ color:#ffd94d; }
+      @media (max-width:480px){ #big-word{ font-size:7vw; } }   /* long words like BLOWN AWAY! stay on screen */
       @keyframes bigWord{ 0%{ opacity:0; transform:translate(-50%,-50%) rotate(-6deg) scale(.5) } 18%{ opacity:1; transform:translate(-50%,-50%) rotate(-6deg) scale(1.15) } 70%{ opacity:1 } 100%{ opacity:0; transform:translate(-50%,-62%) rotate(-6deg) scale(1) } }
       #reveal{ position:absolute; left:0; right:0; margin:0 auto; top:24%; z-index:62; width:min(88vw, 350px); text-align:center; cursor:pointer;
         background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow); padding:16px 18px 12px; animation:revealIn .4s cubic-bezier(.2,.9,.3,1.2); }
@@ -327,9 +329,13 @@
       @keyframes eFlash{ 0%,49%{ filter:none } 52%{ filter:brightness(2.2) } 100%{ filter:none } }
       @keyframes eBlast{ 0%,49%{ transform:scale(1) } 52%{ transform:scale(1.5); opacity:1 } 100%{ transform:scale(1) } }
       @keyframes fgJolt{ 0%,49%{ transform:none } 52%{ transform:translateY(2px) } 62%{ transform:translateY(-1px) } 100%{ transform:none } }
+      .fg-win{ position:absolute; left:132px; top:26px; z-index:3; pointer-events:none; opacity:0; font-family:'Archivo Black',sans-serif; font-size:22px; color:#8ff0a4; -webkit-text-stroke:1.5px #221407; text-shadow:2px 2px 0 #221407; }
+      .fg-bub{ position:absolute; left:0; right:0; margin:0 auto; width:max-content; max-width:94vw; top:calc(var(--safe-t, 0px) + 64px); z-index:6; pointer-events:none; }
+      .fg-bub .forge{ margin:0; padding:0; min-height:0; cursor:default; border-radius:16px; justify-content:center; }
+      .fg-tail{ position:absolute; left:50%; bottom:-11px; width:20px; height:20px; margin-left:-10px; background:#21120a; border-right:3px solid var(--line); border-bottom:3px solid var(--line); transform:rotate(45deg); }
       .forge.hit .fg-clang{ animation:fgClang .8s both; }
       @keyframes fgClang{ 0%,48%{ opacity:0; transform:scale(.3) rotate(-8deg) } 54%{ opacity:1; transform:scale(1.3) rotate(-8deg) } 80%{ opacity:1; transform:scale(1) rotate(-6deg) } 100%{ opacity:0; transform:translateY(-14px) scale(1) rotate(-6deg) } }
-      @media (max-width:420px){ .forge svg{ width:168px; height:84px; } .forge{ min-height:84px; } .fg-sub{ display:none; } .fg-title{ font-size:14px; } .fg-clang{ left:82px; top:2px; font-size:17px; } }
+      @media (max-width:420px){ .forge svg{ width:168px; height:84px; } .forge{ min-height:84px; } .fg-sub{ display:none; } .fg-title{ font-size:14px; } .fg-clang{ left:82px; top:2px; font-size:17px; } .fg-win{ left:112px; top:22px; font-size:19px; } }
       @media (prefers-reduced-motion:reduce){ .forge, .forge *{ animation:none !important; } .e-arm{ transform:rotate(-22deg); } }
       .upg-row{ display:flex; align-items:center; gap:10px; padding:8px 9px; margin-bottom:8px; background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s); transition:background .2s ease; }
       .upg-row.afford{ background:linear-gradient(90deg, var(--panel), rgba(245,185,33,.2)); }
@@ -508,6 +514,8 @@
       .cd-nopic{ width:100%; height:100%; display:grid; place-items:center; font-size:84px; }
       .cd-tag{ position:absolute; left:10px; bottom:10px; font-family:'Archivo Black',sans-serif; font-size:13px; letter-spacing:.1em; color:#221407; background:var(--gold); border:3px solid #221407; box-shadow:3px 3px 0 #221407; padding:4px 10px; transform:rotate(-3deg); }
       .cd-tag.elder{ background:#c9a8ff; }
+      .cd-tag.mino{ background:#3fe8d6; }
+      .cd-tag.dragon{ background:#ff8a4c; } .cd-tag.smith{ background:#ffd23a; } .cd-tag.griffin{ background:#9fe870; } .cd-tag.mole{ background:#e0b48a; }
       .cd-body{ padding:13px 16px 16px; }
       .cd-kicker{ font-size:11px; font-weight:800; letter-spacing:.16em; color:var(--clay-d); margin:0 0 6px; }
       .cd-text{ margin:0; font-weight:700; font-size:17px; line-height:1.45; }
@@ -641,17 +649,25 @@
       .tkids > .tnode::after{ content:""; position:absolute; left:0; top:25px; width:15px; border-top:3px solid var(--line); }
       .upg-row.locked{ opacity:.55; border-style:dashed; box-shadow:none; }
       .upg-row.locked .upg-ico{ filter:grayscale(1); }
-      /* Brick Sorter: warehouse tabs inside the storage building */
-      #wh-tabs{ display:flex; gap:4px; margin:0 0 7px; }
-      #wh-tabs.hidden{ display:none; }
-      .wh-btn{ flex:1 1 0; min-width:0; padding:3px 1px 2px; border:2px solid #8a7358; background:rgba(0,0,0,.28); color:#d9c7a4; font-family:'Archivo',sans-serif; font-weight:800; font-size:8.5px; letter-spacing:.03em; line-height:1.1; text-align:center; position:relative; }
-      .wh-btn i{ display:block; width:20px; height:10px; margin:0 auto 2px; border:2px solid rgba(20,10,4,.75); }
-      .wh-btn i.w-normal{ background:var(--clay); } .wh-btn i.w-lead{ background:linear-gradient(180deg,#6b707a,#33363f); }
-      .wh-btn i.w-silver{ background:linear-gradient(180deg,#f2f5f8,#c9d2da 55%,#9aa5b0); } .wh-btn i.w-gold{ background:linear-gradient(180deg,#ffe27a,#f5b921 55%,#d99a06); }
-      .wh-btn b{ display:block; font-family:'Archivo Black',sans-serif; font-size:11px; color:#fff; letter-spacing:0; }
-      .wh-btn.on{ border-color:#ffd94d; background:rgba(245,185,33,.24); box-shadow:0 0 0 2px rgba(255,217,77,.55); color:#fff3d1; }
-      .wh-btn.zero{ opacity:.5; }
-      .wh-btn.bump{ animation:pop .3s cubic-bezier(.3,1.6,.5,1); }
+      /* Brick Sorter: each metal gets its own little building beside the plain shed (tap one to build from it) */
+      #sheds{ display:flex; align-items:flex-end; gap:6px; flex:0 1 auto; min-width:0; }
+      #sheds.hidden{ display:none; }
+      .shed-x{ position:relative; flex:none; width:42px; padding-top:22px; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+      .shed-x .sx-roof{ position:absolute; left:-4px; right:-4px; top:0; width:calc(100% + 8px); height:26px; overflow:visible; pointer-events:none; filter:drop-shadow(2px 2px 0 var(--shadowc)); }
+      .shed-x .t-sign{ position:absolute; left:50%; top:6px; transform:translateX(-50%); display:flex; align-items:center; gap:3px; z-index:2; padding:1px 5px 1px 4px; background:linear-gradient(180deg,#3a2314,#24140a); border:2px solid var(--line); box-shadow:0 2px 0 rgba(0,0,0,.35); pointer-events:none; white-space:nowrap; }
+      .shed-x .sx-count{ font-family:'Archivo Black',sans-serif; font-size:12px; line-height:1; color:#ffd24d; text-shadow:0 1px 0 #000; }
+      .shed-x .sx-ico{ display:block; width:9px; height:6px; border:1.5px solid rgba(20,10,4,.75); }
+      .shed-x .sx-ico.w-lead{ background:linear-gradient(180deg,#6b707a,#33363f); }
+      .shed-x .sx-ico.w-silver{ background:linear-gradient(180deg,#f2f5f8,#c9d2da 55%,#9aa5b0); }
+      .shed-x .sx-ico.w-gold{ background:linear-gradient(180deg,#ffe27a,#f5b921 55%,#d99a06); }
+      .shed-x .t-bay{ position:relative; border:3px solid var(--line); background:linear-gradient(180deg,#2b1810,#4a2f1c); padding:6px 4px 9px; min-height:44px; box-shadow:var(--shadow-s), inset 0 -5px 0 #8a7358; }
+      .sx-list{ display:flex; flex-wrap:wrap-reverse; justify-content:center; align-content:flex-start; gap:5px 3px; min-height:20px; }
+      .shed-x .tb{ width:18px; height:10px; } .shed-x .tb::after{ width:1px; }
+      .shed-x.zero{ opacity:.6; }
+      .shed-x.thunk{ animation:thunk .22s ease-out; transform-origin:50% 100%; } .shed-x.shake{ animation:shake .3s ease; } .shed-x.bump{ animation:pop .3s cubic-bezier(.3,1.6,.5,1); }
+      #tray.on .t-bay, .shed-x.on .t-bay{ outline:3px solid #ffd94d; outline-offset:1px; }
+      #sheds.ready .shed-x.on .t-bay{ animation:trayReady .7s ease-in-out infinite alternate; }
+      @media (max-width:420px){ #dock.crowded{ gap:6px; } #dock.crowded #kiln{ --ks:76px; } #sheds{ gap:4px; } }
     </style>
   </head>
   <body>
@@ -717,8 +733,9 @@
             <path d="M14 27H86M28 16H72" stroke="#221407" stroke-opacity=".3" stroke-width="2" vector-effect="non-scaling-stroke"/>
           </svg>
           <div class="t-sign"><span id="tray-count">0</span><span id="tray-lab">STORAGE</span></div>
-          <div class="t-bay"><div id="wh-tabs" class="hidden"></div><div id="tray-list"></div></div>
+          <div class="t-bay"><div id="tray-list"></div></div>
         </div>
+        <div id="sheds" class="hidden" aria-label="Metal brick storage"></div>
       </div>
 
       <div id="fx"></div>
@@ -905,19 +922,18 @@ var LOW_END = IS_MOBILE && ((navigator.deviceMemory && navigator.deviceMemory <=
    core.js: config, economy, state, small helpers, audio
    ===================================================================== */
 var FIRST_GOAL = 50, FINAL_GOAL = 100;   // 50 is only the rim of the hole — the keystone waits at 100
-var LEAD_COURSE = 8, WIND_COURSE = 20, CROWD_COURSE = 15, PLUMB_COURSE = 12, PRECISION_COURSE = 10;
+var LEAD_COURSE = 8, WIND_COURSE = 20, CROWD_COURSE = 15, PLUMB_COURSE = 12;
 var HAND_COURSE = 25, MIST_COURSE = 40, HEAVY_MIST_COURSE = 45, TREMOR_COURSE = 65, GLASS_COURSE = 80;
 var HOT_FUSE = 10;            // seconds a hot brick stays hot
 var HIT_TOL = 0.085;          // accepted half-width of the drop window, fraction of a row
 var PERFECT_TOL = HIT_TOL * 0.25;
 var GLASS_TOL = 0.65;         // sky-glass bricks: the drop window is this much of normal
-var GRAB_TIME = 10;           // seconds a hand needs to rip a brick free
+var GRAB_TIME = 7;            // seconds a hand needs to rip a brick free (30% quicker than the old 10s)
 
 /* ----- ECONOMY (rebalanced) -----
    Money is meant to be SCARCE and every upgrade a real choice.
    - A plain brick pays BASE_PAY + 1 per 10 courses reached (the "pay raise").
-   - A streak is a gentle bonus: +1% per hit in a row, capped at ×1.3
-     (Crowd Favor lifts the cap to ×4.0). It used to be ×10 and up.
+   - A streak builds +5% per hit in a row. Combo Bonus caps it at ×2; Crowd Favor then lifts the ceiling to ×4, ×8 and finally ×10.
    - Types: lead ×1.5, silver ×2, gold ×2.5, hot ×2, sky-glass ×5; a PERFECT drop pays more with Perfect Eye.
    - A finished row (on the tower: a finished SIDE) pays 2 × rate (doubled if clean). Smashing a hand pays 10 × rate.
    - METAL BONUSES: every lead / silver / gold brick in a finished row adds +2 / +2.5 / +3 × rate to that row's payout; a run of the
@@ -945,8 +961,8 @@ var PAY_FROM_ROW = 6;         // rows 1-5 are unpaid: the town only offers to pa
    start  -> only a finished ROW pays (row bonus)
    Piece Work (shop) -> every brick pays too
    Combo Bonus (shop) -> hits in a row build a streak multiplier (Crowd Favor then raises its cap) */
-var STREAK_STEP = 0.01;       // +1% per brick in a row; the first cap (x1.3) takes 31 hits
-var CAP = [1.3, 1.6, 2.0, 2.5, 3.0];
+var STREAK_STEP = 0.05;       // +5% per brick in a row: the first ceiling (x2) takes 21 hits, x4 takes 61, x8 takes 141, x10 takes 181
+var CAP = [2, 4, 8, 10];                                          // streak ceiling: Combo Bonus gives x2, Crowd Favor tiers 1-3 lift it to x4, x8, x10
 var BAKE_TIMES = [4.5, 3.8, 3.2, 2.7, 2.25, 1.9, 1.6, 1.35, 1.15, 0.95, 0.78, 0.62];   // seconds per brick WHILE THE KILN IS HELD — the early game is deliberately slow
 var HOPPER_CAP = [1, 2, 3, 4, 5];                                  // Hopper: bricks one tap loads onto the crane (the rest follow by themselves after each drop)
 var STORE_CAP = [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16];         // Bigger Storage: how many bricks the shed holds
@@ -962,11 +978,10 @@ var MINI_TRIES = [1, 2, 2, 3];                                    // Mini Kiln: 
 var TYPE_RANK = { normal: 0, hot: 0, glass: 0.8, lead: 1, silver: 2, gold: 3 };
 var COALS = [0, 0.2, 0.35, 0.5];                        // Banked Coals: share of the hold speed kept when you let go
 var AL_INT = [5, 3.5, 2.2, 1.4];
-var PREC_MULT = [1, 0.85, 0.72, 0.6];
 var GILD_PCT = [0, 8, 15, 22];
 var STEADY_MULT = [1, 1.3, 1.6, 1.6];
 var PLUMB_MULT = [1, 1.5, 2];
-var GLAZE_ADD = [0, 2, 4, 6];            // Slippery Glaze: extra seconds before a hand rips a brick free
+var GLAZE_ADD = [0, 1.4, 2.8, 4.2];      // Slippery Glaze: extra seconds before a hand rips a brick free (30% quicker, like GRAB_TIME)
 var LANTERN_MULT = [1, 0.7, 0.45, 0.25]; // Sky Lantern: how much cloud cover survives
 var LEVEL_MULT = [1, 0.6, 0.3];          // Spirit Level: how much of the tremor survives
 
@@ -982,9 +997,9 @@ var S = {
   hotUnlocked: false, nextHot: false, nextDemo: null, leadUnlocked: false, glassUnlocked: false,
   windOn: false, mistLevel: 0, swayOn: false, raid: null,
   wind: { dir: 1, phase: 0, flipAt: 0 },
-  layAcc: 0, streak: 0, comboTutDone: false, scUsed: 0,
+  layAcc: 0, streak: 0, comboTutDone: false, scUsed: 0, forgeWins: 0, discarded: 0,
   fill: 0, active: "normal", rowT: { lead: 0, silver: 0, gold: 0, n: 0 }, run: { t: null, n: 0 },
-  tier: { starter: 0, hopper: 0, perBrick: 0, perfect: 0, lead: 0, silver: 0, gold: 0, sorter: 0, combo: 0, kilnSpeed: 0, roundTower: 0, storage: 0, placeSpeed: 0, miniKiln: 0, tipJar: 0, luckyBrick: 0, hotGloves: 0, coinPouch: 0, cheerBonus: 0, stool: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, precision: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
+  tier: { forgeLuck: 0, discard: 0, starter: 0, hopper: 0, perBrick: 0, perfect: 0, lead: 0, silver: 0, gold: 0, sorter: 0, combo: 0, kilnSpeed: 0, roundTower: 0, storage: 0, placeSpeed: 0, miniKiln: 0, tipJar: 0, luckyBrick: 0, hotGloves: 0, coinPouch: 0, cheerBonus: 0, stool: 0, bellows: 0, steady: 0, gilded: 0, secondChance: 0, autoLayer: 0, fasterApp: 0, moreApp: 0, predictable: 0, hotMortar: 0, plumb: 0, crowd: 0, glaze: 0, lantern: 0, level: 0 },
   flags: {}, beats: {}, seenLines: {},
   muted: false, musicOn: true, shakeOn: true, vibOn: true, quality: "hi", shadow: IS_MOBILE ? "low" : "hi", hand: "r",
   workshopShown: false, shopOpen: false, seenVis: null
@@ -994,7 +1009,9 @@ var S = {
 // tearing rows off the wall never takes your pay raise or your shop away.
 function hopperCap() { return HOPPER_CAP[S.tier.hopper || 0]; }
 function storeCap() { return STORE_CAP[S.tier.storage]; }
-function storeFull() { return S.stack.length >= storeCap(); }
+function storeFull() { return allWhFull(); }                       // no building has room left (the mini kiln waits for this)
+var SHED_VIS_MAX = 4;                       // the shed is drawn no bigger than 4 bricks; it can still hold more
+function shedVisCap() { return Math.min(storeCap(), SHED_VIS_MAX); }
 function placeTime() { return PLACE_TIMES[S.tier.placeSpeed]; }
 function hotFuse() { return HOT_FUSE + FUSE_ADD[S.tier.hotGloves]; }
 function comboOn() { return S.tier.combo > 0; }
@@ -1018,7 +1035,7 @@ function perfectTol() { return S.tier.perfect >= 1 ? PERFECT_TOL * PLUMB_MULT[S.
 /* Difficulty climbs with the wall: the crane quickens (0.70 → 1.40 rows/s by
    course 50, then more gently to 1.70 by course 100). */
 function heightSpeed() { var c = S.courses; return c <= 50 ? 0.7 + 0.014 * c : 1.4 + 0.006 * (Math.min(c, 100) - 50); }
-function swingSpeed() { return heightSpeed() * PREC_MULT[S.tier.precision]; }
+function swingSpeed() { return heightSpeed(); }
 function windAmp() { return S.windOn ? Math.min(0.45, 0.15 + 0.01 * Math.max(0, S.courses - WIND_COURSE)) : 0; }
 function windGust() { return 0.5 + 0.5 * Math.sin(S.wind.phase); }
 function leadChance() { return S.tier.lead >= 1 ? Math.min(0.12, 0.05 + 0.002 * Math.max(0, S.best - LEAD_COURSE)) : 0; }
@@ -1038,7 +1055,7 @@ function bakeTime() { return kilnBase(S.tier.kilnSpeed) * (S.best === 0 ? 0.8 : 
 function grabTime() { return GRAB_TIME + GLAZE_ADD[S.tier.glaze]; }
 function autoLayInt() { return AL_INT[S.tier.fasterApp]; }          // Faster Apprentices: seconds between trips
 function autoLayBatch() { return 1 + S.tier.moreApp; }                 // More Apprentices: bricks per trip
-var PRED_TIME = 0.7, PRED_MIN = 0.25, PRED_MAX = 0.5;                   // Predictable Placement: target lead time (s) and the allowed spawn distance range
+var PRED_DIST = 0.5;                                                    // Predictable Placement: spawn distance from the slot (fraction of the crane's travel). Fixed: never derived from wind, speed or height
 var AT = { on: false, n: 0, rem: 1, pulsed: 0 };                        // apprentice countdown glow state
 function baseFrac() { if (roundOn()) return 0.5; var p = perFace(); return (Math.min(curSlot(), p - 1) + 0.5) / p; }
 function targetFrac() { return baseFrac() + swayOff(); }
@@ -1101,7 +1118,7 @@ var LINES = [
     effect: function (t) { return "Every brick you lay pays $" + rate() + " (plus type and perfect bonuses)."; },
     next: function (t) { return "Get paid for every brick, not just finished rows. A plain brick pays $" + rate() + "."; } },
   { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [70], gate: function () { return S.tier.perBrick >= 1; },
-    effect: function (t) { return "Hits in a row build a streak bonus (+1% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
+    effect: function (t) { return "Hits in a row build a streak bonus (+" + Math.round(STREAK_STEP * 100) + "% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
     next: function (t) { return "Land bricks in a row to build a STREAK multiplier on every brick. Miss and it resets."; } },
   { id: "starter", noNow: true, icon: "kiln", name: "Warm-Up", costs: [STARTER_COST], gate: function () { return true; },
     effect: function (t) { return "The kiln bakes a brick every " + fmtSec(BAKE_TIMES[0] - STARTER_SHAVE) + "s while you hold it (it used to take " + BAKE_TIMES[0] + "s)."; },
@@ -1136,18 +1153,15 @@ var LINES = [
   { id: "hotMortar", noNow: true, icon: "mortar", name: "Hot Mortar", costs: [160,  420], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
     effect: function (t) { return S.tower ? "Tower sides need " + [5, 4, 3][t] + " bricks." : "Rows need " + (5 - t) + " bricks."; },
     next: function (t) { return S.tower ? "Tower sides drop to " + [5, 4, 3][t + 1] + " bricks — climb faster." : "Rows drop to " + (4 - t) + " bricks — climb faster."; } },
-  { id: "precision", icon: "precision", name: "Precision Gears", costs: [100,  210,  400], gate: function () { return S.flags.precisionShown; },
-    effect: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t]) * 100) + "%."; },
-    next: function (t) { return "Crane speed −" + Math.round((1 - PREC_MULT[t + 1]) * 100) + "% — the crane gets faster as you climb."; } },
   { id: "plumb", icon: "plumb", name: "Plumb Line", costs: [100,  240], gate: function () { return S.best >= PLUMB_COURSE; },
     effect: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t] + " wider."; },
     next: function (t) { return "PERFECT zone ×" + PLUMB_MULT[t + 1] + " wider — more perfects, more pay."; } },
-  { id: "crowd", noNow: true, icon: "crowd", name: "Crowd Favor", costs: [95,  160,  280,  420], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
+  { id: "crowd", noNow: true, icon: "crowd", name: "Crowd Favor", costs: [95,  160,  280], gate: function () { return S.tier.combo >= 1 && S.best >= CROWD_COURSE; },
     effect: function (t) { return "Streak bonus caps at ×" + fmtMult(CAP[t]) + "."; },
     next: function (t) { return "Streak cap ×" + fmtMult(CAP[t]) + " → ×" + fmtMult(CAP[t + 1]) + ". The crowd wants a show."; } },
   { id: "glaze", noNow: true, icon: "glaze", name: "Slippery Glaze", costs: [170,  260,  400], gate: function () { return S.best >= HAND_COURSE; },
-    effect: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s to rip a brick free."; },
-    next: function (t) { return "Hands need " + (GRAB_TIME + GLAZE_ADD[t]) + "s → " + (GRAB_TIME + GLAZE_ADD[t + 1]) + "s to rip a brick free."; } },
+    effect: function (t) { return "Hands need " + fmtSec(GRAB_TIME + GLAZE_ADD[t]) + "s to rip a brick free."; },
+    next: function (t) { return "Hands need " + fmtSec(GRAB_TIME + GLAZE_ADD[t]) + "s → " + fmtSec(GRAB_TIME + GLAZE_ADD[t + 1]) + "s to rip a brick free."; } },
   { id: "lantern", icon: "lantern", name: "Sky Lantern", costs: [280,  400,  525], gate: function () { return S.best >= MIST_COURSE; },
     effect: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t]) * 100) + "%."; },
     next: function (t) { return "Cloud cover thinned by " + Math.round((1 - LANTERN_MULT[t + 1]) * 100) + "% — see the crane through the weather."; } },
@@ -1166,6 +1180,12 @@ var LINES = [
   { id: "gold", icon: "gilded", name: "Gold Bricks", costs: [410],
     effect: function (t) { return "Gold bricks (×" + TYPE_MULT.gold + " pay) turn up in the kiln. Each one in a finished row adds +" + ROW_ADD.gold + "× rate."; },
     next: function (t) { return "Unlock GOLD bricks: ×" + TYPE_MULT.gold + " pay and +" + ROW_ADD.gold + "× rate on every row they sit in. Gilded Clay then makes them common."; } },
+  { id: "forgeLuck", icon: "star", name: "Edgar's Luck", costs: [8, 20, 50, 120], need: function () { return (S.forgeWins || 0) >= 1; }, needText: "Make money at Edgar's Forge first",
+    effect: function (t) { return "Edgar's strike pays $1 " + Math.round(FORGE_P[t] * 100) + "% of the time."; },
+    next: function (t) { return "Edgar's strike pays $1 " + Math.round(FORGE_P[t] * 100) + "% → " + Math.round(FORGE_P[t + 1] * 100) + "% of the time."; } },
+  { id: "discard", icon: "sorter", name: "Full Warehouse Discard", costs: [60], gate: function () { return true; },
+    effect: function (t) { return "When a brick type's warehouse is full, new bricks of that type are thrown out, so the kiln keeps making the others."; },
+    next: function (t) { return "Throw out bricks of a full warehouse automatically, so the kiln keeps making other types."; } },
   { id: "sorter", icon: "sorter", name: "Brick Sorter", costs: [170],
     effect: function (t) { return "Bricks are sorted into a warehouse per type. Tap a warehouse to pick what the crane AND your apprentices build with. A whole row of one metal pays a pure-row bonus."; },
     next: function (t) { return "Sort lead, silver and gold into their own warehouses and choose which one you build from — stockpile gold, then lay a pure gold row for a big bonus."; } },
@@ -1173,8 +1193,8 @@ var LINES = [
     effect: function (t) { return t >= 10 ? "Bricks snap into place instantly." : "Bricks take " + PLACE_TIMES[t] + "s to set into their slot."; },
     next: function (t) { return "Bricks set into place faster: " + PLACE_TIMES[t] + "s → " + (PLACE_TIMES[t + 1] === 0 ? "instant" : PLACE_TIMES[t + 1] + "s") + ". Less waiting between drops."; } },
   { id: "storage", noNow: true, icon: "sorter", name: "Bigger Storage", costs: [14, 30, 52, 80, 115, 160, 215, 280, 380, 500, 650], gate: function () { return true; },
-    effect: function (t) { return "The shed holds " + STORE_CAP[t] + " brick" + (STORE_CAP[t] > 1 ? "s" : "") + "."; },
-    next: function (t) { return "The shed holds " + STORE_CAP[t] + " → " + STORE_CAP[t + 1] + " bricks — the kiln can run longer without you."; } },
+    effect: function (t) { return "Each storage building holds " + STORE_CAP[t] + " brick" + (STORE_CAP[t] > 1 ? "s" : "") + "."; },
+    next: function (t) { return "Every storage building holds " + STORE_CAP[t] + " → " + STORE_CAP[t + 1] + " bricks — the kiln can run longer without you."; } },
   { id: "miniKiln", icon: "kiln", name: "Mini Kiln", costs: [140, 260, 420], gate: function () { return true; },
     effect: function (t) { return "A little kiln bakes a brick every " + MINI_INT[t] + "s on its own, keeping the best of " + MINI_TRIES[t] + " — so better types turn up more often."; },
     next: function (t) { return t === 0 ? "A second, slower kiln that bakes by itself. It keeps the best of " + MINI_TRIES[1] + " bricks, so lead, silver and gold show up more often." : "A brick every " + MINI_INT[t + 1] + "s, keeping the best of " + MINI_TRIES[t + 1] + "."; } },
@@ -1212,10 +1232,11 @@ var TREE = {
   perBrick: { tab: "money", parent: null, row: 5 }, combo: { tab: "money", parent: "perBrick" }, crowd: { tab: "money", parent: "combo", row: 15 },
   perfect: { tab: "money", parent: "perBrick", row: 3 }, plumb: { tab: "money", parent: "perfect", row: 12 },
   lead: { tab: "bricks", parent: "perBrick", row: 8 }, silver: { tab: "bricks", parent: "lead", row: 15 }, gold: { tab: "bricks", parent: "silver", row: 22 }, gilded: { tab: "bricks", parent: "gold" }, sorter: { tab: "bricks", parent: "lead", row: 12 },
-  steady: { tab: "skill", parent: "perBrick", row: 3 }, secondChance: { tab: "skill", parent: "steady", row: 4 }, precision: { tab: "skill", parent: "steady", row: 10 },
+  forgeLuck: { tab: "money", parent: null, row: 0 }, discard: { tab: "bricks", parent: "sorter", row: 14 },
+  steady: { tab: "skill", parent: "perBrick", row: 3 }, secondChance: { tab: "skill", parent: "steady", row: 4 },
   predictable: { tab: "skill", parent: "steady", row: 8 }, glaze: { tab: "skill", parent: "secondChance", row: 25 },
   autoLayer: { tab: "crew", parent: "perBrick", row: 5 }, fasterApp: { tab: "crew", parent: "autoLayer" }, moreApp: { tab: "crew", parent: "autoLayer" },
-  lantern: { tab: "weather", parent: "precision", row: 40 }, level: { tab: "weather", parent: "lantern", row: 65 }
+  lantern: { tab: "weather", parent: "steady", row: 40 }, level: { tab: "weather", parent: "lantern", row: 65 }
 };
 function lineById(id) { for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) return LINES[i]; return null; }
 function lineAvail(l) { return (!l.parent || S.tier[l.parent] >= l.ptier) && S.best >= l.row && (!l.need || l.need()); }
@@ -1223,7 +1244,7 @@ function lineVisible(l) { if (lineAvail(l)) return true; if (!l.parent) return t
 function lockReason(l) {
   var p = l.parent ? lineById(l.parent) : null;
   if (p && S.tier[p.id] < l.ptier) { var tn = ""; TABS.forEach(function (t) { if (t.id === p.tab && p.tab !== l.tab) tn = " (" + t.name + " tab)"; }); return "Unlock " + p.name + (l.ptier > 1 ? " tier " + l.ptier : "") + " first" + tn; }
-  if (l.need && !l.need()) return "Build the tower first";
+  if (l.need && !l.need()) return l.needText || "Build the tower first";
   return "Reach row " + l.row;
 }
 LINES.forEach(function (l) { var T = TREE[l.id]; l.tab = T.tab; l.parent = T.parent; l.ptier = T.ptier || 1; l.row = T.row || 0; l.gate = function () { return lineAvail(l); }; });
@@ -1586,17 +1607,22 @@ function updateOrbit(dt) {
   if (!W3.orbitPivot) return;
   if (CAM.mode === "tower") {
     W3.towerCut += dt; var u = clamp(W3.towerCut / TOWER_CUT, 0, 1), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(2 - 2 * u, 2) / 2;
-    W3.orbitAng = e * Math.PI * 2; W3.orbitT = Math.PI * 2; W3.orbitV = 0;
+    W3.orbitAng = e * Math.PI * 2; W3.orbitMid = W3.orbitAng; W3.orbitT = Math.PI * 2; W3.orbitV = 0;
   } else {
     if (S.tower && G.falls === 0) W3.orbitT = roundOn() ? roundTargetAng() : Math.PI * 2 + towerQ() * Math.PI / 2;
-    var ov = W3.orbitV || 0, sdt = Math.min(dt, 0.05) / 3;      // a stiff, slightly bouncy spring: a quarter-turn lands in about 0.2s
-    for (var os = 0; os < 3; os++) { ov += ((W3.orbitT - W3.orbitAng) * 900 - ov * 42) * sdt; W3.orbitAng += ov * sdt; }
-    if (Math.abs(W3.orbitT - W3.orbitAng) < 0.0006 && Math.abs(ov) < 0.02) { W3.orbitAng = W3.orbitT; ov = 0; }
-    W3.orbitV = ov;
+    // The camera eases round with two chained lags: it starts gently, swings through the middle, and settles softly (no bounce).
+    // A quarter-turn takes about 0.4s. If something else set the angle directly (a load or a snap), the first lag catches up to it.
+    if (W3.orbitMid === undefined || Math.abs(W3.orbitAng - W3.orbitLast) > 1e-6) W3.orbitMid = W3.orbitAng;
+    var ok = 1 - Math.exp(-ORBIT_W * Math.min(dt, 0.05));
+    W3.orbitMid += (W3.orbitT - W3.orbitMid) * ok;
+    W3.orbitAng += (W3.orbitMid - W3.orbitAng) * ok;
+    if (Math.abs(W3.orbitT - W3.orbitAng) < 0.0006 && Math.abs(W3.orbitT - W3.orbitMid) < 0.0006) { W3.orbitAng = W3.orbitMid = W3.orbitT; }
   }
+  W3.orbitLast = W3.orbitAng;
   CAM.turning = CAM.mode === "tower" || Math.abs(W3.orbitT - W3.orbitAng) > 0.08;
   W3.orbitPivot.rotation.y = W3.orbitAng; W3.orbitPivot.updateMatrixWorld(true);
 }
+var ORBIT_W = 14;                         // how briskly the camera swings round to the next side (higher = snappier)
 var _vc = new THREE.Vector3(), _vl = new THREE.Vector3();
 function initWorld() {
   var canvas = $("gl");
@@ -2345,6 +2371,15 @@ var _mp = new THREE.Matrix4(), _ml = new THREE.Matrix4(), _mw = new THREE.Matrix
 var CROWD_BY = [0, 1, 2, 4, 6, 9, 12, 16, 20, 25, 30];    // villagers on site after each finished row (best course) — a slow trickle at first, a crowd by row 10
 function crowdTarget() { return S.started ? (S.best >= 10 ? 30 : CROWD_BY[S.best]) : 0; }
 var TOWER_LAT = [-2.6, 2.6, -1.4, 1.4, -3.6, 3.6];
+/* Floating crowd: once the tower is so tall that the ground (and everyone standing on it) has slid below the bottom of the screen,
+   four villagers - one per side - lift off and drift around the tower at the height you are building, cheering and backflipping. */
+var FLOATERS = 4;
+function groundOutOfView() {             // the patch of ground in front of the tower, on the camera's side, is below the screen
+  var cp = camera.position, dx = cp.x, dz = cp.z + TH, dl = Math.sqrt(dx * dx + dz * dz) || 1;
+  var sp = toScreenW(dx / dl * 4.5, 0, -TH + dz / dl * 4.5), H = window.innerHeight;
+  return sp.behind || sp.y > (W3.flOn ? H - 140 : H + 30);        // two thresholds, so nobody bobs up and down at the edge
+}
+var FLOAT_OFF = [0.4, 1.9, -0.9, 1.1];  // each floater's own height around the working row
 var _qf = new THREE.Quaternion(), _mf = new THREE.Matrix4(), _mf2 = new THREE.Matrix4(), _vf = new THREE.Vector3(), _ef = new THREE.Euler(), _one = new THREE.Vector3(1, 1, 1);
 // Once the tower stands the villagers fan out around ALL four sides; each newcomer joins the next side round.
 function crowdSpot(i) {
@@ -2381,7 +2416,7 @@ function crowdPose(d, dt) {          // sets d.y / d.flipA / d.arm while a react
   d.arm = -2.6;
   if (f.kind === "bonk") {                                      // hand clamped to the head, a hop, then a dizzy wobble
     d.y = 0.32 * Math.sin(Math.PI * Math.min(1, u * 3)); d.tilt = Math.sin(f.t * 26) * 0.3 * (1 - u); d.lat = Math.sin(f.t * 19) * 0.05 * (1 - u); d.arm = -2.9;
-    if (Math.random() < dt * 16 && u < 0.8) { EMIT_WORLD = true; emitGlow(d.x + rand(-0.22, 0.22), 1.55, d.z + rand(-0.22, 0.22), 1, 0xffe27a, 0.5, 0.7, 0.1, -0.4); EMIT_WORLD = false; }
+    if (Math.random() < dt * 16 && u < 0.8) { EMIT_WORLD = true; emitGlow(d.x + rand(-0.22, 0.22), 1.55 + (d.hy || 0), d.z + rand(-0.22, 0.22), 1, 0xffe27a, 0.5, 0.7, 0.1, -0.4); EMIT_WORLD = false; }
     return true;
   }
   if (f.kind === "flip") { d.y = 0.75 * Math.sin(Math.PI * u); d.flipA = -2 * Math.PI * easeOut2(u); }
@@ -2391,7 +2426,7 @@ function crowdPose(d, dt) {          // sets d.y / d.flipA / d.arm while a react
     d.y = H * Math.sin(Math.PI * lu);
     if (ph === 1) d.flipA = -2 * Math.PI * easeOut2(lu);
     if (ph === 2) d.flipA = -4 * Math.PI * easeOut2(lu);
-    if (ph !== f.ph) { f.ph = ph; EMIT_WORLD = true; emitPuffs(d.x, 0.1, d.z, 4, 0xe9dcc2, 0.4); if (ph === 2) emitConfetti(d.x, 1.2, d.z, 8, 1); EMIT_WORLD = false; }
+    if (ph !== f.ph) { f.ph = ph; EMIT_WORLD = true; emitPuffs(d.x, 0.1 + (d.hy || 0), d.z, 4, 0xe9dcc2, 0.4); if (ph === 2) emitConfetti(d.x, 1.2 + (d.hy || 0), d.z, 8, 1); EMIT_WORLD = false; }
   }
   return true;
 }
@@ -2443,12 +2478,13 @@ function pickStroll(d) {
 }
 // A villager the camera has swung right up to would loom over the lens: step them out of the shot (the two distances give it hysteresis, so nobody flickers).
 function camNearVillager(d) {
-  var cp = camera.position, dx = d.x - cp.x, dy = 0.9 - cp.y, dz = d.z - cp.z, dd = Math.sqrt(dx * dx + dy * dy + dz * dz);
+  var cp = camera.position, dx = d.x - cp.x, dy = 0.9 + (d.hy || 0) - cp.y, dz = d.z - cp.z, dd = Math.sqrt(dx * dx + dy * dy + dz * dz);
   if (d.nearCam) { if (dd > 9) d.nearCam = false; } else if (dd < 7) d.nearCam = true;
   return !!d.nearCam;
 }
 function updateCrowd(dt) {
   var want = crowdTarget(); laneUpdate();
+  W3.flOn = S.tower && S.started && CAM.mode !== "title" && groundOutOfView();
   for (var i = 0; i < W3.crowd.length; i++) {
     var d = W3.crowd[i];
     d.ph += dt * 3;
@@ -2460,8 +2496,20 @@ function updateCrowd(dt) {
       EMIT_WORLD = true; emitPuffs(d.x, 0.1, d.z, 6, 0xe9dcc2, 0.5); EMIT_WORLD = false;
     }
     if (!wantI) { d.on = false; d.fx = null; }
-    var walking = false;
-    if (S.tower && d.on) {            // walk to a spot around the tower; strollers then keep wandering between spots
+    var walking = false, wantFloat = i < FLOATERS && W3.flOn && d.on;
+    if (d.hy === undefined) { d.hy = 0; d.fHome = i * Math.PI / 2 + Math.PI / 4; d.fPh = hash01(i * 6.1 + 0.3) * 6.28; d.flT = 1 + i * 0.9; }
+    if (wantFloat) d.hy = damp(d.hy, workY() + FLOAT_OFF[i] + Math.sin(W3.t * 1.3 + d.fPh) * 0.25, 1.8, dt);      // rise to the height of the work, bobbing
+    else d.hy = damp(d.hy, 0, 2.2, dt);                                                                          // ...or come back down
+    if (d.hy < 0.02 && !wantFloat) d.hy = 0;
+    var airborne = d.hy > 0.4;
+    if (d.on && (wantFloat || airborne)) {            // drift round the tower, always turning to face the camera
+      if (wantFloat) {
+        var fa = d.fHome + Math.sin(W3.t * 0.3 + d.fPh) * 0.3, fr = 5.3 + Math.sin(W3.t * 0.45 + d.fPh * 1.7) * 0.5;
+        d.x = damp(d.x, Math.sin(fa) * fr, 1.6, dt); d.z = damp(d.z, -TH + Math.cos(fa) * fr, 1.6, dt);
+      }
+      d.ry -= angDiff(d.ry, Math.atan2(camera.position.x - d.x, camera.position.z - d.z)) * Math.min(1, dt * 5);
+    }
+    else if (S.tower && d.on) {            // walk to a spot around the tower; strollers then keep wandering between spots
       if (d.tx === undefined) { var sp = crowdSpot(i); d.tx = sp.x; d.tz = sp.z; d.stroll = hash01(i * 2.9 + 0.7) < 0.6; d.spd = 0.55 + hash01(i * 5.3) * 0.4; d.wt = rand(1.5, 6); d.arrived = false; }
       if (dt > 0 && (inLane(d.x, d.z) || inLane(d.tx, d.tz))) laneOut(d);                    // the camera swung round: step out of its way
       var mdx = d.tx - d.x, mdz = d.tz - d.z, md = Math.sqrt(mdx * mdx + mdz * mdz);
@@ -2480,6 +2528,13 @@ function updateCrowd(dt) {
     var sc = Math.max(0.0001, d.s * 1.3);
     d.flipA = 0; d.lat = 0; d.tilt = 0;
     if (d.fx && crowdPose(d, dt)) { /* reaction pose applied */ }
+    else if (airborne) {                                // up in the air: arms raised, bobbing, and now and then a backflip
+      if (d.jump > 0) { d.jump -= dt; d.y = Math.abs(Math.sin(d.ph * 3)) * 0.35; }
+      else d.y = damp(d.y, 0.12 * Math.sin(W3.t * 2.2 + d.fPh), 8, dt);
+      d.lat = Math.sin(W3.t * 1.1 + d.fPh) * 0.05; d.tilt = Math.sin(W3.t * 1.7 + d.fPh) * 0.07;
+      d.arm = -2.2 + Math.sin(W3.t * 6 + d.fPh) * 0.45;
+      if (wantFloat) { d.flT -= dt; if (d.flT <= 0) { d.fx = { kind: "flip", t: 0, dur: 0.9, ph: 0 }; d.flT = rand(3, 7); } }
+    }
     else if (d.jump > 0) { d.jump -= dt; d.y = Math.abs(Math.sin(d.ph * 3)) * 0.35; d.arm = -0.5 + Math.sin(d.ph * 6) * 0.6; }
     else if (walking) { d.y = Math.abs(Math.sin(d.ph * 4)) * 0.07; d.arm = -0.5 + Math.sin(d.ph * 4) * 0.35; }
     else if (S.tower && S.fill === 0 && d.on) {       // the tower stands five high: the crowd sways, shuffles and does a tiny dance now and then
@@ -2493,7 +2548,7 @@ function updateCrowd(dt) {
       d.arm = -0.5 + Math.sin(d.ph) * 0.12 + dn * (-1.1 + Math.sin(bt) * 0.4);
     }
     else { d.y = damp(d.y, 0, 10, dt); d.arm = -0.5 + Math.sin(d.ph) * 0.12; }
-    _e.set(0, d.ry, d.tilt || 0); _q.setFromEuler(_e); _v.set(d.x + (d.lat || 0) * Math.cos(d.ry), d.y, d.z - (d.lat || 0) * Math.sin(d.ry)); _s.set(sc, sc, sc); _mp.compose(_v, _q, _s); _s.set(1, 1, 1);
+    _e.set(0, d.ry, d.tilt || 0); _q.setFromEuler(_e); _v.set(d.x + (d.lat || 0) * Math.cos(d.ry), d.y + (d.hy || 0), d.z - (d.lat || 0) * Math.sin(d.ry)); _s.set(sc, sc, sc); _mp.compose(_v, _q, _s); _s.set(1, 1, 1);
     if (d.flipA) { _ef.set(d.flipA, 0, 0); _qf.setFromEuler(_ef); _vf.set(0, 0.5, 0); _mf.compose(_vf, _qf, _one); _mf2.makeTranslation(0, -0.5, 0); _mf.multiply(_mf2); _mp.multiply(_mf); }
     _ml.makeTranslation(0, 0.3, 0); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cBody, i, _mw);
     _ml.makeTranslation(0, 0.27, 0); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cBelt, i, _mw);
@@ -3186,7 +3241,7 @@ function updateCritters(dt) {
 }
 
 /* ---------- particles ---------- */
-var CHIPS = { n: 260, i: 0 }, PUFFS = { n: 140, i: 0 }, GLOW = { n: 900, i: 0 }, CONF = { n: 300, i: 0 }, STREAKS = { n: 36 };
+var CHIPS = { n: 260, i: 0 }, PUFFS = { n: 140, i: 0 }, GLOW = { n: 900, i: 0 }, CONF = { n: 300, i: 0 }, SHOES = { n: 48, i: 0 }, STREAKS = { n: 36 };
 function buildParticles() {
   // chips: little brick shards with gravity
   CHIPS.mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.11, 0.08, 0.11), toon(0xffffff), CHIPS.n);
@@ -3219,6 +3274,12 @@ function buildParticles() {
   CONF.mesh.frustumCulled = false; CONF.mesh.setColorAt(0, _c.set(0xffffff));
   CONF.p = []; for (i = 0; i < CONF.n; i++) { CONF.p.push({ life: 0 }); hideInst(CONF.mesh, i); }
   scene.add(CONF.mesh);
+  // horseshoes: the lucky-brick shower (little 3D shoes, gap down)
+  var hsg = new THREE.TorusGeometry(0.11, 0.04, 6, 14, Math.PI * 1.7); hsg.rotateZ(-Math.PI * 0.35);
+  SHOES.mesh = new THREE.InstancedMesh(hsg, toon(0xffffff), SHOES.n);
+  SHOES.mesh.frustumCulled = false; SHOES.mesh.setColorAt(0, _c.set(0xffffff));
+  SHOES.p = []; for (i = 0; i < SHOES.n; i++) { SHOES.p.push({ life: 0 }); hideInst(SHOES.mesh, i); }
+  scene.add(SHOES.mesh);
   // wind streaks
   var sp = new Float32Array(STREAKS.n * 6);
   var sg = new THREE.BufferGeometry(); sg.setAttribute("position", new THREE.BufferAttribute(sp, 3));
@@ -3278,6 +3339,18 @@ function emitConfetti(x, y, z, n, spread) {
   }
   CONF.mesh.instanceColor.needsUpdate = true;
 }
+function emitShoes(x, y, z, n) {
+  var P = fxPos(x, y, z); x = P.x; y = P.y; z = P.z;
+  for (var k = 0; k < n; k++) {
+    var i = SHOES.i = (SHOES.i + 1) % SHOES.n, p = SHOES.p[i];
+    p.x = x + rand(-0.55, 0.55); p.y = y + rand(0.8, 1.9); p.z = z + rand(0, 0.8);
+    p.vx = rand(-1.2, 1.2); p.vy = rand(0, 2.4); p.vz = rand(-0.2, 0.9);
+    p.rx = rand(0, 6); p.ry = rand(0, 6); p.rz = rand(0, 6); p.w = rand(3, 8); p.d = rand(0, 0.55);
+    p.life = p.max = rand(1.5, 2.2); p.s = rand(0.9, 1.35);
+    SHOES.mesh.setColorAt(i, _c.set(k % 3 === 0 ? 0xdfe6ec : 0xf5b921));
+  }
+  SHOES.mesh.instanceColor.needsUpdate = true;
+}
 function firework(x, y, z) {
   var cols = [0xffd94d, 0xff6b5b, 0x8ff0a4, 0x7fc8ff, 0xff9ef5];
   var col = cols[Math.floor(Math.random() * cols.length)];
@@ -3323,6 +3396,16 @@ function updateParticles(dt) {
     _e.set(p.rx, p.ry, p.rz); _q.setFromEuler(_e); _v.set(p.x, p.y, p.z); var cs = Math.min(1, p.life * 2); _s.set(cs, cs, cs); _m.compose(_v, _q, _s); CONF.mesh.setMatrixAt(i, _m);
   }
   CONF.mesh.instanceMatrix.needsUpdate = true;
+  for (i = 0; i < SHOES.n; i++) {
+    p = SHOES.p[i]; if (p.life <= 0) continue;
+    if (p.d > 0) { p.d -= dt; continue; }                       // still waiting its turn at the top of the shower
+    p.life -= dt; p.vy -= 9 * dt; p.vy = Math.max(p.vy, -4); p.vx *= 0.98; p.vz *= 0.98;
+    p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt; p.rz += dt * p.w; p.ry += dt * p.w * 0.6;
+    if (p.life <= 0) { hideInst(SHOES.mesh, i); continue; }
+    var hs = p.s * Math.min(1, (p.max - p.life) * 7, p.life * 3);
+    _e.set(p.rx * 0.2, p.ry, p.rz); _q.setFromEuler(_e); _v.set(p.x, p.y, p.z); _s.set(hs, hs, hs); _m.compose(_v, _q, _s); SHOES.mesh.setMatrixAt(i, _m);
+  }
+  SHOES.mesh.instanceMatrix.needsUpdate = true;
   updateRain(dt);
 }
 
@@ -3337,8 +3420,33 @@ function fitDistance() {
   return clamp(need, 12.5, 36);
 }
 function workY() { return rowY(workRow()); }
+/* ---------- side plaques: a numbered sign (1-4) on each face of the tower, riding two rows under the working row ---------- */
+var SIGNS = null;
+function signTex(n) {
+  var c = document.createElement("canvas"); c.width = c.height = 128; var g = c.getContext("2d");
+  g.fillStyle = "#221407"; g.fillRect(0, 0, 128, 128);
+  g.fillStyle = "#f5b921"; g.fillRect(7, 7, 114, 114);
+  g.fillStyle = "#3a2412"; g.fillRect(15, 15, 98, 98);
+  g.fillStyle = "#ffd94d"; g.font = "900 82px 'Archivo Black', Impact, 'Arial Black', sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillText(String(n), 64, 70);
+  var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+}
+function updateSideSigns(dt) {
+  var on = S.tower && !roundOn() && CAM.mode !== "tower" && workRow() >= 3;
+  var ty = rowY(Math.max(1, workRow() - 2));
+  if (!SIGNS) {
+    if (!on) return;
+    SIGNS = { y: ty, m: [] };
+    for (var f = 0; f < 4; f++) {
+      var m = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.62), new THREE.MeshBasicMaterial({ map: signTex(f + 1) }));
+      m.rotation.y = f * Math.PI / 2; scene.add(m); SIGNS.m.push(m);
+    }
+  }
+  SIGNS.y = damp(SIGNS.y, ty, 8, dt || 0.016);
+  for (var k = 0; k < 4; k++) { var sm = SIGNS.m[k]; sm.visible = on; if (on) faceToWorld(k, 0, SIGNS.y, BD / 2 + 0.035, sm.position); }
+}
 function updateCamera(dt, rt) {
-  updateOrbit(dt);
+  updateOrbit(dt); updateSideSigns(dt);
   var D = fitDistance();
   if (CAM.mode === "tower") D *= 1.35;
   var ly, cy, cx, lx = 0;
@@ -3525,7 +3633,14 @@ function plainCount() { var n = 0; for (var i = 0; i < S.stack.length; i++) if (
 /* ---------------- BRICK SORTER: one warehouse per type; the ACTIVE one feeds the crane and the apprentices ---------------- */
 function sorterOn() { return S.tier.sorter > 0; }
 function whKey(type) { return isMetal(type) ? type : "normal"; }            // plain, glass and hot bricks share the plain warehouse
-function whCount(k) { var n = 0; for (var i = 0; i < S.stack.length; i++) if (whKey(S.stack[i].type) === k) n++; return n; }
+function stKey(type) { return sorterOn() ? whKey(type) : "normal"; }       // before the Sorter there is just one shed for everything
+function whCount(k) { var n = 0; for (var i = 0; i < S.stack.length; i++) if (stKey(S.stack[i].type) === k) n++; return n; }
+function whFull(k) { return whCount(k) >= storeCap(); }                  // each building holds storeCap() bricks of its own
+function openKeys() { return sorterOn() ? ["normal", "lead", "silver", "gold"].filter(whOpen) : ["normal"]; }
+function allWhFull() { var ks = openKeys(); for (var i = 0; i < ks.length; i++) if (!whFull(ks[i])) return false; return true; }
+function bldList(k) { return sorterOn() ? S.stack.filter(function (it) { return whKey(it.type) === k; }) : S.stack; }   // what building k shows
+function bldEl(k) { return k === "normal" ? el.tray : el.sheds.querySelector('[data-wh="' + k + '"]'); }
+function bldFlash(node, cls) { if (!node) return; node.classList.remove(cls); void node.offsetWidth; node.classList.add(cls); }
 function whOpen(k) { return k === "normal" || S.tier[k] > 0; }               // a warehouse exists once its brick type is unlocked
 function nextIdx() {                      // which brick the crane takes next (-1 = none)
   var i;
@@ -3544,21 +3659,27 @@ function apprCount() {
   for (var i = 0; i < S.stack.length; i++) { var t = S.stack[i].type; if (t === "hot") continue; if (key === "normal" ? t === "normal" : t === key) n++; }
   return n;
 }
-function ensureActive() {                 // the selected warehouse ran dry → fall back to plain
-  if (!sorterOn() || S.active === "normal" || whCount(S.active) > 0) return;
-  var was = S.active; S.active = "normal"; UI.traySig = "";
-  toast(WH_NAME[was] + " storage is empty — back to PLAIN", 2400); renderHUD();
+function ensureActive() {                 // the selected building ran dry -> go straight to the closest one that still has bricks
+  if (!sorterOn() || whCount(S.active) > 0) return;
+  var keys = openKeys(), ai = keys.indexOf(S.active), best = null, bd = 99;
+  for (var i = 0; i < keys.length; i++) { if (i === ai || whCount(keys[i]) === 0) continue; var d = ai < 0 ? i : Math.abs(i - ai); if (d < bd) { bd = d; best = keys[i]; } }
+  if (best === null) return;
+  var was = S.active; S.active = best; UI.traySig = "";
+  toast(WH_NAME[was] + " storage is empty \u2014 switched to " + WH_NAME[best], 2200); renderHUD();
 }
-function selectWh(k) {
-  if (!sorterOn() || !whOpen(k)) return;
-  if (k !== "normal" && whCount(k) === 0) { snd.err(); toast(WH_NAME[k] + " storage is empty", 1600); return; }
-  if (S.active === k) return;
+function selectWh(k) {                    // returns true when k is now the building we build from
+  if (!sorterOn() || !whOpen(k)) return false;
+  if (S.active === k) return true;
+  if (whCount(k) === 0) { snd.err(); haptic(12); toast(WH_NAME[k] + " storage is empty", 1600); bldFlash(bldEl(k), "shake"); return false; }
   S.active = k; UI.traySig = ""; snd.pop(); haptic(8); renderHUD(); saveGame();
+  return true;
 }
-function trayView() {                     // what the storage building shows
-  if (!sorterOn()) return S.stack;
-  return S.stack.filter(function (it) { return whKey(it.type) === S.active; });
+function tapBuilding(k) {                 // tap a building: it becomes the one you build from, and loads the crane
+  if (!S.started || modalPaused() || actionFrozen()) return;
+  if (sorterOn() && S.active !== k && !selectWh(k)) return;
+  tapStorage();
 }
+function trayView() { return bldList("normal"); }         // the plain shed always shows the plain bricks
 function rowTypeBonus(row) {              // metal bonuses for the row (side) that was just finished
   var out = { row: row, bonus: 0, metal: 0, pureAmt: 0, pure: null, n: { lead: S.rowT.lead, silver: S.rowT.silver, gold: S.rowT.gold } };
   if (!payable(row)) return out;
@@ -3581,7 +3702,8 @@ function typeRowFx(tb) {
 
 /* ---------------- KILN ---------------- */
 function tickKiln(dt) {
-  if (S.kilnWait && !storeFull()) { var kw = S.kilnWait; S.kilnWait = null; S.moldT = 0; stackBrick(kw); }       // room at last: the waiting brick leaves the kiln first
+  if (S.kilnWait && S.tier.discard > 0 && whFull(stKey(S.kilnWait.type))) { S.kilnWait = null; S.moldT = 0; discardFx(); }
+  if (S.kilnWait && !whFull(stKey(S.kilnWait.type))) { var kw = S.kilnWait; S.kilnWait = null; S.moldT = 0; stackBrick(kw); }       // room at last: the waiting brick leaves the kiln first
   if (S.tier.miniKiln > 0) {                       // the little kiln bakes by itself, slowly, and keeps the best brick of a few
     S.miniT = (S.miniT || 0) + dt / MINI_INT[S.tier.miniKiln];
     if (S.miniT >= 1) { if (!storeFull()) { S.miniT = 0; produceBrick(true); } else S.miniT = 1; }
@@ -3599,25 +3721,33 @@ function produceBrick(mini) {
   var demoLucky = false;
   if (!mini && !S.shopOpen && S.nextHot) { type = "hot"; S.nextHot = false; }
   else if (!mini && !S.shopOpen && S.nextDemo) { if (S.nextDemo === "lucky") demoLucky = true; else type = S.nextDemo; S.nextDemo = null; }    // show off the new brick type: the first one is guaranteed
+  if (mini && whFull(stKey(type))) { if (whFull(stKey("normal"))) return; type = "normal"; }      // the mini kiln never blocks: it makes a plain brick if its type has no room
   var it = newItem(type);
   if (!S.shopOpen && (demoLucky || Math.random() < LUCKY_P[S.tier.luckyBrick])) it.lucky = true;
-  if (storeFull()) {                                // baked, but there is no shelf for it: it stays in the kiln until there is room
+  if (S.tier.discard > 0 && whFull(stKey(type))) { discardFx(type); return; }   // that type's warehouse is full: the brick is thrown out so the kiln can make other types
+  if (whFull(stKey(type))) {                        // baked, but that building has no shelf free: it stays in the kiln until there is room
     S.kilnWait = it; S.moldT = 1; kilnPuff(); tone(660, 0.12, "triangle", 0.07, 0); tone(880, 0.16, "triangle", 0.06, 0.1); haptic(10);
-    if (!S.flags.kilnWaitSeen) { S.flags.kilnWaitSeen = true; toast("Shed's full — the finished brick waits in the kiln.", 3200); }
+    if (!S.flags.kilnWaitSeen) { S.flags.kilnWaitSeen = true; toast((sorterOn() ? WH_NAME[stKey(type)] + " storage is full" : "Shed's full") + " \u2014 the finished brick waits in the kiln.", 3200); }
     return;
   }
   stackBrick(it);
 }
+function discardFx(type) {
+  S.discarded = (S.discarded || 0) + 1;
+  tone(330, 0.1, "triangle", 0.05, 0); tone(220, 0.14, "triangle", 0.04, 0.08);
+  var r = el.kiln.getBoundingClientRect();
+  popText("DISCARDED", r.left + r.width / 2, r.top + 10, { cls: "", size: 14, rise: 26, dur: 800 });
+}
 function stackBrick(it) {
   var type = it.type;
-  S.stack.push(it); settleStack();
+  S.stack.push(it); settleStack(); ensureActive();
   S.molded++;
   if (type === "hot") { snd.sizzle(); if (!S.flags.hotSeen) { S.flags.hotSeen = true; } }
   else if (type === "gold") { snd.clink(); tone(2349, 0.14, "sine", 0.06, 0.05); }
   else if (type === "silver") { snd.clink(); tone(1976, 0.12, "sine", 0.05, 0.05); }
   else snd.clink();
   if (it.lucky) { tone(1568, 0.1, "sine", 0.06, 0.1); tone(2093, 0.12, "sine", 0.05, 0.18); }
-  UI.trayPop = it.uid; UI.whPop = whKey(type);
+  UI.trayPop = it.uid; UI.whPop = stKey(type);
   kilnPuff();
   if (!REDUCED) UI.fly[it.uid] = 1;
   renderHUD();
@@ -3657,11 +3787,14 @@ function tickCrane(dt, frozen) {
 function tapStorage() {
   if (!S.started || modalPaused() || actionFrozen()) return;
   audio(); S.lastAct = S.time;
-  if (C.state !== "empty") return;                 // the crane already has a brick
+  if (C.state !== "empty") {                        // the crane already has a brick: still top up the hopper if it has empty slots
+    if (S.tier.hopper > 0 && S.hopper.length < hopperCap() - 1) { fillHopper(); renderHUD(); }
+    return;
+  }
   if (S.hopper.length) { if (C.t <= 0 && G.falls === 0) loadCrane(true); return; }      // the hopper is already feeding it
   ensureActive();
   var ni = nextIdx();
-  if (ni < 0) { snd.err(); haptic(12); nudgeKiln(); el.tray.classList.remove("shake"); void el.tray.offsetWidth; el.tray.classList.add("shake"); return; }
+  if (ni < 0) { snd.err(); haptic(12); nudgeKiln(); bldFlash(bldEl(sorterOn() ? S.active : "normal") || el.tray, "shake"); return; }
   if (C.t > 0 || G.falls > 0 || UI.fly[S.stack[ni].uid]) { G.wantLoad = true; return; }     // queued: loads the moment the last brick has set
   loadCrane();
 }
@@ -3683,12 +3816,13 @@ function loadCrane(fromHopper) {
   if (fromHopper) { if (!S.hopper.length) return; item = S.hopper.shift(); }
   else { ni = nextIdx(); if (ni < 0) return; item = S.stack.splice(ni, 1)[0]; }
   dismissHint("load"); S.flags.loadTaught = true;
-  el.tray.classList.remove("thunk"); void el.tray.offsetWidth; el.tray.classList.add("thunk");
+  bldFlash(bldEl(stKey(item.type)) || el.tray, "thunk");
+  ensureActive();
   C.item = item; C.state = "swing"; C.lock = 0.12; C.loadT = 0;
   var fromRight = Math.random() < 0.5;
   C.pos = fromRight ? 1 : 0; C.dir = fromRight ? -1 : 1;
   if (S.tier.predictable > 0) {         // spawn a set distance from the slot, already heading toward it
-    var ptf = targetFrac(), pd = clamp(PRED_TIME * swingSpeed(), PRED_MIN, PRED_MAX), side = fromRight ? 1 : -1;
+    var ptf = targetFrac(), pd = PRED_DIST, side = fromRight ? 1 : -1;
     if (ptf + side * pd > 1) side = -1; else if (ptf + side * pd < 0) side = 1;
     C.pos = clamp(ptf + side * pd, 0, 1); C.dir = -side;
   }
@@ -3800,9 +3934,9 @@ function placeBrick(item, fromAuto, outcome, f, from) {
 }
 function luckyFx(amt, row, slot, per) {
   var x = slotX(row, slot, per), y = rowY(row), sp = toScreen(x, y + 0.5, BD / 2);
-  popText("LUCKY! +$" + fmtPay(amt), sp.x, sp.y - 34, { cls: "green", size: 22, dur: 1150, rise: 46 });
-  moneyFloat(amt, null); spawnCoins(coinsFor(amt), sp);
-  emitConfetti(x, y + 0.3, BD / 2, 16, 1.2); emitGlow(x, y, BD / 2 + 0.1, 16, 0x7dff8a, 2.6, 0.7, 0.14, -1.5);
+  moneyFloat(amt, null); spawnCoins(coinsFor(amt) + 8, sp);            // no word: just an extra burst of coins...
+  emitShoes(x, y + 0.3, BD / 2, 14);                                   // ...and a shower of little horseshoes
+  emitGlow(x, y, BD / 2 + 0.1, 16, 0x7dff8a, 2.6, 0.7, 0.14, -1.5);
   tone(1568, 0.1, "sine", 0.07, 0.02); tone(2093, 0.14, "sine", 0.06, 0.1);
 }
 function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow, bump, runN) {
@@ -3813,7 +3947,7 @@ function landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, st
   emitPuffs(x, y - BH / 2, z, item.type === "lead" ? 9 : fromAuto ? 2 : 5, 0xe9dcc2, 0.5);
   camShake(item.type === "lead" ? 0.42 : fromAuto ? 0.04 : 0.16);
   var sp = toScreen(x, y + 0.3, z);
-  if (pay > 0) moneyFloat(pay, sp.x, sp.y - 10);
+  if (pay > 0) moneyFloat(pay);
   if (outcome === 3) {
     G.hitStop = 0.075;
     camPunch(-2.2);
@@ -3872,7 +4006,7 @@ function towerHides(px, py, pz) {
 }
 function crowdVisible(d) {
   if (!d || !d.on || !(d.s > 0.6)) return false;
-  var W = window.innerWidth, H = window.innerHeight, hy = (d.y || 0) + 1.0 * Math.max(0.0001, d.s * 1.3);       // about where the bubble's tail points
+  var W = window.innerWidth, H = window.innerHeight, hy = (d.y || 0) + (d.hy || 0) + 1.0 * Math.max(0.0001, d.s * 1.3);       // about where the bubble's tail points
   var sp = toScreenW(d.x, hy, d.z);
   if (sp.behind || sp.x < 36 || sp.x > W - 36 || sp.y < 140 || sp.y > H - 240) return false;      // off-screen, or somewhere the bubble would have to float free of them
   return !towerHides(d.x, hy, d.z);
@@ -3914,7 +4048,7 @@ function updateBubbles() {
   var seenF = seen ? 1 : Math.max(0, 1 - (now - bb.hidT) / 180);
   if (seenF <= 0) { dropBubble(); nextSayAt = now + 450; return; }
   var hat = dd.mg && dd.mg.a && dd.mg.a.hat > 0 ? 0.4 * Math.min(1, dd.mg.a.hat) : 0;
-  var sp = toScreenW(dd.x, (dd.y || 0) + (0.97 + hat) * hs, dd.z);
+  var sp = toScreenW(dd.x, (dd.y || 0) + (dd.hy || 0) + (0.97 + hat) * hs, dd.z);
   if (sp.behind) { bb.el.style.opacity = "0"; return; }
   var rise = 12 + 4 * Math.sin(age / 260);                                  // a gentle bob
   var half = bw / 2 + 8, x = clamp(sp.x, half, W - half), y = clamp(sp.y - rise, 76 + (bb.el.offsetHeight || 40), H - 250);
@@ -4008,7 +4142,7 @@ function tickFalling(dt) {
         var vd = W3.crowd[a.idx];
         if (!vd || !vd.on) { a.hit = true; a.vy = 2; a.vx = a.dir || 1; a.vz = 1; a.fall = true; }
         else {
-          _vf.set(vd.x, (vd.y || 0) + 1.3, vd.z); W3.orbit.worldToLocal(_vf);
+          _vf.set(vd.x, (vd.y || 0) + (vd.hy || 0) + 1.3, vd.z); W3.orbit.worldToLocal(_vf);
           var e5 = u * u * 0.4 + u * 0.6;
           m2.position.set(lerp(a.sx, _vf.x, e5), lerp(a.sy, _vf.y, u) + Math.sin(u * Math.PI) * 1.1, lerp(a.sz, _vf.z, e5));
           m2.rotation.z = a.t * a.spin; m2.rotation.x = a.t * 3;
@@ -4142,7 +4276,7 @@ function pickBonkTarget(f) {
   var W = window.innerWidth, H = window.innerHeight, bs = toScreen(f.mesh.position.x, f.mesh.position.y, f.mesh.position.z), pool = [];
   for (var i = 0; i < W3.crowd.length; i++) {
     var d = W3.crowd[i]; if (!d.on || d.s < 0.9 || d.fx || (d.dnLeft || 0) > 0) continue;
-    var sp = toScreenW(d.x, 1.2, d.z); if (sp.behind || sp.x < 40 || sp.x > W - 40 || sp.y < 110 || sp.y > H - 230) continue;
+    var sp = toScreenW(d.x, 1.2 + (d.hy || 0), d.z); if (sp.behind || sp.x < 40 || sp.x > W - 40 || sp.y < 110 || sp.y > H - 230) continue;
     pool.push({ i: i, dist: Math.abs(sp.x - bs.x) + Math.abs(sp.y - bs.y) * 0.3 });
   }
   if (!pool.length) return null;
@@ -4189,7 +4323,7 @@ function sideDone() {
   var tb = rowTypeBonus(row), bonus = (payable(row) ? rowBonus(clean) : 0) + tb.bonus;     // each side is a row of its own: it pays its own row + metal bonuses
   S.rowMisses = 0; S.scUsed = 0; S.rowT = freshRowT();                                  // ...and gets its own clean-row check, Second Chance and metal ledger
   credit(bonus); if (S.courses >= 5 && Math.random() < 0.4) villagersReact(S.courses, false);
-  whenLanded(function () { snd.whoosh(); bigWord("SIDE " + side + " / 4", "gold"); faceFx(row, bonus, clean); typeRowFx(tb); });
+  whenLanded(function () { snd.whoosh(); faceFx(row, bonus, clean); typeRowFx(tb); });
   saveGame();
 }
 function faceFx(row, bonus, clean) {
@@ -4248,10 +4382,25 @@ function completeCourse() {
   if (isNew) S.best = S.courses;
   villagersReact(S.courses, !S.tower && isNew);
   credit(bonus);
-  whenLanded(function () { rowFx(done, bonus, clean); typeRowFx(tb); });
+  whenLanded(function () { if (S.tower) layerFx(done, bonus, clean); else rowFx(done, bonus, clean); typeRowFx(tb); });
   if (isNew) milestone(S.courses);
   updateHazards();
   renderHUD(); checkUnlocks(); saveGame();
+}
+function layerFx(row, bonus, clean) {            // a full layer, all four sides: the normal row fanfare PLUS a tower-wide show
+  rowFx(row, bonus, clean);
+  var y = rowY(row), sp = toScreen(0, y + 0.4, BD / 2), v = new THREE.Vector3();
+  popText("LAYER COMPLETE!", sp.x, sp.y - 82, { cls: "gold", size: 30, rot: -4, dur: 1500, rise: 52, delay: 80 });
+  if (bonus > 0) spawnCoins(10, sp);
+  EMIT_WORLD = true;
+  for (var f = 0; f < 4; f++) {                  // a burst of sparks and confetti off every side of the tower
+    faceToWorld(f, 0, y + 0.3, BD / 2 + 0.25, v);
+    emitGlow(v.x, v.y, v.z, 26, 0xffd94d, 3.2, 1, 0.17, -2, 1.6);
+    emitConfetti(v.x, v.y + 0.4, v.z, 12, 1);
+  }
+  EMIT_WORLD = false;
+  for (var k = 0; k < 3; k++) (function (kk) { setTimeout(function () { firework(rand(-5, 5), y + rand(5, 8), -4); snd.boom(); }, 120 + kk * 230); })(k);
+  camShake(0.3); flashScreen(0.18, 0.4); crowdCheer(2.6); snd.fanfare();
 }
 function rowFx(row, bonus, clean) {
   rowWave(row);
@@ -4278,8 +4427,7 @@ function tickApprentice(dt) {
   if (S.tier.autoLayer <= 0 || CAM.mode === "victory") { AT.on = false; return; }
   ensureActive();
   var plain = apprCount(), int = autoLayInt();
-  var idle = S.time - S.lastAct > 1.8 && !S.held;
-  var go = plain > 0 && (idle || plain >= Math.max(4, storeCap()));
+  var go = plain > 0;                                    // apprentices never stop for you: they lay whenever they have bricks
   if (go) {
     var slots = Math.max(1, perFace() - curSlot());
     AT.n = Math.min(autoLayBatch(), plain, slots);
@@ -4295,6 +4443,7 @@ function tickApprentice(dt) {
         var it = S.stack.splice(pi, 1)[0];
         placeBrick(it, true, 2, null, null);
       }
+      ensureActive();
     }
   } else { AT.on = false; AT.pulsed = 0; if (plain === 0) S.layAcc = 0; }
 }
@@ -4318,7 +4467,7 @@ function tickFuses(dt) {
     if (hb.fuse > 0) continue;
     if (S.courses === 1 && !S.comboTutDone) { hb.fuse = hotFuse(); bigWord("TRY AGAIN!", "gold"); }
     else if (S.scUsed < S.tier.secondChance) { S.scUsed++; hb.fuse = hotFuse(); bigWord("2ND CHANCE!", "gold"); }
-    else { S.stack.splice(i, 1); bigWord("BURNT OUT!"); missFx(hb, null); }
+    else { S.stack.splice(i, 1); bigWord("BURNT OUT!"); missFx(hb, null); ensureActive(); }
     renderHUD(); break;
   }
   for (var hq = S.hopper.length - 1; hq >= 0; hq--) {
@@ -4355,6 +4504,49 @@ function forgeStrike() {                              // Edgar swings his hammer
   clearTimeout(forgeT); forgeT = setTimeout(function () { fg.classList.remove("hit"); }, 900);
   setTimeout(function () { tone(1480, 0.32, "triangle", 0.07, 0, 1250); tone(2960, 0.16, "sine", 0.04, 0.01); tone(220, 0.1, "square", 0.05, 0, 110); noiseBurst(0.05, 0.12, 3200); haptic(12); }, 400);
 }
+var FORGE_P = [0.01, 0.05, 0.15, 0.30, 0.50];          // Edgar's Forge: chance that one click pays $1, per Edgar's Luck tier (1% up to a 50/50)
+function forgeChance() { return FORGE_P[S.tier.forgeLuck] || FORGE_P[0]; }
+var fgBub = null, fgBubT = 0;
+function forgeBubble() {                                // a little bubble with Edgar at his anvil, so a purchase is seen even when the forge has scrolled out of view
+  var src = $("forge"); if (!src || !S.shopOpen || !el.workshop) return;
+  clearTimeout(fgBubT); if (fgBub && fgBub.parentNode) fgBub.parentNode.removeChild(fgBub);
+  var b = document.createElement("div"); b.className = "fg-bub"; fgBub = b;
+  var tail = document.createElement("i"); tail.className = "fg-tail"; b.appendChild(tail);
+  var inner = document.createElement("div"); inner.className = "forge";
+  var svg = src.querySelector("svg"); if (svg) inner.appendChild(svg.cloneNode(true));
+  var cl = document.createElement("b"); cl.className = "fg-clang"; cl.textContent = ["CLANG!", "DING!", "BANG!", "CLINK!"][Math.floor(Math.random() * 4)]; inner.appendChild(cl);
+  b.appendChild(inner); el.workshop.appendChild(b);
+  if (!REDUCED) b.animate([{ opacity: 0, transform: "translateY(-12px) scale(.7)" }, { opacity: 1, transform: "none" }], { duration: 240, easing: "cubic-bezier(.2,1.4,.4,1)", fill: "backwards" });
+  setTimeout(function () { inner.classList.add("hit"); }, 150);          // the hammer swings once the bubble has popped in
+  fgBubT = setTimeout(function () {
+    if (!REDUCED) b.animate([{ opacity: 1 }, { opacity: 0, transform: "translateY(-8px) scale(.92)" }], { duration: 260, fill: "forwards" });
+    fgBubT = setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); if (fgBub === b) fgBub = null; }, 300);
+  }, 1500);
+}
+function forgeClick() {                                // clicking the forge: the strike animation, plus the lucky roll (buying an upgrade only animates, it never rolls)
+  var fg = $("forge"); if (!fg || !S.shopOpen) return;
+  forgeStrike();
+  if (Math.random() < forgeChance()) setTimeout(forgeWin, 400);          // pays as the hammer lands
+}
+function forgeWin() {
+  S.forgeWins = (S.forgeWins || 0) + 1;
+  credit(1); snd.coin(); haptic([10, 40, 10]);
+  var fg = $("forge");
+  if (fg) {                                            // shown inside the forge: the workshop sheet covers the normal effects layer
+    var t = document.createElement("div"); t.className = "fg-win"; t.textContent = "+$1"; fg.appendChild(t);
+    if (REDUCED) { t.style.opacity = "1"; fxKill(t, null, 1200); }
+    else {
+      var a = t.animate([
+        { transform: "translate(0,8px) scale(.5)", opacity: 0 },
+        { transform: "translate(0,-4px) scale(1.25)", opacity: 1, offset: 0.2 },
+        { transform: "translate(0,-12px) scale(1)", opacity: 1, offset: 0.65 },
+        { transform: "translate(0,-30px) scale(.95)", opacity: 0 }
+      ], { duration: 1200, easing: "ease-out" });
+      fxKill(t, a, 1400);
+    }
+  }
+  popEl(el.moneyNum); renderHUD();
+}
 function buyLine(id) {
   var l = null; for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) l = LINES[i];
   if (!l || !l.gate() || S.tier[id] >= l.costs.length) return;
@@ -4362,7 +4554,7 @@ function buyLine(id) {
   if (S.money < cost) { snd.err(); if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); } return; }
   if (row) { var bb = row.querySelector(".buy-btn"); if (bb) { var r = bb.getBoundingClientRect(); domBurst(r.left + r.width / 2, r.top + r.height / 2); popText("TIER " + (S.tier[id] + 1) + "!", r.left + r.width / 2, r.top - 12, { cls: "gold", size: 18, rise: 30 }); } }
   S.money = Math.round((S.money - cost) * 100) / 100; S.tier[id]++;
-  snd.buy(); haptic(15); forgeStrike();
+  snd.buy(); haptic(15); forgeStrike(); forgeBubble();
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
     else {
@@ -4372,12 +4564,12 @@ function buyLine(id) {
       if (S.inCourse >= S.perCourse) completeCourse();
     }
   } else if (id === "kilnSpeed" && S.tier.kilnSpeed === 2 && !S.hotUnlocked) {
-    S.hotUnlocked = true; S.nextHot = true; enqueueReveal("hot");
+    S.hotUnlocked = true; S.nextHot = true; enqueueCards("hot", CARDS_HOT, null);
   } else if (id === "kilnSpeed") toast("The kiln bakes faster while you hold it.", 2600);
-  else if (id === "lead") { S.leadUnlocked = true; if (S.tier.lead === 1) S.nextDemo = "lead"; enqueueReveal("lead"); }
-  else if (id === "silver") { if (S.tier.silver === 1) S.nextDemo = "silver"; enqueueReveal("silver"); }
-  else if (id === "gold") { if (S.tier.gold === 1) S.nextDemo = "gold"; enqueueReveal("gold"); }
-  else if (id === "sorter") { S.active = "normal"; UI.traySig = ""; enqueueReveal("sorter"); }
+  else if (id === "lead") { S.leadUnlocked = true; if (S.tier.lead === 1) S.nextDemo = "lead"; enqueueCards("lead", CARDS_LEAD, null); }
+  else if (id === "silver") { if (S.tier.silver === 1) S.nextDemo = "silver"; enqueueCards("silver", CARDS_SILVER, null); }
+  else if (id === "gold") { if (S.tier.gold === 1) S.nextDemo = "gold"; enqueueCards("gold", CARDS_GOLD, null); }
+  else if (id === "sorter") { S.active = "normal"; UI.traySig = ""; enqueueCards("sorter", CARDS_SORTER, null); }
   else if (id === "perfect") toast(S.tier.perfect === 1 ? "Perfect Eye! Hit the white strip for a PERFECT — it pays ×" + PERF_PAY[1] + "." : "Perfect drops now pay ×" + PERF_PAY[S.tier.perfect] + ".", 3400);
   else if (id === "perBrick") toast("Piece Work! Every brick you lay now pays.", 3200);
   else if (id === "combo") toast("Combos on — land hits in a row for a streak bonus. Don't break it!", 3600);
@@ -4388,15 +4580,14 @@ function buyLine(id) {
   else if (id === "moreApp") toast("More apprentices — " + autoLayBatch() + " bricks per trip.", 3000);
   else if (id === "predictable") toast("Predictable Placement: the crane now brings each brick in from a set distance.", 3600);
   else if (id === "secondChance") toast("Second Chance " + S.tier.secondChance + " — misses forgiven, streaks kept.", 3200);
-  else if (id === "precision") toast("Precision gears: the crane slows down.", 3000);
   else if (id === "gilded") toast("Gold bricks are now common — ×" + TYPE_MULT.gold + " pay.", 3400);
   else if (id === "plumb") toast("Plumb line: the white PERFECT strip is wider.", 3000);
   else if (id === "crowd") toast("The crowd roars — streak bonus now caps at ×" + fmtMult(multCap()) + ".", 3200);
-  else if (id === "glaze") toast("Slippery glaze: hands now need " + grabTime() + "s to rip a brick free.", 3400);
+  else if (id === "glaze") toast("Slippery glaze: hands now need " + fmtSec(grabTime()) + "s to rip a brick free.", 3400);
   else if (id === "lantern") toast("The lantern burns through — the clouds thin out.", 3200);
   else if (id === "level") toast("Spirit level: the tremors shrink.", 3000);
   else if (id === "placeSpeed") toast(placeTime() > 0 ? "Swift Setting: bricks now set in " + placeTime() + "s." : "Bricks now snap into place instantly!", 3000);
-  else if (id === "storage") { toast("The shed now holds " + storeCap() + " bricks.", 2800); UI.traySig = ""; }
+  else if (id === "storage") { toast("Each storage building now holds " + storeCap() + " bricks.", 2800); UI.traySig = ""; }
   else if (id === "miniKiln") { S.miniT = 0; toast(S.tier.miniKiln === 1 ? "Mini Kiln lit! It bakes on its own — slowly." : "Mini Kiln upgraded — a brick every " + MINI_INT[S.tier.miniKiln] + "s.", 3200); }
   else if (id === "hotGloves") toast("Hot Gloves: hot bricks stay hot for " + hotFuse() + "s.", 3000);
   else if (id === "tipJar") toast("Tip Jar: every finished row now drops +$" + TIP_ADD[S.tier.tipJar] + " in the jar.", 3000);
@@ -4404,6 +4595,8 @@ function buyLine(id) {
   else if (id === "cheerBonus") toast("Cheer Bonus: clean rows earn extra from the crowd.", 3000);
   else if (id === "hopper") toast(S.tier.hopper === 1 ? "Hopper fitted! One tap now loads " + hopperCap() + " bricks." : "Hopper upgraded — one tap loads " + hopperCap() + " bricks.", 3200);
   else if (id === "luckyBrick") { if (S.tier.luckyBrick === 1) S.nextDemo = "lucky"; toast("Lucky bricks! Your next brick is guaranteed lucky.", 3000); }
+  else if (id === "forgeLuck") toast("Edgar's Luck: his strike now pays $1 " + Math.round(FORGE_P[S.tier.forgeLuck] * 100) + "% of the time.", 3200);
+  else if (id === "discard") toast("Full Warehouse Discard: full warehouses now throw out new bricks of their type.", 3400);
   else if (id === "roundTower") startRound();
   else if (id === "stool") toast("Apprentice's Stool: apprentices now earn ×" + STOOL[S.tier.stool] + ".", 3000);
   else if (id === "starter") starterBought();
@@ -4550,13 +4743,13 @@ function updateHazards() {
     S.windOn = h.wind;
     if (h.wind) {
       S.wind.flipAt = S.time + rand(6, 11);
-      if (!S.flags.windSeen) { S.flags.windSeen = true; enqueueReveal("wind"); } else announceReturn("wind");
+      if (!S.flags.windSeen) { S.flags.windSeen = true; enqueueCards("wind", CARDS_WIND, null); } else announceReturn("wind");
     }
   }
   if (h.mist !== S.mistLevel) {
     var was = S.mistLevel; S.mistLevel = h.mist;
     if (h.mist > was) {
-      if (h.mist === 1 && !S.flags.mistSeen) { S.flags.mistSeen = true; enqueueReveal("mist"); }
+      if (h.mist === 1 && !S.flags.mistSeen) { S.flags.mistSeen = true; enqueueCards("mist", CARDS_MIST, null); }
       else if (h.mist === 2 && !S.flags.mist2Seen) { S.flags.mist2Seen = true; toast("THE CLOUDS THICKEN — they'll hide the crane for seconds at a time", 3800); snd.whoosh(); }
       else announceReturn(h.mist === 2 ? "mist2" : "mist");
     }
@@ -4564,22 +4757,23 @@ function updateHazards() {
   if (h.sway !== S.swayOn) {
     S.swayOn = h.sway;
     if (h.sway) {
-      if (!S.flags.swaySeen) { S.flags.swaySeen = true; enqueueReveal("tremor"); } else announceReturn("sway");
+      if (!S.flags.swaySeen) { S.flags.swaySeen = true; enqueueCards("tremor", CARDS_TREMOR, null); } else announceReturn("sway");
       snd.rumble(); camShake(0.3);
     }
   }
 }
 
 /* ---------- milestones: story, reveals, raids, banners ---------- */
+function revealGoal() { S.flags.goalShown = true; renderHUD(); popEl($("hud-course-num")); banner("THE GOAL", "BUILD TO ROW 50"); }
 var STORY_AT = { 25: "c25", 30: "c30", 35: "c35", 40: "c40", 45: "c45", 48: "c48", 55: "c55", 60: "c60", 65: "c65", 70: "c70", 75: "c75", 80: "c80", 85: "c85", 90: "c90", 95: "c95" };
 function milestone(n) {
   if (n === 1) {
     enqueueStory("row1");
   }
   if (n === 5 && !S.beats.c5b) { S.beats.c5a = S.beats.c5b = true; enqueueCards("elder", CARDS_ELDER, function () { startTower(); }); }
-  if (n === 10 && !S.flags.goalShown) enqueueSeq(["c10a", "c10b"]);
+  if (n === 10 && !S.flags.goalShown && !S.beats.c10cards) { S.beats.c10cards = true; enqueueCards("ten", CARDS_TEN, revealGoal); }
   if (STORY_AT[n]) enqueueStory(STORY_AT[n]);
-  if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; S.nextDemo = "glass"; enqueueReveal("glass"); }
+  if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; S.nextDemo = "glass"; enqueueCards("glass", CARDS_GLASS, null); }
   if (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0) queueRaid(n);
   if (n % 10 === 0 && n !== FIRST_GOAL && n !== FINAL_GOAL) whenLanded(function () { banner("COURSE " + n, perBrickOn() ? "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE" : "PAY RAISE · ROW BONUS NOW $" + rowBonus(true)); });
   else if (n === FIRST_GOAL - 1 || n === FINAL_GOAL - 1) toast("Course " + n + " — one more.", 3000);
@@ -4763,7 +4957,7 @@ function queueRaid(n) { S.raid = { left: n < 55 ? 1 : n < 80 ? 2 : 3, delay: 0.6
 function tickRaid(dt) {
   var r = S.raid; if (!r) return;
   if (activeMsg || msgQ.length || G.falls > 0 || CAM.mode !== "play") return;
-  if (!S.flags.handSeen) { S.flags.handSeen = true; enqueueReveal("hand"); return; }
+  if (!S.flags.handSeen) { S.flags.handSeen = true; enqueueCards("hand", CARDS_HAND, null); return; }
   r.delay -= dt; if (r.delay > 0) return;
   if (spawnHand()) { r.left--; r.delay = 1.8; } else r.left = 0;
   if (r.left <= 0) S.raid = null;
@@ -4923,7 +5117,7 @@ var UI = { tab: "all", fly: {}, trayPop: 0, traySig: "", shopSig: "", shopNew: {
 var el = {};
 ["hud-course-num", "hud-goal", "prog-fill", "money-num", "hud-money", "btn-shop", "shop-new", "shop-count", "chip-row", "row-num", "row-in",
  "chip-wind", "wind-arrow", "wind-str", "chip-sc", "chip-hand", "hand-t", "chip-sway", "streak", "streak-x", "streak-pay", "prompt", "dock", "kiln", "kiln-ring", "kiln-sub",
- "k-mini", "mini-ring", "tray", "tray-count", "tray-lab", "wh-tabs", "tray-list", "fx", "hot-bar", "toast", "banner", "bn-big", "bn-small", "big-word", "reveal", "hr-brick", "hr-title", "hr-text",
+ "k-mini", "mini-ring", "tray", "tray-count", "tray-lab", "sheds", "tray-list", "fx", "hot-bar", "toast", "banner", "bn-big", "bn-small", "big-word", "reveal", "hr-brick", "hr-title", "hr-text",
  "workshop", "upg-list", "rate-chip", "settings", "story", "story-card", "story-text", "story-kicker", "story-dots", "story-next",
  "hintwrap", "hint-dim", "hint-label", "hint-text", "vignette", "flash", "ov-loading", "ov-start", "ov-victory"].forEach(function (id) {
   el[id.replace(/-([a-z])/g, function (m, c) { return c.toUpperCase(); })] = $(id);
@@ -4962,11 +5156,29 @@ function popText(txt, x, y, o) {
   ], { duration: o.dur || 900, easing: "cubic-bezier(.2,.7,.3,1)", delay: o.delay || 0, fill: "backwards" });
   fxKill(t, anim, (o.dur || 900) + (o.delay || 0) + 200);
 }
-function moneyFloat(amount, x, y) {
+var PEND = { amt: 0 };                                  // the pay the next burst of coins is carrying to the total
+var PLUS = { el: null, amt: 0, until: 0, anim: null, timer: 0 };
+function moneyFloat(amount) {                           // no text where the brick lands any more: the coins carry the pay and it turns into a + on the total
   snd.coin(); popEl(el.hudMoney);
-  if (x == null) return;
-  var ratio = amount / rate();
-  popText("+$" + fmtPay(amount), x, y, { cls: "green", size: Math.round(17 + Math.min(12, Math.log(Math.max(1, ratio)) / Math.LN2 * 2.4)), rise: 40, dur: 850 });
+  PEND.amt = amount > 0 ? amount : 0;
+}
+function plusAdd(amount) {                              // a "+$N" under the money total that lingers a moment then fades; coins landing together add up
+  if (!(amount > 0) || el.hudMoney.classList.contains("hidden")) return;
+  var P = PLUS, now = performance.now();
+  if (!P.el) { P.el = document.createElement("div"); P.el.className = "plus-badge"; el.fx.appendChild(P.el); }
+  P.amt = now < P.until ? P.amt + amount : amount; P.until = now + 1700;
+  P.el.textContent = "+$" + fmtPay(P.amt);
+  var r = el.hudMoney.getBoundingClientRect();
+  P.el.style.left = (r.left + r.width / 2) + "px"; P.el.style.top = (r.bottom + 3) + "px";
+  if (P.anim) P.anim.cancel();
+  clearTimeout(P.timer);
+  if (REDUCED || !P.el.animate) { P.el.style.opacity = "1"; P.timer = setTimeout(function () { P.el.style.opacity = "0"; }, 1700); return; }
+  P.anim = P.el.animate([
+    { opacity: 1, transform: "translate(-50%,0) scale(1.3)" },
+    { opacity: 1, transform: "translate(-50%,0) scale(1)", offset: 0.14 },
+    { opacity: 1, transform: "translate(-50%,0) scale(1)", offset: 0.6 },
+    { opacity: 0, transform: "translate(-50%,-9px) scale(1)" }
+  ], { duration: 1700, easing: "ease-out", fill: "forwards" });
 }
 function bigWord(txt, cls) {
   var b = el.bigWord; b.textContent = txt; b.className = cls || "";
@@ -4993,15 +5205,20 @@ function banner(big, small) {
 var coinFx = [], coinRaf = null;
 // Coins pop out of the brick in a fountain, hang for a beat, then get sucked into the money pill.
 function spawnCoins(n, from) {
-  if (el.hudMoney.classList.contains("hidden") || REDUCED) return;
-  var t = el.hudMoney.getBoundingClientRect(), tx = t.left + t.width / 2 - 9, ty = t.top + t.height / 2 - 9, now = performance.now();
+  var amt = PEND.amt; PEND.amt = 0;
+  if (el.hudMoney.classList.contains("hidden") || REDUCED) { plusAdd(amt); return; }
+  var mine = [];
+  var t = el.hudMoney.getBoundingClientRect(), tx = t.left + t.width / 2 - 12, ty = t.top + t.height / 2 - 12, now = performance.now();
   for (var i = 0; i < n; i++) {
     if (el.fx.childElementCount > 80 && i > 0) break;
     var c = document.createElement("div"); c.className = "coin"; c.style.opacity = "0"; el.fx.appendChild(c);
     var ang = -Math.PI / 2 + rand(-1.2, 1.2), spd = rand(140, 300);
-    coinFx.push({ el: c, x0: from.x - 9 + rand(-8, 8), y0: from.y - 9, bvx: Math.cos(ang) * spd, bvy: Math.sin(ang) * spd, tx: tx, ty: ty,
-      start: now + i * 30, B: rand(0.28, 0.4), F: rand(0.4, 0.55), swirl: rand(-45, 45), spin: rand(0, 6.28) });
+    coinFx.push({ el: c, x0: from.x - 12 + rand(-8, 8), y0: from.y - 12, bvx: Math.cos(ang) * spd, bvy: Math.sin(ang) * spd, tx: tx, ty: ty,
+      start: now + i * 30, B: rand(0.28, 0.4), F: rand(0.4, 0.55), swirl: rand(-45, 45), spin: rand(0, 6.28), share: 0 });
+    mine.push(coinFx[coinFx.length - 1]);
   }
+  for (var m = 0; m < mine.length; m++) mine[m].share = amt / mine.length;      // each coin that lands drops its share onto the total
+  if (!mine.length) plusAdd(amt);
   if (!coinRaf && coinFx.length) coinRaf = requestAnimationFrame(coinStep);
 }
 function coinGlint(x, y) {
@@ -5018,7 +5235,7 @@ function coinStep(now) {
     if (t < c.B) { x = c.x0 + c.bvx * t; y = c.y0 + c.bvy * t + 450 * t * t; sc = 0.6 + 0.4 * (t / c.B); }
     else {
       var u = (t - c.B) / c.F;
-      if (u >= 1) { if (c.el.parentNode) c.el.parentNode.removeChild(c.el); coinFx.splice(i, 1); snd.clink(); popEl(el.hudMoney); coinGlint(c.tx + 9, c.ty + 9); continue; }
+      if (u >= 1) { if (c.el.parentNode) c.el.parentNode.removeChild(c.el); coinFx.splice(i, 1); snd.clink(); popEl(el.hudMoney); coinGlint(c.tx + 12, c.ty + 12); plusAdd(c.share); continue; }
       var e = u * u * (1.6 - 0.6 * u);                       // ease-in: accelerates into the pill
       x = lerp(px, c.tx, e) + Math.sin(u * Math.PI) * c.swirl; y = lerp(py, c.ty, e); sc = 1 - 0.35 * u;
     }
@@ -5074,13 +5291,19 @@ function renderHUD() {
   el.rateChip.textContent = "RATE $" + rate() + (comboOn() ? " · CAP ×" + fmtMult(multCap()) : "");
   renderTray(); renderStreak(false); renderShop(); renderShopBadge();
 }
-function trayCountText() { var n = S.stack.length; for (var i = 0; i < S.stack.length; i++) if (UI.fly[S.stack[i].uid]) n--; return n + "/" + storeCap(); }
+function trayCountText(k) { var v = bldList(k || "normal"), n = v.length; for (var i = 0; i < v.length; i++) if (UI.fly[v[i].uid]) n--; return n + "/" + storeCap(); }
+function refreshCounts() {
+  el.trayCount.textContent = trayCountText("normal");
+  var cs = el.sheds.querySelectorAll("[data-wh]");
+  for (var i = 0; i < cs.length; i++) { var c = cs[i].querySelector(".sx-count"); if (c) c.textContent = trayCountText(cs[i].getAttribute("data-wh")); }
+}
 function trayShown() { var v = trayView(), n = v.length; for (var i = 0; i < v.length; i++) if (UI.fly[v[i].uid]) n--; return n; }
 // a fresh brick arcs from the kiln mouth into the storage bay, then appears on the shelf
 function flyBrick(it) {
   if (!UI.fly[it.uid]) return;
-  var dest = el.trayList.querySelector('[data-uid="' + it.uid + '"]');
-  if (!dest && sorterOn()) dest = el.whTabs.querySelector('[data-wh="' + whKey(it.type) + '"]');      // sorted into a warehouse that is not on show
+  var usel = '[data-uid="' + it.uid + '"]';
+  var dest = el.trayList.querySelector(usel) || el.sheds.querySelector(usel);
+  if (!dest && sorterOn()) dest = bldEl(whKey(it.type));      // beyond the visible shelf: fly into the building itself
   if (!dest || !el.fx.animate) { finishFly(it.uid); return; }
   var kr = el.kiln.getBoundingClientRect(), dr = dest.getBoundingClientRect();
   var sx = kr.left + kr.width / 2 - 15, sy = kr.top + kr.height * 0.82 - 8, ex = dr.left + dr.width / 2 - 15, ey = dr.top + dr.height / 2 - 8.5;
@@ -5100,26 +5323,41 @@ function flyBrick(it) {
 function finishFly(uid) {
   if (!UI.fly[uid]) return;
   delete UI.fly[uid];
-  var node = el.trayList.querySelector('[data-uid="' + uid + '"]'); if (node) node.classList.remove("pend");
-  el.trayCount.textContent = trayCountText(); popEl(el.trayCount);
-  el.tray.classList.remove("thunk"); void el.tray.offsetWidth; el.tray.classList.add("thunk");
+  var usel = '[data-uid="' + uid + '"]', node = el.trayList.querySelector(usel) || el.sheds.querySelector(usel); if (node) node.classList.remove("pend");
+  refreshCounts();
+  var bld = node ? node.closest("#tray, .shed-x") : el.tray;
+  if (bld) { popEl(bld.id === "tray" ? el.trayCount : bld.querySelector(".sx-count")); bldFlash(bld, "thunk"); }
   snd.clink();
 }
-function renderWh() {
-  var on = sorterOn(); el.whTabs.classList.toggle("hidden", !on); if (!on) return;
-  var html = "";
-  ["normal", "lead", "silver", "gold"].forEach(function (k) {
-    if (!whOpen(k)) return;
-    var c = whCount(k);
-    html += '<button class="wh-btn pressable' + (S.active === k ? " on" : "") + (c ? "" : " zero") + (UI.whPop === k ? " bump" : "") + '" data-wh="' + k + '" aria-label="' + WH_NAME[k] + ' storage"><i class="w-' + k + '"></i>' + WH_NAME[k] + "<b>" + c + "</b></button>";
+var SHED_ROOF = { lead: "#4a4f5a", silver: "#b9c3cc", gold: "#d99a06" };
+function renderSheds() {                  // one little building per unlocked metal, standing beside the plain shed
+  var keys = sorterOn() ? ["lead", "silver", "gold"].filter(whOpen) : [], vis = shedVisCap();
+  var sig = keys.map(function (k) { return k + (S.active === k ? "*" : "") + ":" + storeCap() + ":" + bldList(k).map(function (u) { return u.uid; }).join(","); }).join("|");
+  if (sig === UI.shedSig) return; UI.shedSig = sig;
+  el.sheds.classList.toggle("hidden", !keys.length); $("dock").classList.toggle("crowded", keys.length >= 2);
+  var prev = UI.shedUids || {}, now = {}, html = "";
+  keys.forEach(function (k) {
+    var v = bldList(k), shown = 0, inner = "", cnt = 0;
+    for (var i = v.length - 1; i >= 0 && shown < vis; i--, shown++) {
+      var it = v[i]; now[it.uid] = 1;
+      inner += '<div class="tb t-' + it.type + (it.lucky ? " lucky" : "") + (shown === 0 ? " first" : "") + (UI.fly[it.uid] ? " pend" : prev[it.uid] ? "" : " new") + '" data-uid="' + it.uid + '"></div>';
+    }
+    for (var q = 0; q < v.length; q++) if (!UI.fly[v[q].uid]) cnt++;
+    var free = Math.min(Math.max(0, storeCap() - v.length), Math.max(0, vis - shown));
+    for (var sl = 0; sl < free; sl++) inner += '<div class="tb slot"></div>';
+    if (!v.length && !free) inner = '<div class="tb empty"></div>';
+    html += '<div class="shed-x' + (S.active === k ? " on" : "") + (v.length ? "" : " zero") + (UI.whPop === k ? " bump" : "") + '" data-wh="' + k + '" role="button" aria-label="' + WH_NAME[k] + ' storage">' +
+      '<svg class="sx-roof" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><polygon points="1,25 50,3 99,25" fill="' + SHED_ROOF[k] + '" stroke="#221407" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>' +
+      '<div class="t-sign"><i class="sx-ico w-' + k + '"></i><span class="sx-count">' + cnt + "/" + storeCap() + '</span></div>' +
+      '<div class="t-bay"><div class="sx-list">' + inner + "</div></div></div>";
   });
-  el.whTabs.innerHTML = html; UI.whPop = null;
+  el.sheds.innerHTML = html; UI.shedUids = now; UI.whPop = null;
 }
 // The shed starts just big enough for one brick and widens as Bigger Storage is bought.
 function trayWidth() {
-  var cap = storeCap(), small = cap > 4, bw = small ? 21 : 30, gap = small ? 3 : 4;
+  var cap = shedVisCap(), small = cap > 4, bw = small ? 21 : 30, gap = small ? 3 : 4;
   var cols = cap <= 2 ? 1 : cap <= 4 ? 2 : cap <= 6 ? 3 : cap <= 8 ? 4 : cap <= 10 ? 5 : 6;      // 1 brick: a thin shed · 2: they stack · 3-4: it widens to two columns
-  return Math.max(sorterOn() ? 150 : 56, 24 + cols * bw + (cols - 1) * gap + 6);
+  return Math.max(sorterOn() ? 88 : 56, 24 + cols * bw + (cols - 1) * gap + 6);
 }
 function renderHopper() {
   var hp = $("hopper"); if (!hp) return;
@@ -5132,24 +5370,24 @@ function renderHopper() {
   hp.innerHTML = h;
 }
 function renderTray() {
-  renderHopper();
+  renderHopper(); renderSheds();
   var view = trayView(), sorted = sorterOn();
   var tw = trayWidth() + "px"; if (el.tray.style.width !== tw) el.tray.style.width = tw;
-  el.trayCount.textContent = trayCountText();
-  el.tray.classList.toggle("small", storeCap() > 4); el.tray.classList.toggle("tight", !sorterOn() && storeCap() <= 4);
-  var sig = "c" + storeCap() + ":" + (sorted ? S.active + ":" + ["normal", "lead", "silver", "gold"].map(function (k) { return whOpen(k) ? whCount(k) : "-"; }).join(",") + "#" : "") + view.map(function (it) { return it.uid; }).join(",");
+  el.trayCount.textContent = trayCountText("normal");
+  el.tray.classList.toggle("small", shedVisCap() > 4); el.tray.classList.toggle("tight", !sorted && shedVisCap() <= SHED_VIS_MAX);
+  el.tray.classList.toggle("on", sorted && S.active === "normal");
+  var sig = "c" + storeCap() + ":" + (sorted ? "s" : "") + view.map(function (it) { return it.uid; }).join(",");
   if (sig === UI.traySig) return;
   UI.traySig = sig;
-  el.trayLab.textContent = sorted ? WH_NAME[S.active] + " STORAGE" : "STORAGE";
-  renderWh();
-  var html = "", shown = 0, prev = UI.trayUids || {}, now = {};
-  for (var i = view.length - 1; i >= 0; i--, shown++) {
+  el.trayLab.textContent = sorted ? WH_NAME.normal : "STORAGE";
+  var html = "", shown = 0, prev = UI.trayUids || {}, now = {}, visCap = shedVisCap();
+  for (var i = view.length - 1; i >= 0 && shown < visCap; i--, shown++) {
     var it = view[i]; now[it.uid] = 1;
     html += '<div class="tb t-' + it.type + (it.lucky ? " lucky" : "") + (shown === 0 ? " first" : "") + (UI.fly[it.uid] ? " pend" : prev[it.uid] ? "" : " new") + '" data-uid="' + it.uid + '"' + (it.type === "normal" ? ' style="background:' + clayCss(it.seed) + '"' : "") + ">";
     if (it.type === "hot") html += '<span class="fuse"><i></i></span>';
     html += "</div>";
   }
-  var freeSlots = Math.max(0, storeCap() - S.stack.length);
+  var freeSlots = Math.min(Math.max(0, storeCap() - view.length), Math.max(0, visCap - shown));
   for (var sl = 0; sl < freeSlots; sl++) html += '<div class="tb slot"></div>';          // empty shelf space
   if (!view.length && !freeSlots) html = '<div class="tb empty"></div>';
   el.trayList.innerHTML = html; UI.trayUids = now;
@@ -5289,7 +5527,6 @@ el.upgList.addEventListener("click", function (e) {
   var tg = e.target.closest("[data-toggle]"); if (tg) { var id = tg.getAttribute("data-toggle"); UI.openUp[id] = !UI.openUp[id]; var card = $("upg-" + id); if (card) card.classList.toggle("open", !!UI.openUp[id]); UI.shopSig = ""; snd.tick(); }
 });
 $("shop-guide").addEventListener("click", function (e) { var b = e.target.closest("[data-upg]"); if (b) buyLine(b.getAttribute("data-upg")); });
-el.whTabs.addEventListener("click", function (e) { var b = e.target.closest("[data-wh]"); if (b) selectWh(b.getAttribute("data-wh")); });
 
 // Per-frame UI: money roll, kiln ring, fuses, prompt, wind chip.
 function uiFrame(rdt) {
@@ -5306,7 +5543,8 @@ function uiFrame(rdt) {
   if (kgb) { var kwu = S.kilnWait ? S.kilnWait.uid : 0; if (UI.kwUid !== kwu) { UI.kwUid = kwu; kgb.style.background = S.kilnWait && S.kilnWait.type === "normal" ? clayCss(S.kilnWait.seed) : ""; kgb.className = "k-gbrick" + (S.kilnWait ? " t-" + S.kilnWait.type : ""); } }
   if (S.tier.miniKiln > 0) { if (el.kMini.classList.contains("hidden")) el.kMini.classList.remove("hidden"); el.miniRing.style.strokeDashoffset = (119.4 * (1 - clamp(S.miniT || 0, 0, 1))).toFixed(1); }
   else if (!el.kMini.classList.contains("hidden")) el.kMini.classList.add("hidden");
-  el.tray.classList.toggle("ready", S.started && CAM.mode === "play" && C.state === "empty" && S.stack.length > 0 && !S.shopOpen);
+  var trReady = S.started && CAM.mode === "play" && C.state === "empty" && S.stack.length > 0 && !S.shopOpen;
+  el.tray.classList.toggle("ready", trReady && (!sorterOn() || S.active === "normal")); el.sheds.classList.toggle("ready", trReady);
   if (S.held && Math.random() < rdt * 22) ember();
   var fuses = el.trayList.querySelectorAll(".t-hot");
   for (var i = 0; i < fuses.length; i++) {
@@ -5410,7 +5648,7 @@ var KICKERS = { start: "MORNING", mold: "MORNING", row1: "ROW ONE", c5a: "ROW FI
   c50a: "COURSE 50", c50b: "COURSE 50", c50c: "COURSE 50 · THE TRUTH", c50d: "COURSE 50 · NOT THE END", c55: "COURSE 55", c60: "COURSE 60", c65: "COURSE 65 · THE TREMORS", c70: "COURSE 70", c75: "COURSE 75",
   c80: "COURSE 80 · SKY GLASS", c85: "COURSE 85", c90: "COURSE 90", c95: "COURSE 95", c100a: "COURSE 100", c100b: "COURSE 100", c100c: "COURSE 100" };
 var CTAS = { c10b: "FIFTY IT IS", row1: "BACK TO WORK", c5b: "TAKE THE JOB", c50d: "BUILD HIGHER", c100c: "STEP THROUGH" };
-var BEAT_END = { c10b: function () { S.flags.goalShown = true; renderHUD(); popEl($("hud-course-num")); banner("THE GOAL", "BUILD TO ROW 50"); }, c5b: function () { startTower(); }, c50d: function () { finishRim(); }, c100c: function () { showVictory(); } };
+var BEAT_END = { c10b: revealGoal, c5b: function () { startTower(); }, c50d: function () { finishRim(); }, c100c: function () { showVictory(); } };
 var ICO_HAND = '<svg viewBox="0 0 64 46" width="66" height="46"><g fill="#f1d0b4" stroke="#221407" stroke-width="3" stroke-linejoin="round"><rect x="10" y="24" width="44" height="16" rx="6"/><rect x="12" y="8" width="8" height="22" rx="4"/><rect x="23" y="3" width="8" height="27" rx="4"/><rect x="34" y="5" width="8" height="25" rx="4"/><rect x="45" y="11" width="8" height="19" rx="4"/></g></svg>';
 var ICO_CLOUD = '<svg viewBox="0 0 64 46" width="66" height="46"><path d="M16 38a10 10 0 0 1 2-19.800A14 14 0 0 1 45 15a11.5 11.500 0 0 1 3 23z" fill="#fff" stroke="#221407" stroke-width="3" stroke-linejoin="round"/></svg>';
 var ICO_TREMOR = '<svg viewBox="0 0 64 46" width="66" height="46"><rect x="16" y="14" width="32" height="18" fill="#c2502c" stroke="#221407" stroke-width="3"/><path d="M6 10l-3 8 5 5-3 9M58 10l3 8-5 5 3 9" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -5752,6 +5990,62 @@ function buildSatyr(o) {
   return { group: g, head: h, aR: aR, aL: aL, torso: tor };
 }
 
+/* ---------- the Minotaur woman: a crowd member with bright teal lipstick, who carries a sheaf of grain ---------- */
+function buildMinotaur(o) {
+  o = o || {};
+  var g = new THREE.Group(), fur = 0x8a5a3c, furL = 0xb98a66, furD = 0x5e3b27, dress = 0xd9803a, apron = 0xf4e6c8, TEAL = 0x19e6d4;
+  [-1, 1].forEach(function (sx) {                                  // hooved legs
+    pmesh(g, new THREE.CylinderGeometry(0.14, 0.1, 0.55, 9), fur, sx * 0.17, 0.78, 0.02, { r: [-0.5, 0, 0] });
+    pmesh(g, new THREE.CylinderGeometry(0.085, 0.07, 0.55, 9), fur, sx * 0.17, 0.36, -0.1, { r: [0.5, 0, 0] });
+    pmesh(g, new THREE.BoxGeometry(0.15, 0.1, 0.2), 0x2a1a10, sx * 0.17, 0.05, 0.02, { ol: 0.014 });
+  });
+  var tor = new THREE.Group(); tor.rotation.x = 0.12; tor.position.set(0, 0.95, 0); g.add(tor);
+  pmesh(tor, new THREE.CylinderGeometry(0.3, 0.44, 0.9, 12), dress, 0, 0.45, 0);                // a swishy dress
+  pmesh(tor, new THREE.CylinderGeometry(0.45, 0.45, 0.07, 12), 0xf5b921, 0, 0.1, 0, { ol: 0.01 });
+  pmesh(tor, new THREE.BoxGeometry(0.34, 0.66, 0.06), apron, 0, 0.42, 0.33, { ol: 0.012 });       // and a farm apron
+  pmesh(tor, new THREE.BoxGeometry(0.36, 0.05, 0.065), 0xd0452a, 0, 0.72, 0.335, { ol: 0.01 });
+  function arm(sx, rz, rx) {
+    var a = new THREE.Group(); a.position.set(sx * 0.36, 0.8, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
+    pmesh(a, new THREE.CylinderGeometry(0.095, 0.115, 0.6, 9), dress, 0, -0.3, 0);
+    pmesh(a, new THREE.SphereGeometry(0.1, 8, 6), fur, 0, -0.64, 0);
+    return a;
+  }
+  var aR = arm(1, o.armR == null ? 0.35 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.35 : o.armL, o.armLx || 0);
+  var h = new THREE.Group(); h.position.set(0, 1.02, 0.08); tor.add(h);
+  pmesh(h, new THREE.SphereGeometry(0.27, 16, 12), fur, 0, 0, 0, { ol: 0.024, s: [1.02, 1.04, 1] });          // broad bull head
+  pmesh(h, new THREE.SphereGeometry(0.17, 14, 10), furL, 0, -0.1, 0.2, { ol: 0.02, s: [1.2, 0.9, 1.3] });     // the muzzle
+  [-1, 1].forEach(function (sx) {
+    pmesh(h, new THREE.SphereGeometry(0.026, 8, 6), 0x2a1a14, sx * 0.06, -0.075, 0.405, { ol: 0, s: [1, 0.7, 0.6] });      // nostrils
+    pmesh(h, new THREE.SphereGeometry(0.052, 10, 8), 0xffffff, sx * 0.12, 0.06, 0.226, { ol: 0.008, s: [1, 1.1, 0.6] });   // eyes
+    pmesh(h, new THREE.SphereGeometry(0.03, 8, 6), 0x111111, sx * 0.12 + (o.look || 0) * 0.012, 0.058, 0.256, { ol: 0, s: [0.9, 1.2, 0.6] });
+    pmesh(h, new THREE.BoxGeometry(0.1, 0.02, 0.03), 0x1a0f0a, sx * 0.13, 0.118, 0.23, { ol: 0, r: [0, 0, -sx * 0.25] });  // lashes
+    pmesh(h, new THREE.BoxGeometry(0.05, 0.016, 0.026), 0x1a0f0a, sx * 0.19, 0.138, 0.2, { ol: 0, r: [0, 0, -sx * 0.7] });
+    pmesh(h, new THREE.ConeGeometry(0.075, 0.24, 7), fur, sx * 0.31, 0.07, -0.02, { ol: 0.014, r: [0, 0, -sx * 1.45] });    // floppy ears
+    pmesh(h, new THREE.SphereGeometry(0.05, 8, 6), 0xf0a0a0, sx * 0.3, 0.06, 0.02, { ol: 0, s: [0.7, 1.2, 0.5] });
+    pmesh(h, new THREE.CylinderGeometry(0.042, 0.07, 0.3, 9), 0xf3ead2, sx * 0.2 + sx * 0.12, 0.215 + 0.08, 0, { ol: 0.014, r: [0, 0, -sx * 1.0] });   // horns: out...
+    pmesh(h, new THREE.ConeGeometry(0.042, 0.28, 9), 0xf3ead2, sx * (0.2 + 0.252 + 0.03), 0.2 + 0.162 + 0.14, 0, { ol: 0.014, r: [0, 0, -sx * 0.25] });  // ...and up
+    pmesh(h, new THREE.SphereGeometry(0.1, 8, 6), furD, sx * 0.24, -0.02, -0.04, { ol: 0, s: [0.5, 1.3, 0.7] });            // hair at the sides
+  });
+  pmesh(h, new THREE.SphereGeometry(0.28, 14, 8), furD, 0, 0.1, -0.03, { ol: 0.01, s: [1.0, 0.5, 1.0] });       // fringe
+  pmesh(h, new THREE.TorusGeometry(0.03, 0.008, 6, 12), 0xf5b921, 0, -0.1, 0.43, { ol: 0 });                 // nose ring
+  // the teal lipstick: bold, glossy, impossible to miss
+  var open = o.mouth === "open";
+  pmesh(h, new THREE.SphereGeometry(0.08, 14, 10), TEAL, 0, open ? -0.152 : -0.165, 0.392, { ol: 0.012, s: [1.55, 0.5, 0.8] });
+  pmesh(h, new THREE.SphereGeometry(0.086, 14, 10), TEAL, 0, open ? -0.225 : -0.2, 0.384, { ol: 0.012, s: [1.45, 0.55, 0.8] });
+  if (open) pmesh(h, new THREE.BoxGeometry(0.11, 0.04, 0.03), 0x3a1a2a, 0, -0.19, 0.425, { ol: 0 });
+  pmesh(h, new THREE.SphereGeometry(0.018, 6, 5), 0xffffff, -0.04, open ? -0.232 : -0.205, 0.44, { basic: true, alpha: 0.9 });   // a gloss glint
+  // a sheaf of grain: chunky stalks that fan out a little and bend the way the wind blows
+  var sh = new THREE.Group(); sh.position.set(-0.82, 0, 0.16); g.add(sh);
+  var ln = o.lean || 0.1;
+  for (var k = 0; k < 7; k++) {
+    var q = (k - 3) * 0.08 + ln * 0.8, sx0 = (k - 3) * 0.02;
+    pmesh(sh, new THREE.CylinderGeometry(0.02, 0.026, 1.25, 6), 0xd8b24a, sx0 + Math.sin(q) * 0.62, 0.62, (k % 2) * 0.03, { ol: 0.008, r: [0, 0, -q] });
+    pmesh(sh, new THREE.SphereGeometry(0.05, 8, 6), 0xf0c24a, sx0 + Math.sin(q) * 1.28, 1.3, (k % 2) * 0.03, { ol: 0.008, s: [0.75, 2.6, 0.75], r: [0, 0, -q - 0.1] });
+  }
+  pmesh(sh, new THREE.TorusGeometry(0.1, 0.034, 6, 14), 0xd0452a, Math.sin(ln * 0.8) * 0.3, 0.5, 0, { ol: 0.01, r: [Math.PI / 2, 0, 0] });
+  return { group: g, head: h, aR: aR, aL: aL, torso: tor, sheaf: sh };
+}
+
 /* ---------- sky creatures ---------- */
 // A tube that follows a curve with a radius that changes along it (body, neck, tail), optionally painted per vertex.
 function taperTube(pts, radius, opts) {
@@ -5949,6 +6243,77 @@ function buildGriffin() {
   return g;
 }
 
+/* ---------- Bram: a stocky smith and glassblower, leather apron, soot-black cap and a bristling copper beard ---------- */
+function buildSmith(o) {
+  o = o || {};
+  var g = new THREE.Group(), skin = 0xe0a878, beard = 0xb8642e, cloth = 0x3f6e8a, apron = 0x6b4a2a, boots = 0x2a1a10, cap = 0x4a2f1a;
+  [-1, 1].forEach(function (sx) {
+    pmesh(g, new THREE.CylinderGeometry(0.15, 0.13, 0.5, 9), cloth, sx * 0.19, 0.25, 0);
+    pmesh(g, new THREE.BoxGeometry(0.2, 0.12, 0.3), boots, sx * 0.19, 0.06, 0.05, { ol: 0.014 });
+  });
+  var tor = new THREE.Group(); tor.position.set(0, 0.5, 0); g.add(tor);
+  pmesh(tor, new THREE.CylinderGeometry(0.4, 0.34, 0.8, 12), cloth, 0, 0.4, 0);
+  pmesh(tor, new THREE.BoxGeometry(0.46, 0.6, 0.06), apron, 0, 0.32, 0.36, { ol: 0.014 });
+  pmesh(tor, new THREE.CylinderGeometry(0.41, 0.41, 0.07, 12), apron, 0, 0.1, 0, { ol: 0.01 });
+  function arm(sx, rx, rz) {
+    var a = new THREE.Group(); a.position.set(sx * 0.4, 0.72, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
+    pmesh(a, new THREE.CylinderGeometry(0.12, 0.1, 0.6, 9), cloth, 0, -0.3, 0);
+    pmesh(a, new THREE.SphereGeometry(0.12, 8, 6), skin, 0, -0.66, 0);
+    return a;
+  }
+  var aR = arm(1, o.armRx, o.armR == null ? 0.35 : o.armR), aL = arm(-1, o.armLx, o.armL == null ? -0.35 : o.armL);
+  if (o.prop === "ingot") pmesh(tor, new THREE.BoxGeometry(0.46, 0.2, 0.26), 0x4b505a, 0, 0.66, 0.42, { ol: 0.014 });
+  if (o.prop === "glass") {
+    pmesh(aR, new THREE.CylinderGeometry(0.035, 0.035, 1.1, 8), 0x8a6a4a, 0, -0.9, 0.2, { ol: 0 });
+    pmesh(aR, new THREE.SphereGeometry(0.16, 10, 8), 0xcff6ff, 0, -1.5, 0.45, { basic: true, alpha: 0.7 });
+  }
+  var h = new THREE.Group(); h.position.set(0, 0.8, 0.02); tor.add(h);
+  pmesh(h, new THREE.SphereGeometry(0.27, 16, 12), skin, 0, 0, 0, { ol: 0.024 });
+  pmesh(h, new THREE.CylinderGeometry(0.3, 0.3, 0.1, 14), cap, 0, 0.22, 0, { ol: 0.014 });
+  pmesh(h, new THREE.ConeGeometry(0.26, 0.35, 12), beard, 0, -0.32, 0.08, { ol: 0.02, r: [Math.PI, 0, 0] });
+  pmesh(h, new THREE.BoxGeometry(0.2, 0.05, 0.05), beard, 0, -0.1, 0.26, { ol: 0 });
+  pmesh(h, new THREE.SphereGeometry(0.07, 8, 6), 0xf0b090, 0, -0.02, 0.27, { ol: 0.01 });
+  [-1, 1].forEach(function (sx) { pmesh(h, new THREE.SphereGeometry(0.035, 6, 5), 0x221407, sx * 0.1, 0.06, 0.25, { ol: 0, basic: true }); });
+  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
+}
+
+/* ---------- Nell: a mole miner in a yellow hard hat with a lamp, pink paws and a twitching snout ---------- */
+function buildMole(o) {
+  o = o || {};
+  var g = new THREE.Group(), fur = 0x7a5a48, furD = 0x4d3628, pink = 0xf0a0a0, helmet = 0xf5b921, lamp = 0xfff3a0;
+  [-1, 1].forEach(function (sx) {
+    pmesh(g, new THREE.CylinderGeometry(0.13, 0.11, 0.4, 9), furD, sx * 0.2, 0.2, 0.02);
+    pmesh(g, new THREE.SphereGeometry(0.15, 9, 7), pink, sx * 0.2, 0.02, 0.1, { ol: 0.014, s: [1, 0.6, 1.3] });
+  });
+  var tor = new THREE.Group(); tor.position.set(0, 0.42, 0); g.add(tor);
+  pmesh(tor, new THREE.SphereGeometry(0.42, 14, 10), fur, 0, 0.35, 0, { ol: 0.02, s: [1, 1.05, 0.9] });
+  function arm(sx, rx, rz) {
+    var a = new THREE.Group(); a.position.set(sx * 0.36, 0.5, 0.05); a.rotation.set(rx || 0, 0, rz); tor.add(a);
+    pmesh(a, new THREE.CylinderGeometry(0.1, 0.09, 0.5, 9), fur, 0, -0.25, 0);
+    pmesh(a, new THREE.SphereGeometry(0.13, 9, 7), pink, 0, -0.55, 0.04, { ol: 0.014, s: [1.2, 0.9, 1] });
+    return a;
+  }
+  var aR = arm(1, o.armRx, o.armR == null ? 0.4 : o.armR), aL = arm(-1, o.armLx, o.armL == null ? -0.4 : o.armL);
+  var h = new THREE.Group(); h.position.set(0, 0.95, 0.12); tor.add(h);
+  pmesh(h, new THREE.SphereGeometry(0.3, 16, 12), fur, 0, 0, 0, { ol: 0.024 });
+  pmesh(h, new THREE.ConeGeometry(0.11, 0.3, 10), pink, 0, -0.06, 0.3, { ol: 0.014, r: [Math.PI / 2, 0, 0] });
+  pmesh(h, new THREE.SphereGeometry(0.07, 8, 6), 0x2a1a10, 0, -0.03, 0.42, { ol: 0 });
+  [-1, 1].forEach(function (sx) { pmesh(h, new THREE.SphereGeometry(0.035, 6, 5), 0x221407, sx * 0.13, 0.08, 0.24, { ol: 0, basic: true }); });
+  pmesh(h, new THREE.SphereGeometry(0.33, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), helmet, 0, 0.1, 0, { ol: 0.02 });
+  pmesh(h, new THREE.SphereGeometry(0.08, 8, 6), lamp, 0, 0.42, 0.24, { basic: true });
+  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
+}
+
+/* Scale and centre a built object so it fills a portrait frame whatever its proportions. */
+function fitPortrait(obj, w, h, x, y, z) {
+  obj.updateMatrixWorld(true);
+  var b = new THREE.Box3().setFromObject(obj), s = b.getSize(new THREE.Vector3());
+  obj.scale.multiplyScalar(Math.min(w / Math.max(s.x, 0.001), h / Math.max(s.y, 0.001)));
+  obj.updateMatrixWorld(true);
+  b.setFromObject(obj); var c = b.getCenter(new THREE.Vector3());
+  obj.position.x += x - c.x; obj.position.y += y - c.y; obj.position.z += z - c.z;
+}
+
 /* ---------- portrait scenes -> still images ---------- */
 function portraitBackdrop(sc, theme) {
   var top = theme === "dusk" ? 0x5a3a9a : 0x7fa8ff, hor = theme === "dusk" ? 0xff9ab8 : 0xffd9b8;
@@ -5979,6 +6344,12 @@ function portraitBackdrop(sc, theme) {
   for (var i = 0; i < 18; i++) pmesh(sc, new THREE.SphereGeometry(0.035 + Math.random() * 0.03, 6, 5), i % 3 ? 0xfff3a0 : 0xaef6ff, (Math.random() - 0.5) * 8, 0.5 + Math.random() * 3.5, -1 - Math.random() * 5, { basic: true });
   return sc;
 }
+function windSketch(sc) {              // streaks, tumbling leaves and loose grain: the wind, drawn behind a portrait
+  [[-3.1, 3.1, 1.6], [-3.4, 2.4, 1.3], [-2.9, 1.5, 1.8], [-3.3, 0.8, 1.2], [-3.0, 3.7, 1.0]].forEach(function (w) {
+    pmesh(sc, new THREE.BoxGeometry(w[2], 0.04, 0.04), 0xffffff, w[0] + w[2] / 2, w[1], -1.2, { basic: true, alpha: 0.7 });
+  });
+  [[2.4, 3.2], [3.1, 2.1], [2.0, 1.2], [3.3, 3.5]].forEach(function (g, i) { pmesh(sc, new THREE.SphereGeometry(0.05, 6, 5), i % 2 ? 0xe9b84a : 0x6fbf5a, g[0], g[1], 0.3, { basic: true, s: [1.6, 0.7, 1] }); });
+}
 var PORTRAITS = {
   edgar_wave: { theme: "day", build: function (sc) { var e = buildGnoll({ armR: 2.45, armL: -0.2, mouth: "grin", tilt: 0.05 }); e.group.position.x = -0.15; sc.add(e.group);
     var gf = buildGriffin(); gf.scale.setScalar(0.5); gf.position.set(3.2, 4.4, -6); gf.rotation.y = Math.PI; gf.rotation.z = 0.1; sc.add(gf); } },
@@ -5995,9 +6366,25 @@ var PORTRAITS = {
   edgar_shrug: { theme: "dusk", build: function (sc) { var e = buildGnoll({ armR: 1.25, armL: -1.25, mouth: "flat", brow: -0.25, tilt: 0.12, look: -1 }); e.group.position.x = -0.1; sc.add(e.group);
     var q = glyphSprite("?", "#ffd94d", 0.9); q.position.set(0.95, 2.95, 0.3); sc.add(q); var q2 = glyphSprite("?", "#ffffff", 0.55); q2.position.set(-0.8, 3.05, 0.3); sc.add(q2); } },
   elder_pay: { theme: "dusk", build: function (sc) { var s = buildSatyr({ mouth: true, pouch: true, armR: 0.3, armL: -0.3, armLx: -1.2, horns: 1.05 }); s.group.position.x = -0.2; s.group.rotation.y = -0.1; sc.add(s.group); } },
+  minotaur_warn: { theme: "day", build: function (sc) { var m = buildMinotaur({ mouth: "open", armR: 2.35, armL: -0.3, lean: 0.3 }); m.group.position.x = 0.15; m.group.rotation.y = -0.12; sc.add(m.group); windSketch(sc); } },
+  minotaur_point: { theme: "day", build: function (sc) { var m = buildMinotaur({ mouth: "open", armR: 1.55, armRx: -0.35, armL: -0.3, lean: 0.38, look: 1 }); m.group.position.x = 0.1; m.group.rotation.y = -0.2; sc.add(m.group); windSketch(sc); } },
   edgar_grin: { theme: "dusk", build: function (sc) { var e = buildGnoll({ armR: 2.4, armL: -0.25, mouth: "grin", brow: 0.2, tilt: -0.06 }); e.group.position.x = -0.1; sc.add(e.group); coinProp(e.group, 0.55, 2.62, 0.1, 0.2);
     var d = glyphSprite("$", "#8ff0a4", 0.8); d.position.set(-0.95, 2.85, 0.3); sc.add(d); var d2 = glyphSprite("$", "#ffd94d", 0.55); d2.position.set(1.15, 3.2, 0.3); sc.add(d2); } }
 };
+Object.assign(PORTRAITS, {
+  cinder_talk: { theme: "dusk", build: function (sc) { var d = buildDragon(); sc.add(d); fitPortrait(d, 2.8, 2.4, 0, 1.7, -0.6); } },
+  cinder_roll: { theme: "dusk", build: function (sc) { var d = buildDragon(); d.rotation.z = 0.2; sc.add(d); fitPortrait(d, 2.8, 2.4, 0, 1.7, -0.6);
+    var q = glyphSprite("!", "#ffd94d", 0.9); q.position.set(1.4, 3.1, 0.6); sc.add(q); } },
+  bram_lift: { theme: "day", build: function (sc) { var s = buildSmith({ armR: 0.9, armRx: -0.9, armL: -0.9, armLx: -0.9, prop: "ingot" }); s.group.position.x = -0.1; sc.add(s.group); } },
+  bram_glass: { theme: "day", build: function (sc) { var s = buildSmith({ armR: 0.5, armRx: -1.2, prop: "glass" }); s.group.position.x = -0.1; sc.add(s.group); } },
+  skarra_hoard: { theme: "day", build: function (sc) { var g = buildGriffin(); sc.add(g); fitPortrait(g, 2.4, 2.6, 0, 1.75, -0.6);
+    coinProp(sc, -1.1, 0.35, 0.6, 0.2); coinProp(sc, -0.85, 0.42, 0.7, 0.2); coinProp(sc, -0.95, 0.2, 0.9, 0.2); } },
+  skarra_cloud: { theme: "day", build: function (sc) { var g = buildGriffin(); sc.add(g); fitPortrait(g, 2.4, 2.6, 0, 1.75, -0.6);
+    [[-1.6, 0.5, 0.45], [-1.2, 0.2, 0.35], [1.5, 0.9, 0.4], [1.9, 0.4, 0.3]].forEach(function (c) { pmesh(sc, new THREE.SphereGeometry(c[2], 10, 8), 0xffffff, c[0], c[1], 0.8, { ol: 0.03 }); }); } },
+  minotaur_coins: { theme: "day", build: function (sc) { var m = buildMinotaur({ mouth: "open", armR: 1.2, armRx: -0.6, armL: -0.3, lean: 0.1 }); m.group.position.x = 0.15; m.group.rotation.y = -0.2; sc.add(m.group);
+    coinProp(sc, -0.95, 2.5, 0.4, 0.22); coinProp(sc, -0.7, 2.7, 0.3, 0.2); var d = glyphSprite("$", "#ffd94d", 0.7); d.position.set(-0.8, 3.2, 0.3); sc.add(d); } },
+  nell_lamp: { theme: "dusk", build: function (sc) { var n = buildMole({ armR: 1.0, armRx: -0.8, armL: -0.9 }); n.group.position.x = -0.1; sc.add(n.group); } }
+});
 var PORT_IMG = {};          // portrait key -> blob: URL (light on memory); freed when the cards close, re-rendered on demand
 // Portraits are painted with the GAME's own renderer into an offscreen target, then copied into a JPEG blob.
 // (v18/v19 opened a second, throwaway WebGL context for this. Phones and iPads cap how many contexts a page may hold and refuse or
@@ -6065,6 +6452,63 @@ var CARDS_ELDER = [
   { who: "THE ELDER", pic: "elder_pay", kicker: "ROW FIVE", text: "\u201cWell, I\u2019ll pay you. For every finished row.\u201d" },
   { who: "EDGAR", pic: "edgar_grin", kicker: "ROW FIVE", text: "\u201cWell, not only do I like walls, I also like money. And I guess a tower is just four walls.\u201d", cta: "TAKE THE JOB" }
 ];
+var CARDS_TEN = [
+  { who: "EDGAR", pic: "edgar_proud", kicker: "ROW TEN", text: "\u201cLook at that. Five new rows of tower on top of the five I started with. That makes TEN.\u201d" },
+  { who: "EDGAR", pic: "edgar_shrug", kicker: "ROW TEN", text: "\u201cSo\u2026 how tall should this thing be? What\u2019s enough?\u201d" },
+  { who: "THE ELDER", pic: "elder_talk", kicker: "HOW TALL IS ENOUGH?", text: "The villagers huddle. Loudly. The eldest holds up fingers, runs out of fingers, borrows someone else\u2019s. \u201cFifty,\u201d they decide. \u201cFifty rows. That ought to do it.\u201d" },
+  { who: "EDGAR", pic: "edgar_grin", kicker: "ROW TEN", text: "\u201cFifty. Sure. How hard can it be?\u201d", cta: "FIFTY IT IS" }
+];
+var CARDS_WIND = [
+  { who: "THE MINOTAUR", tag: "mino", pic: "minotaur_warn", kicker: "A WARNING FROM THE CROWD", text: "\u201cOi, Edgar! Better watch out for the high wind up there. The grain sure doesn\u2019t like it.\u201d" },
+  { who: "EDGAR", pic: "edgar_shrug", kicker: "THE WIND PICKS UP", text: "\u201cThe grain? I\u2019m building a tower, not a farm.\u201d" },
+  { who: "THE MINOTAUR", tag: "mino", pic: "minotaur_point", kicker: "THE WIND PICKS UP", text: "\u201cEverything\u2019s a farm in a gale, love. Your crane runs <b>fast with the wind</b> and <b>slow against it</b>. Watch the arrow, and time the slow side.\u201d", cta: "BRACE FOR WIND" }
+];
+var FALLBACK_EMO = { dragon: "\uD83D\uDC09", smith: "\uD83D\uDD28", griffin: "\uD83E\uDD85", mole: "\uD83D\uDC3E" };   // shown only if a portrait fails to paint
+var CARDS_HOT = [
+  { who: "CINDER", tag: "dragon", pic: "cinder_talk", kicker: "THE KILN RUNS HOT", text: "\u201cPsst! Down here. Yes, the big green lump with the smoke. Your kiln's been warm since I sneezed on it.\u201d" },
+  { who: "EDGAR", pic: "edgar_shrug", kicker: "THE KILN RUNS HOT", text: "\u201cSneezed on it? Is that bad?\u201d" },
+  { who: "CINDER", tag: "dragon", pic: "cinder_talk", kicker: "HOT BRICKS", text: "\u201cSome bricks come out glowing. Drop one before it cools and it pays <b>\u00d7" + TYPE_MULT.hot + "</b>. Let it burn out and it's a miss.\u201d", cta: "HEAT IT UP" }
+];
+var CARDS_LEAD = [
+  { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "THE SMITH'S NEW STOCK", text: "\u201cHeavy, isn't it? That's lead. Dark and dense, and it swings like a church bell. Mind your toes.\u201d" },
+  { who: "EDGAR", pic: "edgar_shrug", kicker: "THE SMITH'S NEW STOCK", text: "\u201cSo it's heavier. Does heavier pay?\u201d" },
+  { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "LEAD BRICKS", text: "\u201cIt does. They swing <b>40% faster</b>, land one and it's worth <b>\u00d7" + TYPE_MULT.lead + "</b>, and every lead brick in a finished row adds <b>+" + ROW_ADD.lead + "\u00d7 rate</b> to that row's payout.\u201d", cta: "NICE AND HEAVY" }
+];
+var CARDS_SILVER = [
+  { who: "SKARRA", tag: "griffin", pic: "skarra_hoard", kicker: "A GRIFFIN IN THE RAFTERS", text: "\u201cSilver. Pale and shiny. Griffins hoard the stuff, and I know a good thing when it comes out of a kiln.\u201d" },
+  { who: "EDGAR", pic: "edgar_grin", kicker: "A GRIFFIN IN THE RAFTERS", text: "\u201cAre you going to take it?\u201d" },
+  { who: "SKARRA", tag: "griffin", pic: "skarra_hoard", kicker: "SILVER BRICKS", text: "\u201cNot a chance, I'm a griffin, not a bandit. But the kiln gives you silver now. Land one and it's worth <b>\u00d7" + TYPE_MULT.silver + "</b>, and each one in a finished row adds <b>+" + ROW_ADD.silver + "\u00d7 rate</b>. A few in a row earn little bumps.\u201d", cta: "HOARD IT" }
+];
+var CARDS_GOLD = [
+  { who: "THE MINOTAUR", tag: "mino", pic: "minotaur_coins", kicker: "THE MARKET WANTS GOLD", text: "\u201cGold, love! Real gold, coming out of that kiln of yours. I'm going to be insufferable about this.\u201d" },
+  { who: "EDGAR", pic: "edgar_proud", kicker: "THE MARKET WANTS GOLD", text: "\u201cWhat does gold do for a brick?\u201d" },
+  { who: "THE MINOTAUR", tag: "mino", pic: "minotaur_coins", kicker: "GOLD BRICKS", text: "\u201cLand one and it's worth <b>\u00d7" + TYPE_MULT.gold + "</b>. Each one in a finished row adds <b>+" + ROW_ADD.gold + "\u00d7 rate</b>. Gilded Clay makes them more common, if you can stretch to it.\u201d", cta: "SHOW ME THE GOLD" }
+];
+var CARDS_SORTER = [
+  { who: "THE ELDER", pic: "elder_talk", kicker: "THE TOWN CLERK'S RULE", text: "\u201cNow the kiln sends three kinds of metal, Edgar, and a muddle is no good to anyone. Every type gets a warehouse of its own.\u201d" },
+  { who: "EDGAR", pic: "edgar_shrug", kicker: "THE TOWN CLERK'S RULE", text: "\u201cSo I have to sort them by hand?\u201d" },
+  { who: "THE ELDER", pic: "elder_pay", kicker: "BRICK SORTER", text: "\u201cTap a warehouse under STORAGE to choose what the crane builds with. Stockpile gold, then lay a whole row of one metal for a pure-row bonus.\u201d", cta: "SORT IT" }
+];
+var CARDS_HAND = [
+  { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "SOMETHING IN THE RUBBLE", text: "\u201cPsst! Edgar! Don't look down, but there's a hand coming up out of the rubble. Five fingers, all grabby.\u201d" },
+  { who: "EDGAR", pic: "edgar_proud", kicker: "SOMETHING IN THE RUBBLE", text: "\u201cA HAND? Why is there a hand?\u201d" },
+  { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "HANDS!", text: "\u201cIt clamps onto a brick. About <b>10 seconds</b> later it rips it free, and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to smash it. The red slot shows where.\u201d", cta: "SMASH IT" }
+];
+var CARDS_MIST = [
+  { who: "SKARRA", tag: "griffin", pic: "skarra_cloud", kicker: "CLOUDS ROLL IN", text: "\u201cYou're building in my sky, mate. The clouds drift over the site, and up here they get thick.\u201d" },
+  { who: "EDGAR", pic: "edgar_shrug", kicker: "CLOUDS ROLL IN", text: "\u201cI can't see the crane! How do I judge the drop?\u201d" },
+  { who: "SKARRA", tag: "griffin", pic: "skarra_cloud", kicker: "CLOUDS ROLL IN", text: "\u201cJudge by rhythm, not by eye. They come and go, and thicken as you climb. A Sky Lantern thins them.\u201d", cta: "KEEP TIME" }
+];
+var CARDS_TREMOR = [
+  { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "TREMORS", text: "\u201cOops. I rolled over in my sleep and forgot where my tail was. Hold on, the wall's going to shudder.\u201d" },
+  { who: "EDGAR", pic: "edgar_wave", kicker: "TREMORS", text: "\u201cYou're the reason the wall shakes?!\u201d" },
+  { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "THE WALL SHUDDERS", text: "\u201cNow the green drop zone <b>slides side to side</b>. Drop where it <b>is</b> when you tap, not where it was. A Spirit Level calms it.\u201d", cta: "STEADY ON" }
+];
+var CARDS_GLASS = [
+  { who: "BRAM", tag: "smith", pic: "bram_glass", kicker: "SKY GLASS", text: "\u201cPale glass, blown from the high cloud-pools and thin as a promise. Brittle, though. Mind it, it's worth more than your boots.\u201d" },
+  { who: "EDGAR", pic: "edgar_wave", kicker: "SKY GLASS", text: "\u201cHow do I place something that fragile?\u201d" },
+  { who: "BRAM", tag: "smith", pic: "bram_glass", kicker: "SKY GLASS", text: "\u201cThe drop window is <b>35% narrower</b>, but they're worth <b>\u00d7" + TYPE_MULT.glass + "</b>. Bring your steadiest hands.\u201d", cta: "STEADY HANDS" }
+];
 var CARDS = { seq: null, i: 0, m: null, drag: null, busy: false, lock: 0 };
 function cardsLocked() { return performance.now() < CARDS.lock; }
 var elCards = $("cards"), elDeck = $("cards-deck"), elCdNext = $("cards-next"), elCdDots = $("cards-dots"), elCdHint = $("cards-hint");
@@ -6086,7 +6530,7 @@ function renderCard(first) {
   var c = CARDS.seq[CARDS.i], n = CARDS.seq.length, img = PORT_IMG[c.pic];
   stopKd();
   var waiting = !c.demo && !img && PORTRAITS[c.pic] && PORT_BUSY[c.pic];
-  var pic = c.demo ? '<div class="cd-kiln-stage" id="cd-kiln-stage"></div>' : img ? '<img alt="" draggable="false" src="' + img + '" />' : waiting ? '<div class="cd-nopic"></div>' : '<div class="cd-nopic">' + (c.who === "EDGAR" ? "\uD83D\uDC3A" : "\uD83D\uDC10") + "</div>";
+  var pic = c.demo ? '<div class="cd-kiln-stage" id="cd-kiln-stage"></div>' : img ? '<img alt="" draggable="false" src="' + img + '" />' : waiting ? '<div class="cd-nopic"></div>' : '<div class="cd-nopic">' + (c.who === "EDGAR" ? "\uD83D\uDC3A" : c.tag === "mino" ? "\uD83D\uDC02" : FALLBACK_EMO[c.tag] || "\uD83D\uDC10") + "</div>";
   if (waiting) renderPortraits([c.pic], function () {                       // still painting: drop the picture in the moment it is ready
     var u = PORT_IMG[c.pic], box = f.querySelector(".cd-nopic"); if (!u || !box || CARDS.seq !== seqNow || CARDS.seq[CARDS.i] !== c) return;
     var im = document.createElement("img"); im.alt = ""; im.draggable = false; im.src = u; box.parentNode.replaceChild(im, box);
@@ -6094,7 +6538,7 @@ function renderCard(first) {
   var seqNow = CARDS.seq;
   elDeck.querySelector(".cd-front") && elDeck.removeChild(elDeck.querySelector(".cd-front"));
   var f = document.createElement("div"); f.className = "cd cd-front enter"; f.id = "cd-front";
-  f.innerHTML = '<div class="cd-pic">' + pic + '<div class="cd-tag ' + (c.who === "EDGAR" ? "" : "elder") + '">' + c.who + "</div></div>" +
+  f.innerHTML = '<div class="cd-pic">' + pic + '<div class="cd-tag ' + (c.who === "EDGAR" ? "" : c.tag || "elder") + '">' + c.who + "</div></div>" +
     '<div class="cd-body"><div class="cd-kicker">' + c.kicker + '</div><p class="cd-text">' + c.text + "</p>" + (c.extra || "") + "</div>";
   elDeck.appendChild(f);
   if (c.demo) mountKilnDemo();
@@ -6238,7 +6682,7 @@ function openShop() {
 }
 function closeShop() { S.shopOpen = false; hidePanel(el.workshop, 180, pumpMsg); renderHUD(); if (starterTut() && S.money >= STARTER_COST) $("btn-shop").classList.add("shop-pulse"); }
 $("btn-shop").addEventListener("click", function () { audio(); openShop(); });
-$("forge").addEventListener("click", forgeStrike);
+$("forge").addEventListener("click", forgeClick);
 $("btn-shop-close").addEventListener("click", function () { closeShop(); snd.pop(); });
 el.workshop.addEventListener("click", function (e) { if (e.target === el.workshop) closeShop(); });
 function shadowLevelSetting() { return S.shadow || (IS_MOBILE ? "low" : "hi"); }
@@ -6300,9 +6744,12 @@ el.kiln.addEventListener("pointerdown", function (e) {
 });
 function kilnUp(e) { if (e.pointerId !== kilnPtr) return; kilnPtr = null; if (!keyKiln) releaseKiln(); }
 el.kiln.addEventListener("pointerup", kilnUp); el.kiln.addEventListener("pointercancel", kilnUp); el.kiln.addEventListener("lostpointercapture", kilnUp);
-el.tray.addEventListener("pointerdown", function (e) {      // tap the shed to load the next brick onto the crane
-  if (e.target.closest("[data-wh]")) return;
-  e.preventDefault(); e.stopPropagation(); tapStorage();
+el.tray.addEventListener("pointerdown", function (e) {      // tap the plain shed: build from it and load the next brick onto the crane
+  e.preventDefault(); e.stopPropagation(); tapBuilding("normal");
+});
+el.sheds.addEventListener("pointerdown", function (e) {     // tap a metal building: build from it and load the crane
+  var b = e.target.closest("[data-wh]"); if (!b) return;
+  e.preventDefault(); e.stopPropagation(); tapBuilding(b.getAttribute("data-wh"));
 });
 el.kiln.addEventListener("contextmenu", function (e) { e.preventDefault(); });
 window.addEventListener("blur", releaseKiln);
@@ -6539,7 +6986,7 @@ setInterval(musicTick, 100);
 
 /* ---------------- AUTOSAVE ---------------- */
 var SAVE_KEY = "brickbybrick3d_save_v1", NOSAVE = false, lastSaveAt = 0;
-var SAVE_FIELDS = ["money", "earned", "laid", "best", "bestStreak", "perfects", "misses", "drops", "hits", "molded", "smashed", "stolen", "lost", "playTime",
+var SAVE_FIELDS = ["money", "forgeWins", "discarded", "earned", "laid", "best", "bestStreak", "perfects", "misses", "drops", "hits", "molded", "smashed", "stolen", "lost", "playTime",
   "hotUnlocked", "nextDemo", "leadUnlocked", "glassUnlocked", "workshopShown", "comboTutDone", "active", "endless", "goal", "won", "muted", "musicOn", "shakeOn", "vibOn", "quality", "shadow", "hand"];
 function saveGame() {
   if (NOSAVE || !S.started || (S.courses === 0 && S.laid === 0 && S.money === 0)) return;
@@ -6558,6 +7005,10 @@ function loadGame(d) {
   if (d.tier && d.tier.perfect === undefined) S.tier.perfect = 1;                         // perfects used to be free
   if (d.tier && d.tier.starter === undefined && d.workshopShown) S.tier.starter = 1;      // saved before Warm-Up existed: the first-upgrade lesson is behind them (and they get its 0.2s)
   if (S.leadUnlocked && !S.tier.lead) S.tier.lead = 1;
+  var refund = 0;                                                                         // retired / trimmed upgrades: give the money back
+  if (d.tier && d.tier.precision > 0) { var PG = [100, 210, 400]; for (var pq = 0; pq < d.tier.precision && pq < PG.length; pq++) refund += PG[pq]; }   // one-time save migration: Precision Gears were removed, so refund what they cost
+  if (S.tier.crowd > CAP.length - 1) { S.tier.crowd = CAP.length - 1; refund += 420; }                                                              // Crowd Favor lost its 4th tier
+  if (refund > 0) S.money = Math.round((S.money + refund) * 100) / 100;
   if (S.tier.gilded > 0 && !S.tier.gold) { S.tier.gold = 1; S.tier.silver = Math.max(S.tier.silver, 1); S.tier.lead = Math.max(S.tier.lead, 1); }
   S.flags = d.flags || {}; S.beats = d.beats || {}; S.seenLines = d.seenLines || {}; S.flags.begun = true;
   if ((d.best || d.courses || 0) >= 10) S.flags.goalShown = true;
@@ -6594,7 +7045,7 @@ function loadGame(d) {
   if (S.workshopShown) revealEl($("btn-shop"));
   try { applyQuality(); } catch (e) {}
   syncSettings(); updateHazards(); renderHUD(); checkUnlocks();
-  toast("Welcome back — your progress was saved.", 2800);
+  toast("Welcome back — your progress was saved." + (refund > 0 ? " $" + fmt(refund) + " refunded for retired upgrades." : ""), refund > 0 ? 4200 : 2800);
 }
 function decorateStart() {
   var sv = readSave(); if (!sv) return;
