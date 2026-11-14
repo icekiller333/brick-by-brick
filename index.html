@@ -61,7 +61,7 @@
   .tile.t2d { background: #ffd166; }
   .tile.t3d { background: #8ecae6; }
   .tile.tlog { background: #c8f7c5; }
-  #changelog {
+  #versions {
     display: none;
     margin-top: 22px;
     background: #fff;
@@ -69,12 +69,80 @@
     box-shadow: 6px 6px 0 #1a1a1a;
     padding: 22px;
   }
-  #changelog.open { display: block; }
-  #changelog h2 { font-size: 24px; text-transform: uppercase; margin-bottom: 14px; }
-  #changelog h3 { font-size: 17px; margin: 18px 0 6px; }
-  #changelog h3:first-of-type { margin-top: 0; }
-  #changelog ul { margin-left: 20px; }
-  #changelog li { font-size: 14px; line-height: 1.5; margin-bottom: 4px; }
+  #versions.open { display: block; }
+  #versions h2 { font-size: 24px; text-transform: uppercase; margin-bottom: 6px; }
+  #versions .hint { font-size: 14px; margin-bottom: 16px; }
+  .vlist {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding: 4px;
+  }
+  .vtile {
+    display: block;
+    text-align: left;
+    font-family: inherit;
+    width: 100%;
+    background: #fff8e1;
+    border: 3px solid #1a1a1a;
+    box-shadow: 4px 4px 0 #1a1a1a;
+    padding: 14px;
+    cursor: pointer;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .vtile:hover, .vtile:focus-visible { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #1a1a1a; }
+  .vtile:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #1a1a1a; }
+  .vtile .vnum { font-size: 19px; font-weight: bold; text-transform: uppercase; }
+  .vtile .vdate { font-size: 12px; font-weight: bold; color: #555; margin-top: 2px; }
+  .vtile .vtag { font-size: 13px; line-height: 1.4; margin-top: 6px; }
+  .vtile.latest { background: #8ecae6; }
+  #vdetail {
+    display: none;
+    margin-top: 22px;
+    background: #fff;
+    border: 3px solid #1a1a1a;
+    box-shadow: 6px 6px 0 #1a1a1a;
+    padding: 22px;
+  }
+  #vdetail.open { display: block; }
+  .vpage { display: none; }
+  .vpage.open { display: block; }
+  .vpage h2 { font-size: 24px; text-transform: uppercase; }
+  .vpage .vdate { font-size: 13px; font-weight: bold; color: #555; margin: 4px 0 12px; }
+  .vpage ul { margin-left: 20px; }
+  .vpage li { font-size: 14px; line-height: 1.5; margin-bottom: 4px; }
+  .playbtn {
+    display: inline-block;
+    margin-top: 18px;
+    text-decoration: none;
+    color: #1a1a1a;
+    background: #ffd166;
+    border: 3px solid #1a1a1a;
+    box-shadow: 5px 5px 0 #1a1a1a;
+    padding: 12px 22px;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .playbtn:hover, .playbtn:focus-visible { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 #1a1a1a; }
+  .playbtn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #1a1a1a; }
+  .backbtn {
+    display: inline-block;
+    margin-top: 18px;
+    margin-left: 10px;
+    background: #fff;
+    border: 3px solid #1a1a1a;
+    box-shadow: 4px 4px 0 #1a1a1a;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .backbtn:hover, .backbtn:focus-visible { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #1a1a1a; }
   footer { text-align: center; margin-top: 30px; font-size: 13px; }
 </style>
 </head>
@@ -99,200 +167,270 @@
       <p>The latest build (v32.5) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
       <span class="tag">LATEST — v32.5</span>
     </a>
-    <button class="tile tlog" id="logBtn" aria-expanded="false" aria-controls="changelog" type="button">
-      <span class="icon">📜</span>
-      <h2>Changelog</h2>
-      <p>Every version, newest first — what changed each time, from the 2D original to v7.3.</p>
-      <span class="tag" id="logTag">SHOW CHANGES</span>
+    <button class="tile tlog" id="verBtn" aria-expanded="false" aria-controls="versions" type="button">
+      <span class="icon">🕰️</span>
+      <h2>See versions</h2>
+      <p>Every stage of the game, newest first — pick one to see what changed, then play that version.</p>
+      <span class="tag" id="verTag">SHOW VERSIONS</span>
     </button>
   </div>
 
-  <section id="changelog" aria-label="Changelog">
-    <h2>Changelog</h2>
+  <section id="versions" aria-label="All versions">
+    <h2>All versions</h2>
+    <p class="hint">Newest first. Tap a version to see what changed in it, then play that exact build.</p>
+    <div class="vlist" id="vlist">
+      <button class="vtile latest" type="button" data-v="v32-5"><span class="vnum">3D v32.5</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Memory improvements + iOS bug fixes</div></button>
+      <button class="vtile" type="button" data-v="v29-4"><span class="vnum">3D v29.4</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Round 10, item 21: upgrade pacing</div></button>
+      <button class="vtile" type="button" data-v="v28-3"><span class="vnum">3D v28.3</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Round 10 feedback, actioned except upgrade pacing</div></button>
+      <button class="vtile" type="button" data-v="v19-1"><span class="vnum">3D v19.1</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Visual upgrade + slight optimization</div></button>
+      <button class="vtile" type="button" data-v="v18-5"><span class="vnum">3D v18.5</span><div class="vdate">Nov 11, 2026</div><div class="vtag">Round 9 feedback, actioned</div></button>
+      <button class="vtile" type="button" data-v="v17-4"><span class="vnum">3D v17.4</span><div class="vdate">Nov 11, 2026</div><div class="vtag">Round 8 feedback, actioned</div></button>
+      <button class="vtile" type="button" data-v="v16-3"><span class="vnum">3D v16.3</span><div class="vdate">Nov 11, 2026</div><div class="vtag">Round 7 feedback, actioned</div></button>
+      <button class="vtile" type="button" data-v="v14-2"><span class="vnum">3D v14.2</span><div class="vdate">Nov 11, 2026</div><div class="vtag">Rounds 5 and 6 feedback, actioned</div></button>
+      <button class="vtile" type="button" data-v="v11-1"><span class="vnum">3D v11.1</span><div class="vdate">Nov 10, 2026</div><div class="vtag">Round 4 feedback, actioned</div></button>
+      <button class="vtile" type="button" data-v="v8-0"><span class="vnum">3D v8.0</span><div class="vdate">Nov 9, 2026</div><div class="vtag">Round 3 feedback, completed</div></button>
+      <button class="vtile" type="button" data-v="v7-3"><span class="vnum">3D v7.3</span><div class="vdate">Nov 9, 2026</div><div class="vtag">Round 3 feedback, most of it</div></button>
+      <button class="vtile" type="button" data-v="v3-2"><span class="vnum">3D v3.2</span><div class="vdate">Nov 9, 2026</div><div class="vtag">Round 2 feedback, actioned</div></button>
+      <button class="vtile" type="button" data-v="v2-0"><span class="vnum">3D v2.0</span><div class="vdate">Nov 9, 2026</div><div class="vtag">Feedback round 1, actioned</div></button>
+      <button class="vtile" type="button" data-v="improvements"><span class="vnum">3D improvements build</span><div class="vdate">Nov 3, 2026</div><div class="vtag">Manual kiln, economy rebalance, The Hand</div></button>
+      <button class="vtile" type="button" data-v="v10"><span class="vnum">3D rebuild (v10)</span><div class="vdate">Nov 3, 2026</div><div class="vtag">The game rebuilt in 3D</div></button>
+      <button class="vtile" type="button" data-v="v2d"><span class="vnum">2D original</span><div class="vdate">Oct 19, 2026</div><div class="vtag">The first version — cozy idle, flat and fast</div></button>
+    </div>
+  </section>
 
-    <h3>3D v32.5 — Nov 14, 2026 (memory improvements + iOS bug fixes)</h3>
-    <ul>
-      <li>Memory improvements: the wall is now drawn in chunks, and a chunk fully below the screen is skipped; the ground patch and town walkers/doors are also skipped once they're out of view; device pixel ratio is capped (1 on low-end, 2 on high quality).</li>
-      <li>iOS fixes: if iOS drops the WebGL context (backgrounding or memory pressure), progress is saved and a "The 3D view was interrupted. Your tower is saved." prompt offers a reload — restoring the context also reloads so every GPU resource is rebuilt cleanly and the autosave brings the tower back. Audio also resumes properly after iOS parks it in "interrupted" when the app goes to the background.</li>
-    </ul>
-
-    <h3>3D v29.4 — Nov 14, 2026 (round 10, item 21: upgrade pacing)</h3>
-    <ul>
-      <li>Upgrade pacing rework: the skill tree is respaced so unlocks spread across rows 2–26 instead of bunching up around rows 15–25, and Gilded Clay is repriced from $750/$1000/$1250 to $300/$450/$600. The whole tree is now ≈21k coins (was ≈23k). Round 10 is now fully actioned.</li>
-    </ul>
-
-    <h3>3D v28.3 — Nov 14, 2026 (round 10 feedback, actioned except upgrade pacing)</h3>
-    <ul>
-      <li>Bigger celebration for finishing a full layer (all four sides) after row five — the normal row fanfare plus a tower-wide show.</li>
-      <li>Row 10 gets its own story card, styled like the beginning and row-five cards: "Look at that. Five new rows of tower on top of the five I started with. That makes TEN."</li>
-      <li>The "BLOWN AWAY!" miss text now scales down on small screens so it stays on screen instead of being cut off.</li>
-      <li>Side-face rotation eased — two chained lags, starts gently, swings through the middle, settles softly with no bounce; a quarter-turn takes about 0.4s.</li>
-      <li>Pay coins are chunkier (more coins per payout) and the payout shows as a floating +$ amount on the total that fades away.</li>
-      <li>No more "LUCKY" text — a lucky brick just gives an extra burst of coins plus a shower of little 3D horseshoes.</li>
-      <li>The big side text is gone — each face of the tower now has a numbered plaque (1–4) riding two rows under the working row.</li>
-      <li>Tapping to load while a brick is still settling queues the load — it loads the moment the last brick has set, and the crane can't move until then.</li>
-      <li>Streak caps at 10x: first ceiling 2x, then 4x, 8x, 10x with upgrades (Combo Bonus gives 2x, Crowd Favor tiers lift it).</li>
-      <li>Buying an upgrade shows a little bubble of Edgar at his anvil doing the forge animation.</li>
-      <li>The wind-gusting mechanic is introduced with story cards: a Minotaur woman crowd member with bright teal lipstick, carrying a sheaf of grain, warns Edgar about the high wind — the grain sure doesn't like it. New mechanics like lead bricks get the same story-card treatment with different characters (lead gets its own card set on unlock).</li>
-      <li>You can load the hopper even while the crane has something in it, as long as there are empty hopper slots.</li>
-      <li>The shed is drawn no bigger than 4 bricks, even though it can hold more.</li>
-      <li>Memory-leak cleanup pass — geometries and materials are disposed when objects are removed.</li>
-      <li>Precision Tools removed, replaced with nothing.</li>
-      <li>Edgar's Forge easter egg: clicking the little forge graphic in the workshop plays Edgar's animation and has a 1% chance of paying $1. A new upgrade path, "Edgar's Luck" (costs $8/$20/$50/$120 — deliberately cheap), unlocks only once you've made money at the forge, and raises the chance up to a 50/50.</li>
-      <li>Upgrade-cost pacing (item 21) is NOT in this version — still open.</li>
-      <li>Memory issues around rows 28–35: the leak cleanup above is the fix; whether the slowdown is gone is a playtest call.</li>
-      <li>Hands grab about 30% quicker (7s instead of 10s).</li>
-      <li>Predictable Placement distance is now fixed and never derived from wind, speed, or height.</li>
-      <li>Once the tower is tall enough that the ground crowd has slid out of view, 3–4 people float around the tower on the different sides, still backflipping and cheering.</li>
-      <li>Apprentices never stop for you — they lay whenever they have bricks, even while you're running the kiln, the crane is going, or you're placing. The slot still glows and counts down as a warning.</li>
-      <li>New upgrade: Full Warehouse Discard ($60) — once a warehouse is full of one brick type, new bricks of that type are thrown out automatically so you can keep making other types.</li>
-      <li>Storage is now separate buildings beside the regular brick storage — no more tabs, just different buildings you click. Each building holds the storage amount (e.g. storage of four means each building holds four), and when one is empty it switches to the next closest non-empty one.</li>
-    </ul>
-
-    <h3>3D v19.1 — Nov 14, 2026 (visual upgrade + slight optimization — round 10 feedback NOT included)</h3>
-    <ul>
-      <li>Visual upgrade: a cel-shading pass — the cel bands are drawn in the shader instead of read from a ramp, with anti-aliased band edges, shadows leaning cool violet and lit faces leaning warm, and a soft rim of sky light picking out every silhouette, for a painted-storybook look.</li>
-      <li>Slight optimization alongside it.</li>
-      <li>Round 10 feedback is not in this version — it is still being collected.</li>
-    </ul>
-
-    <h3>3D v18.5 — Nov 11, 2026 (round 9 feedback, actioned)</h3>
-    <ul>
-      <li>Screen flashes fixed (best-supported causes — couldn't be reproduced): the dragon and griffin are now anchored to the camera and stay on the horizon; balloons, floating islands, and giant mushrooms shrink away when the camera gets close and grow back slowly; clouds thin out near the camera; villagers step out of shot if the camera gets within 7 units. Butterflies were deliberately left alone.</li>
-      <li>Speech bubbles only come from villagers you can actually see — on screen, in front of the camera, not hidden behind the tower or wall. A line passes to a visible speaker or is dropped, and a bubble fades out if the camera turns its speaker out of view. The bonked villager still says "Ow!".</li>
-      <li>The load-a-brick tutorial hint and the shed pulse now stay until the first brick is loaded, instead of vanishing after 6.5 seconds.</li>
-      <li>Placement grades: NICE!, GOOD!, and PERFECT! pop above the brick at the moment you tap — GOOD is the middle 60% of the drop window, NICE is the rest of the hit zone, PERFECT is the white strip. PERFECT still needs the Perfect Eye upgrade, so early on the best you can earn is GOOD.</li>
-      <li>New $4 starter upgrade, Warm-Up: shaves 0.2s off the kiln's opening bake time (4.5s → 4.3s), and only applies until you buy Hotter Kiln, so no other upgrade changed. It's also the workshop tutorial — the Shop button pulses once you hold $4, the workshop opens showing only this one card with a big BUY button and a "TAP TO BUY" arrow (a progress bar if you're under $4), and buying it gives confetti, a fanfare, "WORKSHOP UNLOCKED!", and a YAY banner before the full workshop fades in. Old saves skip the lesson and get Warm-Up for free.</li>
-      <li>Butterflies: the flock was a flat 36 (14 on low quality); it now ramps from 3 on row 1 to 29 by row 10 (about 19% under the old max), 2 to 11 on low quality, and butterflies grow in and shrink out instead of popping.</li>
-    </ul>
-
-    <h3>3D v17.4 — Nov 11, 2026 (round 8 feedback, actioned)</h3>
-    <ul>
-      <li>Hot bricks now show a visible cooling bar floating over the brick, so you can see how long until it's cool.</li>
-      <li>Brick-setting time now starts at 1 second, with upgrades reducing it by 0.1s each — more upgrade steps on the way to instant.</li>
-      <li>Workshop close X is in the top right corner.</li>
-      <li>New miss animations: a brick lobbed at a villager's head ("OW!"), and a rare one where the brick turns into a leaf and the wind takes it ("BLOWN AWAY!").</li>
-      <li>Hopper upgrade: automatically load multiple bricks into the crane.</li>
-      <li>The exploding miss brick flies up in the air a little before it explodes.</li>
-      <li>The loading wall explodes with bricks flying everywhere before the main menu.</li>
-      <li>The first brick after buying a new brick type is always that type, so you see it demonstrated, then the normal percent chance applies.</li>
-      <li>Tapping a hot air balloon explodes it into a shower of bricks.</li>
-      <li>Edgar is in the workshop now: a banner of him at an anvil forging, and when you buy an upgrade he swings his hammer, the iron flares, and sparks fly.</li>
-      <li>The storage shed's X of X count has a text shadow so it reads clearly against the background.</li>
-    </ul>
-
-    <h3>3D v16.3 — Nov 11, 2026 (round 7 feedback, actioned)</h3>
-    <ul>
-      <li>Double gear button on the main menu fixed — the in-game gear is hidden on the title screen, which has its own gear.</li>
-      <li>Settings cards are clickable anywhere to toggle the setting.</li>
-      <li>Flying creatures are now tappable — the dragon and griffin (and other fly-bys) react when tapped.</li>
-      <li>People never go transparent — villagers stay solid; only buildings and scenery fade when they're in front of the tower or wall.</li>
-      <li>Speech bubble tails are on the bottom, not the top, and the bubbles are anchored to the people — the tail slides to stay on the speaker.</li>
-      <li>Row-5 story cards: no more misclick-swipe on the first card — cards animate in and aren't clickable during the animation.</li>
-      <li>The top-left number is gone as a row counter — it's now a HEIGHT counter that only appears once the goal to get to 50 is revealed.</li>
-      <li>You can start baking another brick even if your storage is full — the finished brick waits in the kiln until there's room in the storage.</li>
-      <li>The storage shed is narrower and starts just big enough for one brick, widening as Bigger Storage is bought.</li>
-      <li>Backgrounds are fuller and more magical when moving around the tower.</li>
-      <li>The next-block highlight animates in only once the turn to the new side has been made.</li>
-      <li>People around the tower move, so it doesn't feel static.</li>
-    </ul>
-
-    <h3>3D v14.2 — Nov 11, 2026 (rounds 5 and 6 feedback, actioned)</h3>
-    <ul>
-      <li>Upgrade famine fixed: new early upgrades Tip Jar, Lucky Brick, Hot Gloves, Coin Pouch, Cheer Bonus, Apprentice's Stool; the early game is very slow, and the earliest upgrades are speed, then storage.</li>
-      <li>Storage now starts as a tiny shed holding 1 brick, upgradeable to 2, 3, 4, 5, 6, 7, 8, maxing out at ~16.</li>
-      <li>Brick-setting-into-place animation added (0.5s), with an upgrade ladder 0.4s → 0.3s → 0.2s → 0.1s → instantaneous.</li>
-      <li>Two more miss animations — an explosion and a 3D twirl toward the camera before the brick falls away — playing randomly, never the same one back to back.</li>
-      <li>Mini kiln upgrade: a second, slower source of bricks that outputs higher-quality types more often.</li>
-      <li>Tower-side rotation is much snappier.</li>
-      <li>Circular tower upgrade: in the skill tree, unlocked once you've gotten the bricks down to three on a side — the square tower becomes a cylinder, one row per level, ~10–12 bricks per row.</li>
-      <li>You now click your storage to load a brick, so background things and easter eggs are clickable again.</li>
-      <li>Intro cards: swipe left to move forward, right to go back; the kiln card shows the real in-game kiln graphic — press and hold to bake, a mini tutorial that reinforces the one at game start; "tap anywhere" text moved to the top of the screen.</li>
-      <li>Once all five tower rows are built and you start building higher, the citizens do subtle little dancing animations so they're not static.</li>
-      <li>Buildings show little characters going in and out of houses, smoke from chimneys, lights in windows.</li>
-      <li>Reset progress from the settings menu; the settings menu is cleaned up with cards and a better layout; the skill-tree UI/UX is vastly improved with good information design so it's clear what you're supposed to be doing.</li>
-    </ul>
-
-    <h3>3D v11.1 — Nov 10, 2026 (round 4 feedback, actioned)</h3>
-    <ul>
-      <li>Upgrade text de-duplicated (e.g., kiln heating no longer repeats itself).</li>
-      <li>Tower reworked to 5×5; objects hiding bricks drop to ~50% transparency so bricks stay visible.</li>
-      <li>Villagers keep speaking after every finished row, even while the tower is being rebuilt.</li>
-      <li>The 50-row goal is no longer shown at first — you're just a guy building a wall. Once the wall is 5 high and the tower is rebuilt to 5 high (total 10), you ask the villagers how many is enough and they say 50; past 50 it extends (course 100).</li>
-      <li>Settings button on the main menu is clickable again; "A Tiny Wall Building Game" is readable against the background.</li>
-      <li>Edgar intro cards on Start: Edgar is a gnoll from D&D (Three.js) — "Hey, this is you — you're Edgar," he loves building walls, first he makes the bricks (kiln shown), then he places them, then you play.</li>
-      <li>Fantasy revamp: buildings more fantasy-esque, a wizard's tower in the background, dragons and griffins flying by, kept magical and mystical.</li>
-      <li>The hole's story smoothed out: no hole on row 1; on row 2 a tiny hole appears and someone mentions they saw a hole in the sky — that's why the villager appears.</li>
-      <li>Crowd messages now appear one at a time, fading away in a chain so they don't compete; pop-ups no longer block the kiln instructions; messages rewritten shorter, sweeter, snappier, with humor.</li>
-      <li>People around the tower grow more magical as the rows go on (wizard hats, glowing auras, horns, hooves, satyr bodies).</li>
-      <li>At row 5, the elder cards return: a little satyr old man with a big scarf and long horns — "Well, I'll pay you," and Edgar: "Not only do I like walls, I also like money — and I guess a tower is just four walls."</li>
-    </ul>
-
-    <h3>3D v8.0 — Nov 9, 2026 (round 3 feedback, completed)</h3>
-    <ul>
-      <li>Brick Sorter unlock: one warehouse per brick type, with warehouse tabs inside the storage building; the active warehouse feeds the crane, and apprentices build from the warehouse you have selected.</li>
-      <li>Same-type streak bonuses: every lead / silver / gold brick in a finished row adds +2 / +2.5 / +3 × rate to that row's payout; a whole row of one metal pays a pure-row bonus on top.</li>
-      <li>Tower sides are no longer auto-built — you build them yourself.</li>
-      <li>Full economy rebalance: upgrade prices reflect their value, and the unlockable brick types (lead, silver, gold) are rebalanced around the more frequent per-face pay.</li>
-    </ul>
-
-    <h3>3D v7.3 — Nov 9, 2026 (round 3 feedback, most of it)</h3>
-    <ul>
-      <li>Villager text now appears below their heads; background music added — calm medieval for the first 5 rows, upbeat energetic medieval after that, a bit eerie at row 25, spooky at row 50, melty and weird (but still enjoyable) at row 75.</li>
-      <li>Crowd builds 1 person on day 2, 2 on day 3, 4 on day 4, 6 on day 5; automatic saving added.</li>
-      <li>Tower: villagers spread around every side, and pay per row now means per row per face (one full side, one layer).</li>
-      <li>Upgrade prices reflect their value: Hotter Kiln first upgrade $10, Piece Work (pay per brick) $50; initial pay per brick is $1.</li>
-      <li>Combo celebrations: backflips every 5, triple-height somersaults every 25, triple jumps every 50.</li>
-      <li>Silver added as an unlockable brick type; unlock order lead → silver → gold; all buyable unlocks now chained in a visual skill-tree tab interface.</li>
-      <li>Perfects as a paid upgrade; the coin shower now shows the actual amount paid; birds and things flying by are tappable with per-type reactions; the streak rises 0.01 per brick.</li>
-      <li>Still open: Brick Sorter with separate warehouses per brick type, apprentices pulling from the selected warehouse; same-type streak bonuses, whole-row bonus, gold +3 / lead +2 row bonuses; tower sides built by hand instead of auto-built; the full economy rebalance, since those prices depend on the above.</li>
-    </ul>
-
-    <h3>3D v3.2 — Nov 9, 2026 (round 2 feedback, actioned)</h3>
-    <ul>
-      <li>First 5 days' wall shortened to 6 bricks wide; tower sides lengthened to 6 (6×6 footprint, 24-brick tower).</li>
-      <li>Villagers gather slower at the start.</li>
-      <li>Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.</li>
-      <li>First payday highlighted with a popup card and a coin shower.</li>
-      <li>Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).</li>
-    </ul>
-
-    <h3>3D v2.0 — Nov 9, 2026 (feedback round, actioned)</h3>
-    <ul>
-      <li>Opening reworked: more enticing loading and start screens; Start goes straight to making bricks, with the story dripping in after rows instead of up front.</li>
-      <li>Story: first story popup after row 1 (a little about the hole in the sky); villagers join after each finished row up to row 5 and talk about the hole; at row 5 they ask you to build closer to the hole — a tower, not a wall — rebuilding the four other sides with a full rotation around it in 3D.</li>
-      <li>Pay: rows 1–5 are unpaid (it's your job); pay starts when the tower build begins, with a reworked gold-and-coins burst effect.</li>
-      <li>Next-brick placement outline is now blue, for color accessibility.</li>
-      <li>Kiln is now a little building you tap, with a circular fill indicator on top (above your thumb); a finished brick animates down to a little storage building instead of in-hand storage.</li>
-      <li>Streak reworked: better look, and slower scaling so the max comes after more bricks laid.</li>
-      <li>New upgrades: Predictable Placement, More Apprentices, Faster Apprentices.</li>
-      <li>Apprentices: the placement spot glows for a second before they place a block, pulsing as a countdown (1s, 0.5s, 0.25s).</li>
-      <li>Background life: below row 50, nice things float by (birds from row 10, a kite, glow bugs); past row 50, spooky things (eyes, peepers, limbs, imps, ghost-jellies).</li>
-    </ul>
-
-    <h3>3D improvements build — Nov 3, 2026</h3>
-    <ul>
-      <li>Kiln starts manual — it only bakes while you hold it; Auto-Kiln becomes a purchase.</li>
-      <li>Upgrade costs rebalanced, with a clear reason to buy upgrades throughout.</li>
-      <li>Full economy rebalance (bonuses, chains, gold/lead/hot bricks).</li>
-      <li>Combo stash cascades: at combo 25 the stash pays out 5 bricks, 50 → 10, 100 → 25, 250 → all, then every 100 past 250 → all.</li>
-      <li>The Hand hazard: after the course-25 story beat, a hand descends and tries to grab bricks off the wall — place a brick on its fingers to fight it off, or it may tear down a course or two.</li>
-    </ul>
-
-    <h3>3D rebuild (v10) — Nov 3, 2026</h3>
-    <ul>
-      <li>The game rebuilt in 3D (Three.js), same core loop.</li>
-    </ul>
-
-    <h3>2D original — Oct 19, 2026</h3>
-    <ul>
-      <li>Cozy idle core: hold to mold bricks in the kiln (~2s per brick), place them with a timing minigame.</li>
-      <li>A course is 8 bricks; win at 50 courses, then endless mode.</li>
-      <li>Economy: $1 per brick, $5 per row; combo streak pays $N per brick, a miss resets it.</li>
-      <li>Special bricks: golden ($8 flat), hot (~12%, 10s fuse, pays 2× streak), lead (~6%, swings 50% faster, pays 3×). Golden keystone every 10th course.</li>
-      <li>Upgrade tree: Kiln Fill Speed, Auto-Kiln, Auto-Layer, Second Chance, Precision Tools, Gilded Clay, Hot Mortar, Steady Hands.</li>
-      <li>Story: a hole in the sky with silhouettes inside; the town's wall maker must build high enough to reach it.</li>
-    </ul>
+  <section id="vdetail" aria-label="Version details">
+    <div class="vpage" id="vp-v32-5">
+      <h2>3D v32.5</h2>
+      <p class="vdate">Nov 14, 2026 — memory improvements + iOS bug fixes</p>
+      <ul>
+        <li>Memory improvements: the wall is now drawn in chunks, and a chunk fully below the screen is skipped; the ground patch and town walkers/doors are also skipped once they're out of view; device pixel ratio is capped (1 on low-end, 2 on high quality).</li>
+        <li>iOS fixes: if iOS drops the WebGL context (backgrounding or memory pressure), progress is saved and a "The 3D view was interrupted. Your tower is saved." prompt offers a reload — restoring the context also reloads so every GPU resource is rebuilt cleanly and the autosave brings the tower back. Audio also resumes properly after iOS parks it in "interrupted" when the app goes to the background.</li>
+      </ul>
+      <a class="playbtn" href="versions/v32.5.html">▶ Play v32.5</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v29-4">
+      <h2>3D v29.4</h2>
+      <p class="vdate">Nov 14, 2026 — round 10, item 21: upgrade pacing</p>
+      <ul>
+        <li>Upgrade pacing rework: the skill tree is respaced so unlocks spread across rows 2–26 instead of bunching up around rows 15–25, and Gilded Clay is repriced from $750/$1000/$1250 to $300/$450/$600. The whole tree is now ≈21k coins (was ≈23k). Round 10 is now fully actioned.</li>
+      </ul>
+      <a class="playbtn" href="versions/v29.4.html">▶ Play v29.4</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v28-3">
+      <h2>3D v28.3</h2>
+      <p class="vdate">Nov 14, 2026 — round 10 feedback, actioned except upgrade pacing</p>
+      <ul>
+        <li>Bigger celebration for finishing a full layer (all four sides) after row five — the normal row fanfare plus a tower-wide show.</li>
+        <li>Row 10 gets its own story card, styled like the beginning and row-five cards: "Look at that. Five new rows of tower on top of the five I started with. That makes TEN."</li>
+        <li>The "BLOWN AWAY!" miss text now scales down on small screens so it stays on screen instead of being cut off.</li>
+        <li>Side-face rotation eased — two chained lags, starts gently, swings through the middle, settles softly with no bounce; a quarter-turn takes about 0.4s.</li>
+        <li>Pay coins are chunkier (more coins per payout) and the payout shows as a floating +$ amount on the total that fades away.</li>
+        <li>No more "LUCKY" text — a lucky brick just gives an extra burst of coins plus a shower of little 3D horseshoes.</li>
+        <li>The big side text is gone — each face of the tower now has a numbered plaque (1–4) riding two rows under the working row.</li>
+        <li>Tapping to load while a brick is still settling queues the load — it loads the moment the last brick has set, and the crane can't move until then.</li>
+        <li>Streak caps at 10x: first ceiling 2x, then 4x, 8x, 10x with upgrades (Combo Bonus gives 2x, Crowd Favor tiers lift it).</li>
+        <li>Buying an upgrade shows a little bubble of Edgar at his anvil doing the forge animation.</li>
+        <li>The wind-gusting mechanic is introduced with story cards: a Minotaur woman crowd member with bright teal lipstick, carrying a sheaf of grain, warns Edgar about the high wind — the grain sure doesn't like it. New mechanics like lead bricks get the same story-card treatment with different characters (lead gets its own card set on unlock).</li>
+        <li>You can load the hopper even while the crane has something in it, as long as there are empty hopper slots.</li>
+        <li>The shed is drawn no bigger than 4 bricks, even though it can hold more.</li>
+        <li>Memory-leak cleanup pass — geometries and materials are disposed when objects are removed.</li>
+        <li>Precision Tools removed, replaced with nothing.</li>
+        <li>Edgar's Forge easter egg: clicking the little forge graphic in the workshop plays Edgar's animation and has a 1% chance of paying $1. A new upgrade path, "Edgar's Luck" (costs $8/$20/$50/$120 — deliberately cheap), unlocks only once you've made money at the forge, and raises the chance up to a 50/50.</li>
+        <li>Upgrade-cost pacing (item 21) is NOT in this version — still open.</li>
+        <li>Memory issues around rows 28–35: the leak cleanup above is the fix; whether the slowdown is gone is a playtest call.</li>
+        <li>Hands grab about 30% quicker (7s instead of 10s).</li>
+        <li>Predictable Placement distance is now fixed and never derived from wind, speed, or height.</li>
+        <li>Once the tower is tall enough that the ground crowd has slid out of view, 3–4 people float around the tower on the different sides, still backflipping and cheering.</li>
+        <li>Apprentices never stop for you — they lay whenever they have bricks, even while you're running the kiln, the crane is going, or you're placing. The slot still glows and counts down as a warning.</li>
+        <li>New upgrade: Full Warehouse Discard ($60) — once a warehouse is full of one brick type, new bricks of that type are thrown out automatically so you can keep making other types.</li>
+        <li>Storage is now separate buildings beside the regular brick storage — no more tabs, just different buildings you click. Each building holds the storage amount (e.g. storage of four means each building holds four), and when one is empty it switches to the next closest non-empty one.</li>
+      </ul>
+      <a class="playbtn" href="versions/v28.3.html">▶ Play v28.3</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v19-1">
+      <h2>3D v19.1</h2>
+      <p class="vdate">Nov 14, 2026 — visual upgrade + slight optimization — round 10 feedback NOT included</p>
+      <ul>
+        <li>Visual upgrade: a cel-shading pass — the cel bands are drawn in the shader instead of read from a ramp, with anti-aliased band edges, shadows leaning cool violet and lit faces leaning warm, and a soft rim of sky light picking out every silhouette, for a painted-storybook look.</li>
+        <li>Slight optimization alongside it.</li>
+        <li>Round 10 feedback is not in this version — it is still being collected.</li>
+      </ul>
+      <a class="playbtn" href="versions/v19.1.html">▶ Play v19.1</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v18-5">
+      <h2>3D v18.5</h2>
+      <p class="vdate">Nov 11, 2026 — round 9 feedback, actioned</p>
+      <ul>
+        <li>Screen flashes fixed (best-supported causes — couldn't be reproduced): the dragon and griffin are now anchored to the camera and stay on the horizon; balloons, floating islands, and giant mushrooms shrink away when the camera gets close and grow back slowly; clouds thin out near the camera; villagers step out of shot if the camera gets within 7 units. Butterflies were deliberately left alone.</li>
+        <li>Speech bubbles only come from villagers you can actually see — on screen, in front of the camera, not hidden behind the tower or wall. A line passes to a visible speaker or is dropped, and a bubble fades out if the camera turns its speaker out of view. The bonked villager still says "Ow!".</li>
+        <li>The load-a-brick tutorial hint and the shed pulse now stay until the first brick is loaded, instead of vanishing after 6.5 seconds.</li>
+        <li>Placement grades: NICE!, GOOD!, and PERFECT! pop above the brick at the moment you tap — GOOD is the middle 60% of the drop window, NICE is the rest of the hit zone, PERFECT is the white strip. PERFECT still needs the Perfect Eye upgrade, so early on the best you can earn is GOOD.</li>
+        <li>New $4 starter upgrade, Warm-Up: shaves 0.2s off the kiln's opening bake time (4.5s → 4.3s), and only applies until you buy Hotter Kiln, so no other upgrade changed. It's also the workshop tutorial — the Shop button pulses once you hold $4, the workshop opens showing only this one card with a big BUY button and a "TAP TO BUY" arrow (a progress bar if you're under $4), and buying it gives confetti, a fanfare, "WORKSHOP UNLOCKED!", and a YAY banner before the full workshop fades in. Old saves skip the lesson and get Warm-Up for free.</li>
+        <li>Butterflies: the flock was a flat 36 (14 on low quality); it now ramps from 3 on row 1 to 29 by row 10 (about 19% under the old max), 2 to 11 on low quality, and butterflies grow in and shrink out instead of popping.</li>
+      </ul>
+      <a class="playbtn" href="versions/v18.5.html">▶ Play v18.5</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v17-4">
+      <h2>3D v17.4</h2>
+      <p class="vdate">Nov 11, 2026 — round 8 feedback, actioned</p>
+      <ul>
+        <li>Hot bricks now show a visible cooling bar floating over the brick, so you can see how long until it's cool.</li>
+        <li>Brick-setting time now starts at 1 second, with upgrades reducing it by 0.1s each — more upgrade steps on the way to instant.</li>
+        <li>Workshop close X is in the top right corner.</li>
+        <li>New miss animations: a brick lobbed at a villager's head ("OW!"), and a rare one where the brick turns into a leaf and the wind takes it ("BLOWN AWAY!").</li>
+        <li>Hopper upgrade: automatically load multiple bricks into the crane.</li>
+        <li>The exploding miss brick flies up in the air a little before it explodes.</li>
+        <li>The loading wall explodes with bricks flying everywhere before the main menu.</li>
+        <li>The first brick after buying a new brick type is always that type, so you see it demonstrated, then the normal percent chance applies.</li>
+        <li>Tapping a hot air balloon explodes it into a shower of bricks.</li>
+        <li>Edgar is in the workshop now: a banner of him at an anvil forging, and when you buy an upgrade he swings his hammer, the iron flares, and sparks fly.</li>
+        <li>The storage shed's X of X count has a text shadow so it reads clearly against the background.</li>
+      </ul>
+      <a class="playbtn" href="versions/v17.4.html">▶ Play v17.4</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v16-3">
+      <h2>3D v16.3</h2>
+      <p class="vdate">Nov 11, 2026 — round 7 feedback, actioned</p>
+      <ul>
+        <li>Double gear button on the main menu fixed — the in-game gear is hidden on the title screen, which has its own gear.</li>
+        <li>Settings cards are clickable anywhere to toggle the setting.</li>
+        <li>Flying creatures are now tappable — the dragon and griffin (and other fly-bys) react when tapped.</li>
+        <li>People never go transparent — villagers stay solid; only buildings and scenery fade when they're in front of the tower or wall.</li>
+        <li>Speech bubble tails are on the bottom, not the top, and the bubbles are anchored to the people — the tail slides to stay on the speaker.</li>
+        <li>Row-5 story cards: no more misclick-swipe on the first card — cards animate in and aren't clickable during the animation.</li>
+        <li>The top-left number is gone as a row counter — it's now a HEIGHT counter that only appears once the goal to get to 50 is revealed.</li>
+        <li>You can start baking another brick even if your storage is full — the finished brick waits in the kiln until there's room in the storage.</li>
+        <li>The storage shed is narrower and starts just big enough for one brick, widening as Bigger Storage is bought.</li>
+        <li>Backgrounds are fuller and more magical when moving around the tower.</li>
+        <li>The next-block highlight animates in only once the turn to the new side has been made.</li>
+        <li>People around the tower move, so it doesn't feel static.</li>
+      </ul>
+      <a class="playbtn" href="versions/v16.3.html">▶ Play v16.3</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v14-2">
+      <h2>3D v14.2</h2>
+      <p class="vdate">Nov 11, 2026 — rounds 5 and 6 feedback, actioned</p>
+      <ul>
+        <li>Upgrade famine fixed: new early upgrades Tip Jar, Lucky Brick, Hot Gloves, Coin Pouch, Cheer Bonus, Apprentice's Stool; the early game is very slow, and the earliest upgrades are speed, then storage.</li>
+        <li>Storage now starts as a tiny shed holding 1 brick, upgradeable to 2, 3, 4, 5, 6, 7, 8, maxing out at ~16.</li>
+        <li>Brick-setting-into-place animation added (0.5s), with an upgrade ladder 0.4s → 0.3s → 0.2s → 0.1s → instantaneous.</li>
+        <li>Two more miss animations — an explosion and a 3D twirl toward the camera before the brick falls away — playing randomly, never the same one back to back.</li>
+        <li>Mini kiln upgrade: a second, slower source of bricks that outputs higher-quality types more often.</li>
+        <li>Tower-side rotation is much snappier.</li>
+        <li>Circular tower upgrade: in the skill tree, unlocked once you've gotten the bricks down to three on a side — the square tower becomes a cylinder, one row per level, ~10–12 bricks per row.</li>
+        <li>You now click your storage to load a brick, so background things and easter eggs are clickable again.</li>
+        <li>Intro cards: swipe left to move forward, right to go back; the kiln card shows the real in-game kiln graphic — press and hold to bake, a mini tutorial that reinforces the one at game start; "tap anywhere" text moved to the top of the screen.</li>
+        <li>Once all five tower rows are built and you start building higher, the citizens do subtle little dancing animations so they're not static.</li>
+        <li>Buildings show little characters going in and out of houses, smoke from chimneys, lights in windows.</li>
+        <li>Reset progress from the settings menu; the settings menu is cleaned up with cards and a better layout; the skill-tree UI/UX is vastly improved with good information design so it's clear what you're supposed to be doing.</li>
+      </ul>
+      <a class="playbtn" href="versions/v14.2.html">▶ Play v14.2</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v11-1">
+      <h2>3D v11.1</h2>
+      <p class="vdate">Nov 10, 2026 — round 4 feedback, actioned</p>
+      <ul>
+        <li>Upgrade text de-duplicated (e.g., kiln heating no longer repeats itself).</li>
+        <li>Tower reworked to 5×5; objects hiding bricks drop to ~50% transparency so bricks stay visible.</li>
+        <li>Villagers keep speaking after every finished row, even while the tower is being rebuilt.</li>
+        <li>The 50-row goal is no longer shown at first — you're just a guy building a wall. Once the wall is 5 high and the tower is rebuilt to 5 high (total 10), you ask the villagers how many is enough and they say 50; past 50 it extends (course 100).</li>
+        <li>Settings button on the main menu is clickable again; "A Tiny Wall Building Game" is readable against the background.</li>
+        <li>Edgar intro cards on Start: Edgar is a gnoll from D&amp;D (Three.js) — "Hey, this is you — you're Edgar," he loves building walls, first he makes the bricks (kiln shown), then he places them, then you play.</li>
+        <li>Fantasy revamp: buildings more fantasy-esque, a wizard's tower in the background, dragons and griffins flying by, kept magical and mystical.</li>
+        <li>The hole's story smoothed out: no hole on row 1; on row 2 a tiny hole appears and someone mentions they saw a hole in the sky — that's why the villager appears.</li>
+        <li>Crowd messages now appear one at a time, fading away in a chain so they don't compete; pop-ups no longer block the kiln instructions; messages rewritten shorter, sweeter, snappier, with humor.</li>
+        <li>People around the tower grow more magical as the rows go on (wizard hats, glowing auras, horns, hooves, satyr bodies).</li>
+        <li>At row 5, the elder cards return: a little satyr old man with a big scarf and long horns — "Well, I'll pay you," and Edgar: "Not only do I like walls, I also like money — and I guess a tower is just four walls."</li>
+      </ul>
+      <a class="playbtn" href="versions/v11.1.html">▶ Play v11.1</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v8-0">
+      <h2>3D v8.0</h2>
+      <p class="vdate">Nov 9, 2026 — round 3 feedback, completed</p>
+      <ul>
+        <li>Brick Sorter unlock: one warehouse per brick type, with warehouse tabs inside the storage building; the active warehouse feeds the crane, and apprentices build from the warehouse you have selected.</li>
+        <li>Same-type streak bonuses: every lead / silver / gold brick in a finished row adds +2 / +2.5 / +3 × rate to that row's payout; a whole row of one metal pays a pure-row bonus on top.</li>
+        <li>Tower sides are no longer auto-built — you build them yourself.</li>
+        <li>Full economy rebalance: upgrade prices reflect their value, and the unlockable brick types (lead, silver, gold) are rebalanced around the more frequent per-face pay.</li>
+      </ul>
+      <a class="playbtn" href="versions/v8.0.html">▶ Play v8.0</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v7-3">
+      <h2>3D v7.3</h2>
+      <p class="vdate">Nov 9, 2026 — round 3 feedback, most of it</p>
+      <ul>
+        <li>Villager text now appears below their heads; background music added — calm medieval for the first 5 rows, upbeat energetic medieval after that, a bit eerie at row 25, spooky at row 50, melty and weird (but still enjoyable) at row 75.</li>
+        <li>Crowd builds 1 person on day 2, 2 on day 3, 4 on day 4, 6 on day 5; automatic saving added.</li>
+        <li>Tower: villagers spread around every side, and pay per row now means per row per face (one full side, one layer).</li>
+        <li>Upgrade prices reflect their value: Hotter Kiln first upgrade $10, Piece Work (pay per brick) $50; initial pay per brick is $1.</li>
+        <li>Combo celebrations: backflips every 5, triple-height somersaults every 25, triple jumps every 50.</li>
+        <li>Silver added as an unlockable brick type; unlock order lead → silver → gold; all buyable unlocks now chained in a visual skill-tree tab interface.</li>
+        <li>Perfects as a paid upgrade; the coin shower now shows the actual amount paid; birds and things flying by are tappable with per-type reactions; the streak rises 0.01 per brick.</li>
+        <li>Still open: Brick Sorter with separate warehouses per brick type, apprentices pulling from the selected warehouse; same-type streak bonuses, whole-row bonus, gold +3 / lead +2 row bonuses; tower sides built by hand instead of auto-built; the full economy rebalance, since those prices depend on the above.</li>
+      </ul>
+      <a class="playbtn" href="versions/v7.3.html">▶ Play v7.3</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v3-2">
+      <h2>3D v3.2</h2>
+      <p class="vdate">Nov 9, 2026 — round 2 feedback, actioned</p>
+      <ul>
+        <li>First 5 days' wall shortened to 6 bricks wide; tower sides lengthened to 6 (6×6 footprint, 24-brick tower).</li>
+        <li>Villagers gather slower at the start.</li>
+        <li>Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.</li>
+        <li>First payday highlighted with a popup card and a coin shower.</li>
+        <li>Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).</li>
+      </ul>
+      <a class="playbtn" href="versions/v3.2.html">▶ Play v3.2</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v2-0">
+      <h2>3D v2.0</h2>
+      <p class="vdate">Nov 9, 2026 — feedback round 1, actioned</p>
+      <ul>
+        <li>Opening reworked: more enticing loading and start screens; Start goes straight to making bricks, with the story dripping in after rows instead of up front.</li>
+        <li>Story: first story popup after row 1 (a little about the hole in the sky); villagers join after each finished row up to row 5 and talk about the hole; at row 5 they ask you to build closer to the hole — a tower, not a wall — rebuilding the four other sides with a full rotation around it in 3D.</li>
+        <li>Pay: rows 1–5 are unpaid (it's your job); pay starts when the tower build begins, with a reworked gold-and-coins burst effect.</li>
+        <li>Next-brick placement outline is now blue, for color accessibility.</li>
+        <li>Kiln is now a little building you tap, with a circular fill indicator on top (above your thumb); a finished brick animates down to a little storage building instead of in-hand storage.</li>
+        <li>Streak reworked: better look, and slower scaling so the max comes after more bricks laid.</li>
+        <li>New upgrades: Predictable Placement, More Apprentices, Faster Apprentices.</li>
+        <li>Apprentices: the placement spot glows for a second before they place a block, pulsing as a countdown (1s, 0.5s, 0.25s).</li>
+        <li>Background life: below row 50, nice things float by (birds from row 10, a kite, glow bugs); past row 50, spooky things (eyes, peepers, limbs, imps, ghost-jellies).</li>
+      </ul>
+      <a class="playbtn" href="versions/v2.0.html">▶ Play v2.0</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-improvements">
+      <h2>3D improvements build</h2>
+      <p class="vdate">Nov 3, 2026 — manual kiln, economy rebalance, The Hand</p>
+      <ul>
+        <li>Kiln starts manual — it only bakes while you hold it; Auto-Kiln becomes a purchase.</li>
+        <li>Upgrade costs rebalanced, with a clear reason to buy upgrades throughout.</li>
+        <li>Full economy rebalance (bonuses, chains, gold/lead/hot bricks).</li>
+        <li>Combo stash cascades: at combo 25 the stash pays out 5 bricks, 50 → 10, 100 → 25, 250 → all, then every 100 past 250 → all.</li>
+        <li>The Hand hazard: after the course-25 story beat, a hand descends and tries to grab bricks off the wall — place a brick on its fingers to fight it off, or it may tear down a course or two.</li>
+      </ul>
+      <a class="playbtn" href="versions/improvements.html">▶ Play this build</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v10">
+      <h2>3D rebuild (v10)</h2>
+      <p class="vdate">Nov 3, 2026 — the game rebuilt in 3D</p>
+      <ul>
+        <li>The game rebuilt in 3D (Three.js), same core loop.</li>
+      </ul>
+      <a class="playbtn" href="versions/v10.html">▶ Play v10</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
+    <div class="vpage" id="vp-v2d">
+      <h2>2D original</h2>
+      <p class="vdate">Oct 19, 2026 — the first version</p>
+      <ul>
+        <li>Cozy idle core: hold to mold bricks in the kiln (~2s per brick), place them with a timing minigame.</li>
+        <li>A course is 8 bricks; win at 50 courses, then endless mode.</li>
+        <li>Economy: $1 per brick, $5 per row; combo streak pays $N per brick, a miss resets it.</li>
+        <li>Special bricks: golden ($8 flat), hot (~12%, 10s fuse, pays 2× streak), lead (~6%, swings 50% faster, pays 3×). Golden keystone every 10th course.</li>
+        <li>Upgrade tree: Kiln Fill Speed, Auto-Kiln, Auto-Layer, Second Chance, Precision Tools, Gilded Clay, Hot Mortar, Steady Hands.</li>
+        <li>Story: a hole in the sky with silhouettes inside; the town's wall maker must build high enough to reach it.</li>
+      </ul>
+      <a class="playbtn" href="brick-by-brick-2d.html">▶ Play the 2D original</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
   </section>
 
   <footer>Built iteratively across several versions (Oct–Nov 2026), with AI assistance directed by playtesting and feedback after each version.</footer>
@@ -300,15 +438,43 @@
 
 <script>
   (function () {
-    var btn = document.getElementById('logBtn');
-    var panel = document.getElementById('changelog');
-    var tag = document.getElementById('logTag');
-    btn.addEventListener('click', function () {
-      var open = panel.classList.toggle('open');
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      tag.textContent = open ? 'HIDE CHANGES' : 'SHOW CHANGES';
-      if (open) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var verBtn = document.getElementById('verBtn');
+    var versions = document.getElementById('versions');
+    var verTag = document.getElementById('verTag');
+    var detail = document.getElementById('vdetail');
+    verBtn.addEventListener('click', function () {
+      var open = versions.classList.toggle('open');
+      verBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      verTag.textContent = open ? 'HIDE VERSIONS' : 'SHOW VERSIONS';
+      if (!open) { detail.classList.remove('open'); }
+      if (open) versions.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
+    function showDetail(id) {
+      var pages = detail.querySelectorAll('.vpage');
+      for (var i = 0; i < pages.length; i++) pages[i].classList.remove('open');
+      var page = document.getElementById('vp-' + id);
+      if (!page) return;
+      page.classList.add('open');
+      detail.classList.add('open');
+      versions.classList.remove('open');
+      verBtn.setAttribute('aria-expanded', 'false');
+      verTag.textContent = 'SHOW VERSIONS';
+      detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    var tiles = document.querySelectorAll('.vtile');
+    for (var i = 0; i < tiles.length; i++) {
+      tiles[i].addEventListener('click', function () { showDetail(this.getAttribute('data-v')); });
+    }
+    var backs = detail.querySelectorAll('.backbtn');
+    for (var j = 0; j < backs.length; j++) {
+      backs[j].addEventListener('click', function () {
+        detail.classList.remove('open');
+        versions.classList.add('open');
+        verBtn.setAttribute('aria-expanded', 'true');
+        verTag.textContent = 'HIDE VERSIONS';
+        versions.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
   })();
 </script>
 </body>
