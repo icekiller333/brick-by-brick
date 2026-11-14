@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#221407" />
     <link rel="icon" href="data:," />
@@ -292,7 +292,7 @@
       /* ---------- Sheets (shop / settings) ---------- */
       .sheet-wrap{ position:absolute; inset:0; z-index:58; background:rgba(24,14,4,.5); display:flex; align-items:flex-end; justify-content:center; animation:fadeIn .2s ease; touch-action:pan-y; }
       .sheet-wrap.closing{ animation:fadeOut .18s ease forwards; pointer-events:none; }
-      .sheet{ background:var(--paper); border:3px solid var(--line); border-bottom:none; width:100%; max-width:560px; max-height:86dvh; overflow-y:auto; overscroll-behavior:contain;
+      .sheet{ background:var(--paper); border:3px solid var(--line); border-bottom:none; width:100%; max-width:560px; max-height:86vh; max-height:86dvh; overflow-y:auto; overscroll-behavior:contain;
         padding:12px 12px calc(14px + var(--safe-b)); animation:sheetIn .3s cubic-bezier(.2,.9,.3,1.1); box-shadow:0 -6px 0 rgba(0,0,0,.12); }
       .sheet-wrap.closing .sheet{ animation:sheetOut .18s ease-in forwards; }
       @keyframes sheetIn{ from{ transform:translateY(40px); opacity:.4 } to{ transform:none; opacity:1 } }
@@ -574,7 +574,7 @@
         .stats-grid{ grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:10px; }
         .stat-box{ padding:5px 4px; } .stat-num{ font-size:18px; }
         .panel-box{ padding:14px; }
-        .sheet{ max-height:94dvh; }
+        .sheet{ max-height:94vh; max-height:94dvh; }
         .upg-row{ padding:5px 7px; margin-bottom:5px; }
         #reveal{ top:10%; }
       }
@@ -1280,7 +1280,7 @@ function audio() {
       BUS = AC.createGain(); BUS.gain.value = 0.9; BUS.connect(comp); comp.connect(AC.destination);
     } catch (e) { AC = null; BUS = null; }
   }
-  if (AC && AC.state === "suspended") AC.resume();
+  if (AC && AC.state !== "running") AC.resume().catch(function () {});   // iOS parks it in "interrupted" after a background
   return AC;
 }
 function tone(freq, dur, type, vol, delay, slideTo) {
@@ -1630,12 +1630,36 @@ function updateOrbit(dt) {
 }
 var ORBIT_W = 14;                         // how briskly the camera swings round to the next side (higher = snappier)
 var _vc = new THREE.Vector3(), _vl = new THREE.Vector3();
+/* WebGL context loss (iOS can drop it when the app is backgrounded or under memory pressure).
+   Save progress, offer a reload if the context doesn't come back, and reload on restore so
+   every GPU resource is rebuilt cleanly. The autosave brings the tower back. */
+var GL_LOST_T = 0;
+function onGlLost(e) {
+  e.preventDefault();                                    // lets the browser try to restore it
+  try { saveGame(); } catch (err) {}
+  clearTimeout(GL_LOST_T); GL_LOST_T = setTimeout(showGlPrompt, 1500);
+}
+function onGlRestored() {
+  clearTimeout(GL_LOST_T); try { saveGame(); } catch (err) {} location.reload();
+}
+function showGlPrompt() {
+  if (document.getElementById("gl-lost")) return;
+  var d = document.createElement("div"); d.id = "gl-lost";
+  d.style.cssText = "position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(34,20,7,.85);color:#fdf3df;font-family:Archivo,system-ui,sans-serif;font-size:16px;text-align:center;padding:24px";
+  d.innerHTML = "<div>The 3D view was interrupted.<br>Your tower is saved.</div>";
+  var b = document.createElement("button"); b.textContent = "Reload";
+  b.style.cssText = "font:inherit;font-weight:800;padding:10px 20px;border:3px solid #fdf3df;background:#f5b921;color:#221407;cursor:pointer";
+  b.addEventListener("click", function () { location.reload(); });
+  d.appendChild(b); document.body.appendChild(d);
+}
 function initWorld() {
   var canvas = $("gl");
   try {
     renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !LOW_END, powerPreference: "high-performance" });
   } catch (e) { return false; }
   if (!renderer || !renderer.getContext()) return false;
+  canvas.addEventListener("webglcontextlost", onGlLost, false);
+  canvas.addEventListener("webglcontextrestored", onGlRestored, false);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = IS_MOBILE ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
   scene = new THREE.Scene();
@@ -1662,7 +1686,7 @@ function initWorld() {
   W3.ok = true;
   return true;
 }
-function maxDpr() { return Math.min(window.devicePixelRatio || 1, S.quality === "hi" ? 2 : 1); }
+function maxDpr() { if (LOW_END) return 1; return Math.min(window.devicePixelRatio || 1, S.quality === "hi" ? 2 : 1); }
 function applyQuality() {
   if (!renderer) return;
   W3.dpr = maxDpr();
@@ -2071,7 +2095,7 @@ function buildGround() {
   bake(hills, { noAO: true });
 }
 function buildTown() {
-  var town = new THREE.Group(); scene.add(town);
+  var town = new THREE.Group(); scene.add(town); W3.town = town;
   var roofCols = [0x6b3fb0, 0x2f8f9a, 0xc2417a, 0x3f5fc0, 0x8a3fa0, 0xd0802a];
   var wallCols = [0xf4e6ff, 0xe6f0e0, 0xffe9d0, 0xe0e6ff, 0xffeaf0];
   var glowCols = [0xaef6ff, 0xffe9a0, 0xffb0e0, 0xb8ffc8];
@@ -2223,7 +2247,7 @@ function buildTown() {
     add(town, new THREE.SphereGeometry(0.2, 8, 6), new THREE.MeshBasicMaterial({ color: glowCols[o % 4] }), lx, rand(2.5, 6), lz, false); }
   // windows & crystals glow warmer as evening falls (one shared tint)
   W3.windowMat = fadable(new THREE.MeshBasicMaterial({ vertexColors: true }));
-  bake(town, { basicMat: W3.windowMat });
+  bake(town, { basicMat: W3.windowMat }); W3.townSpots = spots;
   buildWalkers();
 }
 /* little townsfolk who now and then step out of a house, potter about and go back in (or visit a neighbour) */
@@ -2238,7 +2262,7 @@ function buildWalkers() {
 }
 function doorGlow(x, z) { EMIT_WORLD = true; emitGlow(x, 0.7, z, 4, 0xffe9a0, 0.5, 0.5, 0.18, 0, 0.3); EMIT_WORLD = false; }
 function updateWalkers(dt) {
-  if (!W3.walkers || !W3.doors || !W3.doors.length) return;
+  if (!W3.walkers || !W3.doors || !W3.doors.length || W3.groundAway) return;
   var live = 0, k, w;
   for (k = 0; k < W3.walkers.length; k++) if (W3.walkers[k].state !== "off") live++;
   for (k = 0; k < W3.walkers.length; k++) {
@@ -2380,10 +2404,17 @@ var TOWER_LAT = [-2.6, 2.6, -1.4, 1.4, -3.6, 3.6];
 /* Floating crowd: once the tower is so tall that the ground (and everyone standing on it) has slid below the bottom of the screen,
    four villagers - one per side - lift off and drift around the tower at the height you are building, cheering and backflipping. */
 var FLOATERS = 4;
-function groundOutOfView() {             // the patch of ground in front of the tower, on the camera's side, is below the screen
+function groundOutOfView(prev) {            // the patch of ground in front of the tower, on the camera's side, is below the screen
   var cp = camera.position, dx = cp.x, dz = cp.z + TH, dl = Math.sqrt(dx * dx + dz * dz) || 1;
   var sp = toScreenW(dx / dl * 4.5, 0, -TH + dz / dl * 4.5), H = window.innerHeight;
-  return sp.behind || sp.y > (W3.flOn ? H - 140 : H + 30);        // two thresholds, so nobody bobs up and down at the edge
+  return sp.behind || sp.y > (prev ? H - 140 : H + 30);           // two thresholds (prev = last answer), so nobody flickers at the edge
+}
+// Ground-level people (villagers and walkers) are hidden and skipped while the ground they stand on is off-screen.
+// Critters are not touched: they fly in the sky and cost little.
+function setGroundCrowdShown(show) {
+  (W3.cParts || []).forEach(function (ip) { if (ip.fill) ip.fill.visible = show; if (ip.out) ip.out.visible = show; });
+  if (W3.cAura) W3.cAura.visible = show;
+  (W3.walkers || []).forEach(function (w) { if (w.g) w.g.visible = show && w.state !== "off"; });
 }
 var FLOAT_OFF = [0.4, 1.9, -0.9, 1.1];  // each floater's own height around the working row
 var _qf = new THREE.Quaternion(), _mf = new THREE.Matrix4(), _mf2 = new THREE.Matrix4(), _vf = new THREE.Vector3(), _ef = new THREE.Euler(), _one = new THREE.Vector3(1, 1, 1);
@@ -2490,7 +2521,10 @@ function camNearVillager(d) {
 }
 function updateCrowd(dt) {
   var want = crowdTarget(); laneUpdate();
-  W3.flOn = S.tower && S.started && CAM.mode !== "title" && groundOutOfView();
+  W3.flOn = S.tower && S.started && CAM.mode !== "title" && groundOutOfView(W3.flOn);
+  var away = S.started && CAM.mode !== "title" && groundOutOfView(W3.groundAway);
+  if (away !== W3.groundAway) { W3.groundAway = away; setGroundCrowdShown(!away); }
+  if (away) return;
   for (var i = 0; i < W3.crowd.length; i++) {
     var d = W3.crowd[i];
     d.ph += dt * 3;
@@ -2623,14 +2657,8 @@ function brickTex() {
 }
 function buildWall() {
   W3.brickGeo = roundedBox(1, BH, BD, 0.055, 3);
-  W3.wall = new THREE.InstancedMesh(W3.brickGeo, toon(0xffffff, { map: brickTex() }), MAXB);
-  W3.wall.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  W3.wall.castShadow = true; W3.wall.receiveShadow = true; W3.wall.frustumCulled = false;
-  W3.wallOut = new THREE.InstancedMesh(W3.brickGeo, OUT_MAT, MAXB);
-  W3.wallOut.instanceMatrix.setUsage(THREE.DynamicDrawUsage); W3.wallOut.frustumCulled = false;
-  W3.wall.setColorAt(0, _c.set(0xffffff));
-  W3.wall.count = 0; W3.wallOut.count = 0;
-  scene.add(W3.wall); scene.add(W3.wallOut);
+  W3.wallMat = toon(0xffffff, { map: brickTex() });
+  W3.wallChunks = [];       // the wall is drawn in chunks of WALL_CH bricks; a chunk that is fully below the screen is skipped
   // foundation slab
   var f = add(scene, new THREE.BoxGeometry(WALL_W + 1.4, FOUND, BD + 0.5), toon(0x8a8478), 0, FOUND / 2, 0, 0.05);
   W3.found = f;
@@ -2644,9 +2672,9 @@ function setBrickMatrix(i, dy, ky, kx) {
   _e.set(0, yaw, b.rot || 0); _q.setFromEuler(_e);
   var bsx = b.sx; if (b.round && RMORPH < 1 && b.sxq) bsx = lerp(b.sxq, b.sx, RMORPH * RMORPH * (3 - 2 * RMORPH));
   var sx = bsx * (kx || 1), sy = ky || 1;
-  _s.set(sx, sy, 1); _m.compose(_v, _q, _s); W3.wall.setMatrixAt(i, _m);
-  _s.set(sx + 2 * OUTLINE, sy * (BH + 2 * OUTLINE) / BH, (BD + 2 * OUTLINE) / BD); _m.compose(_v, _q, _s); W3.wallOut.setMatrixAt(i, _m);
-  W3.wall.instanceMatrix.needsUpdate = true; W3.wallOut.instanceMatrix.needsUpdate = true;
+  var wc = wallChunkFor(i), li = i % WALL_CH; _s.set(sx, sy, 1); _m.compose(_v, _q, _s); wc.fill.setMatrixAt(li, _m); b.wx = _v.x; b.wy = _v.y; b.wz = _v.z;
+  _s.set(sx + 2 * OUTLINE, sy * (BH + 2 * OUTLINE) / BH, (BD + 2 * OUTLINE) / BD); _m.compose(_v, _q, _s); wc.out.setMatrixAt(li, _m);
+  wc.fill.instanceMatrix.needsUpdate = true; wc.out.instanceMatrix.needsUpdate = true;
 }
 function brickColorHex(type, seed) {
   if (type === "gold") return _c.set(0xf7c02a);
@@ -2656,6 +2684,58 @@ function brickColorHex(type, seed) {
   if (type === "glass") return _c.set(0x9fe6f7);
   var h = clayHSL(seed); return _c.setHSL(h[0], h[1], h[2]);
 }
+var WALL_CH = 256;          // bricks per wall chunk
+function makeWallChunk() {
+  var fill = new THREE.InstancedMesh(W3.brickGeo, W3.wallMat, WALL_CH);
+  var out = new THREE.InstancedMesh(W3.brickGeo, OUT_MAT, WALL_CH);
+  fill.instanceMatrix.setUsage(THREE.DynamicDrawUsage); out.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  fill.castShadow = true; fill.receiveShadow = true; fill.frustumCulled = false; out.frustumCulled = false;
+  fill.count = 0; out.count = 0;
+  fill.setColorAt(0, _c.set(0xffffff));
+  scene.add(fill); scene.add(out);
+  W3.wallChunks.push({ fill: fill, out: out, top: null, shown: false });
+}
+function wallChunkFor(i) {
+  var c = Math.floor(i / WALL_CH);
+  while (W3.wallChunks.length <= c) makeWallChunk();
+  return W3.wallChunks[c];
+}
+function wallSetColor(i, col) {
+  var ch = W3.wallChunks[Math.floor(i / WALL_CH)]; if (!ch) return;
+  ch.fill.setColorAt(i % WALL_CH, col); ch.fill.instanceColor.needsUpdate = true;
+}
+// Recounts every chunk after bricks are removed, and finds each chunk's highest brick.
+function syncWall() {
+  var n = BRICKS.length;
+  for (var c = 0; c < W3.wallChunks.length; c++) {
+    var ch = W3.wallChunks[c], base = c * WALL_CH, cnt = clamp(n - base, 0, WALL_CH);
+    ch.fill.count = ch.out.count = cnt; ch.top = null;
+    for (var j = base; j < base + cnt; j++) { var b = BRICKS[j]; if (b.wy !== undefined && (!ch.top || b.wy > ch.top.y)) ch.top = { x: b.wx, y: b.wy, z: b.wz }; }
+  }
+}
+// A chunk is hidden once its highest brick is well below the bottom of the screen (everything in it sits lower still).
+function updateTownShown() {
+  if (!W3.town || !W3.townSpots) return;
+  var W = window.innerWidth, H = window.innerHeight, m = W3.townShown ? 110 : 40, any = false;
+  for (var k = 0; k < W3.townSpots.length && !any; k++) {
+    var s = W3.townSpots[k];
+    for (var hh = 0; hh <= 6 && !any; hh += 6) {
+      var sp = toScreenW(s[0], hh, s[1]);
+      if (!sp.behind && sp.x > -m && sp.x < W + m && sp.y > -m && sp.y < H + m) any = true;
+    }
+  }
+  W3.townShown = any; W3.town.visible = any;
+}
+function updateWallChunks() {
+  var H = window.innerHeight;
+  for (var c = 0; c < W3.wallChunks.length; c++) {
+    var ch = W3.wallChunks[c];
+    var sp = ch.top && ch.fill.count > 0 ? toScreenW(ch.top.x, ch.top.y, ch.top.z) : null;
+    var show = !!sp && (sp.behind || sp.y < (ch.shown ? H + 110 : H + 40));   // two thresholds: no flicker at the edge
+    ch.shown = show; ch.fill.visible = show; ch.out.visible = show;
+  }
+}
+
 // Adds a brick to the wall and returns its index.
 function wallAdd(row, slot, per, type, seed, face, ci) {
   if (BRICKS.length >= MAXB) return -1;
@@ -2663,9 +2743,11 @@ function wallAdd(row, slot, per, type, seed, face, ci) {
   var b = { x: slotX(row, slot, per), y: rowY(row), sx: FW() / per - GAP, face: face || 0, ci: ci == null ? slot : ci, row: row, slot: slot, per: per, type: type, seed: seed, rot: (hash01(seed + row) - 0.5) * 0.02 };
   if (roundOn()) { var rn = per === S.perCourse ? per : 4 * per, ridx = rn === per ? slot : (face || 0) * per + slot; b.round = true; b.ang = ringAng(row, ridx, rn); b.x = 0; b.face = 0; b.sx = ringSX(rn); b.ci = ridx; b.n = rn; }
   BRICKS.push(b);
-  W3.wall.count = W3.wallOut.count = BRICKS.length;
-  W3.wall.setColorAt(i, brickColorHex(type, seed)); W3.wall.instanceColor.needsUpdate = true;
+  var wc = wallChunkFor(i), li = i % WALL_CH;
+  wc.fill.count = wc.out.count = li + 1;
+  wc.fill.setColorAt(li, brickColorHex(type, seed)); wc.fill.instanceColor.needsUpdate = true;
   setBrickMatrix(i);
+  if (!wc.top || b.wy > wc.top.y) wc.top = { x: b.wx, y: b.wy, z: b.wz };
   if (type === "gold" || type === "silver" || type === "glass") (W3.golds = W3.golds || []).push(i);
   if (type === "hot") animBrick(i, "cool", 0, 2.5);
   return i;
@@ -2686,7 +2768,7 @@ function updateBrickAnims(dt) {
     } else if (a.kind === "cool") {
       var b = BRICKS[a.i]; var h = clayHSL(b.seed);
       _c.set(0xff7a2a).lerp(_c2.setHSL(h[0], h[1], h[2]), u);
-      W3.wall.setColorAt(a.i, _c); W3.wall.instanceColor.needsUpdate = true;
+      wallSetColor(a.i, _c);
     }
     if (u >= 1) { if (a.kind !== "cool") setBrickMatrix(a.i); ANIMS.splice(k, 1); }
   }
@@ -3534,6 +3616,7 @@ function updateWorld(dt, rt) {
   if (S.swayOn && S.started && !actionFrozen() && Math.random() < dt * 4) emitPuffs(rand(-4, 4), wy - 0.3, BD / 2, 1, 0xd8cdb8, 0.3, -0.4, 0.8);
   updateCritters(dt);
   updateCrowd(dt);
+  updateWallChunks(); updateTownShown();
   // finished-row glint
   if (W3.glintT >= 0) {
     W3.glintT += dt;
@@ -4027,7 +4110,7 @@ function villagerSay(idx, text, fixed) {
   while (SAYQ.length > 3) SAYQ.shift();                       // never a backlog: only the freshest few lines
 }
 // A bubble waits its turn while any tutorial hint, story card, reveal or panel is up — so it can never cover a "tap this" prompt.
-function bubblesBlocked() { return !S.started || !!activeMsg || panelsBusy() || S.shopOpen || CAM.mode !== "play" || !!(el.story && !el.story.classList.contains("hidden")); }
+function bubblesBlocked() { return !S.started || !!W3.groundAway || !!activeMsg || panelsBusy() || S.shopOpen || CAM.mode !== "play" || !!(el.story && !el.story.classList.contains("hidden")); }
 function dropBubble() { if (curBubble) { if (curBubble.el.parentNode) curBubble.el.parentNode.removeChild(curBubble.el); curBubble = null; } }
 function updateBubbles() {
   var now = performance.now();
@@ -4886,7 +4969,7 @@ function tintBrick(h, k) {
   if (!h.brick || BRICKS[h.bi] !== h.brick) return;
   brickColorHex(h.brick.type, h.brick.seed); _c2.copy(_c);
   _c.set(0xff3b2a).lerp(_c2, 1 - k);
-  W3.wall.setColorAt(h.bi, _c); W3.wall.instanceColor.needsUpdate = true;
+  wallSetColor(h.bi, _c);
 }
 function untintBrick(h) { tintBrick(h, 0); }
 function handOn(b) { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && HANDS[i].brick === b) return true; return false; }
@@ -5010,8 +5093,7 @@ function yankHand(h) {
 function collapseFrom(bi) {
   G.gen++;
   var gone = BRICKS.splice(bi, BRICKS.length - bi), g0 = gone[0];
-  W3.wall.count = W3.wallOut.count = BRICKS.length;
-  W3.wall.instanceMatrix.needsUpdate = W3.wallOut.instanceMatrix.needsUpdate = true;
+  syncWall();
   ANIMS = ANIMS.filter(function (a) { return a.i < BRICKS.length; });
   if (W3.golds) W3.golds = W3.golds.filter(function (i) { return i < BRICKS.length; });
   S.courses = g0.row - 1; S.inCourse = g0.ci != null ? g0.ci : g0.slot; if (S.tower && g0.row > S.towerStart && !roundOn()) { S.perFace = g0.per; S.perCourse = 4 * g0.per; } S.scUsed = 0; S.rowMisses = Math.max(S.rowMisses, 1); S.rowT = freshRowT();
