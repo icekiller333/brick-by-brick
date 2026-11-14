@@ -96,8 +96,8 @@
     <a class="tile t3d" href="brick-by-brick-3d.html">
       <span class="icon">🏰</span>
       <h2>3D Version</h2>
-      <p>The latest build (v29.4) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
-      <span class="tag">LATEST — v29.4</span>
+      <p>The latest build (v32.5) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
+      <span class="tag">LATEST — v32.5</span>
     </a>
     <button class="tile tlog" id="logBtn" aria-expanded="false" aria-controls="changelog" type="button">
       <span class="icon">📜</span>
@@ -109,6 +109,12 @@
 
   <section id="changelog" aria-label="Changelog">
     <h2>Changelog</h2>
+
+    <h3>3D v32.5 — Nov 14, 2026 (memory improvements + iOS bug fixes)</h3>
+    <ul>
+      <li>Memory improvements: the wall is now drawn in chunks, and a chunk fully below the screen is skipped; the ground patch and town walkers/doors are also skipped once they're out of view; device pixel ratio is capped (1 on low-end, 2 on high quality).</li>
+      <li>iOS fixes: if iOS drops the WebGL context (backgrounding or memory pressure), progress is saved and a "The 3D view was interrupted. Your tower is saved." prompt offers a reload — restoring the context also reloads so every GPU resource is rebuilt cleanly and the autosave brings the tower back. Audio also resumes properly after iOS parks it in "interrupted" when the app goes to the background.</li>
+    </ul>
 
     <h3>3D v29.4 — Nov 14, 2026 (round 10, item 21: upgrade pacing)</h3>
     <ul>
