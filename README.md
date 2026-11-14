@@ -6,8 +6,8 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: the latest 3D version up top, and a "See versions" browser with every stage of the game.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v41.10).
-- `versions/` — every playable stage of the game, one file per version (2D original, v10, improvements build, v2.0, v3.2, v7.3, v8.0, v11.1, v14.2, v16.3, v17.4, v18.5, v19.1, v28.3, v29.4, v32.5, v41.10). Pick a version on the landing page to see what changed in it and play that exact build.
+- `brick-by-brick-3d.html` — the latest version, 3D (v46.11).
+- `versions/` — every playable stage of the game, one file per version (2D original, v10, improvements build, v2.0, v3.2, v7.3, v8.0, v11.1, v14.2, v16.3, v17.4, v18.5, v19.1, v28.3, v29.4, v32.5, v41.10, v46.11). Pick a version on the landing page to see what changed in it and play that exact build.
 
 ## How to play
 
@@ -59,6 +59,12 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
+
+### 3D v46.11 — Nov 14, 2026 (round 12 feedback, actioned + round 11 remainder)
+
+- Round 12, all 8 items: flat-bonus upgrades halved (Tip Jar $1/$2/$3 → $0.50/$1/$1.50 per row); silhouettes now stand along the hole's edge from row 25 (1, growing to 7 by row 50), and the row-30 story mentions them; the duplicated row-40 cloud pop-up is gone — the griffin cards still introduce the clouds; early upgrade costs brought down (Piece Work $50 → $30, Combo Bonus $70 → $45, Steady Hands and Tip Jar cheaper too) while later prices now scale with how many upgrades you own (×(1 + 0.03n + 0.0012n²)); with multiple warehouses open each shed shows one brick plus its total (n/storeCap); the workshop is now a node tree — parents above children, joined by lines, tap a node to open its card in the pinned bottom panel; row 50 now reads "For one second, the entire world is silent."; the tremor cards have the dragon's tail excuse ("Wait. Is the tail the only reason it sways?" / "Well no, but um anyway.").
+- Round 11 remainder, 6 of the 8 open items: the loading wall now explodes all at once (animation delay forced to 0); rapid forge taps spark after 5 hits within 1.6s, from a pool of 24 reused spark elements; music is now rule-generated — chords and melody rebuilt every 16 bars from a random walk over the mood's mode, so no two passages match; a missed brick can now fly up at a passing balloon and pop it into a shower of bricks; walking villagers' arms swing forwards and backwards in opposite phase instead of sideways; villagers crawl the tower after row 10 (up to 2 at a time), tap one to throw it off for $1, and if one reaches the top it jumps off on its own.
+- Still open from round 11: 1 (the Edgar first card flicker) and 4 (the crane drop mini-game on the intro card) — no code for either in this version.
 
 ### 3D v41.10 — Nov 14, 2026 (round 11 feedback, most of it — 28 of 36)
 
@@ -207,4 +213,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again; v28.3 published Nov 14, replacing the 3D file again; v29.4 published Nov 14, replacing the 3D file again; v32.5 published Nov 14, replacing the 3D file again; v41.10 published Nov 14, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again; v28.3 published Nov 14, replacing the 3D file again; v29.4 published Nov 14, replacing the 3D file again; v32.5 published Nov 14, replacing the 3D file again; v41.10 published Nov 14, replacing the 3D file again; v46.11 published Nov 14, replacing the 3D file again.
