@@ -58,7 +58,7 @@
       #hud{ position:absolute; z-index:30; top:0; left:0; right:0; display:flex; align-items:flex-start; gap:8px;
         padding:calc(8px + var(--safe-t)) calc(10px + var(--safe-r)) 0 calc(10px + var(--safe-l)); pointer-events:none; }
       #hud > *{ pointer-events:auto; }
-      #hud-course{ display:flex; flex-direction:column; gap:3px; padding:5px 10px 6px; min-width:118px; }
+      #hud-course{ display:flex; flex-direction:column; gap:3px; padding:5px 10px 6px; min-width:118px; flex:none; }
       #hud-course .row1{ display:flex; align-items:baseline; gap:6px; white-space:nowrap; }
       #hud-course .lab{ font-weight:800; font-size:10px; letter-spacing:.16em; }
       #chip-row{ display:none !important; }   /* the row / side counter is gone: the tower itself shows where you are */
@@ -384,6 +384,9 @@
       .seg .set-opt{ flex:1; border:0; padding:7px 4px; }
       .seg .set-opt + .set-opt{ border-left:3px solid var(--line); }
       .set-how{ background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s); padding:8px 10px; }
+      .cr-card{ text-align:center; margin-bottom:10px; }
+      .cr-role{ font-weight:800; font-size:11px; letter-spacing:.14em; color:var(--muted); }
+      .cr-name{ font-family:'Archivo Black',sans-serif; font-size:22px; margin-top:4px; }
       .how-step{ display:flex; align-items:center; gap:10px; padding:5px 0; font-size:12.5px; font-weight:600; line-height:1.35; }
       .how-step b{ flex:none; width:24px; height:24px; display:grid; place-items:center; background:var(--clay); color:#fff; border:2px solid var(--line); font-family:'Archivo Black',sans-serif; font-size:12px; }
       .how-step u{ text-decoration:none; font-weight:800; }
@@ -533,6 +536,7 @@
       #ov-start .st-settings{ position:absolute; z-index:5; top:calc(12px + var(--safe-t)); right:calc(12px + var(--safe-r)); width:44px; height:44px; padding:0; display:grid; place-items:center;
         background:var(--panel); color:var(--ink); border:3px solid var(--line); box-shadow:var(--shadow-s); }
       #ov-start .st-settings svg{ width:22px; height:22px; }
+      #ov-start .st-credits{ position:absolute; z-index:5; top:calc(12px + var(--safe-t)); left:calc(12px + var(--safe-l)); height:44px; padding:0 14px; font-family:'Archivo Black',sans-serif; font-size:12px; letter-spacing:.1em; background:var(--panel); color:var(--ink); border:3px solid var(--line); box-shadow:var(--shadow-s); }
       #ov-start .t-brick{ display:inline-block; animation:tBob 2.4s ease-in-out infinite; text-shadow:5px 5px 0 #221407, 0 0 22px rgba(255,140,60,.8); }
       @keyframes tBob{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-5px) } }
       #btn-begin{ font-size:24px; padding:15px 54px; letter-spacing:.06em; }
@@ -875,6 +879,21 @@
         </div>
       </div>
 
+      <div id="credits" class="sheet-wrap hidden" data-ui>
+        <div class="sheet">
+          <div class="sheet-head"><h2>CREDITS</h2>
+            <button class="x-btn pressable" id="btn-credits-close" aria-label="Close credits">✕</button></div>
+          <div class="set-how cr-card">
+            <div class="cr-role">GAME DESIGNER, MANAGER &amp; PLAYTESTER</div>
+            <div class="cr-name">Ken Wheadon</div>
+          </div>
+          <div class="set-how cr-card">
+            <div class="cr-role">PRODUCED BY</div>
+            <div class="cr-name">Weird Demon Games</div>
+          </div>
+        </div>
+      </div>
+
       <div id="hintwrap" class="hidden">
         <div id="hint-dim"><div class="hd"></div><div class="hd"></div><div class="hd"></div><div class="hd"></div></div>
         <div id="hint-label"><span id="hint-text"></span></div>
@@ -906,6 +925,7 @@
           <p class="tagline">Tap. Stack. Climb. And try not to look up.</p>
         </div>
         <button class="st-settings pressable" id="btn-settings-start" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+        <button class="st-credits pressable" id="btn-credits" aria-label="Credits">CREDITS</button>
         <button class="cta-btn" id="btn-begin">START</button>
         <p class="start-how"><b>Hold</b> the kiln to bake · <b>tap storage</b> to load · <b>tap anywhere</b> to drop</p>
       </div>
@@ -1007,7 +1027,7 @@ var MINI_INT = [0, 12, 8.5, 6];                                   // Mini Kiln: 
 var MINI_TRIES = [1, 2, 2, 3];                                    // Mini Kiln: it bakes this many bricks and keeps the best
 var TYPE_RANK = { normal: 0, hot: 0, glass: 0.8, lead: 1, silver: 2, gold: 3 };
 var COALS = [0, 0.2, 0.35, 0.5];                        // Banked Coals: share of the hold speed kept when you let go
-var AL_INT = [5, 3.5, 2.2, 1.4];
+var AL_INT = [6.7, 5, 3.6, 2.3];
 var GILD_PCT = [0, 8, 15, 22];
 var STEADY_MULT = [1, 1.3, 1.6, 1.6];
 var PLUMB_MULT = [1, 1.5, 2];
@@ -4704,7 +4724,7 @@ function tickApprentice(dt) {
   if (S.tier.autoLayer <= 0 || CAM.mode === "victory") { AT.on = false; return; }
   ensureActive();
   var plain = apprCount(), int = autoLayInt();
-  var go = plain > 0;                                    // apprentices never stop for you: they lay whenever they have bricks
+  var go = plain > 0 && handCount() === 0;               // apprentices lay whenever they have bricks, but not while a hand is on the wall
   if (go) {
     var slots = Math.max(1, perFace() - curSlot());
     AT.n = Math.min(autoLayBatch(), plain, slots);
@@ -5191,7 +5211,7 @@ function nearestHand() {
 }
 function handCount() { var n = 0; for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && (HANDS[i].state === "arrive" || HANDS[i].state === "grip")) n++; return n; }
 function handNMax() {
-  var cap = clamp(2 + Math.floor((S.courses - HAND_COURSE) / 12), 2, 7);          // how far ahead a hand may sit
+  var cap = clamp(2 + Math.floor((S.courses - HAND_COURSE) / 12), 2, 3);          // how far ahead a hand may sit (capped at three)
   var inHand = S.stack.length + (C.item ? 1 : 0);
   var perBrick = Math.max(bakeTime() * 0.95, 1.15);
   var feasible = inHand + Math.floor(grabTime() * 0.8 / perBrick);               // never ask the impossible
@@ -7081,6 +7101,11 @@ function openSettings() { clearHintForPanel(); releaseKiln(); syncSettings(); sh
 function closeSettings() { hidePanel(el.settings, 180, pumpMsg); }
 $("btn-settings").addEventListener("click", function () { audio(); openSettings(); });
 $("btn-settings-start").addEventListener("click", function () { audio(); openSettings(); });
+function openCredits() { audio(); showPanel($("credits")); snd.pop(); }
+function closeCredits() { hidePanel($("credits"), 180, pumpMsg); }
+$("btn-credits").addEventListener("click", openCredits);
+$("btn-credits-close").addEventListener("click", closeCredits);
+$("credits").addEventListener("click", function (e) { if (e.target === $("credits")) closeCredits(); });
 $("btn-settings-close").addEventListener("click", function () { closeSettings(); snd.pop(); });
 el.settings.addEventListener("click", function (e) { if (e.target === el.settings) closeSettings(); });
 // Each settings card is a big switch: tap anywhere on it (not only the small ON/OFF buttons) to flip it to the other choice.
@@ -7147,11 +7172,11 @@ window.addEventListener("keydown", function (e) {
     if (!el.ovVictory.classList.contains("hidden")) { $("btn-endless").click(); return; }
     if (storyActive()) { el.storyNext.click(); return; }
     if (activeMsg && activeMsg.kind === "reveal") { el.reveal.click(); return; }
-    if (S.shopOpen || !el.settings.classList.contains("hidden")) return;
+    if (S.shopOpen || !el.settings.classList.contains("hidden") || !$("credits").classList.contains("hidden")) return;
     hintTapThrough(); if (C.state === "empty") tapStorage(); else tryDrop(e.timeStamp); return;
   }
   if (e.code === "KeyS" && S.workshopShown && !e.repeat) { if (S.shopOpen) { closeShop(); snd.pop(); } else openShop(); return; }
-  if (e.code === "Escape") { if (S.shopOpen) { closeShop(); snd.pop(); } else if (!el.settings.classList.contains("hidden")) { closeSettings(); snd.pop(); } }
+  if (e.code === "Escape") { if (S.shopOpen) { closeShop(); snd.pop(); } else if (!el.settings.classList.contains("hidden")) { closeSettings(); snd.pop(); } else if (!$("credits").classList.contains("hidden")) { closeCredits(); snd.pop(); } }
 });
 window.addEventListener("keyup", function (e) { if (isKilnKey(e) && keyKiln) { keyKiln = false; if (kilnPtr === null) releaseKiln(); } });
 window.addEventListener("resize", function () { resizeWorld(); if (activeMsg && activeMsg.kind === "hint") layoutHint(); });
