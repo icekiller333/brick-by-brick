@@ -939,7 +939,7 @@ var GRAB_TIME = 7;            // seconds a hand needs to rip a brick free (30% q
    - METAL BONUSES: every lead / silver / gold brick in a finished row adds +2 / +2.5 / +3 × rate to that row's payout; a run of the
      same metal pays little bumps; a row that is ALL one metal pays a pure-row bonus on top (see ROW_ADD / RUN_ADD / PURE_ADD).
    - PRICES (rebalanced): a tier costs roughly  income-per-second at the row you would normally buy it  ×  (25 s + 500 s × the share of
-     income it adds).  Strong upgrades cost more, weak ones (Crowd Favor, Sky Lantern…) cost less.  The whole tree is ≈15k coins.
+     income it adds).  Strong upgrades cost more, weak ones (Crowd Favor, Sky Lantern…) cost less.  The whole tree is ≈21k coins.
    - The kiln only bakes while you HOLD it. Banked Coals (shop) lets it
      smoulder on its own once you've earned it. The apprentice pays flat rate.
    Pay now arrives every finished SIDE (4× as often on the tower), so the tree was re-priced against that faster income. */
@@ -1132,7 +1132,7 @@ var LINES = [
   { id: "steady", icon: "steady", name: "Steady Hands", costs: [45,  110,  190], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return t >= 3 ? "Window +60% and the ALMOST RING — near misses swing again." : "Drop window +" + Math.round((STEADY_MULT[t] - 1) * 100) + "% wider."; },
     next: function (t) { return t === 2 ? "Adds the ALMOST RING: land just outside and the brick swings again — streak safe." : "Drop window +" + Math.round((STEADY_MULT[t + 1] - 1) * 100) + "% wider — the gold zone on the crane grows."; } },
-  { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [750,  1000,  1250], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
+  { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [300,  450,  600], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return "+" + GILD_PCT[t] + "% more bricks come out golden (×" + TYPE_MULT.gold + " pay)."; },
     next: function (t) { return "+" + GILD_PCT[t + 1] + "% more bricks come out golden — gold pays ×" + TYPE_MULT.gold + "."; } },
   { id: "secondChance", icon: "second", name: "Second Chance", costs: [60,  130,  200], gate: function () { return S.tier.perBrick >= 1 && S.best >= 4; },
@@ -1226,16 +1226,17 @@ var LINES = [
 /* ----- SKILL TREE: every upgrade hangs off a parent. A node opens once its parent is owned (to the tier shown) and you've reached its row. ----- */
 var TABS = [ { id: "kiln", name: "KILN" }, { id: "bricks", name: "BRICKS" }, { id: "money", name: "MONEY" }, { id: "skill", name: "SKILL" }, { id: "crew", name: "CREW" }, { id: "weather", name: "WEATHER" } ];
 var TREE = {
-  starter: { tab: "kiln", parent: null }, kilnSpeed: { tab: "kiln", parent: null }, placeSpeed: { tab: "kiln", parent: "kilnSpeed", ptier: 1 }, storage: { tab: "kiln", parent: "kilnSpeed", ptier: 2 }, hopper: { tab: "kiln", parent: "storage", ptier: 3, row: 7 }, miniKiln: { tab: "kiln", parent: "storage", ptier: 3, row: 8 }, hotGloves: { tab: "kiln", parent: "kilnSpeed", ptier: 3, row: 6 }, roundTower: { tab: "kiln", parent: "hotMortar", ptier: 2, row: 6 },
-  tipJar: { tab: "money", parent: null, row: 5 }, coinPouch: { tab: "money", parent: "tipJar", ptier: 1, row: 8 }, cheerBonus: { tab: "money", parent: "coinPouch", ptier: 1, row: 10 }, luckyBrick: { tab: "bricks", parent: null, row: 7 }, stool: { tab: "crew", parent: "autoLayer", ptier: 1, row: 6 },
-  bellows: { tab: "kiln", parent: "kilnSpeed", row: 6 }, hotMortar: { tab: "kiln", parent: "kilnSpeed", ptier: 2, row: 6 },
-  perBrick: { tab: "money", parent: null, row: 5 }, combo: { tab: "money", parent: "perBrick" }, crowd: { tab: "money", parent: "combo", row: 15 },
-  perfect: { tab: "money", parent: "perBrick", row: 3 }, plumb: { tab: "money", parent: "perfect", row: 12 },
-  lead: { tab: "bricks", parent: "perBrick", row: 8 }, silver: { tab: "bricks", parent: "lead", row: 15 }, gold: { tab: "bricks", parent: "silver", row: 22 }, gilded: { tab: "bricks", parent: "gold" }, sorter: { tab: "bricks", parent: "lead", row: 12 },
-  forgeLuck: { tab: "money", parent: null, row: 0 }, discard: { tab: "bricks", parent: "sorter", row: 14 },
-  steady: { tab: "skill", parent: "perBrick", row: 3 }, secondChance: { tab: "skill", parent: "steady", row: 4 },
-  predictable: { tab: "skill", parent: "steady", row: 8 }, glaze: { tab: "skill", parent: "secondChance", row: 25 },
-  autoLayer: { tab: "crew", parent: "perBrick", row: 5 }, fasterApp: { tab: "crew", parent: "autoLayer" }, moreApp: { tab: "crew", parent: "autoLayer" },
+  starter: { tab: "kiln", parent: null }, kilnSpeed: { tab: "kiln", parent: null, row: 1 }, placeSpeed: { tab: "kiln", parent: "kilnSpeed", ptier: 1 }, storage: { tab: "kiln", parent: "kilnSpeed", ptier: 2 },
+  hopper: { tab: "kiln", parent: "storage", ptier: 3, row: 17 }, miniKiln: { tab: "kiln", parent: "storage", ptier: 3, row: 19 }, hotGloves: { tab: "kiln", parent: "kilnSpeed", ptier: 3, row: 14 }, roundTower: { tab: "kiln", parent: "hotMortar", ptier: 2, row: 29 },
+  tipJar: { tab: "money", parent: null, row: 2 }, coinPouch: { tab: "money", parent: "tipJar", ptier: 1, row: 15 }, cheerBonus: { tab: "money", parent: "coinPouch", ptier: 1, row: 20 }, luckyBrick: { tab: "bricks", parent: null, row: 3 }, stool: { tab: "crew", parent: "autoLayer", ptier: 1, row: 16 },
+  bellows: { tab: "kiln", parent: "kilnSpeed", row: 12 }, hotMortar: { tab: "kiln", parent: "kilnSpeed", ptier: 2, row: 13 },
+  perBrick: { tab: "money", parent: null, row: 5 }, combo: { tab: "money", parent: "perBrick", row: 7 }, crowd: { tab: "money", parent: "combo", row: 26 },
+  perfect: { tab: "money", parent: "perBrick", row: 9 }, plumb: { tab: "money", parent: "perfect", row: 22 },
+  lead: { tab: "bricks", parent: "perBrick", row: 10 }, silver: { tab: "bricks", parent: "lead", row: 25 }, gold: { tab: "bricks", parent: "silver", row: 27 }, gilded: { tab: "bricks", parent: "gold" }, sorter: { tab: "bricks", parent: "lead", row: 23 },
+  forgeLuck: { tab: "money", parent: null, row: 0 }, discard: { tab: "bricks", parent: "sorter", row: 24 },
+  steady: { tab: "skill", parent: "perBrick", row: 6 }, secondChance: { tab: "skill", parent: "steady", row: 11 },
+  predictable: { tab: "skill", parent: "steady", row: 18 }, glaze: { tab: "skill", parent: "secondChance", row: 28 },
+  autoLayer: { tab: "crew", parent: "perBrick", row: 8 }, fasterApp: { tab: "crew", parent: "autoLayer" }, moreApp: { tab: "crew", parent: "autoLayer" },
   lantern: { tab: "weather", parent: "steady", row: 40 }, level: { tab: "weather", parent: "lantern", row: 65 }
 };
 function lineById(id) { for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) return LINES[i]; return null; }
@@ -1248,6 +1249,11 @@ function lockReason(l) {
   return "Reach row " + l.row;
 }
 LINES.forEach(function (l) { var T = TREE[l.id]; l.tab = T.tab; l.parent = T.parent; l.ptier = T.ptier || 1; l.row = T.row || 0; l.gate = function () { return lineAvail(l); }; });
+/* UPGRADE SCALING: every upgrade step costs its listed price PLUS a flat amount for each upgrade step already bought (across the whole tree).
+   Tune UPG_SCALE to change how fast the tree gets expensive. The starter Warm-Up is unaffected (you own nothing before it). */
+var UPG_SCALE = 3;
+function upgOwned() { var n = 0; for (var i = 0; i < LINES.length; i++) n += S.tier[LINES[i].id] || 0; return n; }
+function costOf(l) { return l.costs[S.tier[l.id]] + UPG_SCALE * upgOwned(); }
 
 /* ----- helpers ----- */
 function $(id) { return document.getElementById(id); }
@@ -4550,7 +4556,7 @@ function forgeWin() {
 function buyLine(id) {
   var l = null; for (var i = 0; i < LINES.length; i++) if (LINES[i].id === id) l = LINES[i];
   if (!l || !l.gate() || S.tier[id] >= l.costs.length) return;
-  var cost = l.costs[S.tier[id]], row = $("upg-" + id);
+  var cost = costOf(l), row = $("upg-" + id);
   if (S.money < cost) { snd.err(); if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); } return; }
   if (row) { var bb = row.querySelector(".buy-btn"); if (bb) { var r = bb.getBoundingClientRect(); domBurst(r.left + r.width / 2, r.top + r.height / 2); popText("TIER " + (S.tier[id] + 1) + "!", r.left + r.width / 2, r.top - 12, { cls: "gold", size: 18, rise: 30 }); } }
   S.money = Math.round((S.money - cost) * 100) / 100; S.tier[id]++;
@@ -5411,7 +5417,7 @@ function currentVis() { return LINES.filter(function (l) { return l.gate(); }).m
 function renderShopBadge() {
   if (!S.workshopShown) return;
   var vis = currentVis(), afford = 0;
-  LINES.forEach(function (l) { var t = S.tier[l.id]; if (l.gate() && t < l.costs.length && S.money >= l.costs[t]) afford++; });
+  LINES.forEach(function (l) { var t = S.tier[l.id]; if (l.gate() && t < l.costs.length && S.money >= costOf(l)) afford++; });
   if (starterTut()) afford = S.money >= STARTER_COST ? 1 : 0;          // during the lesson only the Warm-Up is on offer
   if (S.shopOpen || S.seenVis === null) { S.seenVis = vis; el.shopNew.classList.add("hidden"); }
   else el.shopNew.classList.toggle("hidden", vis === S.seenVis);
@@ -5426,7 +5432,7 @@ var CAT_COL = { kiln: "#e0704a", bricks: "#8a96ab", money: "#f5b921", skill: "#3
 UI.openUp = {}; UI.secOpen = { locked: false, owned: false };
 function tabName(id) { for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i].name; return id; }
 function upCard(l, state) {
-  var t = S.tier[l.id], maxed = t >= l.costs.length, cost = maxed ? 0 : l.costs[t];
+  var t = S.tier[l.id], maxed = t >= l.costs.length, cost = maxed ? 0 : costOf(l);
   var pips = '<span class="pips">'; for (var p = 0; p < l.costs.length && l.costs.length <= 6; p++) pips += '<i class="' + (p < t ? "on" : "") + '"></i>'; pips += "</span>";
   var tier = l.costs.length > 6 ? '<span class="up-tier">LV ' + t + "/" + l.costs.length + "</span>" : "";
   var open = UI.openUp[l.id] ? " open" : "";
@@ -5449,9 +5455,9 @@ function guideHTML(ready, saving, locked) {
   var h = '<div class="sg-wallet"><span>YOUR COINS</span><b>$' + fmtMoney(S.money) + "</b></div>";
   if (ready.length) {
     var l = ready[0], t = S.tier[l.id];
-    h += '<div class="sg-card ready"><div class="sg-k">★ BEST BUY RIGHT NOW</div><div class="sg-row"><div class="upg-ico">' + ICON[l.icon] + '</div><div class="sg-t"><b>' + l.name + '</b><small>' + l.next(t) + '</small></div><button class="buy-btn" data-upg="' + l.id + '">BUY $' + fmt(l.costs[t]) + "</button></div></div>";
+    h += '<div class="sg-card ready"><div class="sg-k">★ BEST BUY RIGHT NOW</div><div class="sg-row"><div class="upg-ico">' + ICON[l.icon] + '</div><div class="sg-t"><b>' + l.name + '</b><small>' + l.next(t) + '</small></div><button class="buy-btn" data-upg="' + l.id + '">BUY $' + fmt(costOf(l)) + "</button></div></div>";
   } else if (saving.length) {
-    var s = saving[0], st = S.tier[s.id], c = s.costs[st];
+    var s = saving[0], st = S.tier[s.id], c = costOf(s);
     h += '<div class="sg-card saving"><div class="sg-k">NEXT GOAL</div><div class="sg-row"><div class="upg-ico">' + ICON[s.icon] + '</div><div class="sg-t"><b>' + s.name + '</b><small>$' + fmt(c - Math.floor(S.money)) + ' to go — keep building!</small></div></div><div class="up-bar big"><i style="width:' + Math.min(100, S.money / c * 100).toFixed(0) + '%"></i></div></div>';
   } else {
     var nx = null; locked.forEach(function (l) { if (S.best < l.row && (!nx || l.row < nx.row)) nx = l; });
@@ -5475,6 +5481,20 @@ function renderStarterTut() {
   h += can ? '<div class="st-arrow">TAP TO BUY</div>' : '<div class="st-tip">Earn $' + (STARTER_COST - Math.floor(S.money)) + ' more, then come back. The forge will wait.</div>';
   el.upgList.innerHTML = h;
 }
+/* TREE VIEW: each visible upgrade is a card; children nest under their parent with the connector lines (.tnode / .tkids). */
+function treeHTML(list) {
+  var ids = {}, kids = {}, roots = [];
+  list.forEach(function (l) { ids[l.id] = true; });
+  list.forEach(function (l) { if (l.parent && ids[l.parent]) (kids[l.parent] = kids[l.parent] || []).push(l); else roots.push(l); });
+  function node(l) {
+    var t = S.tier[l.id], av = lineAvail(l), maxed = av && t >= l.costs.length, can = av && !maxed && S.money >= costOf(l);
+    var state = !av ? "locked" : maxed ? "maxed" : can ? "afford" : "saving";
+    var h = '<div class="tnode">' + upCard(l, state);
+    if (kids[l.id]) h += '<div class="tkids">' + kids[l.id].map(node).join("") + "</div>";
+    return h + "</div>";
+  }
+  return roots.map(function (l) { return '<div class="troot">' + node(l) + "</div>"; }).join("");
+}
 function renderShop() {
   if (!S.workshopShown) return;
   var tutOn = starterTut();
@@ -5483,35 +5503,29 @@ function renderShop() {
   var shown = TABS.filter(function (tb) { return LINES.some(function (l) { return l.tab === tb.id && lineVisible(l); }); });
   if (!shown.length) return;
   if (UI.tab !== "all" && !shown.some(function (tb) { return tb.id === UI.tab; })) UI.tab = "all";
-  var ready = [], saving = [], locked = [], owned = [], allReady = 0, counts = {};
+  var allReady = 0, counts = {}, list = [], lockedN = 0;
   LINES.forEach(function (l) {
     if (!lineVisible(l)) return;
-    var t = S.tier[l.id], av = lineAvail(l), maxed = av && t >= l.costs.length, can = av && !maxed && S.money >= l.costs[t];
+    var t = S.tier[l.id], av = lineAvail(l), maxed = av && t >= l.costs.length, can = av && !maxed && S.money >= costOf(l);
     if (can) { allReady++; counts[l.tab] = (counts[l.tab] || 0) + 1; }
     if (UI.tab !== "all" && l.tab !== UI.tab) return;
-    if (!av) locked.push(l); else if (maxed) owned.push(l); else if (can) ready.push(l); else saving.push(l);
+    if (!av) { lockedN++; if (!UI.secOpen.locked) return; }
+    list.push(l);
   });
-  var byCost = function (a, b) { return a.costs[S.tier[a.id]] - b.costs[S.tier[b.id]]; };
-  ready.sort(byCost); saving.sort(byCost);
   // the guide always looks across every tab, so it can point you at the best buy wherever it is
-  var gReady = [], gSaving = [], gLocked = [];
-  LINES.forEach(function (l) { if (!lineVisible(l)) return; var t = S.tier[l.id], av = lineAvail(l); if (!av) gLocked.push(l); else if (t < l.costs.length) (S.money >= l.costs[t] ? gReady : gSaving).push(l); });
+  var gReady = [], gSaving = [], gLocked = [], byCost = function (a, b) { return costOf(a) - costOf(b); };
+  LINES.forEach(function (l) { if (!lineVisible(l)) return; var t = S.tier[l.id], av = lineAvail(l); if (!av) gLocked.push(l); else if (t < l.costs.length) (S.money >= costOf(l) ? gReady : gSaving).push(l); });
   gReady.sort(byCost); gSaving.sort(byCost);
   var gh = guideHTML(gReady, gSaving, gLocked);
   if (gh !== UI.guideHtml) { UI.guideHtml = gh; $("shop-guide").innerHTML = gh; }
-  var sig = [UI.tab, UI.secOpen.locked, UI.secOpen.owned, JSON.stringify(UI.openUp), ready.map(function (l) { return l.id + S.tier[l.id]; }).join(), saving.map(function (l) { return l.id + S.tier[l.id]; }).join(),
-    locked.map(function (l) { return l.id; }).join(), owned.map(function (l) { return l.id; }).join()].join("#");
+  var sig = [UI.tab, UI.secOpen.locked, JSON.stringify(UI.openUp), lockedN, list.map(function (l) { return l.id + S.tier[l.id] + (S.money >= costOf(l) ? "+" : "-"); }).join()].join("#");
   if (sig !== UI.shopSig) {
     UI.shopSig = sig;
     var th = '<button class="tab-btn pressable' + (UI.tab === "all" ? " on" : "") + '" data-tab="all">ALL<b></b></button>';
     shown.forEach(function (tb) { th += '<button class="tab-btn pressable' + (tb.id === UI.tab ? " on" : "") + '" data-tab="' + tb.id + '" style="--cat:' + CAT_COL[tb.id] + '"><i class="tab-dot"></i>' + tb.name + "<b></b></button>"; });
     $("tree-tabs").innerHTML = th; $("tree-tabs").classList.toggle("hidden", shown.length < 2);
-    var html = "";
-    if (ready.length) { html += '<div class="up-sec ready"><span>READY TO BUY</span><em>' + ready.length + "</em></div>"; ready.forEach(function (l) { html += upCard(l, "afford"); }); }
-    if (saving.length) { html += '<div class="up-sec"><span>SAVING UP</span><em>' + saving.length + "</em></div>"; saving.forEach(function (l) { html += upCard(l, "saving"); }); }
-    if (!ready.length && !saving.length && !locked.length && !owned.length) html += '<div class="up-empty">Nothing here yet.</div>';
-    if (locked.length) { html += '<button class="up-sec fold" data-sec="locked"><span>COMING UP</span><em>' + locked.length + "</em><u>" + (UI.secOpen.locked ? "HIDE" : "SHOW") + "</u></button>"; if (UI.secOpen.locked) locked.forEach(function (l) { html += upCard(l, "locked"); }); }
-    if (owned.length) { html += '<button class="up-sec fold" data-sec="owned"><span>MAXED OUT</span><em>' + owned.length + "</em><u>" + (UI.secOpen.owned ? "HIDE" : "SHOW") + "</u></button>"; if (UI.secOpen.owned) owned.forEach(function (l) { html += upCard(l, "maxed"); }); }
+    var html = list.length ? treeHTML(list) : '<div class="up-empty">Nothing here yet.</div>';
+    if (lockedN) html += '<button class="up-sec fold" data-sec="locked"><span>COMING UP</span><em>' + lockedN + "</em><u>" + (UI.secOpen.locked ? "HIDE" : "SHOW") + "</u></button>";
     el.upgList.innerHTML = html;
   }
   var tbs = $("tree-tabs").querySelectorAll("[data-tab]");
