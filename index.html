@@ -96,8 +96,8 @@
     <a class="tile t3d" href="brick-by-brick-3d.html">
       <span class="icon">🏰</span>
       <h2>3D Version</h2>
-      <p>The latest build (v19.1) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
-      <span class="tag">LATEST — v19.1</span>
+      <p>The latest build (v28.3) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
+      <span class="tag">LATEST — v28.3</span>
     </a>
     <button class="tile tlog" id="logBtn" aria-expanded="false" aria-controls="changelog" type="button">
       <span class="icon">📜</span>
@@ -109,6 +109,34 @@
 
   <section id="changelog" aria-label="Changelog">
     <h2>Changelog</h2>
+
+    <h3>3D v28.3 — Nov 14, 2026 (round 10 feedback, actioned except upgrade pacing)</h3>
+    <ul>
+      <li>Bigger celebration for finishing a full layer (all four sides) after row five — the normal row fanfare plus a tower-wide show.</li>
+      <li>Row 10 gets its own story card, styled like the beginning and row-five cards: "Look at that. Five new rows of tower on top of the five I started with. That makes TEN."</li>
+      <li>The "BLOWN AWAY!" miss text now scales down on small screens so it stays on screen instead of being cut off.</li>
+      <li>Side-face rotation eased — two chained lags, starts gently, swings through the middle, settles softly with no bounce; a quarter-turn takes about 0.4s.</li>
+      <li>Pay coins are chunkier (more coins per payout) and the payout shows as a floating +$ amount on the total that fades away.</li>
+      <li>No more "LUCKY" text — a lucky brick just gives an extra burst of coins plus a shower of little 3D horseshoes.</li>
+      <li>The big side text is gone — each face of the tower now has a numbered plaque (1–4) riding two rows under the working row.</li>
+      <li>Tapping to load while a brick is still settling queues the load — it loads the moment the last brick has set, and the crane can't move until then.</li>
+      <li>Streak caps at 10x: first ceiling 2x, then 4x, 8x, 10x with upgrades (Combo Bonus gives 2x, Crowd Favor tiers lift it).</li>
+      <li>Buying an upgrade shows a little bubble of Edgar at his anvil doing the forge animation.</li>
+      <li>The wind-gusting mechanic is introduced with story cards: a Minotaur woman crowd member with bright teal lipstick, carrying a sheaf of grain, warns Edgar about the high wind — the grain sure doesn't like it. New mechanics like lead bricks get the same story-card treatment with different characters (lead gets its own card set on unlock).</li>
+      <li>You can load the hopper even while the crane has something in it, as long as there are empty hopper slots.</li>
+      <li>The shed is drawn no bigger than 4 bricks, even though it can hold more.</li>
+      <li>Memory-leak cleanup pass — geometries and materials are disposed when objects are removed.</li>
+      <li>Precision Tools removed, replaced with nothing.</li>
+      <li>Edgar's Forge easter egg: clicking the little forge graphic in the workshop plays Edgar's animation and has a 1% chance of paying $1. A new upgrade path, "Edgar's Luck" (costs $8/$20/$50/$120 — deliberately cheap), unlocks only once you've made money at the forge, and raises the chance up to a 50/50.</li>
+      <li>Upgrade-cost pacing (item 21) is NOT in this version — still open.</li>
+      <li>Memory issues around rows 28–35: the leak cleanup above is the fix; whether the slowdown is gone is a playtest call.</li>
+      <li>Hands grab about 30% quicker (7s instead of 10s).</li>
+      <li>Predictable Placement distance is now fixed and never derived from wind, speed, or height.</li>
+      <li>Once the tower is tall enough that the ground crowd has slid out of view, 3–4 people float around the tower on the different sides, still backflipping and cheering.</li>
+      <li>Apprentices never stop for you — they lay whenever they have bricks, even while you're running the kiln, the crane is going, or you're placing. The slot still glows and counts down as a warning.</li>
+      <li>New upgrade: Full Warehouse Discard ($60) — once a warehouse is full of one brick type, new bricks of that type are thrown out automatically so you can keep making other types.</li>
+      <li>Storage is now separate buildings beside the regular brick storage — no more tabs, just different buildings you click. Each building holds the storage amount (e.g. storage of four means each building holds four), and when one is empty it switches to the next closest non-empty one.</li>
+    </ul>
 
     <h3>3D v19.1 — Nov 14, 2026 (visual upgrade + slight optimization — round 10 feedback NOT included)</h3>
     <ul>

@@ -6,7 +6,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: tiles for the 2D original, the 3D version, and a changelog.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v19.1).
+- `brick-by-brick-3d.html` — the latest version, 3D (v28.3).
 
 ## How to play
 
@@ -58,6 +58,33 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
+
+### 3D v28.3 — Nov 14, 2026 (round 10 feedback, actioned except upgrade pacing)
+
+- Bigger celebration for finishing a full layer (all four sides) after row five — the normal row fanfare plus a tower-wide show.
+- Row 10 gets its own story card, styled like the beginning and row-five cards: "Look at that. Five new rows of tower on top of the five I started with. That makes TEN."
+- The "BLOWN AWAY!" miss text now scales down on small screens so it stays on screen instead of being cut off.
+- Side-face rotation eased — two chained lags, starts gently, swings through the middle, settles softly with no bounce; a quarter-turn takes about 0.4s.
+- Pay coins are chunkier (more coins per payout) and the payout shows as a floating +$ amount on the total that fades away.
+- No more "LUCKY" text — a lucky brick just gives an extra burst of coins plus a shower of little 3D horseshoes.
+- The big side text is gone — each face of the tower now has a numbered plaque (1–4) riding two rows under the working row.
+- Tapping to load while a brick is still settling queues the load — it loads the moment the last brick has set, and the crane can't move until then.
+- Streak caps at 10x: first ceiling 2x, then 4x, 8x, 10x with upgrades (Combo Bonus gives 2x, Crowd Favor tiers lift it).
+- Buying an upgrade shows a little bubble of Edgar at his anvil doing the forge animation.
+- The wind-gusting mechanic is introduced with story cards: a Minotaur woman crowd member with bright teal lipstick, carrying a sheaf of grain, warns Edgar about the high wind — the grain sure doesn't like it. New mechanics like lead bricks get the same story-card treatment with different characters (lead gets its own card set on unlock).
+- You can load the hopper even while the crane has something in it, as long as there are empty hopper slots.
+- The shed is drawn no bigger than 4 bricks, even though it can hold more.
+- Memory-leak cleanup pass — geometries and materials are disposed when objects are removed.
+- Precision Tools removed, replaced with nothing.
+- Edgar's Forge easter egg: clicking the little forge graphic in the workshop plays Edgar's animation and has a 1% chance of paying $1. A new upgrade path, "Edgar's Luck" (costs $8/$20/$50/$120 — deliberately cheap), unlocks only once you've made money at the forge, and raises the chance up to a 50/50.
+- Upgrade-cost pacing (item 21) is NOT in this version — still open.
+- Memory issues around rows 28–35: the leak cleanup above is the fix; whether the slowdown is gone is a playtest call.
+- Hands grab about 30% quicker (7s instead of 10s).
+- Predictable Placement distance is now fixed and never derived from wind, speed, or height.
+- Once the tower is tall enough that the ground crowd has slid out of view, 3–4 people float around the tower on the different sides, still backflipping and cheering.
+- Apprentices never stop for you — they lay whenever they have bricks, even while you're running the kiln, the crane is going, or you're placing. The slot still glows and counts down as a warning.
+- New upgrade: Full Warehouse Discard ($60) — once a warehouse is full of one brick type, new bricks of that type are thrown out automatically so you can keep making other types.
+- Storage is now separate buildings beside the regular brick storage — no more tabs, just different buildings you click. Each building holds the storage amount (e.g. storage of four means each building holds four), and when one is empty it switches to the next closest non-empty one.
 
 ### 3D v19.1 — Nov 14, 2026 (visual upgrade + slight optimization — round 10 feedback NOT included)
 
@@ -152,4 +179,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again; v28.3 published Nov 14, replacing the 3D file again.
