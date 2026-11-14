@@ -4,7 +4,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 ## Versions
 
-- `index.html` — the landing page: tiles for the 2D original, the 3D version, and a "See versions" browser with every stage of the game.
+- `index.html` — the landing page: the latest 3D version up top, and a "See versions" browser with every stage of the game.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
 - `brick-by-brick-3d.html` — the latest version, 3D (v32.5).
 - `versions/` — every playable stage of the game, one file per version (2D original, v10, improvements build, v2.0, v3.2, v7.3, v8.0, v11.1, v14.2, v16.3, v17.4, v18.5, v19.1, v28.3, v29.4, v32.5). Pick a version on the landing page to see what changed in it and play that exact build.
