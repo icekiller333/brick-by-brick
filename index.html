@@ -158,8 +158,8 @@
     <a class="tile t3d" href="brick-by-brick-3d.html">
       <span class="icon">🏰</span>
       <h2>3D Version</h2>
-      <p>The latest build (v32.5) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
-      <span class="tag">LATEST — v32.5</span>
+      <p>The latest build (v41.10) — the full 3D game with the tower, villagers, music, and the skill tree.</p>
+      <span class="tag">LATEST — v41.10</span>
     </a>
     <button class="tile tlog" id="verBtn" aria-expanded="false" aria-controls="versions" type="button">
       <span class="icon">🕰️</span>
@@ -173,7 +173,8 @@
     <h2>All versions</h2>
     <p class="hint">Newest first. Tap a version to see what changed in it, then play that exact build.</p>
     <div class="vlist" id="vlist">
-      <button class="vtile latest" type="button" data-v="v32-5"><span class="vnum">3D v32.5</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Memory improvements + iOS bug fixes</div></button>
+      <button class="vtile latest" type="button" data-v="v41-10"><span class="vnum">3D v41.10</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Round 11 feedback, most of it</div></button>
+      <button class="vtile" type="button" data-v="v32-5"><span class="vnum">3D v32.5</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Memory improvements + iOS bug fixes</div></button>
       <button class="vtile" type="button" data-v="v29-4"><span class="vnum">3D v29.4</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Round 10, item 21: upgrade pacing</div></button>
       <button class="vtile" type="button" data-v="v28-3"><span class="vnum">3D v28.3</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Round 10 feedback, actioned except upgrade pacing</div></button>
       <button class="vtile" type="button" data-v="v19-1"><span class="vnum">3D v19.1</span><div class="vdate">Nov 14, 2026</div><div class="vtag">Visual upgrade + slight optimization</div></button>
@@ -193,6 +194,28 @@
   </section>
 
   <section id="vdetail" aria-label="Version details">
+    <div class="vpage" id="vp-v41-10">
+      <h2>3D v41.10</h2>
+      <p class="vdate">Nov 14, 2026 — round 11 feedback, most of it (28 of 36)</p>
+      <ul>
+        <li>Loading title stays hidden until the font has loaded (or 1.5s, whichever comes first); swipe hints are now one line — "SWIPE ›" on the first card, "‹ SWIPE" on the next, then gone; the kiln demo card's top tip moved down so it no longer overlaps the brick count.</li>
+        <li>Sounds split: the kiln makes a low thunk, the shed a higher clink whose pitch depends on the brick type.</li>
+        <li>The elder's money pouch is now actually in his hand; Edgar's dollar signs sit lower with three more added; the row-10 card's question marks moved down around Edgar.</li>
+        <li>Edgar's Forge luck starts at 5% (was 1%), and every click rolls — no need to wait out the animation.</li>
+        <li>The first villager seen halfway through row 2 says "That hole sure is cool."; after every finished side, one or two villagers speak — including whimsical remarks about new arrivals ("Wizards now? Fine by me.", "Does that one have horns?").</li>
+        <li>Easter-egg clicks now pay $1 per unique thing, once you're building the tower and have earned $20; bonk misses only ever hit villagers in front or to the sides, never behind the tower.</li>
+        <li>Hot bricks are gated: they only appear once the per-brick pay upgrade is bought and you've been paid for 20 bricks, and a hot brick now stays hot for 6 seconds. Placed hot bricks carry a permanent flame mark, lucky ones a horseshoe.</li>
+        <li>New miss animation: the brick streaks to the top-right corner and leaves a crack in the screen that fades after ten seconds.</li>
+        <li>The clean bonus is explained now: Cheer Bonus is a $10 upgrade, unlocked after your first upgrade, and a clean row pays double plus extra coin.</li>
+        <li>Workshop cost escalation is explained after your third upgrade (toast) and shown on every upgrade card ("+$X for each upgrade you own").</li>
+        <li>Money now drains visibly: the green "+$" holds the pending amount and drains into the total; bricks pay 1 coin at first; the streak starts at ×3.</li>
+        <li>Hands: the course-25 pop-up is gone — the story cards introduce them now; a hand needs a brick squished on both sides of its fingers to let go; from row 30 there's a hand at least every row.</li>
+        <li>Hovering people: one from row 25, two at 35, three at 37, and one on each side by row 40.</li>
+        <li>Also: metal row bonuses repriced (lead 2 → 1.25, silver 2.5 → 1.75, gold 3 → 2.25).</li>
+        <li>Still open from round 11: the Edgar first-card flicker, the loading wall exploding all at once, the crane drop mini-game on the card, forge rapid-tap sparks, longer/rule-generated music, the balloon miss animation, villager walk facing/arms, and villagers crawling the tower.</li>
+      </ul>
+      <a class="playbtn" href="versions/v41.10.html">▶ Play v41.10</a><button class="backbtn" type="button">← Back to versions</button>
+    </div>
     <div class="vpage" id="vp-v32-5">
       <h2>3D v32.5</h2>
       <p class="vdate">Nov 14, 2026 — memory improvements + iOS bug fixes</p>
