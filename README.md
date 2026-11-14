@@ -6,7 +6,7 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: tiles for the 2D original, the 3D version, and a changelog.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v18.5).
+- `brick-by-brick-3d.html` — the latest version, 3D (v19.1).
 
 ## How to play
 
@@ -58,6 +58,12 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
+
+### 3D v19.1 — Nov 14, 2026 (visual upgrade + slight optimization — round 10 feedback NOT included)
+
+- Visual upgrade: a cel-shading pass — the cel bands are drawn in the shader instead of read from a ramp, with anti-aliased band edges, shadows leaning cool violet and lit faces leaning warm, and a soft rim of sky light picking out every silhouette, for a painted-storybook look.
+- Slight optimization alongside it.
+- Round 10 feedback is not in this version — it is still being collected.
 
 ### 3D v18.5 — Nov 11, 2026 (round 9 feedback, actioned)
 
@@ -146,4 +152,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again.
