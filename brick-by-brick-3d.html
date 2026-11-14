@@ -185,7 +185,7 @@
       .cd-kiln-stage .kiln-clone{ position:absolute; left:50%; bottom:14%; margin-left:calc(var(--ks) * -0.575); touch-action:none; cursor:pointer; user-select:none; -webkit-user-select:none; }
       .cd-kcount{ position:absolute; right:10px; top:10px; background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow-s); padding:4px 9px; font-weight:800; font-size:11px; letter-spacing:.14em; }
       .cd-kcount b{ font-family:'Archivo Black',sans-serif; font-size:16px; margin-left:4px; }
-      .cd-ktip{ position:absolute; left:0; right:0; top:12px; text-align:center; font-weight:800; font-size:11px; letter-spacing:.18em; color:#fff; text-shadow:0 2px 0 #221407; animation:cdHint 1.2s ease-in-out infinite; transition:opacity .2s; }
+      .cd-ktip{ position:absolute; left:0; right:0; top:44px; text-align:center; font-weight:800; font-size:11px; letter-spacing:.18em; color:#fff; text-shadow:0 2px 0 #221407; animation:cdHint 1.2s ease-in-out infinite; transition:opacity .2s; }
       .cd-kbrick{ position:absolute; width:30px; height:17px; border:2px solid rgba(20,10,4,.7); box-shadow:inset 0 -3px 0 rgba(0,0,0,.2), inset 0 2px 0 rgba(255,255,255,.25); z-index:4; pointer-events:none; }
       #tray{ min-width:0; transition:width .45s cubic-bezier(.3,1.5,.5,1); }
       #tray-list{ justify-content:center; }
@@ -246,6 +246,9 @@
         padding:9px 14px; font-weight:700; font-size:14px; opacity:0; transition:opacity .3s ease, transform .3s ease; }
       #toast.show{ opacity:1; transform:translate(-50%,0); }
       @media (max-height:560px){ #toast{ bottom:calc(162px + var(--safe-b)); } }
+      .crack-fx{ position:fixed; top:0; right:0; width:min(42vw,300px); height:min(34vw,240px); pointer-events:none; z-index:60; transition:opacity 1s ease; }
+      .crack-fx svg{ width:100%; height:100%; display:block; }
+      .crack-fx.gone{ opacity:0; }
       #banner{ position:absolute; left:0; right:0; top:34%; z-index:45; pointer-events:none; text-align:center; background:var(--ink); color:var(--paper);
         border-top:3px solid var(--gold); border-bottom:3px solid var(--gold); padding:8px; transform:translateX(-110%); }
       #banner.show{ animation:bannerSweep 2.2s cubic-bezier(.2,.9,.2,1) forwards; }
@@ -612,6 +615,7 @@
       .up-bar{ height:7px; margin:0 9px 8px; background:var(--panel2); border:2px solid var(--line); } .up-bar i{ display:block; height:100%; background:var(--gold); transition:width .3s ease; }
       .up-bar.big{ margin:8px 0 0; height:10px; }
       .up-more{ display:none; padding:0 9px 8px 56px; } .up-card.open .up-more{ display:block; }
+      .up-raise{ font-size:10px; font-weight:800; color:var(--muted); text-align:right; margin-top:2px; }
       .up-cat{ font-size:10px; font-weight:800; letter-spacing:.1em; color:var(--muted); margin-top:3px; text-transform:uppercase; }
       .up-card.saving .buy-btn{ background:var(--panel2); color:var(--muted); } .up-card.afford{ background:linear-gradient(90deg, var(--panel), rgba(245,185,33,.22)); }
       .up-card.locked{ opacity:.7; } .up-card.locked .up-top{ padding:6px 9px; } .up-card.locked .upg-ico{ width:30px; height:30px; font-size:14px; }
@@ -694,7 +698,7 @@
         <div id="chip-hand" class="tag hidden">HAND <span id="hand-t"></span></div>
         <div id="chip-sway" class="tag hidden">TREMOR ≈</div>
       </div>
-      <div id="streak" class="hidden"><span class="st-lab">STREAK</span><span class="st-x" id="streak-x">×2</span><i class="st-bar"><b id="streak-fill"></b></i><span class="st-pay" id="streak-pay"></span></div>
+      <div id="streak" class="hidden"><span class="st-lab">STREAK</span><span class="st-x" id="streak-x">×3</span><i class="st-bar"><b id="streak-fill"></b></i><span class="st-pay" id="streak-pay"></span></div>
       <div id="prompt" class="hidden"></div>
 
       <div id="dock" class="hidden" data-ui>
@@ -862,7 +866,7 @@
       <div class="overlay" id="ov-loading">
         <div class="ld-sun" aria-hidden="true"></div>
         <div class="ld-wall" aria-hidden="true"><div class="ld-row"><i style="background:#c2502c;animation-delay:0.00s"></i><i style="background:#e0704a;animation-delay:0.10s"></i><i style="background:#c2502c;animation-delay:0.20s"></i></div><div class="ld-row off"><i style="background:#e0704a;animation-delay:0.30s"></i><i style="background:#f5b921;animation-delay:0.40s"></i></div><div class="ld-row"><i style="background:#9c3a1e;animation-delay:0.55s"></i><i style="background:#c2502c;animation-delay:0.65s"></i><i style="background:#e0704a;animation-delay:0.75s"></i></div></div>
-        <div class="ld-title">BRICK BY BRICK</div>
+        <div class="ld-title" style="visibility:hidden">BRICK BY BRICK</div><script>(function(){var t=document.querySelector("#ov-loading .ld-title");var done=false;function go(){if(!done){done=true;if(t)t.style.visibility="visible";}}if(document.fonts&&document.fonts.load){document.fonts.load("30px 'Archivo Black'").then(go,go);}setTimeout(go,1500);})();</script>
         <div class="ld-msg" id="ld-msg">FIRING THE KILN…</div>
         <div class="ld-bar" aria-hidden="true"><i></i></div>
       </div>
@@ -882,7 +886,7 @@
 
       <div id="cards" class="hidden" data-ui>
         <div id="cards-deck"><div class="cd cd-ghost g2"></div><div class="cd cd-ghost g1"></div></div>
-        <div id="cards-foot"><div id="cards-dots" aria-hidden="true"></div><button class="cta-btn" id="cards-next">NEXT</button><div id="cards-hint">‹ SWIPE LEFT FOR NEXT · RIGHT FOR BACK ›</div></div>
+        <div id="cards-foot"><div id="cards-dots" aria-hidden="true"></div><button class="cta-btn" id="cards-next">NEXT</button><div id="cards-hint">SWIPE ›</div></div>
       </div>
 
       <div class="overlay hidden" id="ov-victory" data-ui>
@@ -924,7 +928,7 @@ var LOW_END = IS_MOBILE && ((navigator.deviceMemory && navigator.deviceMemory <=
 var FIRST_GOAL = 50, FINAL_GOAL = 100;   // 50 is only the rim of the hole — the keystone waits at 100
 var LEAD_COURSE = 8, WIND_COURSE = 20, CROWD_COURSE = 15, PLUMB_COURSE = 12;
 var HAND_COURSE = 25, MIST_COURSE = 40, HEAVY_MIST_COURSE = 45, TREMOR_COURSE = 65, GLASS_COURSE = 80;
-var HOT_FUSE = 10;            // seconds a hot brick stays hot
+var HOT_FUSE = 6;            // seconds a hot brick stays hot
 var HIT_TOL = 0.085;          // accepted half-width of the drop window, fraction of a row
 var PERFECT_TOL = HIT_TOL * 0.25;
 var GLASS_TOL = 0.65;         // sky-glass bricks: the drop window is this much of normal
@@ -945,7 +949,7 @@ var GRAB_TIME = 7;            // seconds a hand needs to rip a brick free (30% q
    Pay now arrives every finished SIDE (4× as often on the tower), so the tree was re-priced against that faster income. */
 var TYPE_MULT = { normal: 1, lead: 1.5, silver: 2, gold: 2.5, hot: 2, glass: 5 };
 var TYPE_NAME = { gold: "GOLD", silver: "SILVER", lead: "LEAD", hot: "HOT", glass: "GLASS" };
-var ROW_ADD = { lead: 2, silver: 2.5, gold: 3 };        // × rate: each metal brick in a finished row (side) adds this to that row's payout
+var ROW_ADD = { lead: 1.25, silver: 1.75, gold: 2.25 }; // × rate: each metal brick in a finished row (side) adds this to that row's payout
 var PURE_ADD = { lead: 3, silver: 5, gold: 8 };         // × rate: a row that is ALL one metal pays this on top
 var RUN_ADD = { lead: 0.2, silver: 0.3, gold: 0.5 };    // × rate per step of a same-metal run (2nd brick in a row = 1 step … capped at 5 steps)
 var WH_NAME = { normal: "PLAIN", lead: "LEAD", silver: "SILVER", gold: "GOLD" };
@@ -961,8 +965,8 @@ var PAY_FROM_ROW = 6;         // rows 1-5 are unpaid: the town only offers to pa
    start  -> only a finished ROW pays (row bonus)
    Piece Work (shop) -> every brick pays too
    Combo Bonus (shop) -> hits in a row build a streak multiplier (Crowd Favor then raises its cap) */
-var STREAK_STEP = 0.05;       // +5% per brick in a row: the first ceiling (x2) takes 21 hits, x4 takes 61, x8 takes 141, x10 takes 181
-var CAP = [2, 4, 8, 10];                                          // streak ceiling: Combo Bonus gives x2, Crowd Favor tiers 1-3 lift it to x4, x8, x10
+var STREAK_STEP = 0.05;       // +5% per brick in a row: the first ceiling (x3) takes 41 hits, x4 takes 61, x8 takes 141, x10 takes 181
+var CAP = [3, 4, 8, 10];                                          // streak ceiling: Combo Bonus gives x3, Crowd Favor tiers 1-3 lift it to x4, x8, x10
 var BAKE_TIMES = [4.5, 3.8, 3.2, 2.7, 2.25, 1.9, 1.6, 1.35, 1.15, 0.95, 0.78, 0.62];   // seconds per brick WHILE THE KILN IS HELD — the early game is deliberately slow
 var HOPPER_CAP = [1, 2, 3, 4, 5];                                  // Hopper: bricks one tap loads onto the crane (the rest follow by themselves after each drop)
 var STORE_CAP = [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16];         // Bigger Storage: how many bricks the shed holds
@@ -994,7 +998,7 @@ var S = {
   stack: [],           // bottom → top; the LAST item loads onto the crane next
   hopper: [],          // bricks already riding in the crane's hopper, waiting to swing out after each drop
   crane: { item: null, state: "empty", pos: 0, dir: 1, t: 0, lock: 0 },
-  hotUnlocked: false, nextHot: false, nextDemo: null, leadUnlocked: false, glassUnlocked: false,
+  hotUnlocked: false, paidBricks: 0, nextHot: false, nextDemo: null, leadUnlocked: false, glassUnlocked: false,
   windOn: false, mistLevel: 0, swayOn: false, raid: null,
   wind: { dir: 1, phase: 0, flipAt: 0 },
   layAcc: 0, streak: 0, comboTutDone: false, scUsed: 0, forgeWins: 0, discarded: 0,
@@ -1023,7 +1027,7 @@ function fmtMult(m) { return String(Math.round(m * 100) / 100); }
 function fmtPay(n) { n = Math.round(n * 100) / 100; return n % 1 === 0 ? String(n) : n.toFixed(2); }   // $4 or $1.05
 function fmtMoney(n) { return fmt(Math.floor(n + 1e-6)); }                                          // HUD shows whole dollars only
 function coinsFor(amount) { return amount <= 12 ? Math.max(1, Math.round(amount)) : Math.min(24, 12 + Math.round(Math.sqrt(amount - 12))); }   // one coin per $1, then thinning out
-function brickPay(mult, type, perfect) { var p = rate() * mult * TYPE_MULT[type]; if (perfect) p *= PERF_PAY[S.tier.perfect] || 1; return Math.max(rate(), Math.round(p * POUCH[S.tier.coinPouch] * 100) / 100); }
+function brickPay(mult, type, perfect) { if (rate() <= BASE_PAY) return BASE_PAY; var p = rate() * mult * TYPE_MULT[type]; if (perfect) p *= PERF_PAY[S.tier.perfect] || 1; return Math.max(rate(), Math.round(p * POUCH[S.tier.coinPouch] * 100) / 100); }
 function payable(row) { return row >= PAY_FROM_ROW || S.best >= PAY_FROM_ROW || S.tower; }   // the tower is a paid job from the first side
 function workRow() { return S.fill > 0 ? S.fill : S.courses + 1; }     // the row the crane is working on (the tower fill starts back at row 1)
 function towerQ() { return (S.fill > 0 ? S.fill - 1 : S.courses) * 4 + curFace(); }   // quarter-turns the camera has walked round the tower
@@ -1207,9 +1211,9 @@ var LINES = [
   { id: "coinPouch", icon: "star", name: "Coin Pouch", costs: [45, 110, 220], gate: function () { return true; },
     effect: function (t) { return "Brick and row pay +" + Math.round((POUCH[t] - 1) * 100) + "%."; },
     next: function (t) { return "Brick and row pay +" + Math.round((POUCH[t + 1] - 1) * 100) + "% — a bigger pouch holds more coin."; } },
-  { id: "cheerBonus", icon: "crowd", name: "Cheer Bonus", costs: [60, 140], gate: function () { return true; },
+  { id: "cheerBonus", icon: "crowd", name: "Cheer Bonus", costs: [10, 60], gate: function () { return upgOwned() >= 1; },
     effect: function (t) { return "A clean row (no misses) pays +" + CHEER_ADD[t] + "× rate extra from the cheering crowd."; },
-    next: function (t) { return "The crowd tosses extra coin for a CLEAN row: +" + CHEER_ADD[t + 1] + "× rate."; } },
+    next: function (t) { return "A CLEAN row (no misses) pays double, and the crowd tosses extra coin on top: +" + CHEER_ADD[t + 1] + "× rate."; } },
   { id: "luckyBrick", icon: "star", name: "Lucky Brick", costs: [30, 70, 130], gate: function () { return true; },
     effect: function (t) { return Math.round(LUCKY_P[t] * 100) + "% of bricks come out LUCKY — they sparkle green and pay a coin bonus when laid."; },
     next: function (t) { return Math.round(LUCKY_P[t + 1] * 100) + "% of baked bricks are LUCKY: lay one for a coin bonus (5× rate)."; } },
@@ -1306,6 +1310,10 @@ var LADDER = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 156
 var snd = {
   clink: function () { if (S.time - lastClink < 0.08) return; lastClink = S.time; tone(1900, 0.06, "square", 0.035); tone(2650, 0.08, "sine", 0.06, 0.02); },
   pop: function () { tone(480, 0.07, "triangle", 0.13, 0, 760); },
+  // kiln output: a low, round thunk (the old high clink stays for the shed)
+  bake: function () { tone(190, 0.18, "triangle", 0.11, 0, 120); tone(260, 0.12, "sine", 0.05, 0.03); noiseBurst(0.07, 0.035, 650); },
+  // landing in the shed: a higher note whose pitch depends on the brick type
+  shed: function (type) { var base = { normal: 1900, lead: 1100, silver: 2100, gold: 2349, hot: 1560, glass: 2800 }[type] || 1900; tone(base, 0.1, "square", 0.035); tone(base * 1.395, 0.12, "sine", 0.06, 0.02); },
   tick: function () { tone(1250, 0.03, "square", 0.04); },
   load: function () { tone(300, 0.06, "triangle", 0.07, 0, 520); noiseBurst(0.05, 0.04, 2000); },
   drop: function () { noiseBurst(0.08, 0.05, 1600); tone(700, 0.08, "sine", 0.05, 0, 380); },
@@ -2404,6 +2412,7 @@ var TOWER_LAT = [-2.6, 2.6, -1.4, 1.4, -3.6, 3.6];
 /* Floating crowd: once the tower is so tall that the ground (and everyone standing on it) has slid below the bottom of the screen,
    four villagers - one per side - lift off and drift around the tower at the height you are building, cheering and backflipping. */
 var FLOATERS = 4;
+function floaterCount() { var n = S.best; return n >= 40 ? FLOATERS : n >= 37 ? 3 : n >= 35 ? 2 : n >= 25 ? 1 : 0; }   // hovering people: one from row 25, one at 30, two at 35, three at 37, one per side by 40
 function groundOutOfView(prev) {            // the patch of ground in front of the tower, on the camera's side, is below the screen
   var cp = camera.position, dx = cp.x, dz = cp.z + TH, dl = Math.sqrt(dx * dx + dz * dz) || 1;
   var sp = toScreenW(dx / dl * 4.5, 0, -TH + dz / dl * 4.5), H = window.innerHeight;
@@ -2536,7 +2545,7 @@ function updateCrowd(dt) {
       EMIT_WORLD = true; emitPuffs(d.x, 0.1, d.z, 6, 0xe9dcc2, 0.5); EMIT_WORLD = false;
     }
     if (!wantI) { d.on = false; d.fx = null; }
-    var walking = false, wantFloat = i < FLOATERS && W3.flOn && d.on;
+    var walking = false, wantFloat = i < floaterCount() && (W3.flOn || S.best >= 25) && d.on;
     if (d.hy === undefined) { d.hy = 0; d.fHome = i * Math.PI / 2 + Math.PI / 4; d.fPh = hash01(i * 6.1 + 0.3) * 6.28; d.flT = 1 + i * 0.9; }
     if (wantFloat) d.hy = damp(d.hy, workY() + FLOAT_OFF[i] + Math.sin(W3.t * 1.3 + d.fPh) * 0.25, 1.8, dt);      // rise to the height of the work, bobbing
     else d.hy = damp(d.hy, 0, 2.2, dt);                                                                          // ...or come back down
@@ -2672,9 +2681,29 @@ function setBrickMatrix(i, dy, ky, kx) {
   _e.set(0, yaw, b.rot || 0); _q.setFromEuler(_e);
   var bsx = b.sx; if (b.round && RMORPH < 1 && b.sxq) bsx = lerp(b.sxq, b.sx, RMORPH * RMORPH * (3 - 2 * RMORPH));
   var sx = bsx * (kx || 1), sy = ky || 1;
-  var wc = wallChunkFor(i), li = i % WALL_CH; _s.set(sx, sy, 1); _m.compose(_v, _q, _s); wc.fill.setMatrixAt(li, _m); b.wx = _v.x; b.wy = _v.y; b.wz = _v.z;
+  var wc = wallChunkFor(i), li = i % WALL_CH; _s.set(sx, sy, 1); _m.compose(_v, _q, _s); wc.fill.setMatrixAt(li, _m); b.wx = _v.x; b.wy = _v.y; b.wz = _v.z; if (b.markSp) placeMarks(i);
   _s.set(sx + 2 * OUTLINE, sy * (BH + 2 * OUTLINE) / BH, (BD + 2 * OUTLINE) / BD); _m.compose(_v, _q, _s); wc.out.setMatrixAt(li, _m);
   wc.fill.instanceMatrix.needsUpdate = true; wc.out.instanceMatrix.needsUpdate = true;
+}
+// Permanent marks on placed bricks: a flame for hot bricks, a horseshoe for lucky ones.
+function markSprite(kind) {
+  var c = document.createElement("canvas"); c.width = c.height = 128; var x = c.getContext("2d");
+  if (kind === "flame") { x.font = "92px sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("\uD83D\uDD25", 64, 70); }
+  else {
+    x.lineCap = "round"; x.strokeStyle = "#221407"; x.lineWidth = 22; x.beginPath(); x.arc(64, 58, 34, 0, Math.PI, false); x.stroke();
+    x.strokeStyle = "#e8edf2"; x.lineWidth = 12; x.beginPath(); x.arc(64, 58, 34, 0, Math.PI, false); x.stroke();
+  }
+  var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthTest: true }));
+  sp.scale.set(0.2, 0.2, 1); return sp;
+}
+function addMark(i, kind, off) {
+  var b = BRICKS[i], wc = wallChunkFor(i); if (!b || !wc || !wc.fill || !wc.fill.parent) return;
+  var sp = markSprite(kind); sp.userData.off = off; wc.fill.parent.add(sp);
+  b.markSp = (b.markSp || []).concat([sp]); placeMarks(i);
+}
+function placeMarks(i) {
+  var b = BRICKS[i]; if (!b || !b.markSp) return;
+  for (var k = 0; k < b.markSp.length; k++) { var sp = b.markSp[k]; sp.position.set(b.wx + sp.userData.off * b.sx, b.wy + BH * 0.5 + 0.06, b.wz + BD / 2 + 0.05); }
 }
 function brickColorHex(type, seed) {
   if (type === "gold") return _c.set(0xf7c02a);
@@ -3217,6 +3246,7 @@ function critTap(px, py) {
     if (dd < rad && dd < bd) { bd = dd; best = it; bsp = { sp: sp, wp: wp }; }
   }
   if (!best) return false;
+  if (!best.paid && S.tower && S.earned >= 20) { best.paid = true; credit(1); moneyFloat(1); spawnCoins(1, bsp.sp); }
   var R = CRIT_REACT[best.T.id]; best.rc = { t: 0, dur: R.dur };
   if (R.boost) best.boost = R.boost;
   if (R.scatter) for (i = 0; i < CRIT.items.length; i++) if (CRIT.items[i].T === best.T && CRIT.items[i].active) CRIT.items[i].boost = 1.2;
@@ -3234,7 +3264,7 @@ function critSpawn(T) {
   var col = FINCH_COLS[Math.floor(Math.random() * FINCH_COLS.length)];
   for (var k = 0; k < CRIT.items.length && cnt > 0; k++) {
     var it = CRIT.items[k]; if (it.T !== T || it.active) continue;
-    cnt--; it.active = true; it.leaving = false; it.s = 0; it.age = 0; it.dir = dir; it.v = v * rand(0.92, 1.08); it.z = z + rand(-0.6, 0.6); it.dy = dy + rand(-0.6, 0.6) * (T.flock ? 1 : 0); it.ph = Math.random() * 6;
+    cnt--; it.active = true; it.paid = false; it.leaving = false; it.s = 0; it.age = 0; it.dir = dir; it.v = v * rand(0.92, 1.08); it.z = z + rand(-0.6, 0.6); it.dy = dy + rand(-0.6, 0.6) * (T.flock ? 1 : 0); it.ph = Math.random() * 6;
     it.halfW = halfW;
     if (T.life) { it.x = rand(-0.75, 0.75) * halfW; if (T.id === "kite") { it.x0 = (Math.random() < 0.5 ? -1 : 1) * halfW * 0.5; it.dir = it.x0 < 0 ? -1 : 1; } }
     else it.x = -dir * (halfW + 3) - dir * (T.flock ? (T.flock - cnt - 1) * 1.1 : 0);
@@ -3838,7 +3868,7 @@ function stackBrick(it) {
   if (it.lucky) { tone(1568, 0.1, "sine", 0.06, 0.1); tone(2093, 0.12, "sine", 0.05, 0.18); }
   UI.trayPop = it.uid; UI.whPop = stKey(type);
   kilnPuff();
-  if (!REDUCED) UI.fly[it.uid] = 1;
+  if (!REDUCED) UI.fly[it.uid] = it.type || "normal";
   renderHUD();
   flyBrick(it);
   checkUnlocks();
@@ -3974,6 +4004,7 @@ function placeBrick(item, fromAuto, outcome, f, from) {
   var willComplete = S.inCourse + 1 >= S.perCourse;
   var r = rate();
   S.laid++; S.inCourse++; S.lastAct = S.time;
+  if (!S.tower && S.courses === 1 && !S.flags.coolHole && S.inCourse >= Math.round(S.perCourse / 2)) coolHoleLine();
   var pay = r, mult = 1, prevMult = streakMult(S.streak);
   if (!fromAuto) {
     if (S.courses >= 1) {           // row-2 tutorial: misses are forgiven until you land two bricks
@@ -3989,6 +4020,8 @@ function placeBrick(item, fromAuto, outcome, f, from) {
   }
   else pay = round2(r * STOOL[S.tier.stool]);          // the apprentice stands on a stool: a better flat rate
   if (!payable(row) || !perBrickOn()) pay = 0;
+  // hot bricks arrive on their own once Piece Work has paid for 20 bricks
+  if (pay > 0 && perBrickOn()) { S.paidBricks = (S.paidBricks || 0) + 1; if (S.paidBricks >= 20 && !S.hotUnlocked) { S.hotUnlocked = true; S.nextHot = true; enqueueCards("hot", CARDS_HOT, null); } }
   // METAL LEDGER: every metal brick counts toward the row's bonus, and a run of the same metal pays little bumps
   var metal = isMetal(item.type) ? item.type : null, bump = 0;
   S.rowT.n++; if (metal) S.rowT[metal]++;
@@ -4002,7 +4035,7 @@ function placeBrick(item, fromAuto, outcome, f, from) {
   var land = function () {
     if (gen !== G.gen) return;          // a collapse reset the wall while this brick was in flight
     var idx = wallAdd(row, slot, per, item.type, item.seed, face, ci);
-    if (idx >= 0) { animBrick(idx, "land", 0, 0.32); checkHandSmash(BRICKS[idx]); }
+    if (idx >= 0) { animBrick(idx, "land", 0, 0.32); checkHandSmash(BRICKS[idx]); if (item.type === "hot") addMark(idx, "flame", -0.2); if (item.lucky) addMark(idx, "horseshoe", 0.2); }
     landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow, bump, runN);
   };
   // the visible fall (or the apprentice's pop-up)
@@ -4288,7 +4321,7 @@ function tickFalling(dt) {
 }
 function credit(amount) {
   if (!(amount > 0)) return;
-  S.money = Math.round((S.money + amount) * 100) / 100; S.earned += amount;
+  S.money = Math.round((S.money + amount) * 100) / 100; S.earned += amount; DRAIN.pend = Math.round((DRAIN.pend + amount) * 100) / 100;
   if (!S.flags.moneyShown && S.started) { S.flags.moneyShown = true; revealEl($("hud-money")); }
   var firstPay = false;
   if (!S.workshopShown && S.started) {
@@ -4364,7 +4397,7 @@ function pickBonkTarget(f) {
   if (!W3.crowd || !S.started) return null;
   var W = window.innerWidth, H = window.innerHeight, bs = toScreen(f.mesh.position.x, f.mesh.position.y, f.mesh.position.z), pool = [];
   for (var i = 0; i < W3.crowd.length; i++) {
-    var d = W3.crowd[i]; if (!d.on || d.s < 0.9 || d.fx || (d.dnLeft || 0) > 0) continue;
+    var d = W3.crowd[i]; if (!d.on || d.s < 0.9 || d.fx || (d.dnLeft || 0) > 0 || towerHides(d.x, 1.2 + (d.hy || 0), d.z)) continue;
     var sp = toScreenW(d.x, 1.2 + (d.hy || 0), d.z); if (sp.behind || sp.x < 40 || sp.x > W - 40 || sp.y < 110 || sp.y > H - 230) continue;
     pool.push({ i: i, dist: Math.abs(sp.x - bs.x) + Math.abs(sp.y - bs.y) * 0.3 });
   }
@@ -4377,7 +4410,7 @@ function missFx(item, f) {
   breakStreak();
   var kind = null, bonk = f ? pickBonkTarget(f) : null;
   if (f) {
-    var kinds = ["tumble", "boom", "twirl"]; if (bonk !== null) kinds.push("bonk", "bonk");        // ow: more likely whenever a villager is standing handy
+    var kinds = ["tumble", "boom", "twirl", "crack"]; if (bonk !== null) kinds.push("bonk", "bonk");        // ow: more likely whenever a villager is standing handy
     if (Math.random() < 0.07 && G.lastMiss !== "leaf") kind = "leaf";                       // rare: the brick turns into a leaf and the wind takes it
     else do { kind = kinds[Math.floor(Math.random() * kinds.length)]; } while (kind === G.lastMiss);
     G.lastMiss = kind;
@@ -4393,10 +4426,37 @@ function missFx(item, f) {
       f.anim = { kind: "leaf", t: 0, dir: C.dir || 1, sx: f.mesh.position.x, sy: f.mesh.position.y, sz: f.mesh.position.z, c0: { r: c0.r, g: c0.g, b: c0.b }, c1: { r: 0.42 + Math.random() * 0.4, g: 0.62 + Math.random() * 0.18, b: 0.14 }, ph: Math.random() * 6 };
       emitPuffs(f.mesh.position.x, f.mesh.position.y, f.mesh.position.z, 8, 0xe9f3d0, 0.8, 0.5);
     }
+    else if (kind === "crack") { crackFx(); f.anim = { kind: "poof", t: 0, dur: 0.18, done: function () { releaseFree(f); } }; }
     else if (kind === "twirl") { snd.whoosh(); f.anim = { kind: "twirl", t: 0, sx: f.mesh.position.x, sy: f.mesh.position.y, sz: f.mesh.position.z, zFar: Math.min(CAM.D * 0.5, 10), vy: 4.5, col: col }; }
     else f.anim = { kind: "miss", t: 0, vx: C.dir * rand(1.2, 2.4), vy: 1.6, vz: 0.6, rx: rand(-2, 2), rz: -C.dir * rand(4, 8), ty: rowY(workRow()) - PITCH, bounced: false };
     FALLING.push(f);
   }
+}
+// A brick streaks up to the top-right corner and leaves a crack in the screen that fades after ten seconds.
+function crackFx() {
+  var W = window.innerWidth, H = window.innerHeight;
+  var b = document.createElement("div");
+  b.style.cssText = "position:absolute;left:0;top:0;width:16px;height:9px;background:#c2502c;border:2px solid #221407;z-index:58;pointer-events:none;";
+  el.fx.appendChild(b);
+  if (REDUCED || !b.animate) { if (b.parentNode) b.parentNode.removeChild(b); crackScreen(); return; }
+  var a = b.animate([
+    { transform: "translate(" + (W * 0.4) + "px," + (H * 0.55) + "px) rotate(0deg)", opacity: 1 },
+    { transform: "translate(" + (W - 30) + "px," + (H * 0.08) + "px) rotate(720deg)", opacity: 1 }
+  ], { duration: 240, easing: "ease-in", fill: "forwards" });
+  a.onfinish = function () { if (b.parentNode) b.parentNode.removeChild(b); crackScreen(); };
+}
+function crackScreen() {
+  var c = document.createElement("div"); c.className = "crack-fx";
+  c.innerHTML = '<svg viewBox="0 0 200 160" preserveAspectRatio="xMaxYMin meet"><g fill="none" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M200,0 L186,20 L194,34 L176,52 L182,66 L160,80" stroke="#221407" stroke-width="3.2"/>'
+    + '<path d="M186,20 L170,22 L158,12" stroke="#221407" stroke-width="2"/>'
+    + '<path d="M176,52 L160,46 L150,56" stroke="#221407" stroke-width="2"/>'
+    + '<path d="M194,34 L200,50" stroke="#221407" stroke-width="2"/>'
+    + '<path d="M200,0 L186,20 L194,34 L176,52 L182,66 L160,80" stroke="#ffffff" stroke-width="1.2"/></g></svg>';
+  document.body.appendChild(c);
+  snd.crash(); flashScreen(0.1);
+  setTimeout(function () { c.classList.add("gone"); }, 9000);
+  setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 10100);
 }
 function breakStreak() {
   S.run = { t: null, n: 0 };
@@ -4405,13 +4465,31 @@ function breakStreak() {
   S.streak = 0;
 }
 
+var SIDE_SAY = ["Wizards now? Fine by me.", "Does that one have horns?", "Wizards at a hole in the sky. Sure, why not.", "Is that a tail? Respect.", "Horns! Lovely horns.", "Four walls, zero excuses.", "Who invited the goblin?", "I didn't know wizards liked magic holes."];
+function sideReact() {
+  var vis = visibleSpeakers(W3.crowd ? W3.crowd.length : 0, -1);
+  if (!vis.length) return;
+  var count = Math.min(vis.length, Math.random() < 0.5 ? 1 : 2);
+  for (var i = 0; i < count; i++) {
+    var who = vis.splice(Math.floor(Math.random() * vis.length), 1)[0];
+    villagerSay(who, SIDE_SAY[Math.floor(Math.random() * SIDE_SAY.length)]);
+  }
+  nextSayAt = Math.max(nextSayAt, performance.now() + 900);
+}
+// The first villager to be seen during the halfway point of the second layer remarks on the hole.
+function coolHoleLine() {
+  var vis = visibleSpeakers(W3.crowd ? W3.crowd.length : 0, -1);
+  if (!vis.length) return;                                  // wait until someone is in view
+  S.flags.coolHole = true;
+  villagerSay(vis[0], "That hole sure is cool.");
+}
 /* ---------------- ROWS ---------------- */
 function sideDone() {
   fleeAllHands();
   var side = curFace() + 1, row = workRow(), clean = S.rowMisses === 0;
   var tb = rowTypeBonus(row), bonus = (payable(row) ? rowBonus(clean) : 0) + tb.bonus;     // each side is a row of its own: it pays its own row + metal bonuses
   S.rowMisses = 0; S.scUsed = 0; S.rowT = freshRowT();                                  // ...and gets its own clean-row check, Second Chance and metal ledger
-  credit(bonus); if (S.courses >= 5 && Math.random() < 0.4) villagersReact(S.courses, false);
+  credit(bonus); sideReact();
   whenLanded(function () { snd.whoosh(); faceFx(row, bonus, clean); typeRowFx(tb); });
   saveGame();
 }
@@ -4593,7 +4671,7 @@ function forgeStrike() {                              // Edgar swings his hammer
   clearTimeout(forgeT); forgeT = setTimeout(function () { fg.classList.remove("hit"); }, 900);
   setTimeout(function () { tone(1480, 0.32, "triangle", 0.07, 0, 1250); tone(2960, 0.16, "sine", 0.04, 0.01); tone(220, 0.1, "square", 0.05, 0, 110); noiseBurst(0.05, 0.12, 3200); haptic(12); }, 400);
 }
-var FORGE_P = [0.01, 0.05, 0.15, 0.30, 0.50];          // Edgar's Forge: chance that one click pays $1, per Edgar's Luck tier (1% up to a 50/50)
+var FORGE_P = [0.05, 0.10, 0.15, 0.30, 0.50];          // Edgar's Forge: chance that one click pays $1, per Edgar's Luck tier (5% up to a 50/50)
 function forgeChance() { return FORGE_P[S.tier.forgeLuck] || FORGE_P[0]; }
 var fgBub = null, fgBubT = 0;
 function forgeBubble() {                                // a little bubble with Edgar at his anvil, so a purchase is seen even when the forge has scrolled out of view
@@ -4643,6 +4721,7 @@ function buyLine(id) {
   if (S.money < cost) { snd.err(); if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); } return; }
   if (row) { var bb = row.querySelector(".buy-btn"); if (bb) { var r = bb.getBoundingClientRect(); domBurst(r.left + r.width / 2, r.top + r.height / 2); popText("TIER " + (S.tier[id] + 1) + "!", r.left + r.width / 2, r.top - 12, { cls: "gold", size: 18, rise: 30 }); } }
   S.money = Math.round((S.money - cost) * 100) / 100; S.tier[id]++;
+  if (upgOwned() === 3 && !S.flags.scaleTaught) { S.flags.scaleTaught = true; toast("Workshop prices climb: every upgrade you own adds $" + UPG_SCALE + " to the next one. It shows on each card.", 4200); }
   snd.buy(); haptic(15); forgeStrike(); forgeBubble();
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
@@ -4652,8 +4731,6 @@ function buyLine(id) {
       toast("Hot mortar! Rows now take " + S.perCourse + " bricks.", 3400);
       if (S.inCourse >= S.perCourse) completeCourse();
     }
-  } else if (id === "kilnSpeed" && S.tier.kilnSpeed === 2 && !S.hotUnlocked) {
-    S.hotUnlocked = true; S.nextHot = true; enqueueCards("hot", CARDS_HOT, null);
   } else if (id === "kilnSpeed") toast("The kiln bakes faster while you hold it.", 2600);
   else if (id === "lead") { S.leadUnlocked = true; if (S.tier.lead === 1) S.nextDemo = "lead"; enqueueCards("lead", CARDS_LEAD, null); }
   else if (id === "silver") { if (S.tier.silver === 1) S.nextDemo = "silver"; enqueueCards("silver", CARDS_SILVER, null); }
@@ -4854,7 +4931,7 @@ function updateHazards() {
 
 /* ---------- milestones: story, reveals, raids, banners ---------- */
 function revealGoal() { S.flags.goalShown = true; renderHUD(); popEl($("hud-course-num")); banner("THE GOAL", "BUILD TO ROW 50"); }
-var STORY_AT = { 25: "c25", 30: "c30", 35: "c35", 40: "c40", 45: "c45", 48: "c48", 55: "c55", 60: "c60", 65: "c65", 70: "c70", 75: "c75", 80: "c80", 85: "c85", 90: "c90", 95: "c95" };
+var STORY_AT = { 30: "c30", 35: "c35", 40: "c40", 45: "c45", 48: "c48", 55: "c55", 60: "c60", 65: "c65", 70: "c70", 75: "c75", 80: "c80", 85: "c85", 90: "c90", 95: "c95" };
 function milestone(n) {
   if (n === 1) {
     enqueueStory("row1");
@@ -4863,7 +4940,7 @@ function milestone(n) {
   if (n === 10 && !S.flags.goalShown && !S.beats.c10cards) { S.beats.c10cards = true; enqueueCards("ten", CARDS_TEN, revealGoal); }
   if (STORY_AT[n]) enqueueStory(STORY_AT[n]);
   if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; S.nextDemo = "glass"; enqueueCards("glass", CARDS_GLASS, null); }
-  if (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0) queueRaid(n);
+  if (n >= 30 || (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0)) queueRaid(n);
   if (n % 10 === 0 && n !== FIRST_GOAL && n !== FINAL_GOAL) whenLanded(function () { banner("COURSE " + n, perBrickOn() ? "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE" : "PAY RAISE · ROW BONUS NOW $" + rowBonus(true)); });
   else if (n === FIRST_GOAL - 1 || n === FINAL_GOAL - 1) toast("Course " + n + " — one more.", 3000);
   if (n === FIRST_GOAL && !S.flags.rimStarted) { S.flags.rimPending = true; whenLanded(startRim); }
@@ -4961,8 +5038,8 @@ function makeHand() {
   return h;
 }
 function poseHand(h, grip) {
-  var a = lerp(0.12, 1.4, grip);
-  for (var i = 0; i < 4; i++) { h.fingers[i].pv.rotation.x = a + i * 0.03; h.fingers[i].tip.rotation.x = a * 0.55; }
+  var a = lerp(0.12, 1.4, grip); h.grip = grip;
+  for (var i = 0; i < 4; i++) { var sq = h.sides && h.sides[i < 2 ? -1 : 1] ? 0.55 : 0; h.fingers[i].pv.rotation.x = a + i * 0.03 + sq; h.fingers[i].tip.rotation.x = (a + sq) * 0.55; }
   h.thumb.rotation.x = lerp(0.1, 1.15, grip);
 }
 function tintBrick(h, k) {
@@ -5025,7 +5102,7 @@ function spawnHand() {
   if (!tgt && first) tgt = pickHandTarget(2);
   if (!tgt) return false;
   S.flags.handDone = true;
-  h.active = true; h.state = "arrive"; h.t = 0; h.brick = tgt.brick; h.bi = tgt.bi; h.row = tgt.brick.row; h.round = roundOn(); h.ang = h.round ? tgt.brick.ang : 0; h.x = h.round ? 0 : tgt.brick.x;
+  h.active = true; h.state = "arrive"; h.sides = {}; h.t = 0; h.brick = tgt.brick; h.bi = tgt.bi; h.row = tgt.brick.row; h.round = roundOn(); h.ang = h.round ? tgt.brick.ang : 0; h.x = h.round ? 0 : tgt.brick.x;
   h.iFirst = tgt.i; h.per = perFace(); h.face = curFace();
   h.scale = clamp((FW() / h.per) / 1.0, 0.9, 1.4) * HAND_SCALE;
   h.topY = rowY(h.row) + BH / 2 + 0.15 * h.scale + 0.02;
@@ -5058,13 +5135,21 @@ function fleeHand(h) {
   untintBrick(h); h.state = "flee"; h.t = 0; h.mark.visible = h.markFill.visible = h.arrow.visible = false; h.carry.visible = false;
 }
 function dropHand(h) { h.active = false; h.state = "off"; h.g.visible = false; h.mark.visible = h.markFill.visible = h.arrow.visible = false; }
+// A hand clamps on both sides of its fingers. One brick squeezes one side; a brick on the other side makes it let go (smashed).
+function squeezeSide(h, side) {
+  h.sides = h.sides || {};
+  if (h.sides[side]) return;
+  h.sides[side] = true; snd.clink(); camShake(0.12);
+  if (h.sides[-1] && h.sides[1]) { smashHand(h); return; }
+  poseHand(h, h.grip || 0);
+}
 function checkHandSmash(b) {
   for (var i = 0; i < HANDS.length; i++) {
     var h = HANDS[i]; if (!h.active || (h.state !== "arrive" && h.state !== "grip")) continue;
     if (h.row + 1 !== b.row) continue;
-    if (h.round) { if (b.round && Math.abs(angDiff(b.ang, h.ang)) < 0.72 * 2 * Math.PI / b.n) smashHand(h); continue; }
+    if (h.round) { if (b.round && Math.abs(angDiff(b.ang, h.ang)) < 0.72 * 2 * Math.PI / b.n) squeezeSide(h, angDiff(b.ang, h.ang) >= 0 ? 1 : -1); continue; }
     if ((h.face || 0) !== (b.face || 0)) continue;
-    if (Math.abs(b.x - h.x) < 0.72 * (b.sx + GAP)) smashHand(h);
+    if (Math.abs(b.x - h.x) < 0.72 * (b.sx + GAP)) squeezeSide(h, b.x < h.x ? -1 : 1);
   }
 }
 function smashHand(h) {
@@ -5246,6 +5331,15 @@ function popText(txt, x, y, o) {
 }
 var PEND = { amt: 0 };                                  // the pay the next burst of coins is carrying to the total
 var PLUS = { el: null, amt: 0, until: 0, anim: null, timer: 0 };
+// Pay is credited straight away, but the total only counts up as the green "+$" drains into it.
+var DRAIN = { pend: 0 };
+function drainPend(dt) {
+  if (DRAIN.pend <= 0) return;
+  var step = DRAIN.pend * Math.min(1, dt * 2.2);
+  DRAIN.pend = Math.max(0, Math.round((DRAIN.pend - step) * 100) / 100);
+  if (DRAIN.pend < 0.01) DRAIN.pend = 0;
+  if (PLUS.el && DRAIN.pend > 0) PLUS.el.textContent = "+$" + fmtPay(DRAIN.pend);
+}
 function moneyFloat(amount) {                           // no text where the brick lands any more: the coins carry the pay and it turns into a + on the total
   snd.coin(); popEl(el.hudMoney);
   PEND.amt = amount > 0 ? amount : 0;
@@ -5254,7 +5348,7 @@ function plusAdd(amount) {                              // a "+$N" under the mon
   if (!(amount > 0) || el.hudMoney.classList.contains("hidden")) return;
   var P = PLUS, now = performance.now();
   if (!P.el) { P.el = document.createElement("div"); P.el.className = "plus-badge"; el.fx.appendChild(P.el); }
-  P.amt = now < P.until ? P.amt + amount : amount; P.until = now + 1700;
+  P.amt = DRAIN.pend > 0 ? DRAIN.pend : amount; P.until = now + 1700;
   P.el.textContent = "+$" + fmtPay(P.amt);
   var r = el.hudMoney.getBoundingClientRect();
   P.el.style.left = (r.left + r.width / 2) + "px"; P.el.style.top = (r.bottom + 3) + "px";
@@ -5410,12 +5504,13 @@ function flyBrick(it) {
 }
 function finishFly(uid) {
   if (!UI.fly[uid]) return;
+  var flyType = UI.fly[uid];
   delete UI.fly[uid];
   var usel = '[data-uid="' + uid + '"]', node = el.trayList.querySelector(usel) || el.sheds.querySelector(usel); if (node) node.classList.remove("pend");
   refreshCounts();
   var bld = node ? node.closest("#tray, .shed-x") : el.tray;
   if (bld) { popEl(bld.id === "tray" ? el.trayCount : bld.querySelector(".sx-count")); bldFlash(bld, "thunk"); }
-  snd.clink();
+  snd.shed(typeof flyType === "string" ? flyType : "normal");
 }
 var SHED_ROOF = { lead: "#4a4f5a", silver: "#b9c3cc", gold: "#d99a06" };
 function renderSheds() {                  // one little building per unlocked metal, standing beside the plain shed
@@ -5525,7 +5620,7 @@ function upCard(l, state) {
   if (state === "locked") h += '<div class="up-sum lock">' + lockReason(l) + "</div></div></div></div>";
   else {
     h += '<div class="up-sum">' + sum + "</div></div>";
-    h += maxed ? '<div class="buy-btn maxed">✓ MAX</div>' : '<button class="buy-btn" data-upg="' + l.id + '">$' + fmt(cost) + "</button>";
+    h += (maxed ? '<div class="buy-btn maxed">✓ MAX</div>' : '<button class="buy-btn" data-upg="' + l.id + '">$' + fmt(cost) + "</button>") + (!maxed && upgOwned() >= 3 ? '<div class="up-raise">+$' + UPG_SCALE + " for each upgrade you own</div>" : "");
     h += "</div>";
     if (state === "saving") h += '<div class="up-bar"><i style="width:' + Math.min(100, S.money / cost * 100).toFixed(0) + '%"></i></div>';
     h += '<div class="up-more">' + (t > 0 && !maxed && !l.noNow ? '<div class="upg-now">NOW: ' + l.effect(t) + "</div>" : "") + '<div class="up-cat">' + tabName(l.tab) + " tab</div></div>";
@@ -5627,9 +5722,11 @@ $("shop-guide").addEventListener("click", function (e) { var b = e.target.closes
 // Per-frame UI: money roll, kiln ring, fuses, prompt, wind chip.
 function uiFrame(rdt) {
   updateBubbles();
-  var diff = S.money - UI.moneyShown;
+  drainPend(rdt);
+  var shownTarget = Math.round((S.money - DRAIN.pend) * 100) / 100;
+  var diff = shownTarget - UI.moneyShown;
   if (diff !== 0) {
-    UI.moneyShown = Math.abs(diff) < 0.5 ? S.money : UI.moneyShown + diff * Math.min(1, rdt * 12);
+    UI.moneyShown = Math.abs(diff) < 0.5 ? shownTarget : UI.moneyShown + diff * Math.min(1, rdt * 12);
     el.moneyNum.textContent = fmtMoney(UI.moneyShown);
   }
   el.kilnRing.style.strokeDashoffset = (119.4 * (1 - clamp(S.moldT, 0, 1))).toFixed(1);
@@ -5717,7 +5814,7 @@ var BEATS = {
   c5b: "A murmur, then a decision. \u201cNot a wall,\u201d says the eldest. \u201cA tower. Build us a tower up toward that hole \u2014 and we\u2019ll pay you for every finished row.\u201d",
   c10a: "The tower stands five rows high, right on top of your five-row wall. You turn to the crowd. \u201cSo\u2026 how tall should this thing be? What\u2019s enough?\u201d",
   c10b: "The villagers huddle. Loudly. The eldest holds up fingers, runs out of fingers, borrows someone else\u2019s. \u201cFifty,\u201d they decide. \u201cFifty rows. That ought to do it.\u201d",
-  c25: "Hands are starting to grab at the wall. Huge pale hands reach down through the hole, clamp onto a brick and pull — and everything laid after it falls. Drop a brick on top of a hand to smash it.",
+  c25: "Hands are starting to grab at the wall. Huge pale hands reach down through the hole, clamp onto a brick and pull — and everything laid after it falls. Drop a brick on top of a hand to make it let go.",
   c30: "The hands are getting bolder. Whatever is up there does not want this wall finished.",
   c35: "The silhouettes are waving their arms now. Not cheering — warning. You still can't make out the words.",
   c40: "Clouds are gathering around the hole, curling into a slow ring. They drift down toward your crane. Something up there doesn't want you to see.",
@@ -5756,7 +5853,7 @@ var REVEALS = {
   gold: { cls: "gold", title: "GOLD BRICKS", text: "Real gold bricks now turn up in the kiln. Land one and it's worth <b>×" + TYPE_MULT.gold + "</b>, and each one in a finished row adds <b>+" + ROW_ADD.gold + "× rate</b>. Gilded Clay makes them more common." },
   sorter: { cls: "icon", icon: ICO_SORT, title: "BRICK SORTER", text: "Bricks are now <b>sorted into a warehouse per type</b>. <b>Tap a warehouse</b> under STORAGE to choose what the crane — and your apprentices — build with. Stockpile gold, then lay a <b>whole row of one metal</b> for a pure-row bonus." },
   wind: { cls: "wind", title: "THE WIND PICKS UP", text: "The wind gusts in spells. The crane runs <b>fast with it</b> and <b>slow against it</b> — watch the arrow, time the slow side. It will come and go." },
-  hand: { cls: "icon", icon: ICO_HAND, title: "HANDS!", text: "A hand is clamping onto a brick. In <b>about 10 seconds</b> it rips it free — and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to smash it. The red slot shows where." },
+  hand: { cls: "icon", icon: ICO_HAND, title: "HANDS!", text: "A hand is clamping onto a brick. In <b>about 10 seconds</b> it rips it free — and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to make it let go. The red slot shows where." },
   mist: { cls: "icon", icon: ICO_CLOUD, title: "CLOUDS ROLL IN", text: "Clouds drift across the work site and hide the crane. <b>Judge by rhythm</b>, not by eye — they come and go, and thicken as you climb. A Sky Lantern thins them." },
   tremor: { cls: "icon tremor", icon: ICO_TREMOR, title: "TREMORS", text: "The wall shudders. The green drop zone now <b>slides side to side</b> — drop where it <b>is</b> when you tap, not where it was. A Spirit Level calms it." },
   glass: { cls: "glass", title: "SKY GLASS", text: "Pale glass bricks now come out of the kiln. The drop window is <b>35% narrower</b> — but they're worth <b>×5</b>." }
@@ -6078,7 +6175,7 @@ function buildSatyr(o) {
   pmesh(st, new THREE.SphereGeometry(0.3, 12, 8), 0x9afcff, 0, 2.08, 0, { basic: true, alpha: 0.25 });
   pmesh(st, new THREE.TorusGeometry(0.17, 0.035, 6, 12), 0x6b4a2a, 0, 1.93, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });
   if (o.pouch) {
-    var pg = new THREE.Group(); pg.position.set(-0.1, 1.2, 0.8); g.add(pg);
+    var pg = new THREE.Group(); pg.position.set(0, -0.66, 0.08); aR.add(pg);
     pmesh(pg, new THREE.SphereGeometry(0.2, 12, 9), 0x8a5a33, 0, 0, 0, { s: [1, 1.1, 1] });
     pmesh(pg, new THREE.CylinderGeometry(0.1, 0.14, 0.1, 10), 0x6b4423, 0, 0.2, 0);
     coinProp(pg, 0.0, 0.3, 0.05, 0.09); coinProp(pg, 0.12, 0.34, -0.02, 0.07);
@@ -6460,12 +6557,12 @@ var PORTRAITS = {
     var dr = buildDragon(); dr.scale.setScalar(0.38); dr.position.set(-3.2, 4.3, -5); dr.rotation.z = 0.12; sc.add(dr); dr.userData.wings.forEach(function (w) { w.w.rotation.x = -w.sz * 0.5; }); } },
   elder_talk: { theme: "dusk", build: function (sc) { var s = buildSatyr({ mouth: true, armR: 0.3, armL: -1.3, armLx: -0.5 }); s.group.position.x = -0.2; s.group.rotation.y = 0.15; sc.add(s.group); } },
   edgar_shrug: { theme: "dusk", build: function (sc) { var e = buildGnoll({ armR: 1.25, armL: -1.25, mouth: "flat", brow: -0.25, tilt: 0.12, look: -1 }); e.group.position.x = -0.1; sc.add(e.group);
-    var q = glyphSprite("?", "#ffd94d", 0.9); q.position.set(0.95, 2.95, 0.3); sc.add(q); var q2 = glyphSprite("?", "#ffffff", 0.55); q2.position.set(-0.8, 3.05, 0.3); sc.add(q2); } },
+    var q = glyphSprite("?", "#ffd94d", 0.9); q.position.set(0.9, 2.35, 0.3); sc.add(q); var q2 = glyphSprite("?", "#ffffff", 0.55); q2.position.set(-0.85, 2.15, 0.3); sc.add(q2); } },
   elder_pay: { theme: "dusk", build: function (sc) { var s = buildSatyr({ mouth: true, pouch: true, armR: 0.3, armL: -0.3, armLx: -1.2, horns: 1.05 }); s.group.position.x = -0.2; s.group.rotation.y = -0.1; sc.add(s.group); } },
   minotaur_warn: { theme: "day", build: function (sc) { var m = buildMinotaur({ mouth: "open", armR: 2.35, armL: -0.3, lean: 0.3 }); m.group.position.x = 0.15; m.group.rotation.y = -0.12; sc.add(m.group); windSketch(sc); } },
   minotaur_point: { theme: "day", build: function (sc) { var m = buildMinotaur({ mouth: "open", armR: 1.55, armRx: -0.35, armL: -0.3, lean: 0.38, look: 1 }); m.group.position.x = 0.1; m.group.rotation.y = -0.2; sc.add(m.group); windSketch(sc); } },
   edgar_grin: { theme: "dusk", build: function (sc) { var e = buildGnoll({ armR: 2.4, armL: -0.25, mouth: "grin", brow: 0.2, tilt: -0.06 }); e.group.position.x = -0.1; sc.add(e.group); coinProp(e.group, 0.55, 2.62, 0.1, 0.2);
-    var d = glyphSprite("$", "#8ff0a4", 0.8); d.position.set(-0.95, 2.85, 0.3); sc.add(d); var d2 = glyphSprite("$", "#ffd94d", 0.55); d2.position.set(1.15, 3.2, 0.3); sc.add(d2); } }
+    var d = glyphSprite("$", "#8ff0a4", 0.8); d.position.set(-0.9, 2.45, 0.3); sc.add(d); var d2 = glyphSprite("$", "#ffd94d", 0.55); d2.position.set(1.0, 2.5, 0.3); sc.add(d2); [[-0.5, 2.8], [0.6, 2.85], [1.1, 1.9]].forEach(function (p) { var g = glyphSprite("$", "#ffd94d", 0.5); g.position.set(p[0], p[1], 0.3); sc.add(g); }); } }
 };
 Object.assign(PORTRAITS, {
   cinder_talk: { theme: "dusk", build: function (sc) { var d = buildDragon(); sc.add(d); fitPortrait(d, 2.8, 2.4, 0, 1.7, -0.6); } },
@@ -6588,7 +6685,7 @@ var CARDS_SORTER = [
 var CARDS_HAND = [
   { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "SOMETHING IN THE RUBBLE", text: "\u201cPsst! Edgar! Don't look down, but there's a hand coming up out of the rubble. Five fingers, all grabby.\u201d" },
   { who: "EDGAR", pic: "edgar_proud", kicker: "SOMETHING IN THE RUBBLE", text: "\u201cA HAND? Why is there a hand?\u201d" },
-  { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "HANDS!", text: "\u201cIt clamps onto a brick. About <b>10 seconds</b> later it rips it free, and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to smash it. The red slot shows where.\u201d", cta: "SMASH IT" }
+  { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "HANDS!", text: "\u201cIt clamps onto a brick. About <b>10 seconds</b> later it rips it free, and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to make it let go. The red slot shows where.\u201d", cta: "SMASH IT" }
 ];
 var CARDS_MIST = [
   { who: "SKARRA", tag: "griffin", pic: "skarra_cloud", kicker: "CLOUDS ROLL IN", text: "\u201cYou're building in my sky, mate. The clouds drift over the site, and up here they get thick.\u201d" },
@@ -6641,7 +6738,7 @@ function renderCard(first) {
   var dots = ""; for (var k = 0; k < n; k++) dots += '<i class="' + (k === CARDS.i ? "on" : "") + '"></i>';
   elCdDots.innerHTML = dots;
   elCdNext.textContent = c.cta || "NEXT";
-  elCdHint.classList.toggle("hidden", CARDS.i > 0 || n < 2);
+  elCdHint.textContent = CARDS.i === 0 ? "SWIPE \u203A" : "\u2039 SWIPE"; elCdHint.classList.toggle("hidden", CARDS.i > 1 || n < 2);
   elDeck.classList.toggle("last", CARDS.i === n - 1);
   if (!first) { snd.pop(); haptic(8); CARDS.lock = performance.now() + 280; }
   CARDS.busy = false;
@@ -6703,7 +6800,7 @@ function mountKilnDemo() {
   me.raf = requestAnimationFrame(tick);
 }
 function kdBrick(me) {                      // a brick pops out of the kiln's mouth and arcs up toward the counter
-  snd.clink(); haptic(10);
+  snd.bake(); haptic(10);
   var b = document.createElement("div"); b.className = "cd-kbrick"; b.style.background = clayCss(me.n * 7 + 3);
   var kr = me.k.getBoundingClientRect(), sr = me.st.getBoundingClientRect(), x = kr.left - sr.left + kr.width * 0.5 - 15, y = kr.top - sr.top + kr.height * 0.62;
   b.style.left = x + "px"; b.style.top = y + "px"; me.st.appendChild(b);
@@ -7083,7 +7180,7 @@ setInterval(musicTick, 100);
 /* ---------------- AUTOSAVE ---------------- */
 var SAVE_KEY = "brickbybrick3d_save_v1", NOSAVE = false, lastSaveAt = 0;
 var SAVE_FIELDS = ["money", "forgeWins", "discarded", "earned", "laid", "best", "bestStreak", "perfects", "misses", "drops", "hits", "molded", "smashed", "stolen", "lost", "playTime",
-  "hotUnlocked", "nextDemo", "leadUnlocked", "glassUnlocked", "workshopShown", "comboTutDone", "active", "endless", "goal", "won", "muted", "musicOn", "shakeOn", "vibOn", "quality", "shadow", "hand"];
+  "hotUnlocked", "paidBricks", "nextDemo", "leadUnlocked", "glassUnlocked", "workshopShown", "comboTutDone", "active", "endless", "goal", "won", "muted", "musicOn", "shakeOn", "vibOn", "quality", "shadow", "hand"];
 function saveGame() {
   if (NOSAVE || !S.started || (S.courses === 0 && S.laid === 0 && S.money === 0)) return;
   try {
