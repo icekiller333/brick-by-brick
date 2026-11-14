@@ -311,6 +311,7 @@
         background:radial-gradient(130px 70px at 118px 58px, rgba(255,140,40,.38), rgba(255,140,40,0) 70%), linear-gradient(180deg,#3a2314,#21120a); border:3px solid var(--line); box-shadow:var(--shadow-s); }
       .forge svg{ width:192px; height:96px; flex:none; display:block; }
       .fg-txt{ min-width:0; text-align:left; }
+      .fg-sp{ position:absolute; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%; background:#ffd24d; box-shadow:0 0 6px #ff9a2e; pointer-events:none; opacity:0; }
       .fg-title{ font-family:'Archivo Black',sans-serif; font-size:15px; letter-spacing:.05em; color:#ffd24d; text-shadow:0 2px 0 #000; line-height:1.1; }
       .fg-sub{ margin-top:4px; font-size:11px; font-weight:700; color:#e9d8b5; line-height:1.3; }
       .fg-clang{ position:absolute; left:96px; top:4px; font-family:'Archivo Black',sans-serif; font-size:20px; color:#fff; -webkit-text-stroke:1.5px #221407; text-shadow:2px 2px 0 #221407; opacity:0; pointer-events:none; transform-origin:0 100%; }
@@ -453,7 +454,7 @@
       .ld-bar i{ display:block; height:100%; width:0; background:linear-gradient(90deg,#f5b921,#e0704a); animation:ldFill 1.3s ease-in-out forwards; }
       @keyframes ldFill{ to{ width:100% } }
       /* loading finale: the finished wall detonates, bricks fly out in every direction, then the title screen takes over */
-      .ld-row i.fly{ animation:ldZoom var(--bt,.6s) cubic-bezier(.4,0,.8,.7) forwards; will-change:transform,opacity; }
+      .ld-row i.fly{ animation:ldZoom var(--bt,.6s) cubic-bezier(.4,0,.8,.7) forwards; animation-delay:0s !important; will-change:transform,opacity; }
       @keyframes ldZoom{ 0%{ transform:perspective(500px) translate3d(0,0,0) rotate(0); opacity:1 } 14%{ transform:perspective(500px) translate3d(0,0,-40px) rotate(0) scale(.88); opacity:1; animation-timing-function:cubic-bezier(.2,.6,.6,1) } 72%{ opacity:1 } 100%{ transform:perspective(500px) translate3d(var(--bx),var(--by),var(--bz)) rotate(var(--br)); opacity:0 } }
       @keyframes ldBX{ from{ translate:0 0 } to{ translate:var(--bx) 0 } }
       @keyframes ldBY{ 0%{ transform:translateY(0) rotate(0) scale(1); animation-timing-function:cubic-bezier(.1,.7,.4,1) }
@@ -645,6 +646,31 @@
       @keyframes stReveal{ from{ transform:translateY(14px); opacity:0 } to{ transform:none; opacity:1 } }
       @media (prefers-reduced-motion: reduce){ .st-card, .st-arrow, #st-yay.show, .tut-end #shop-guide, .tut-end #tree-tabs, .tut-end #upg-list > *{ animation:none !important; } }
       .tab-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--cat, #999); border:2px solid var(--line); margin-right:5px; vertical-align:baseline; }
+      /* ---------- workshop node tree ---------- */
+      .nd-sec{ margin:0 0 12px; }
+      .nd-head{ display:flex; align-items:center; gap:6px; font-family:'Archivo Black',sans-serif; font-size:11px; letter-spacing:.12em; color:var(--muted); margin:0 2px 8px; }
+      .nd-head::before{ content:""; width:10px; height:10px; background:var(--cat); border:2px solid var(--line); }
+      .nd-scroll{ overflow-x:auto; padding:6px 0 14px; -webkit-overflow-scrolling:touch; }
+      .nd-canvas{ position:relative; margin:0 auto; }
+      .nd-canvas svg{ position:absolute; left:0; top:0; pointer-events:none; overflow:visible; }
+      .nd-canvas svg path{ fill:none; stroke:var(--line); stroke-width:3; stroke-linejoin:round; }
+      .nd-canvas svg path.lk{ stroke-dasharray:5 5; opacity:.5; }
+      .nd{ position:absolute; width:54px; height:54px; padding:0; display:grid; place-items:center; background:var(--panel); border:3px solid var(--line); border-top:7px solid var(--cat, var(--line)); box-shadow:var(--shadow-s); border-radius:10px; color:inherit; touch-action:manipulation; z-index:1; }
+      .nd:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadowc); }
+      .nd-ico{ display:grid; place-items:center; font-size:19px; line-height:1; }
+      .nd-ico svg{ width:26px; height:26px; }
+      .nd-badge{ position:absolute; left:50%; bottom:-11px; transform:translateX(-50%); min-width:34px; padding:1px 5px; font-size:10.5px; font-weight:800; background:var(--panel); border:2px solid var(--line); white-space:nowrap; text-align:center; color:var(--ink); }
+      .nd-t{ position:absolute; right:-8px; top:-13px; font-size:9.5px; font-weight:800; background:var(--ink); color:var(--paper); padding:0 5px; border-radius:8px; }
+      .nd-new{ position:absolute; left:-6px; top:-11px; width:12px; height:12px; border-radius:50%; background:var(--bad); border:2px solid var(--line); }
+      .nd.afford{ background:linear-gradient(180deg,#fff3c4,#ffd96a); color:#221407; animation:ndGlow 1.3s ease-in-out infinite alternate; }
+      .nd.afford .nd-badge{ background:var(--gold); color:#221407; }
+      .nd.maxed{ background:var(--panel2); } .nd.maxed .nd-badge{ background:var(--good); color:#fff; }
+      .nd.locked{ opacity:.6; border-style:dashed; box-shadow:none; }
+      .nd.sel{ outline:3px solid var(--ink); outline-offset:3px; z-index:2; }
+      @keyframes ndGlow{ from{ box-shadow:3px 3px 0 var(--shadowc), 0 0 0 0 rgba(245,185,33,0) } to{ box-shadow:3px 3px 0 var(--shadowc), 0 0 0 5px rgba(245,185,33,.7) } }
+      .nd-detail{ position:sticky; bottom:0; z-index:6; padding-top:10px; background:linear-gradient(180deg, transparent, var(--paper) 14px); }
+      .nd-detail .upg-row{ margin-bottom:6px; }
+      .nd-detail.empty{ text-align:center; font-size:12px; font-weight:700; color:var(--muted); padding:12px 0 8px; }
       .tnode{ position:relative; }
       .tkids{ margin-left:10px; }
       .tkids > .tnode{ padding-left:18px; }
@@ -757,7 +783,7 @@
 
       <div id="workshop" class="sheet-wrap hidden" data-ui>
         <div class="sheet">
-          <div class="sheet-head"><h2>WORKSHOP</h2><span class="sub">Tap a card for details.</span><b class="rate-chip" id="rate-chip"></b>
+          <div class="sheet-head"><h2>WORKSHOP</h2><span class="sub">Tap a node for details.</span><b class="rate-chip" id="rate-chip"></b>
             <button class="x-btn pressable" id="btn-shop-close" aria-label="Close workshop">✕</button></div>
           <div class="forge" id="forge" aria-hidden="true">
             <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
@@ -972,7 +998,7 @@ var HOPPER_CAP = [1, 2, 3, 4, 5];                                  // Hopper: br
 var STORE_CAP = [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16];         // Bigger Storage: how many bricks the shed holds
 var PLACE_TIMES = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0];                   // Swift Setting: seconds a brick takes to set into its slot (0 = instant)
 var FUSE_ADD = [0, 4, 8];                                         // Hot Gloves: extra seconds a hot brick stays hot
-var TIP_ADD = [0, 1, 2, 3];                                       // Tip Jar: flat $ dropped in per finished row
+var TIP_ADD = [0, 0.5, 1, 1.5];                                       // Tip Jar: flat $ dropped in per finished row
 var LUCKY_P = [0, 0.05, 0.09, 0.14];                              // Lucky Brick: chance a baked brick is lucky
 var POUCH = [1, 1.1, 1.2, 1.35];                                  // Coin Pouch: brick and row pay multiplier
 var CHEER_ADD = [0, 1.5, 3];                                      // Cheer Bonus: extra × rate on a clean row
@@ -1118,10 +1144,10 @@ var ICON = {
   level: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="2.5" y="9" width="19" height="6" rx="1"/><circle cx="12" cy="12" r="1.6"/><path d="M8 9v2M16 9v2"/></svg>'
 };
 var LINES = [
-  { id: "perBrick", icon: "gilded", name: "Piece Work", costs: [50], gate: function () { return S.best >= PAY_FROM_ROW - 1; },
+  { id: "perBrick", icon: "gilded", name: "Piece Work", costs: [30], gate: function () { return S.best >= PAY_FROM_ROW - 1; },
     effect: function (t) { return "Every brick you lay pays $" + rate() + " (plus type and perfect bonuses)."; },
     next: function (t) { return "Get paid for every brick, not just finished rows. A plain brick pays $" + rate() + "."; } },
-  { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [70], gate: function () { return S.tier.perBrick >= 1; },
+  { id: "combo", icon: "crowd", name: "Combo Bonus", costs: [45], gate: function () { return S.tier.perBrick >= 1; },
     effect: function (t) { return "Hits in a row build a streak bonus (+" + Math.round(STREAK_STEP * 100) + "% per hit), capped at ×" + fmtMult(multCap()) + ". A miss resets it."; },
     next: function (t) { return "Land bricks in a row to build a STREAK multiplier on every brick. Miss and it resets."; } },
   { id: "starter", noNow: true, icon: "kiln", name: "Warm-Up", costs: [STARTER_COST], gate: function () { return true; },
@@ -1133,7 +1159,7 @@ var LINES = [
   { id: "bellows", icon: "bellows", name: "Banked Coals", costs: [100,  190,  320], gate: function () { return S.tier.perBrick >= 1 && S.best >= 6; },
     effect: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t] * 100) + "% speed."; },
     next: function (t) { return "Let go and the kiln keeps baking at " + Math.round(COALS[t + 1] * 100) + "% speed — bricks while your hands are busy."; } },
-  { id: "steady", icon: "steady", name: "Steady Hands", costs: [45,  110,  190], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
+  { id: "steady", icon: "steady", name: "Steady Hands", costs: [30,  85,  170], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
     effect: function (t) { return t >= 3 ? "Window +60% and the ALMOST RING — near misses swing again." : "Drop window +" + Math.round((STEADY_MULT[t] - 1) * 100) + "% wider."; },
     next: function (t) { return t === 2 ? "Adds the ALMOST RING: land just outside and the brick swings again — streak safe." : "Drop window +" + Math.round((STEADY_MULT[t + 1] - 1) * 100) + "% wider — the gold zone on the crane grows."; } },
   { id: "gilded", icon: "gilded", name: "Gilded Clay", costs: [300,  450,  600], gate: function () { return S.tier.perBrick >= 1 && S.best >= 3; },
@@ -1205,7 +1231,7 @@ var LINES = [
   { id: "hotGloves", icon: "mortar", name: "Hot Gloves", costs: [40, 90], gate: function () { return true; },
     effect: function (t) { return "Hot bricks stay hot for " + (HOT_FUSE + FUSE_ADD[t]) + "s."; },
     next: function (t) { return "Hot bricks stay hot " + (HOT_FUSE + FUSE_ADD[t]) + "s → " + (HOT_FUSE + FUSE_ADD[t + 1]) + "s — more time to line them up."; } },
-  { id: "tipJar", icon: "gilded", name: "Tip Jar", costs: [12, 30, 64], gate: function () { return true; },
+  { id: "tipJar", icon: "gilded", name: "Tip Jar", costs: [8, 20, 44], gate: function () { return true; },
     effect: function (t) { return "Every finished row drops +$" + TIP_ADD[t] + " in the jar."; },
     next: function (t) { return "A jar by the wall: every finished row earns +$" + TIP_ADD[t + 1] + " in tips" + (t > 0 ? " (now +$" + TIP_ADD[t] + ")" : "") + "."; } },
   { id: "coinPouch", icon: "star", name: "Coin Pouch", costs: [45, 110, 220], gate: function () { return true; },
@@ -1257,7 +1283,7 @@ LINES.forEach(function (l) { var T = TREE[l.id]; l.tab = T.tab; l.parent = T.par
    Tune UPG_SCALE to change how fast the tree gets expensive. The starter Warm-Up is unaffected (you own nothing before it). */
 var UPG_SCALE = 3;
 function upgOwned() { var n = 0; for (var i = 0; i < LINES.length; i++) n += S.tier[LINES[i].id] || 0; return n; }
-function costOf(l) { return l.costs[S.tier[l.id]] + UPG_SCALE * upgOwned(); }
+function costOf(l) { var n = upgOwned(); return Math.round(l.costs[S.tier[l.id]] * (1 + 0.03 * n + 0.0012 * n * n)); }   // the price climbs faster the more you own
 
 /* ----- helpers ----- */
 function $(id) { return document.getElementById(id); }
@@ -2421,8 +2447,9 @@ function groundOutOfView(prev) {            // the patch of ground in front of t
 // Ground-level people (villagers and walkers) are hidden and skipped while the ground they stand on is off-screen.
 // Critters are not touched: they fly in the sky and cost little.
 function setGroundCrowdShown(show) {
-  (W3.cParts || []).forEach(function (ip) { if (ip.fill) ip.fill.visible = show; if (ip.out) ip.out.visible = show; });
-  if (W3.cAura) W3.cAura.visible = show;
+  var crowd = show || floaterCount() > 0; W3.floatShown = floaterCount() > 0;      // the floating villagers are drawn from the same meshes: keep them while anyone floats
+  (W3.cParts || []).forEach(function (ip) { if (ip.fill) ip.fill.visible = crowd; if (ip.out) ip.out.visible = crowd; });
+  if (W3.cAura) W3.cAura.visible = crowd;
   (W3.walkers || []).forEach(function (w) { if (w.g) w.g.visible = show && w.state !== "off"; });
 }
 var FLOAT_OFF = [0.4, 1.9, -0.9, 1.1];  // each floater's own height around the working row
@@ -2528,16 +2555,67 @@ function camNearVillager(d) {
   if (d.nearCam) { if (dd > 9) d.nearCam = false; } else if (dd < 7) d.nearCam = true;
   return !!d.nearCam;
 }
+var CLIMB_COURSE = 10, CLIMB_MAX = 2, climbT = 0;
+function updateClimbers(dt) {                  // after row 10 a villager now and then starts crawling up the tower face
+  if (!S.tower || !S.started || S.courses < CLIMB_COURSE || !W3.crowd) return;
+  var n = 0, i, d;
+  for (i = 0; i < W3.crowd.length; i++) if (W3.crowd[i].climb) n++;
+  climbT -= dt;
+  if (climbT > 0 || n >= CLIMB_MAX) return;
+  climbT = rand(4, 9);
+  var cands = [];
+  for (i = 0; i < W3.crowd.length; i++) { d = W3.crowd[i]; if (d.on && d.s > 0.9 && !d.climb && !d.fall && !d.fx && (d.hy || 0) < 0.05) cands.push(i); }
+  if (!cands.length) return;
+  d = W3.crowd[cands[Math.floor(Math.random() * cands.length)]];
+  d.climb = { ang: Math.atan2(d.x, d.z + TH), from: { x: d.x, z: d.z }, t: 0, y: 0, yTop: rowY(S.courses) + BH / 2 };
+}
+function climbStep(d, dt) {                    // one villager's climb, jump-off or thrown-off fall
+  if (!d.on) { d.climb = null; d.fall = null; return; }
+  if (d.fall) {
+    d.fall.vy -= 14 * dt; d.y += d.fall.vy * dt; d.x += d.fall.vx * dt; d.z += d.fall.vz * dt;
+    d.ry -= angDiff(d.ry, d.fall.ry) * Math.min(1, dt * 6); d.arm = -2.4 + Math.sin(W3.t * 14 + d.ph) * 0.5;
+    if (d.y <= 0) { d.y = 0; d.fall = null; d.jump = 0.35; d.tx = undefined; d.arrived = false; }
+    return;
+  }
+  var c = d.climb; c.t += dt;
+  var R = TW / 2 + 0.35, sx = Math.sin(c.ang) * R, sz = -TH + Math.cos(c.ang) * R;
+  if (c.t < 0.6) { var k = c.t / 0.6; d.x = lerp(c.from.x, sx, k); d.z = lerp(c.from.z, sz, k); d.y = 0; d.ry = Math.atan2(-Math.sin(c.ang), -Math.cos(c.ang)); return; }
+  c.y = Math.min(c.yTop, (c.t - 0.6) * c.yTop / 14);
+  d.x = sx; d.z = sz; d.y = c.y; d.ry = Math.atan2(-Math.sin(c.ang), -Math.cos(c.ang));
+  d.arm = -1.5 + Math.sin(d.ph * 4) * 0.9; d.lat = 0; d.tilt = 0;
+  if (c.y >= c.yTop) { d.climb = null; d.fall = { vy: 3.0, vx: Math.sin(c.ang) * 2.2, vz: Math.cos(c.ang) * 2.2, ry: c.ang }; }
+}
+function climberTap(px, py) {                  // tap a climber: it is thrown off the tower and you get $1
+  if (!W3.crowd || !S.started) return false;
+  var best = -1, bd = 56, bsp = null;
+  for (var i = 0; i < W3.crowd.length; i++) {
+    var d = W3.crowd[i]; if (!d.climb) continue;
+    if (towerHides(d.x, d.y + 1.2, d.z)) continue;
+    var sp = toScreenW(d.x, d.y + 1.0, d.z); if (sp.behind) continue;
+    var dd = Math.sqrt((sp.x - px) * (sp.x - px) + (sp.y - py) * (sp.y - py));
+    if (dd < bd) { bd = dd; best = i; bsp = sp; }
+  }
+  if (best < 0) return false;
+  var dc = W3.crowd[best], ang = dc.climb.ang;
+  dc.climb = null; dc.fall = { vy: 4.5, vx: Math.sin(ang) * 3.5, vz: Math.cos(ang) * 3.5, ry: ang };
+  credit(1); snd.coin(); haptic(12);
+  popText("+$1", clamp(bsp.x, 50, window.innerWidth - 50), Math.max(100, bsp.y - 10), { cls: "gold", size: 24, rise: 40, rot: 0, dur: 900 });
+  return true;
+}
 function updateCrowd(dt) {
   var want = crowdTarget(); laneUpdate();
   W3.flOn = S.tower && S.started && CAM.mode !== "title" && groundOutOfView(W3.flOn);
   var away = S.started && CAM.mode !== "title" && groundOutOfView(W3.groundAway);
   if (away !== W3.groundAway) { W3.groundAway = away; setGroundCrowdShown(!away); }
-  if (away) return;
+  var fc = floaterCount();
+  if (away && (fc > 0) !== !!W3.floatShown) setGroundCrowdShown(false);        // the first floater arrived (or the last left) while the ground was away
+  if (away && fc === 0) return;
+  updateClimbers(dt);
   for (var i = 0; i < W3.crowd.length; i++) {
     var d = W3.crowd[i];
+    if (away && i >= fc && d.gz) continue;                    // a ground villager already shrunk away: nothing to redraw
     d.ph += dt * 3;
-    var wantI = i < want && !camNearVillager(d);
+    var wantI = i < want && !camNearVillager(d) && !(away && i >= fc);
     if (d.s === undefined) { d.s = 0; d.vs = 0; d.on = false; d.flipA = 0; }
     if (wantI && !d.on && dt > 0) {
       d.on = true; d.jump = Math.max(d.jump, 0.7);
@@ -2558,7 +2636,7 @@ function updateCrowd(dt) {
       }
       d.ry -= angDiff(d.ry, Math.atan2(camera.position.x - d.x, camera.position.z - d.z)) * Math.min(1, dt * 5);
     }
-    else if (S.tower && d.on) {            // walk to a spot around the tower; strollers then keep wandering between spots
+    else if (S.tower && d.on && !d.climb && !d.fall) {            // walk to a spot around the tower; strollers then keep wandering between spots
       if (d.tx === undefined) { var sp = crowdSpot(i); d.tx = sp.x; d.tz = sp.z; d.stroll = hash01(i * 2.9 + 0.7) < 0.6; d.spd = 0.55 + hash01(i * 5.3) * 0.4; d.wt = rand(1.5, 6); d.arrived = false; }
       if (dt > 0 && (inLane(d.x, d.z) || inLane(d.tx, d.tz))) laneOut(d);                    // the camera swung round: step out of its way
       var mdx = d.tx - d.x, mdz = d.tz - d.z, md = Math.sqrt(mdx * mdx + mdz * mdz);
@@ -2576,7 +2654,8 @@ function updateCrowd(dt) {
     d.s += d.vs * Math.min(dt, 0.033); if (d.s < 0) { d.s = 0; d.vs = 0; }
     var sc = Math.max(0.0001, d.s * 1.3);
     d.flipA = 0; d.lat = 0; d.tilt = 0;
-    if (d.fx && crowdPose(d, dt)) { /* reaction pose applied */ }
+    if (d.climb || d.fall) climbStep(d, dt);
+    else if (d.fx && crowdPose(d, dt)) { /* reaction pose applied */ }
     else if (airborne) {                                // up in the air: arms raised, bobbing, and now and then a backflip
       if (d.jump > 0) { d.jump -= dt; d.y = Math.abs(Math.sin(d.ph * 3)) * 0.35; }
       else d.y = damp(d.y, 0.12 * Math.sin(W3.t * 2.2 + d.fPh), 8, dt);
@@ -2610,11 +2689,12 @@ function updateCrowd(dt) {
     var cheer = d.arm < -1.2; vPart(W3.cMouth, i, 0, 0.725, 0.15, 1, cheer ? 1.9 : 1, 1);
     crowdMagic(d, i, dt, sc);
     // two arms that hang from the shoulders: they swing opposite ways while walking and go up together for a cheer
-    var aR = d.arm + 0.32, aL = walking ? -(-0.5 - (d.arm + 0.5)) - 0.32 : -(d.arm + 0.32);
+    var aR = d.arm + 0.32, aL = -(d.arm + 0.32), walkSwing = walking ? (d.arm + 0.5) : 0;   // walking: forward/back swing, arms in opposite phase
     for (var sd = 0; sd < 2; sd++) {
-      _e.set(0, 0, sd ? aR : aL); _q.setFromEuler(_e); _v.set(sd ? 0.17 : -0.17, 0.55, 0); _ml.compose(_v, _q, _s); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cArm, i * 2 + sd, _mw);
+      if (walking) _e.set(sd ? walkSwing : -walkSwing, 0, 0); else _e.set(0, 0, sd ? aR : aL); _q.setFromEuler(_e); _v.set(sd ? 0.17 : -0.17, 0.55, 0); _ml.compose(_v, _q, _s); _mw.multiplyMatrices(_mp, _ml); setInst(W3.cArm, i * 2 + sd, _mw);
       _ml2.makeTranslation(0, -0.32, 0); _mw2.multiplyMatrices(_mw, _ml2); setInst(W3.cHand, i * 2 + sd, _mw2);
     }
+    d.gz = away && i >= fc && d.s <= 0.0005;
   }
   W3.cParts.forEach(flushInst);
   W3.cAura.instanceMatrix.needsUpdate = true; if (W3.cBody.fill.instanceColor) W3.cBody.fill.instanceColor.needsUpdate = true;
@@ -2889,6 +2969,7 @@ function styleFree(f, type, seed) {
 function releaseFree(f) { if (!f) return; f.busy = false; f.mesh.visible = false; f.anim = null; }
 
 /* ---------- the hole in the sky ---------- */
+function silCount(c) { return c >= 50 ? 7 : c >= 48 ? 6 : c >= 45 ? 5 : c >= 40 ? 4 : c >= 35 ? 3 : c >= 30 ? 2 : c >= 25 ? 1 : 0; }
 function buildHole() {
   var g = new THREE.Group(); scene.add(g); W3.hole = g;
   W3.holeMat = new THREE.ShaderMaterial({
@@ -2916,11 +2997,11 @@ function buildHole() {
   // silhouettes peering down — sharper as you approach
   W3.sils = [];
   var silMat = new THREE.MeshBasicMaterial({ color: 0x181230, transparent: true, opacity: 0.4, fog: false, depthWrite: false });
-  for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < 7; i++) {
     var s = new THREE.Group();
     var body = new THREE.Mesh(new THREE.CircleGeometry(1.5, 20, 0, Math.PI), silMat); body.scale.y = 1.4; s.add(body);
     var head = new THREE.Mesh(new THREE.CircleGeometry(1.0, 20), silMat); head.position.y = 2.6; s.add(head);
-    s.position.set(-4 + i * 4, -7.6 + (i === 1 ? 0.6 : 0), 0.1); s.renderOrder = -6; body.renderOrder = -6; head.renderOrder = -6;
+    s.position.set(-6 + i * 2, -7.6 + (i % 2 ? 0.6 : 0), 0.1); s.visible = false; s.renderOrder = -6; body.renderOrder = -6; head.renderOrder = -6;
     s.userData.ph = i * 2.1; g.add(s); W3.sils.push(s);
   }
   W3.silMat = silMat;
@@ -3210,6 +3291,18 @@ function updateRain(dt) {
   if (any) flushInst(RAIN.ip);
 }
 // Tap a hot-air balloon: it pops and rains bricks.
+function popBalloon(best) {                       // the pop: sound, bricks rain down, a POP! word
+  var bp = best.g.position, bx = bp.x, by = bp.y, bz = bp.z, bsp = toScreenW(bx, by, bz);
+  best.g.visible = false; best.hide = 22;
+  EMIT_WORLD = true;
+  emitPuffs(bx, by, bz, 10, best.col, 3.2, 0.5, 2.4); emitGlow(bx, by, bz, 34, 0xfff0b0, 9, 0.7, 0.4, -2, 1); emitConfetti(bx, by, bz, 34, 2.5);
+  EMIT_WORLD = false;
+  rainBricks(bx, by, bz, 22);
+  noiseBurst(0.3, 0.22, 700); tone(520, 0.12, "sine", 0.1, 0, 140); tone(1040, 0.08, "triangle", 0.06, 0.02, 300);
+  for (var c = 0; c < 6; c++) tone(900 + Math.random() * 900, 0.08, "triangle", 0.05, 0.35 + c * 0.12 + Math.random() * 0.08);      // bricks clinking down
+  popText("POP!", clamp(bsp.x, 50, window.innerWidth - 50), Math.max(100, bsp.y - 10), { cls: "gold", size: 30, rise: 46, rot: -5, dur: 1100 });
+  camShake(0.12); haptic([10, 20, 10]); flashScreen(0.08, 120);
+}
 function balloonTap(px, py) {
   if (!S.started || !WON || !WON.ok || !WON.balloons) return false;
   var best = null, bd = 1e9, H = window.innerHeight;
@@ -3221,21 +3314,13 @@ function balloonTap(px, py) {
     if (dd < r && dd < bd) { bd = dd; best = o; }
   }
   if (!best) return false;
-  var bp = best.g.position, bx = bp.x, by = bp.y, bz = bp.z, bsp = toScreenW(bx, by, bz);
-  best.g.visible = false; best.hide = 22;
-  EMIT_WORLD = true;
-  emitPuffs(bx, by, bz, 10, best.col, 3.2, 0.5, 2.4); emitGlow(bx, by, bz, 34, 0xfff0b0, 9, 0.7, 0.4, -2, 1); emitConfetti(bx, by, bz, 34, 2.5);
-  EMIT_WORLD = false;
-  rainBricks(bx, by, bz, 22);
-  noiseBurst(0.3, 0.22, 700); tone(520, 0.12, "sine", 0.1, 0, 140); tone(1040, 0.08, "triangle", 0.06, 0.02, 300);
-  for (var c = 0; c < 6; c++) tone(900 + Math.random() * 900, 0.08, "triangle", 0.05, 0.35 + c * 0.12 + Math.random() * 0.08);      // bricks clinking down
-  popText("POP!", clamp(bsp.x, 50, window.innerWidth - 50), Math.max(100, bsp.y - 10), { cls: "gold", size: 30, rise: 46, rot: -5, dur: 1100 });
-  camShake(0.12); haptic([10, 20, 10]); flashScreen(0.08, 120);
+  popBalloon(best);
   return true;
 }
 function critTap(px, py) {
   if (skyTap(px, py)) return true;
   if (balloonTap(px, py)) return true;
+  if (climberTap(px, py)) return true;
   if (!CG || !S.started) return false;
   var best = null, bd = 1e9, bsp = null, i;
   for (i = 0; i < CRIT.items.length; i++) {
@@ -3712,7 +3797,7 @@ function updateHole(dt, prog) {
   W3.hole.scale.setScalar(sc * (1 + Math.sin(W3.t * 1.3) * 0.02) * clamp(W3.holeShow, 0, 1));
   W3.silMat.opacity = lerp(0.35, 0.9, p1);
   for (var i = 0; i < W3.sils.length; i++) {
-    var s = W3.sils[i]; s.position.x = -4 + i * 4 + Math.sin(W3.t * 0.8 + s.userData.ph) * 0.5;
+    var s = W3.sils[i]; s.position.x = -6 + i * 2 + Math.sin(W3.t * 0.8 + s.userData.ph) * 0.5; s.visible = i < silCount(S.courses);
     s.rotation.z = Math.sin(W3.t * 0.6 + s.userData.ph) * 0.06;
   }
   // the keystone gate
@@ -3784,7 +3869,7 @@ function ensureActive() {                 // the selected building ran dry -> go
   for (var i = 0; i < keys.length; i++) { if (i === ai || whCount(keys[i]) === 0) continue; var d = ai < 0 ? i : Math.abs(i - ai); if (d < bd) { bd = d; best = keys[i]; } }
   if (best === null) return;
   var was = S.active; S.active = best; UI.traySig = "";
-  toast(WH_NAME[was] + " storage is empty \u2014 switched to " + WH_NAME[best], 2200); renderHUD();
+  renderHUD();
 }
 function selectWh(k) {                    // returns true when k is now the building we build from
   if (!sorterOn() || !whOpen(k)) return false;
@@ -4143,7 +4228,7 @@ function villagerSay(idx, text, fixed) {
   while (SAYQ.length > 3) SAYQ.shift();                       // never a backlog: only the freshest few lines
 }
 // A bubble waits its turn while any tutorial hint, story card, reveal or panel is up — so it can never cover a "tap this" prompt.
-function bubblesBlocked() { return !S.started || !!W3.groundAway || !!activeMsg || panelsBusy() || S.shopOpen || CAM.mode !== "play" || !!(el.story && !el.story.classList.contains("hidden")); }
+function bubblesBlocked() { return !S.started || (!!W3.groundAway && floaterCount() === 0) || !!activeMsg || panelsBusy() || S.shopOpen || CAM.mode !== "play" || !!(el.story && !el.story.classList.contains("hidden")); }
 function dropBubble() { if (curBubble) { if (curBubble.el.parentNode) curBubble.el.parentNode.removeChild(curBubble.el); curBubble = null; } }
 function updateBubbles() {
   var now = performance.now();
@@ -4257,6 +4342,19 @@ function tickFalling(dt) {
         camShake(0.85); flashScreen(0.22); snd.crash(); noiseBurst(0.35, 0.22, 500);
         releaseFree(f); FALLING.splice(i, 1); continue;
       }
+      continue;
+    } else if (a.kind === "balloon") {         // flung up at a balloon: it pops, and the brick tumbles down from there
+      var ub = Math.min(1, a.t / a.dur), ob = WON && WON.balloons ? WON.balloons[a.bi] : null;
+      if (ob && ob.g.visible && !a.hit) {
+        ob.g.getWorldPosition(_vf); W3.orbit.worldToLocal(_vf);
+        var eb = ub * ub * 0.5 + ub * 0.5;
+        f.mesh.position.set(lerp(a.sx, _vf.x, eb), lerp(a.sy, _vf.y, ub) + Math.sin(ub * Math.PI) * 1.6, lerp(a.sz, _vf.z, eb));
+        f.mesh.rotation.z = a.t * a.spin; f.mesh.rotation.x = a.t * 2;
+        if (ub < 1) continue;
+      }
+      if (ob && ob.g.visible) popBalloon(ob);
+      a.hit = true; a.kind = "miss"; a.vx = (Math.random() < 0.5 ? -1 : 1) * rand(0.8, 1.6); a.vy = 2.5; a.vz = 0.4;
+      a.rx = rand(-3, 3); a.rz = rand(-4, 4); a.ty = rowY(workRow()) - PITCH; a.bounced = false;
       continue;
     } else if (a.kind === "bonk") {            // lobbed at a villager's head: thonk, "ow", and it ricochets off
       var m2 = f.mesh;
@@ -4393,6 +4491,16 @@ function poofBack(item, f, word) {
   S.stack.push(item); settleStack();
   C.t = 0.3; G.reload = true;
 }
+function pickBalloonTarget(f) {            // a visible hot-air balloon the brick can reach on screen (nearest to the brick)
+  if (!WON || !WON.ok || !WON.balloons || !S.started) return -1;
+  var W = window.innerWidth, H = window.innerHeight, bs = toScreen(f.mesh.position.x, f.mesh.position.y, f.mesh.position.z), best = -1, bd = 1e9;
+  for (var i = 0; i < WON.balloons.length; i++) {
+    var o = WON.balloons[i]; if (!o.g.visible || o.hide > 0 || o.pop < 0.6) continue;
+    o.g.getWorldPosition(_vt); var sp = toScreenW(_vt.x, _vt.y, _vt.z); if (sp.behind || sp.x < 40 || sp.x > W - 40 || sp.y < 110 || sp.y > H - 230) continue;
+    var dd = Math.abs(sp.x - bs.x) + Math.abs(sp.y - bs.y) * 0.3; if (dd < bd) { bd = dd; best = i; }
+  }
+  return best;
+}
 function pickBonkTarget(f) {
   if (!W3.crowd || !S.started) return null;
   var W = window.innerWidth, H = window.innerHeight, bs = toScreen(f.mesh.position.x, f.mesh.position.y, f.mesh.position.z), pool = [];
@@ -4408,9 +4516,10 @@ function pickBonkTarget(f) {
 function missFx(item, f) {
   S.misses++; S.rowMisses++;
   breakStreak();
-  var kind = null, bonk = f ? pickBonkTarget(f) : null;
+  var kind = null, bonk = f ? pickBonkTarget(f) : null, ball = f ? pickBalloonTarget(f) : -1;
   if (f) {
-    var kinds = ["tumble", "boom", "twirl", "crack"]; if (bonk !== null) kinds.push("bonk", "bonk");        // ow: more likely whenever a villager is standing handy
+    var kinds = ["tumble", "boom", "twirl", "crack"]; if (bonk !== null) kinds.push("bonk", "bonk");
+    if (ball >= 0) kinds.push("balloon", "balloon");        // a brick lobbed up at a passing balloon        // ow: more likely whenever a villager is standing handy
     if (Math.random() < 0.07 && G.lastMiss !== "leaf") kind = "leaf";                       // rare: the brick turns into a leaf and the wind takes it
     else do { kind = kinds[Math.floor(Math.random() * kinds.length)]; } while (kind === G.lastMiss);
     G.lastMiss = kind;
@@ -4420,6 +4529,7 @@ function missFx(item, f) {
   if (f) {
     var col = brickColorHex(item.type, item.seed).getHex();
     if (kind === "boom") { snd.whoosh(); f.anim = { kind: "boom", t: 0, vx: C.dir * 0.7, vy: 7.4, vz: 0.4, rz: -C.dir * 5, rx: rand(-3, 3), col: col }; }
+    else if (kind === "balloon") { snd.whoosh(); f.anim = { kind: "balloon", t: 0, dur: 0.85, sx: f.mesh.position.x, sy: f.mesh.position.y, sz: f.mesh.position.z, bi: ball, spin: -C.dir * rand(8, 12), col: col }; }
     else if (kind === "bonk") { snd.whoosh(); f.anim = { kind: "bonk", t: 0, dur: 0.8, sx: f.mesh.position.x, sy: f.mesh.position.y, sz: f.mesh.position.z, idx: bonk, spin: -C.dir * rand(8, 13), col: col }; }
     else if (kind === "leaf") {
       snd.whoosh(); var c0 = f.mesh.material.color;
@@ -4692,8 +4802,31 @@ function forgeBubble() {                                // a little bubble with 
 }
 function forgeClick() {                                // clicking the forge: the strike animation, plus the lucky roll (buying an upgrade only animates, it never rolls)
   var fg = $("forge"); if (!fg || !S.shopOpen) return;
-  forgeStrike();
+  forgeStrike(); forgeFiveTaps(fg);
   if (Math.random() < forgeChance()) setTimeout(forgeWin, 400);          // pays as the hammer lands
+}
+var FG_POOL = [], FG_POOL_N = 24, fgPoolIdx = 0, fgTapN = 0, fgTapT = 0;   // spark elements are made once and reused round-robin
+function fgSparkPool(fg) {
+  if (FG_POOL.length) return FG_POOL;
+  for (var i = 0; i < FG_POOL_N; i++) { var sp = document.createElement("i"); sp.className = "fg-sp"; fg.appendChild(sp); FG_POOL.push(sp); }
+  return FG_POOL;
+}
+function fgSparkBurst(fg) {
+  var pool = fgSparkPool(fg);
+  for (var k = 0; k < 12; k++) {
+    var sp = pool[fgPoolIdx]; fgPoolIdx = (fgPoolIdx + 1) % pool.length;
+    sp.style.left = "70%"; sp.style.top = "58%";
+    if (REDUCED || !sp.animate) continue;
+    var dx = rand(-70, 70), dy = rand(-80, -20);
+    sp.animate([{ transform: "translate(0,0) scale(1)", opacity: 1 },
+                { transform: "translate(" + dx.toFixed(0) + "px," + (dy + 50).toFixed(0) + "px) scale(.2)", opacity: 0 }],
+               { duration: rand(450, 800), delay: k * 15, easing: "cubic-bezier(.1,.6,.4,1)", fill: "backwards" });
+  }
+}
+function forgeFiveTaps(fg) {
+  var now = performance.now();
+  fgTapN = (now - fgTapT < 1600) ? fgTapN + 1 : 1; fgTapT = now;
+  if (fgTapN >= 5) { fgTapN = 0; fgSparkBurst(fg); }
 }
 function forgeWin() {
   S.forgeWins = (S.forgeWins || 0) + 1;
@@ -4721,7 +4854,7 @@ function buyLine(id) {
   if (S.money < cost) { snd.err(); if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); } return; }
   if (row) { var bb = row.querySelector(".buy-btn"); if (bb) { var r = bb.getBoundingClientRect(); domBurst(r.left + r.width / 2, r.top + r.height / 2); popText("TIER " + (S.tier[id] + 1) + "!", r.left + r.width / 2, r.top - 12, { cls: "gold", size: 18, rise: 30 }); } }
   S.money = Math.round((S.money - cost) * 100) / 100; S.tier[id]++;
-  if (upgOwned() === 3 && !S.flags.scaleTaught) { S.flags.scaleTaught = true; toast("Workshop prices climb: every upgrade you own adds $" + UPG_SCALE + " to the next one. It shows on each card.", 4200); }
+  if (upgOwned() === 3 && !S.flags.scaleTaught) { S.flags.scaleTaught = true; toast("Workshop prices climb: every upgrade you own makes the next one dearer. It shows on each card.", 4200); }
   snd.buy(); haptic(15); forgeStrike(); forgeBubble();
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
@@ -4931,7 +5064,7 @@ function updateHazards() {
 
 /* ---------- milestones: story, reveals, raids, banners ---------- */
 function revealGoal() { S.flags.goalShown = true; renderHUD(); popEl($("hud-course-num")); banner("THE GOAL", "BUILD TO ROW 50"); }
-var STORY_AT = { 30: "c30", 35: "c35", 40: "c40", 45: "c45", 48: "c48", 55: "c55", 60: "c60", 65: "c65", 70: "c70", 75: "c75", 80: "c80", 85: "c85", 90: "c90", 95: "c95" };
+var STORY_AT = { 30: "c30", 35: "c35", 45: "c45", 48: "c48", 55: "c55", 60: "c60", 65: "c65", 70: "c70", 75: "c75", 80: "c80", 85: "c85", 90: "c90", 95: "c95" };
 function milestone(n) {
   if (n === 1) {
     enqueueStory("row1");
@@ -5514,7 +5647,7 @@ function finishFly(uid) {
 }
 var SHED_ROOF = { lead: "#4a4f5a", silver: "#b9c3cc", gold: "#d99a06" };
 function renderSheds() {                  // one little building per unlocked metal, standing beside the plain shed
-  var keys = sorterOn() ? ["lead", "silver", "gold"].filter(whOpen) : [], vis = shedVisCap();
+  var keys = sorterOn() ? ["lead", "silver", "gold"].filter(whOpen) : [], multi = keys.length >= 2, vis = multi ? 1 : shedVisCap();
   var sig = keys.map(function (k) { return k + (S.active === k ? "*" : "") + ":" + storeCap() + ":" + bldList(k).map(function (u) { return u.uid; }).join(","); }).join("|");
   if (sig === UI.shedSig) return; UI.shedSig = sig;
   el.sheds.classList.toggle("hidden", !keys.length); $("dock").classList.toggle("crowded", keys.length >= 2);
@@ -5526,7 +5659,7 @@ function renderSheds() {                  // one little building per unlocked me
       inner += '<div class="tb t-' + it.type + (it.lucky ? " lucky" : "") + (shown === 0 ? " first" : "") + (UI.fly[it.uid] ? " pend" : prev[it.uid] ? "" : " new") + '" data-uid="' + it.uid + '"></div>';
     }
     for (var q = 0; q < v.length; q++) if (!UI.fly[v[q].uid]) cnt++;
-    var free = Math.min(Math.max(0, storeCap() - v.length), Math.max(0, vis - shown));
+    var free = multi ? 0 : Math.min(Math.max(0, storeCap() - v.length), Math.max(0, vis - shown));
     for (var sl = 0; sl < free; sl++) inner += '<div class="tb slot"></div>';
     if (!v.length && !free) inner = '<div class="tb empty"></div>';
     html += '<div class="shed-x' + (S.active === k ? " on" : "") + (v.length ? "" : " zero") + (UI.whPop === k ? " bump" : "") + '" data-wh="' + k + '" role="button" aria-label="' + WH_NAME[k] + ' storage">' +
@@ -5608,11 +5741,11 @@ function renderShopBadge() {
 var CAT_COL = { kiln: "#e0704a", bricks: "#8a96ab", money: "#f5b921", skill: "#3fae9a", crew: "#8a6bd0", weather: "#5fb3e8" };
 UI.openUp = {}; UI.secOpen = { locked: false, owned: false };
 function tabName(id) { for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i].name; return id; }
-function upCard(l, state) {
+function upCard(l, state, forceOpen) {
   var t = S.tier[l.id], maxed = t >= l.costs.length, cost = maxed ? 0 : costOf(l);
   var pips = '<span class="pips">'; for (var p = 0; p < l.costs.length && l.costs.length <= 6; p++) pips += '<i class="' + (p < t ? "on" : "") + '"></i>'; pips += "</span>";
   var tier = l.costs.length > 6 ? '<span class="up-tier">LV ' + t + "/" + l.costs.length + "</span>" : "";
-  var open = UI.openUp[l.id] ? " open" : "";
+  var open = (forceOpen || UI.openUp[l.id]) ? " open" : "";
   var sum = maxed ? l.effect(t) : l.next(t);
   var h = '<div class="upg-row up-card ' + state + open + '" id="upg-' + l.id + '" data-cost="' + cost + '" data-tab="' + l.tab + '" style="--cat:' + CAT_COL[l.tab] + '">';
   h += '<div class="up-top" data-toggle="' + l.id + '"><div class="upg-ico">' + (state === "locked" ? "🔒" : ICON[l.icon]) + '</div>';
@@ -5620,7 +5753,7 @@ function upCard(l, state) {
   if (state === "locked") h += '<div class="up-sum lock">' + lockReason(l) + "</div></div></div></div>";
   else {
     h += '<div class="up-sum">' + sum + "</div></div>";
-    h += (maxed ? '<div class="buy-btn maxed">✓ MAX</div>' : '<button class="buy-btn" data-upg="' + l.id + '">$' + fmt(cost) + "</button>") + (!maxed && upgOwned() >= 3 ? '<div class="up-raise">+$' + UPG_SCALE + " for each upgrade you own</div>" : "");
+    h += (maxed ? '<div class="buy-btn maxed">✓ MAX</div>' : '<button class="buy-btn" data-upg="' + l.id + '">$' + fmt(cost) + "</button>") + (!maxed && upgOwned() >= 3 ? '<div class="up-raise">prices rise as you own more upgrades</div>' : "");
     h += "</div>";
     if (state === "saving") h += '<div class="up-bar"><i style="width:' + Math.min(100, S.money / cost * 100).toFixed(0) + '%"></i></div>';
     h += '<div class="up-more">' + (t > 0 && !maxed && !l.noNow ? '<div class="upg-now">NOW: ' + l.effect(t) + "</div>" : "") + '<div class="up-cat">' + tabName(l.tab) + " tab</div></div>";
@@ -5658,19 +5791,63 @@ function renderStarterTut() {
   h += can ? '<div class="st-arrow">TAP TO BUY</div>' : '<div class="st-tip">Earn $' + (STARTER_COST - Math.floor(S.money)) + ' more, then come back. The forge will wait.</div>';
   el.upgList.innerHTML = h;
 }
-/* TREE VIEW: each visible upgrade is a card; children nest under their parent with the connector lines (.tnode / .tkids). */
-function treeHTML(list) {
+/* NODE TREE: every upgrade is a small node; parents sit above their children, joined by lines. Tap a node and its card opens in the panel pinned to the bottom. */
+var ND_W = 62, ND_H = 86, ND_BOX = 54;
+function ndState(l) { var t = S.tier[l.id], av = lineAvail(l), maxed = av && t >= l.costs.length, can = av && !maxed && S.money >= costOf(l); return !av ? "locked" : maxed ? "maxed" : can ? "afford" : "saving"; }
+function ndLayout(items, cols) {
   var ids = {}, kids = {}, roots = [];
-  list.forEach(function (l) { ids[l.id] = true; });
-  list.forEach(function (l) { if (l.parent && ids[l.parent]) (kids[l.parent] = kids[l.parent] || []).push(l); else roots.push(l); });
-  function node(l) {
-    var t = S.tier[l.id], av = lineAvail(l), maxed = av && t >= l.costs.length, can = av && !maxed && S.money >= costOf(l);
-    var state = !av ? "locked" : maxed ? "maxed" : can ? "afford" : "saving";
-    var h = '<div class="tnode">' + upCard(l, state);
-    if (kids[l.id]) h += '<div class="tkids">' + kids[l.id].map(node).join("") + "</div>";
-    return h + "</div>";
-  }
-  return roots.map(function (l) { return '<div class="troot">' + node(l) + "</div>"; }).join("");
+  items.forEach(function (l) { ids[l.id] = true; });
+  items.forEach(function (l) { if (l.parent && ids[l.parent]) (kids[l.parent] = kids[l.parent] || []).push(l); else roots.push(l); });
+  var layouts = roots.map(function (r) {
+    var slot = 0, pos = {}, maxD = 0;
+    (function walk(l, d) {
+      if (d > maxD) maxD = d;
+      var ks = kids[l.id] || [];
+      if (!ks.length) { pos[l.id] = { x: slot++, y: d }; return; }
+      ks.forEach(function (k) { walk(k, d + 1); });
+      pos[l.id] = { x: (pos[ks[0].id].x + pos[ks[ks.length - 1].id].x) / 2, y: d };
+    })(r, 0);
+    return { pos: pos, w: Math.max(1, slot), h: maxD + 1 };
+  });
+  var out = {}, x = 0, y = 0, rowH = 0, totalW = 0;                          // pack the separate trees left to right, wrapping to a new band when the row is full
+  layouts.forEach(function (rl) {
+    if (x > 0 && x + rl.w > cols) { y += rowH; x = 0; rowH = 0; }
+    for (var id in rl.pos) out[id] = { x: x + rl.pos[id].x, y: y + rl.pos[id].y };
+    x += rl.w; if (rl.h > rowH) rowH = rl.h; if (x > totalW) totalW = x;
+  });
+  return { pos: out, w: totalW, h: y + rowH, kids: kids };
+}
+function ndSection(tabId, items, cols, showHead) {
+  var L = ndLayout(items, cols), W = L.w * ND_W, H = (L.h - 1) * ND_H + ND_BOX + 16, paths = "", nodes = "";
+  items.forEach(function (l) {
+    var p = L.pos[l.id], px = p.x * ND_W + ND_W / 2, py = p.y * ND_H;
+    (L.kids[l.id] || []).forEach(function (k) {
+      var c = L.pos[k.id], cx = c.x * ND_W + ND_W / 2, cy = c.y * ND_H, y0 = py + ND_BOX - 6, ym = cy - (ND_H - ND_BOX) / 2;
+      paths += '<path class="' + (ndState(k) === "locked" ? "lk" : "") + '" d="M' + px + " " + y0 + "V" + ym + "H" + cx + "V" + cy + '"/>';
+    });
+  });
+  items.forEach(function (l) {
+    var p = L.pos[l.id], st = ndState(l), t = S.tier[l.id], n = l.costs.length;
+    var badge = st === "locked" ? "\u{1F512}" : st === "maxed" ? "MAX" : "$" + fmt(costOf(l));
+    nodes += '<button class="nd ' + st + (UI.sel === l.id ? " sel" : "") + '" data-node="' + l.id + '" aria-label="' + l.name + '" style="left:' + (p.x * ND_W + (ND_W - ND_BOX) / 2) + "px;top:" + (p.y * ND_H) + "px;--cat:" + CAT_COL[l.tab] + '">' +
+      '<span class="nd-ico">' + (st === "locked" ? "\u{1F512}" : ICON[l.icon]) + "</span>" +
+      (n > 1 && st !== "locked" ? '<span class="nd-t">' + t + "/" + n + "</span>" : "") +
+      (UI.shopNew[l.id] ? '<span class="nd-new"></span>' : "") +
+      '<span class="nd-badge">' + badge + "</span></button>";
+  });
+  return '<div class="nd-sec">' + (showHead ? '<div class="nd-head" style="--cat:' + CAT_COL[tabId] + '">' + tabName(tabId) + "</div>" : "") +
+    '<div class="nd-scroll"><div class="nd-canvas" style="width:' + W + "px;height:" + H + 'px"><svg width="' + W + '" height="' + H + '">' + paths + "</svg>" + nodes + "</div></div></div>";
+}
+function ndDetail(list) {
+  var l = null; if (UI.sel) list.forEach(function (x) { if (x.id === UI.sel) l = x; });
+  if (!l) return '<div class="nd-detail empty">Tap a node to see what it does.</div>';
+  return '<div class="nd-detail">' + upCard(l, ndState(l), true).replace(' data-toggle="' + l.id + '"', "") + "</div>";
+}
+function nodesHTML(list, cols) {
+  var byTab = {}, h = "";
+  list.forEach(function (l) { (byTab[l.tab] = byTab[l.tab] || []).push(l); });
+  TABS.forEach(function (tb) { if (byTab[tb.id]) h += ndSection(tb.id, byTab[tb.id], cols, UI.tab === "all"); });
+  return h + ndDetail(list);
 }
 function renderShop() {
   if (!S.workshopShown) return;
@@ -5686,7 +5863,7 @@ function renderShop() {
     var t = S.tier[l.id], av = lineAvail(l), maxed = av && t >= l.costs.length, can = av && !maxed && S.money >= costOf(l);
     if (can) { allReady++; counts[l.tab] = (counts[l.tab] || 0) + 1; }
     if (UI.tab !== "all" && l.tab !== UI.tab) return;
-    if (!av) { lockedN++; if (!UI.secOpen.locked) return; }
+    if (!av) lockedN++;
     list.push(l);
   });
   // the guide always looks across every tab, so it can point you at the best buy wherever it is
@@ -5695,14 +5872,14 @@ function renderShop() {
   gReady.sort(byCost); gSaving.sort(byCost);
   var gh = guideHTML(gReady, gSaving, gLocked);
   if (gh !== UI.guideHtml) { UI.guideHtml = gh; $("shop-guide").innerHTML = gh; }
-  var sig = [UI.tab, UI.secOpen.locked, JSON.stringify(UI.openUp), lockedN, list.map(function (l) { return l.id + S.tier[l.id] + (S.money >= costOf(l) ? "+" : "-"); }).join()].join("#");
+  var ndCols = Math.max(3, Math.floor(((el.upgList.clientWidth || 340) - 4) / ND_W));
+  var sig = [UI.tab, UI.sel || "", ndCols, lockedN, list.map(function (l) { return l.id + S.tier[l.id] + (S.money >= costOf(l) ? "+" : "-"); }).join()].join("#");
   if (sig !== UI.shopSig) {
     UI.shopSig = sig;
     var th = '<button class="tab-btn pressable' + (UI.tab === "all" ? " on" : "") + '" data-tab="all">ALL<b></b></button>';
     shown.forEach(function (tb) { th += '<button class="tab-btn pressable' + (tb.id === UI.tab ? " on" : "") + '" data-tab="' + tb.id + '" style="--cat:' + CAT_COL[tb.id] + '"><i class="tab-dot"></i>' + tb.name + "<b></b></button>"; });
     $("tree-tabs").innerHTML = th; $("tree-tabs").classList.toggle("hidden", shown.length < 2);
-    var html = list.length ? treeHTML(list) : '<div class="up-empty">Nothing here yet.</div>';
-    if (lockedN) html += '<button class="up-sec fold" data-sec="locked"><span>COMING UP</span><em>' + lockedN + "</em><u>" + (UI.secOpen.locked ? "HIDE" : "SHOW") + "</u></button>";
+    var html = list.length ? nodesHTML(list, ndCols) : '<div class="up-empty">Nothing here yet.</div>';
     el.upgList.innerHTML = html;
   }
   var tbs = $("tree-tabs").querySelectorAll("[data-tab]");
@@ -5713,6 +5890,7 @@ function renderShop() {
 }
 $("tree-tabs").addEventListener("click", function (e) { var b = e.target.closest("[data-tab]"); if (!b) return; UI.tab = b.getAttribute("data-tab"); UI.shopSig = ""; renderShop(); snd.pop(); });
 el.upgList.addEventListener("click", function (e) {
+  var nd = e.target.closest("[data-node]"); if (nd) { UI.sel = nd.getAttribute("data-node"); UI.shopSig = ""; renderShop(); snd.tick(); return; }
   var b = e.target.closest("[data-upg]"); if (b) { buyLine(b.getAttribute("data-upg")); return; }
   var sc = e.target.closest("[data-sec]"); if (sc) { var k = sc.getAttribute("data-sec"); UI.secOpen[k] = !UI.secOpen[k]; UI.shopSig = ""; renderShop(); snd.pop(); return; }
   var tg = e.target.closest("[data-toggle]"); if (tg) { var id = tg.getAttribute("data-toggle"); UI.openUp[id] = !UI.openUp[id]; var card = $("upg-" + id); if (card) card.classList.toggle("open", !!UI.openUp[id]); UI.shopSig = ""; snd.tick(); }
@@ -5815,12 +5993,12 @@ var BEATS = {
   c10a: "The tower stands five rows high, right on top of your five-row wall. You turn to the crowd. \u201cSo\u2026 how tall should this thing be? What\u2019s enough?\u201d",
   c10b: "The villagers huddle. Loudly. The eldest holds up fingers, runs out of fingers, borrows someone else\u2019s. \u201cFifty,\u201d they decide. \u201cFifty rows. That ought to do it.\u201d",
   c25: "Hands are starting to grab at the wall. Huge pale hands reach down through the hole, clamp onto a brick and pull — and everything laid after it falls. Drop a brick on top of a hand to make it let go.",
-  c30: "The hands are getting bolder. Whatever is up there does not want this wall finished.",
+  c30: "The hands are getting bolder. Whatever is up there does not want this wall finished. Down in the hole, dark shapes have started to stand along its edge, watching.",
   c35: "The silhouettes are waving their arms now. Not cheering — warning. You still can't make out the words.",
   c40: "Clouds are gathering around the hole, curling into a slow ring. They drift down toward your crane. Something up there doesn't want you to see.",
   c45: "The cloud ring tightens and rolls straight through your work site. You'll be dropping bricks half-blind. Trust the rhythm.",
   c48: "Two courses to go. The silhouettes have stopped moving. They're standing at the rim, hands pressed to its edge, watching you.",
-  c50a: "Your last brick touches the rim of the hole. For one heartbeat the whole world is silent. Then the town below ERUPTS. You did it.",
+  c50a: "Your last brick touches the rim of the hole. For one second, the entire world is silent. Then the town below ERUPTS. You did it.",
   c50b: "But the light behind the hole is wrong. The silhouettes aren't cheering — they're beating on the edge of the sky with both fists. Now you can hear them: “NOT YET. HIGHER.”",
   c50c: "The hole isn't a door. It's a tear in the underside of the sky — and through it you can see what's above: a second wall, a hundred courses tall, standing unfinished in the dark. The silhouettes are its builders. The hands are the sky's way of tearing it all back down.",
   c50d: "Your wall is the other half. Reach course 100 and the two walls meet, and a KEYSTONE can lock them together. Stop now and the tear seals — with them on the wrong side. Fifty was never the end. Build higher.",
@@ -6695,6 +6873,8 @@ var CARDS_MIST = [
 var CARDS_TREMOR = [
   { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "TREMORS", text: "\u201cOops. I rolled over in my sleep and forgot where my tail was. Hold on, the wall's going to shudder.\u201d" },
   { who: "EDGAR", pic: "edgar_wave", kicker: "TREMORS", text: "\u201cYou're the reason the wall shakes?!\u201d" },
+  { who: "EDGAR", pic: "edgar_shrug", kicker: "TREMORS", text: "\u201cWait. Is the tail the only reason it sways?\u201d" },
+  { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "TREMORS", text: "\u201cWell no, but um anyway.\u201d" },
   { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "THE WALL SHUDDERS", text: "\u201cNow the green drop zone <b>slides side to side</b>. Drop where it <b>is</b> when you tap, not where it was. A Spirit Level calms it.\u201d", cta: "STEADY ON" }
 ];
 var CARDS_GLASS = [
@@ -7106,31 +7286,55 @@ function mNoise(d, t, dur, vol, ftype, f0, f1) {
   var g = AC.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + Math.min(0.02, dur / 3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   s.connect(f); f.connect(g); g.connect(d); s.start(t, Math.random() * 0.4); s.stop(t + dur + 0.02);
 }
-var CALM_PROG = [[50, 53, 57], [48, 52, 55], [50, 53, 57], [45, 48, 52], [46, 50, 53], [48, 52, 55], [50, 53, 57], [50, 53, 57]];
-var UP_PROG = [[50, 53, 57], [48, 52, 55], [46, 50, 53], [48, 52, 55], [50, 53, 57], [48, 52, 55], [53, 57, 60], [45, 49, 52]];
 var EE_PROG = [[50, 53, 57], [51, 55, 58], [50, 53, 57], [47, 50, 53]];
 var ME_PROG = [[53, 57, 60, 64], [55, 59, 62, 66], [52, 55, 59, 62], [57, 60, 64, 67]];
 var D_DOR = [62, 64, 65, 67, 69, 71, 72, 74, 76];
-var PHR = [[74, 0, 72, 74, 76, 0, 74, 72], [69, 71, 72, 0, 74, 72, 71, 69], [74, 0, 72, 74, 76, 0, 74, 72], [72, 74, 76, 77, 76, 74, 72, 0]];
+/* Generated music: every 16 bars the chords and the melody are rebuilt from rules (a random walk over the mood's mode that
+   cadences in the middle and at the end, and four 2-bar melody cells arranged so no two passages match). */
+var MOOD_MODE = [[0, 2, 3, 5, 7, 9, 10], [0, 2, 4, 5, 7, 9, 11], [0, 2, 3, 5, 7, 8, 10], [0, 2, 3, 5, 7, 8, 10], [0, 2, 4, 6, 7, 9, 11]];
+function mPitch(base, mode, d) { var i = ((d % 7) + 7) % 7, oct = Math.floor(d / 7); return base + mode[i] + 12 * oct; }
+function regenMusic(mood) {
+  var mode = MOOD_MODE[mood] || MOOD_MODE[0], prog = [], d = 0, bar, i, k;
+  var walk = [-2, -1, -1, 1, 1, 2, 3, -3];
+  for (bar = 0; bar < 16; bar++) {
+    if (bar === 7) d = 4; else if (bar === 15) d = 0;
+    else if (bar > 0) { var nd = d; for (k = 0; k < 6; k++) { nd = d + pick(walk); if (nd >= 0 && nd <= 6) break; } d = Math.max(0, Math.min(6, nd)); }
+    prog.push([mPitch(50, mode, d), mPitch(50, mode, d + 2), mPitch(50, mode, d + 4)]);
+  }
+  var cells = [];
+  for (k = 0; k < 4; k++) {
+    var grid = [], n = 5 + Math.floor(Math.random() * 3), pos = [0];
+    for (i = 0; i < 16; i++) grid.push(0);
+    while (pos.length < n) { var q = Math.floor(Math.random() * 16); if (pos.indexOf(q) < 0) pos.push(q); }
+    pos.sort(function (a, b) { return a - b; });
+    var deg = 1 + Math.floor(Math.random() * 3);
+    for (i = 0; i < pos.length; i++) { if (i > 0) deg = Math.max(-2, Math.min(7, deg + pick([-2, -1, -1, 1, 1, 2]))); grid[pos[i]] = mPitch(72, mode, deg); }
+    cells.push(grid);
+  }
+  for (i = 15; i >= 0; i--) if (cells[3][i]) { cells[3][i] = mPitch(72, mode, 0); break; }   // the last cell lands on the tonic
+  var order = [0, 1, 0, 2, 0, 1, 2, 3], phr = [];
+  for (k = 0; k < 8; k++) phr = phr.concat(cells[order[k]]);
+  MUS.prog = prog; MUS.phr = phr;
+}
 var MOODS = [
   { bpm: 70, step: function (s, t, sd, d) {            // CALM: lute arpeggios, a lone flute, a low drone
-    var bar = Math.floor(s / 8), st = s % 8, ch = CALM_PROG[bar % 8];
+    var bar = Math.floor(s / 8), st = s % 8, ch = MUS.prog[bar % 16];
     mPluck(d, mtof(ch[[0, 2, 1, 2, 0, 2, 1, 2][st]] + 12), t, st === 0 ? 0.085 : 0.055, 1.1);
     if (st === 0 || st === 4) mPluck(d, mtof(ch[0] - 12), t, 0.09, 1.6);
     if (st === 0) mPad(d, mtof(38), t, sd * 8, 0.04, 4);
     if ((st === 0 || st === 3 || st === 6) && Math.random() < (st === 0 ? 0.7 : 0.4)) { MUS.fi = clamp(MUS.fi + pick([-2, -1, -1, 1, 1, 2]), 0, 8); mFlute(d, mtof(D_DOR[MUS.fi]), t, sd * (st === 0 ? 4 : 2.4), 0.05); }
   } },
   { bpm: 132, step: function (s, t, sd, d) {           // UPBEAT: jig-like strumming, drum and tambourine, a lively flute
-    var bar = Math.floor(s / 8), st = s % 8, ch = UP_PROG[bar % 8];
+    var bar = Math.floor(s / 8), st = s % 8, ch = MUS.prog[bar % 16];
     if ([1, 0, 1, 1, 1, 0, 1, 1][st]) for (var k = 0; k < 3; k++) mPluck(d, mtof(ch[k] + 12), t + k * 0.012, st % 4 === 0 ? 0.07 : 0.05, 0.5);
     if (st === 0 || st === 4 || st === 6) mPluck(d, mtof(ch[0] - 12), t, 0.1, 0.5);
     if (st === 0 || st === 4) mThump(d, t, 0.22, 120, 48);
     if (st === 2 || st === 6) mNoise(d, t, 0.09, 0.07, "highpass", 5000);
     if (st % 2 === 1) mNoise(d, t, 0.03, 0.025, "highpass", 8000);
-    var n = PHR[bar % 4][st]; if (n) mFlute(d, mtof(n), t, sd * 1.7, 0.06);
+    var n = MUS.phr[(bar % 16) * 8 + st]; if (n) mFlute(d, mtof(n), t, sd * 1.7, 0.06);
   } },
   { bpm: 56, step: function (s, t, sd, d) {            // EERIE: detuned pads, sparse music-box bells, a drooping lute
-    var bar = Math.floor(s / 8), st = s % 8, ch = EE_PROG[bar % 4];
+    var bar = Math.floor(s / 8), st = s % 8, ch = MUS.prog[bar % 16];
     if (st === 0) { ch.forEach(function (n) { mPad(d, mtof(n), t, sd * 8, 0.032, 9); }); mPad(d, mtof(38), t, sd * 8, 0.045, 3); }
     if (st === 0 && bar % 2 === 0) mNote(d, "triangle", mtof(ch[0]), t, 2.4, 0.07, { lp: 1200, slide: 0.97 });
     if (st % 2 === 0 && Math.random() < 0.28) mBell(d, mtof(pick([74, 75, 77, 79, 81, 82, 84])) * (Math.random() < 0.25 ? 0.985 : 1), t, 0.04, 2.4);
@@ -7148,7 +7352,7 @@ var MOODS = [
     if (st === 4 && Math.random() < 0.4) { var up = Math.random() < 0.5; mNoise(d, t, 0.9, 0.035, "bandpass", up ? 500 : 1400, up ? 1400 : 500); }
   } },
   { bpm: 88, step: function (s, t, sd, d) {            // MELTY: wobbling lydian pads, drooping bell-plucks, a soft heartbeat
-    var bar = Math.floor(s / 8), st = s % 8, ch = ME_PROG[bar % 4];
+    var bar = Math.floor(s / 8), st = s % 8, ch = MUS.prog[bar % 16];
     if (st === 0) ch.forEach(function (n) { mPad(d, mtof(n), t, sd * 8, 0.03, 14, { vib: 20, vibRate: 0.35 }); });
     if (st === 0 || st === 4) mNote(d, "sine", mtof(ch[0] - 12) * 1.06, t, sd * 3.6, 0.1, { slide: 1 / 1.06, slideT: 0.35, att: 0.02 });
     if (Math.random() < 0.75) { var f = mtof(ch[Math.floor(Math.random() * 4)] + 12 * (1 + Math.floor(Math.random() * 2))); mNote(d, "triangle", f, t, sd * 2.2, 0.05, { slide: 0.965, lp: 2400, att: 0.01 }); if (Math.random() < 0.12) mNote(d, "sine", f * 1.5, t, 0.25, 0.035, { slide: 1.25, att: 0.01 }); }
@@ -7173,7 +7377,7 @@ function musicTick() {
   if (want !== MUS.mood) musicSwitch(want, now);
   var M = MOODS[MUS.mood], sd = 60 / M.bpm / 2;
   if (MUS.next < now - 0.5) MUS.next = now + 0.05;                  // fell behind (tab was hidden): restart the clock
-  while (MUS.next < now + 0.35) { try { M.step(MUS.step, MUS.next, sd, MUS.gains[MUS.mood]); } catch (e) {} MUS.step++; MUS.next += sd; }
+  while (MUS.next < now + 0.35) { if (MUS.step % 128 === 0) regenMusic(MUS.mood); try { M.step(MUS.step, MUS.next, sd, MUS.gains[MUS.mood]); } catch (e) {} MUS.step++; MUS.next += sd; }
 }
 setInterval(musicTick, 100);
 
