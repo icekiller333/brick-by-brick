@@ -6,8 +6,8 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: the latest 3D version up top, and a "See versions" browser with every stage of the game.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v56.4).
-- `versions/` — every playable stage of the game, one file per version (2D original, v10, improvements build, v2.0, v3.2, v7.3, v8.0, v11.1, v14.2, v16.3, v17.4, v18.5, v19.1, v28.3, v29.4, v32.5, v41.10, v46.11, v47.12, v51.13, v52.0, v53.1, v54.2, v55.3, v56.4). Pick a version on the landing page to see what changed in it and play that exact build.
+- `brick-by-brick-3d.html` — the latest version, 3D (v59.5).
+- `versions/` — every playable stage of the game, one file per version (2D original, v10, improvements build, v2.0, v3.2, v7.3, v8.0, v11.1, v14.2, v16.3, v17.4, v18.5, v19.1, v28.3, v29.4, v32.5, v41.10, v46.11, v47.12, v51.13, v52.0, v53.1, v54.2, v55.3, v56.4, v59.5). Pick a version on the landing page to see what changed in it and play that exact build.
 
 ## How to play
 
@@ -59,6 +59,20 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
+
+### 3D v59.5 — Nov 15, 2026 (round 17 feedback, 14 of 15 — tails & horns, rows not courses)
+
+- Tails and horns are smooth tapered curves now, not plain cones. Tails first appear at row 5, horns at row 10.
+- On the loading screen, the "BRICK BY BRICK" title fades out when the bricks explode — it only lives on the main menu now.
+- Pop-ups, banners, story cards, and the victory screen say "row" everywhere now, not "course" — "Row 48, two rows to go", "A hundred rows tall".
+- Row 50 cut scene: the camera never dips below the ground any more, and the closing text shrinks to fit narrow screens instead of clipping at the edges.
+- Sky eyeballs pop when you click them — they swell, burst with a "POP!", and every ball on the tail pops after it in quick succession.
+- The thickest cloud cover is 10% less opaque, and the drop-zone glow now shows through the clouds.
+- The hole in the sky stays upright as you rotate — it faces you without rolling.
+- Lead bricks swing 10% slower (26% faster than normal, down from 40%). Wind at severity 3 and 4 pushes 10% less.
+- After the "hands come in pairs" card, the next raid really is two hands — if there's no free brick yet it waits and retries instead of dropping the second hand.
+- Upgrade prices now compound by a multiplier for every upgrade you own, instead of a flat increase — implemented at 5% per upgrade (the round asked for 2%).
+- Still open: round 16's drop bar sometimes missing on the first brick after you turn — the highlight code is unchanged in this version. Note: the silhouettes are lighter again in this build (50–60% opaque, down from 92%), which softens round 16's darker-silhouettes fix.
 
 ### 3D v56.4 — Nov 15, 2026 (round 16 feedback, 7 of 8 — climbers, hands, silhouettes)
 
@@ -259,4 +273,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again; v28.3 published Nov 14, replacing the 3D file again; v29.4 published Nov 14, replacing the 3D file again; v32.5 published Nov 14, replacing the 3D file again; v41.10 published Nov 14, replacing the 3D file again; v46.11 published Nov 14, replacing the 3D file again; v47.12 published Nov 14, replacing the 3D file again; v51.13 published Nov 14, replacing the 3D file again; v52.0 published Nov 15, replacing the 3D file again; v53.1 published Nov 15, replacing the 3D file again; v54.2 published Nov 15, replacing the 3D file again; v55.3 published Nov 15, replacing the 3D file again; v56.4 published Nov 15, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again; v28.3 published Nov 14, replacing the 3D file again; v29.4 published Nov 14, replacing the 3D file again; v32.5 published Nov 14, replacing the 3D file again; v41.10 published Nov 14, replacing the 3D file again; v46.11 published Nov 14, replacing the 3D file again; v47.12 published Nov 14, replacing the 3D file again; v51.13 published Nov 14, replacing the 3D file again; v52.0 published Nov 15, replacing the 3D file again; v53.1 published Nov 15, replacing the 3D file again; v54.2 published Nov 15, replacing the 3D file again; v55.3 published Nov 15, replacing the 3D file again; v56.4 published Nov 15, replacing the 3D file again; v59.5 published Nov 15, replacing the 3D file again.
