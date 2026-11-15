@@ -467,7 +467,7 @@
         30%{ transform:translateY(var(--by)) rotate(calc(var(--br) * .45)) scale(1.25); animation-timing-function:cubic-bezier(.5,0,.9,.6) }
         100%{ transform:translateY(calc(var(--by) + 760px)) rotate(var(--br)) scale(.8) } }
       #ov-loading.boom .ld-msg, #ov-loading.boom .ld-bar{ opacity:0; transition:opacity .12s; }
-      #ov-loading.boom .ld-title{ animation:ldKick .55s ease-out both; }
+      #ov-loading.boom .ld-title{ opacity:0; transition:opacity .12s; }
       @keyframes ldKick{ 0%{ transform:scale(1) } 18%{ transform:scale(1.18) rotate(-2deg) } 40%{ transform:scale(.97) rotate(1.5deg) } 100%{ transform:scale(1) rotate(0) } }
       .ld-flash{ position:absolute; inset:0; background:#fff7d6; pointer-events:none; animation:ldFlash .45s ease-out .12s both; z-index:3; }
       @keyframes ldFlash{ 0%{ opacity:.95 } 100%{ opacity:0 } }
@@ -965,7 +965,7 @@
       <div class="overlay hidden" id="ov-victory" data-ui>
         <div class="panel-box">
           <h1 class="v-title">THE KEYSTONE<br /><span class="t-brick">IS SET</span></h1>
-          <p class="v-tag">A hundred courses up. The two walls are one — and the silhouettes were people all along. Down in the town, nobody is pointing anymore.</p>
+          <p class="v-tag">A hundred rows up. The two walls are one — and the silhouettes were people all along. Down in the town, nobody is pointing anymore.</p>
           <div class="stats-grid">
             <div class="stat-box"><span class="stat-num" id="st-laid">0</span><span class="stat-lab">BRICKS LAID</span></div>
             <div class="stat-box"><span class="stat-num" id="st-time">0:00</span><span class="stat-lab">TIME TAKEN</span></div>
@@ -1251,7 +1251,7 @@ var LINES = [
     effect: function (t) { return "PERFECT drops are on — they pay ×" + PERF_PAY[t] + "."; },
     next: function (t) { return t === 0 ? "Start landing PERFECT drops: hit the white strip in the green zone for ×" + PERF_PAY[1] + " pay." : "PERFECT drops pay ×" + PERF_PAY[t] + " → ×" + PERF_PAY[t + 1] + "."; } },
   { id: "lead", icon: "brick", name: "Lead Bricks", costs: [100],
-    effect: function (t) { return "Lead bricks (×" + TYPE_MULT.lead + " pay, swing 40% faster) come out of the kiln. Each one in a finished row adds +" + ROW_ADD.lead + "× rate to that row's payout."; },
+    effect: function (t) { return "Lead bricks (×" + TYPE_MULT.lead + " pay, swing 26% faster) come out of the kiln. Each one in a finished row adds +" + ROW_ADD.lead + "× rate to that row's payout."; },
     next: function (t) { return "Unlock LEAD bricks: heavy and fast, worth ×" + TYPE_MULT.lead + " — and +" + ROW_ADD.lead + "× rate on every row they sit in. A run of lead earns bumps."; } },
   { id: "silver", icon: "brick", name: "Silver Bricks", costs: [230],
     effect: function (t) { return "Silver bricks (×" + TYPE_MULT.silver + " pay) turn up in the kiln. Each one in a finished row adds +" + ROW_ADD.silver + "× rate."; },
@@ -1328,11 +1328,11 @@ function lockReason(l) {
   return "Reach row " + l.row;
 }
 LINES.forEach(function (l) { var T = TREE[l.id]; l.tab = T.tab; l.parent = T.parent; l.ptier = T.ptier || 1; l.row = T.row || 0; l.gate = function () { return lineAvail(l); }; });
-/* UPGRADE SCALING: every upgrade step costs its listed price PLUS a flat amount for each upgrade step already bought (across the whole tree).
+/* UPGRADE SCALING: every upgrade step costs its listed price MULTIPLIED by 1.05 for each upgrade already bought, compounding (across the whole tree).
    Tune UPG_SCALE to change how fast the tree gets expensive. The starter Warm-Up is unaffected (you own nothing before it). */
 var UPG_SCALE = 3;
 function upgOwned() { var n = 0; for (var i = 0; i < LINES.length; i++) n += S.tier[LINES[i].id] || 0; return n; }
-function costOf(l) { if (l.id === "starter") return STARTER_COST; var n = upgOwned(); return Math.round(l.costs[S.tier[l.id]] * (1 + 0.03 * n + 0.0012 * n * n)); }   // the price climbs faster the more you own
+function costOf(l) { if (l.id === "starter") return STARTER_COST; var n = upgOwned(); return Math.round(l.costs[S.tier[l.id]] * Math.pow(1.05, n)); }   // every upgrade you own compounds the price of every upgrade by 5%, so the spread between upgrades holds as the total climbs
 
 /* ----- helpers ----- */
 function $(id) { return document.getElementById(id); }
@@ -2345,6 +2345,7 @@ function buildWalkers() {
 }
 function doorGlow(x, z) { EMIT_WORLD = true; emitGlow(x, 0.7, z, 4, 0xffe9a0, 0.5, 0.5, 0.18, 0, 0.3); EMIT_WORLD = false; }
 function updateWalkers(dt) {
+  (W3.walkers || []).forEach(function (w) { var mp = w.g && w.g.userData.magic; if (mp) mp.forEach(function (m) { m.visible = S.best >= m.userData.minRow; }); });   // walkers' tails (row 5) and horns (row 10) creep in with the rows
   if (!W3.walkers || !W3.doors || !W3.doors.length || W3.groundAway) return;
   var live = 0, k, w;
   for (k = 0; k < W3.walkers.length; k++) if (W3.walkers[k].state !== "off") live++;
@@ -2396,11 +2397,14 @@ function villagerGeo() {
     robe: robe, belt: new THREE.CylinderGeometry(0.2, 0.205, 0.05, 12), head: new THREE.SphereGeometry(0.16, 12, 9),
     hair: new THREE.SphereGeometry(0.172, 11, 5, 0, Math.PI * 2, 0, Math.PI * 0.52), dot: new THREE.SphereGeometry(1, 6, 4),
     smile: smile, arm: arm, hand: new THREE.SphereGeometry(0.05, 6, 4), boot: new THREE.SphereGeometry(1, 7, 4),
-    tail: new THREE.ConeGeometry(0.035, 0.36, 6).translate(0, 0.18, 0), horn: new THREE.ConeGeometry(0.05, 0.22, 6), hat: hat, brim: new THREE.CylinderGeometry(0.25, 0.25, 0.025, 12), band: new THREE.CylinderGeometry(0.158, 0.162, 0.045, 10)
+    tail: magicTailGeo(), horn: magicHornGeo(), hat: hat, brim: new THREE.CylinderGeometry(0.25, 0.25, 0.025, 12), band: new THREE.CylinderGeometry(0.158, 0.162, 0.045, 10)
   };
   for (var vk in VG) VG[vk].userData.shared = true;           // the crowd keeps using these after a townsperson is baked
   return VG;
 }
+// Tails and horns for the villagers: smooth tapered curves instead of plain cones (same footprint, so placement is unchanged).
+function magicTailGeo() { return taperTube([V3(0, 0, 0), V3(0, 0.1, 0.02), V3(0, 0.22, 0.06), V3(0, 0.31, 0.12), V3(0, 0.34, 0.2)], function (t) { return 0.05 * (1 - t) + 0.007; }, { tub: 12, rad: 7 }); }
+function magicHornGeo() { return taperTube([V3(0, 0, 0), V3(0, 0.07, 0.012), V3(0, 0.14, 0.034), V3(0, 0.2, 0.06)], function (t) { return 0.055 * (1 - t) + 0.006; }, { tub: 10, rad: 7 }).translate(0, -0.1, 0); }
 var HAIR_COLS = [0x3a2416, 0x6b3f1f, 0xe0b45a, 0xb4532a, 0x1d1712, 0xd8d2c8, 0x8a5a33];
 // Face parts, as [x, y, z, sx, sy, sz] relative to the villager's feet (front is +z).
 var FACE = { eyeL: [-0.058, 0.8, 0.146, 0.026, 0.036, 0.016], eyeR: [0.058, 0.8, 0.146, 0.026, 0.036, 0.016], chL: [-0.097, 0.748, 0.124, 0.036, 0.022, 0.012], chR: [0.097, 0.748, 0.124, 0.036, 0.022, 0.012], nose: [0, 0.768, 0.158, 0.03, 0.028, 0.026] };
@@ -2422,8 +2426,8 @@ function makeFolk(shirt, skin, hairC, hatC, extras) {
     arms.push(a);
   });
   if (hatC != null) { add(g, G.brim, T(hatC), 0, 0.9, 0, 0.02); add(g, G.band, T(0xf5b921), 0, 0.935, 0, 0.012); var h = add(g, G.hat, T(hatC), 0, 1.13, 0, 0.025); h.rotation.y = 0.6; }
-  if (extras && extras.tail) add(g, G.tail, T(extras.tail), 0, 0.28, -0.2, 0.02).rotation.x = -1.0;
-  if (extras && extras.horns) [-1, 1].forEach(function (sx) { add(g, G.horn, T(0xf3ead2), sx * 0.1, 0.96, 0, 0.012).rotation.z = -sx * 0.5; });
+  if (extras && extras.tail) { var tl = add(g, G.tail, T(extras.tail), 0, 0.28, -0.2, 0.02); tl.rotation.x = -1.0; tl.userData.keep = true; tl.userData.minRow = 5; g.userData.magic = (g.userData.magic || []).concat([tl]); }
+  if (extras && extras.horns) [-1, 1].forEach(function (sx) { var hm = add(g, G.horn, T(0xf3ead2), sx * 0.1, 0.96, 0, 0.012); hm.rotation.z = -sx * 0.5; hm.userData.keep = true; hm.userData.minRow = 10; g.userData.magic = (g.userData.magic || []).concat([hm]); });
   arms.forEach(function (a) { a.userData.keep = true; }); bake(g, { noAO: true, solid: true, cast: true });
   arms.forEach(function (a) { a.userData.keep = false; bake(a, { noAO: true, solid: true, cast: true }); });
   g.userData.arms = arms;
@@ -2451,9 +2455,9 @@ function buildCrowd() {
   // small magical details that creep in as the rows climb: wizard hats, horns, hooves (satyrs) and glowing auras
   W3.cHat = instPart(VGk.hat, N, 0.025);
   W3.cBrim = instPart(VGk.brim, N, 0.02);
-  W3.cHorn = instPart(new THREE.ConeGeometry(0.05, 0.22, 6), N * 2, 0.02);
+  W3.cHorn = instPart(magicHornGeo(), N * 2, 0.02);
   W3.cHoof = instPart(new THREE.BoxGeometry(0.1, 0.09, 0.13), N * 2, 0.02);
-  W3.cTail = instPart(new THREE.ConeGeometry(0.035, 0.36, 6).translate(0, 0.18, 0), N, 0.018);
+  W3.cTail = instPart(magicTailGeo(), N, 0.018);
   W3.cParts = [W3.cBody, W3.cHead, W3.cArm, W3.cHand, W3.cBelt, W3.cHair, W3.cBoot, W3.cNose, W3.cEye, W3.cCheek, W3.cMouth, W3.cHat, W3.cBrim, W3.cBand, W3.cHorn, W3.cHoof, W3.cTail];
   W3.cParts.forEach(function (ip) { if (ip.out) ip.out.material = OUT_MAT; });   // villagers stay solid; only buildings and scenery fade
   W3.cAura = new THREE.InstancedMesh(new THREE.SphereGeometry(0.46, 12, 9), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false }), N);
@@ -2472,7 +2476,7 @@ function buildCrowd() {
     W3.cBoot.fill.setColorAt(i * 2, _c.set(0x3a2618)); W3.cBoot.fill.setColorAt(i * 2 + 1, _c);
     W3.cBand.fill.setColorAt(i, _c.set([0xf5b921, 0xffe9a0, 0xe0704a][i % 3]));
     var r1 = hash01(i * 5.3 + 1), r2 = hash01(i * 9.1 + 2), r3 = hash01(i * 3.7 + 3), r4 = hash01(i * 6.9 + 4), r5 = hash01(i * 8.3 + 5);
-    var mg = { hat: r1 < 0.5 ? 6 + Math.floor(r1 * 30) : 999, aura: r2 < 0.4 ? 14 + Math.floor(r2 * 50) : 999, horn: r3 < 0.6 ? 2 + Math.floor(r3 * 8) : 999, tail: r5 < 0.6 ? 1 + Math.floor(r5 * 6) : 999, hoof: r4 < 0.3 ? 24 + Math.floor(r4 * 60) : 999, a: { hat: 0, aura: 0, horn: 0, hoof: 0, tail: 0 } };
+    var mg = { hat: r1 < 0.5 ? 6 + Math.floor(r1 * 30) : 999, aura: r2 < 0.4 ? 14 + Math.floor(r2 * 50) : 999, horn: r3 < 0.6 ? 10 + Math.floor(r3 * 8) : 999, tail: r5 < 0.6 ? 5 + Math.floor(r5 * 6) : 999, hoof: r4 < 0.3 ? 24 + Math.floor(r4 * 60) : 999, a: { hat: 0, aura: 0, horn: 0, hoof: 0, tail: 0 } };
     if (mg.hoof < 999) mg.horn = Math.min(mg.horn, mg.hoof);                 // satyrs always have their horns
     W3.cHat.fill.setColorAt(i, _c.set(hatCols[i % hatCols.length])); W3.cBrim.fill.setColorAt(i, _c.set(hatCols[i % hatCols.length]));
     W3.cAura.setColorAt(i, _c.set(auraCols[(i * 3) % auraCols.length]));
@@ -3032,6 +3036,7 @@ function buildCrane() {
   }
   W3.guide = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1, 0.05), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false }));
   scene.add(W3.guide);
+  [W3.band, W3.perfBand, W3.ringBand, W3.ghost, W3.guide].forEach(function (m) { m.material.depthTest = false; m.renderOrder = 40; });   // the drop-zone glow stays visible through the cloud banks (which draw at 30)
   W3.craneY = rowY(1) + 2.2;
 }
 
@@ -3089,12 +3094,12 @@ function buildHole() {
   ring.renderOrder = -7; g.add(ring);
   // silhouettes peering down — sharper as you approach
   W3.sils = [];
-  var silMat = new THREE.MeshBasicMaterial({ color: 0x05020c, transparent: true, opacity: 0.92, fog: false, depthWrite: false });
+  var silMat = new THREE.MeshBasicMaterial({ color: 0x05020c, transparent: true, opacity: 0.5, fog: false, depthWrite: false });
   for (var i = 0; i < 7; i++) {
     var s = new THREE.Group();
     var body = new THREE.Mesh(new THREE.CircleGeometry(1.5, 20, 0, Math.PI), silMat); body.scale.y = 1.4; s.add(body);
     var head = new THREE.Mesh(new THREE.CircleGeometry(1.0, 20), silMat); head.position.y = 2.6; s.add(head);
-    s.position.set(-6 + i * 2, -7.6 + (i % 2 ? 0.6 : 0), 0.1); s.visible = false; s.renderOrder = -6; body.renderOrder = -6; head.renderOrder = -6;
+    s.position.set(-4.5 + i * 1.5, -4 + (i % 2 ? 0.5 : 0), 0.1); s.visible = false; s.renderOrder = 2; body.renderOrder = 2; head.renderOrder = 2;
     s.userData.ph = i * 2.1; g.add(s); W3.sils.push(s);
   }
   W3.silMat = silMat;
@@ -3311,7 +3316,7 @@ function critTap(px, py) {
   if (!CG || !S.started) return false;
   var best = null, bd = 1e9, bsp = null, i;
   for (i = 0; i < CRIT.items.length; i++) {
-    var it = CRIT.items[i]; if (!it.active || it.leaving || it.s < 0.5 || it.rc) continue;
+    var it = CRIT.items[i]; if (!it.active || it.leaving || it.s < 0.5 || it.rc || it.pop) continue;
     it.g.getWorldPosition(_vt); var wp = { x: _vt.x, y: _vt.y, z: _vt.z }, sp = toScreenW(wp.x, wp.y, wp.z);
     if (sp.behind) continue;
     var dx = sp.x - px, dy = sp.y - py, dd = Math.sqrt(dx * dx + dy * dy), rad = it.T.id === "kite" ? 62 : 46;
@@ -3319,6 +3324,7 @@ function critTap(px, py) {
   }
   if (!best) return false;
   if (!best.paid && S.tower && S.earned >= 20) { best.paid = true; credit(1); moneyFloat(1); spawnCoins(1, bsp.sp); }
+  if (best.T.id === "eye") { eyePopStart(best, bsp); haptic(8); return true; }
   var R = CRIT_REACT[best.T.id]; best.rc = { t: 0, dur: R.dur };
   if (R.boost) best.boost = R.boost;
   if (R.scatter) for (i = 0; i < CRIT.items.length; i++) if (CRIT.items[i].T === best.T && CRIT.items[i].active) CRIT.items[i].boost = 1.2;
@@ -3328,6 +3334,36 @@ function critTap(px, py) {
   haptic(8);
   return true;
 }
+// Tap a sky eyeball: it swells and pops like a hot-air balloon, then each ball on its tail pops after it in quick succession.
+var EYE_BALL_GAP = 0.085;                                   // seconds between tail balls popping
+function eyeReset(it) {
+  var u = it.u; it.pop = null;
+  u.eb.visible = true; u.eb.scale.setScalar(1);
+  for (var k = 0; k < u.nerve.length; k++) u.nerve[k].visible = true;
+}
+function eyePopStart(it, bsp) { eyeReset(it); it.pop = { t: 0, boomed: false, k: 0, sp: bsp.sp }; }
+function eyePopStep(it, dt) {
+  var P = it.pop, u = it.u, balls = u.nerve;
+  P.t += dt;
+  if (!P.boomed) {
+    u.eb.scale.setScalar(1 + 0.32 * easeOut2(Math.min(1, P.t / 0.1)));          // the swell
+    if (P.t < 0.1) return;
+    P.boomed = true; u.eb.visible = false;
+    it.g.getWorldPosition(_vt); EMIT_WORLD = true;
+    emitPuffs(_vt.x, _vt.y, _vt.z, 10, 0xf4efe4, 2.6, 0.5, 2.2); emitGlow(_vt.x, _vt.y, _vt.z, 20, 0xd42a1e, 2.2, 0.6, 0.12, 0, 1); emitConfetti(_vt.x, _vt.y, _vt.z, 14, 1.2);
+    EMIT_WORLD = false;
+    noiseBurst(0.25, 0.18, 600); tone(520, 0.12, "sine", 0.1, 0, 140);
+    popText("POP!", clamp(P.sp.x, 50, window.innerWidth - 50), Math.max(100, P.sp.y - 10), { cls: "red", size: 26, rise: 40, rot: -5, dur: 1000 });
+    camShake(0.08); haptic([8, 16, 8]);
+  }
+  while (P.k < balls.length && P.t >= 0.17 + P.k * EYE_BALL_GAP) {               // the tail: each ball pops after the last
+    var b = balls[P.k]; b.getWorldPosition(_vt); EMIT_WORLD = true;
+    emitPuffs(_vt.x, _vt.y, _vt.z, 5, 0xe8a0b0, 1.6, 0.4, 1.3); EMIT_WORLD = false;
+    b.visible = false; tone(760 + P.k * 110, 0.07, "triangle", 0.05, 0);
+    P.k++;
+  }
+  if (P.k >= balls.length && P.t >= 0.17 + (balls.length - 1) * EYE_BALL_GAP + 0.15) { it.active = false; it.g.visible = false; eyeReset(it); }
+}
 function critAllowed(T) { var c = S.courses; return S.started && c >= T.from && (T.nice ? c < 50 : c > 50); }
 function critCap(T) { return Math.min(T.cap, 1 + Math.floor((S.courses - T.from) / 6)); }
 function critSpawn(T) {
@@ -3336,7 +3372,7 @@ function critSpawn(T) {
   var col = FINCH_COLS[Math.floor(Math.random() * FINCH_COLS.length)];
   for (var k = 0; k < CRIT.items.length && cnt > 0; k++) {
     var it = CRIT.items[k]; if (it.T !== T || it.active) continue;
-    cnt--; it.active = true; it.paid = false; it.leaving = false; it.s = 0; it.age = 0; it.dir = dir; it.v = v * rand(0.92, 1.08); it.z = z + rand(-0.6, 0.6); it.dy = dy + rand(-0.6, 0.6) * (T.flock ? 1 : 0); it.ph = Math.random() * 6;
+    cnt--; if (it.pop) eyeReset(it); it.active = true; it.paid = false; it.leaving = false; it.s = 0; it.age = 0; it.dir = dir; it.v = v * rand(0.92, 1.08); it.z = z + rand(-0.6, 0.6); it.dy = dy + rand(-0.6, 0.6) * (T.flock ? 1 : 0); it.ph = Math.random() * 6;
     it.halfW = halfW;
     if (T.life) { it.x = rand(-0.75, 0.75) * halfW; if (T.id === "kite") { it.x0 = (Math.random() < 0.5 ? -1 : 1) * halfW * 0.5; it.dir = it.x0 < 0 ? -1 : 1; } }
     else it.x = -dir * (halfW + 3) - dir * (T.flock ? (T.flock - cnt - 1) * 1.1 : 0);
@@ -3384,8 +3420,8 @@ function updateCritters(dt) {
         var fl = Math.sin(it.ph * 40) * 0.6; u.w[0].rotation.z = 0.4 + fl; u.w[1].rotation.z = -0.4 - fl; break;
       }
       case "eye": {
-        u.eb.lookAt(camera.position);
-        var bl = Math.sin(it.ph * 0.9 + it.age * 0.1), blink = bl > 0.985 ? 0.12 : 1; u.eb.scale.y += (blink - u.eb.scale.y) * Math.min(1, dt * 30);
+        if (!it.pop) u.eb.lookAt(camera.position);
+        var bl = Math.sin(it.ph * 0.9 + it.age * 0.1), blink = bl > 0.985 ? 0.12 : 1; if (!it.pop) u.eb.scale.y += (blink - u.eb.scale.y) * Math.min(1, dt * 30);
         for (k = 0; k < u.nerve.length; k++) u.nerve[k].position.set(-it.dir * (1.2 + k * 0.5), Math.sin(it.ph * 2.5 - k * 0.7) * 0.35 - k * 0.12, 0);
         by = Math.sin(it.ph * 0.7) * 0.5; break;
       }
@@ -3405,6 +3441,7 @@ function updateCritters(dt) {
         break;
       }
     }
+    if (it.pop) eyePopStep(it, dt);
     it.by = by;
     var hop = 0, rs = 1;
     if (it.rc) {
@@ -3775,17 +3812,18 @@ function updateHole(dt, prog) {
   var Wd = window.innerWidth, Hd = window.innerHeight;
   var Rpx = Math.min(0.21 * Hd, 0.46 * Wd) * W3.holeF;            // on-screen radius in pixels
   var tanT = (Rpx / (Hd / 2)) * Math.tan(THREE.MathUtils.degToRad(20));
+  camera.updateMatrixWorld(true);
   _v.set(0.12, ny, 0.5).unproject(camera).sub(camera.position).normalize();
   W3.hole.position.copy(camera.position).addScaledVector(_v, dist);
-  W3.hole.quaternion.copy(camera.quaternion);
+  W3.hole.up.set(0, 1, 0); W3.hole.lookAt(camera.position);
   var sc = Math.max(0.01, tanT * dist / 10);
   var hWant = S.courses >= 1 || CAM.mode === "victory" ? 1 : 0;
   W3.holeShow = W3.holeShow == null ? hWant : damp(W3.holeShow, hWant, 0.7, dt);       // row 1: nothing. Row 2: a pinprick opens
   W3.hole.visible = W3.holeShow > 0.02;
   W3.hole.scale.setScalar(sc * (1 + Math.sin(W3.t * 1.3) * 0.02) * clamp(W3.holeShow, 0, 1));
-  W3.silMat.opacity = lerp(0.92, 1, p1);
+  W3.silMat.opacity = lerp(0.5, 0.6, p1);
   for (var i = 0; i < W3.sils.length; i++) {
-    var s = W3.sils[i]; s.position.x = -6 + i * 2 + Math.sin(W3.t * 0.8 + s.userData.ph) * 0.5; s.visible = i < silCount(S.courses);
+    var s = W3.sils[i]; s.position.x = -4.5 + i * 1.5 + Math.sin(W3.t * 0.8 + s.userData.ph) * 0.5; s.visible = i < silCount(S.courses);
     s.rotation.z = Math.sin(W3.t * 0.6 + s.userData.ph) * 0.06;
   }
   // the keystone gate
@@ -3954,9 +3992,10 @@ function stackBrick(it) {
 
 /* ---------------- CRANE ---------------- */
 var C = S.crane;
+function windSpeedMult(g) { var bars = Math.max(1, Math.round(g / 0.45 * 4)); return bars >= 3 ? 0.9 : 1; }   // severity 3 and 4 wind (the wind chip bars) push 10% less
 function craneSpeed() {
-  var spd = swingSpeed() * (C.item && C.item.type === "lead" ? 1.4 : 1);
-  return spd * (1 + windAmp() * windGust() * S.wind.dir * C.dir);
+  var spd = swingSpeed() * (C.item && C.item.type === "lead" ? 1.26 : 1);
+  var g = windAmp() * windGust(); return spd * (1 + g * windSpeedMult(g) * S.wind.dir * C.dir);
 }
 function tickCrane(dt, frozen) {
   if (C.lock > 0) C.lock -= dt;
@@ -4845,7 +4884,7 @@ function buyLine(id) {
   if (upgOwned() === 3 && !S.flags.scaleTaught) { S.flags.scaleTaught = true; enqueueReveal("prices"); }
   snd.buy(); haptic(15); forgeStrike(); forgeBubble();
   if (id === "hotMortar") {
-    if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
+    if (S.tower) toast("Hot mortar! From the next row, tower sides take " + towerPerFace() + " bricks.", 3400);
     else {
       S.perCourse = 6 - S.tier.hotMortar;
       refitWallRow(S.courses + 1, S.perCourse);
@@ -5062,8 +5101,8 @@ function milestone(n) {
   if (STORY_AT[n]) enqueueStory(STORY_AT[n]);
   if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; S.nextDemo = "glass"; enqueueCards("glass", CARDS_GLASS, null); }
   if (n >= 30 || (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0)) queueRaid(n);
-  if (n % 10 === 0 && n !== FIRST_GOAL && n !== FINAL_GOAL) whenLanded(function () { banner("COURSE " + n, perBrickOn() ? "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE" : "PAY RAISE · ROW BONUS NOW $" + rowBonus(true)); });
-  else if (n === FIRST_GOAL - 1 || n === FINAL_GOAL - 1) toast("Course " + n + " — one more.", 3000);
+  if (n % 10 === 0 && n !== FIRST_GOAL && n !== FINAL_GOAL) whenLanded(function () { banner("ROW " + n, perBrickOn() ? "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE" : "PAY RAISE · ROW BONUS NOW $" + rowBonus(true)); });
+  else if (n === FIRST_GOAL - 1 || n === FINAL_GOAL - 1) toast("Row " + n + " — one more.", 3000);
   if (n === FIRST_GOAL && !S.flags.rimStarted) { S.flags.rimPending = true; whenLanded(startRim); }
   if (n >= FINAL_GOAL && !S.won) { S.won = true; whenLanded(startVictory); }
 }
@@ -5246,7 +5285,7 @@ function tickRaid(dt) {
   if (activeMsg || msgQ.length || G.falls > 0 || CAM.mode !== "play") return;
   if (!S.flags.handSeen) { S.flags.handSeen = true; enqueueCards("hand", CARDS_HAND, null); return; }
   r.delay -= dt; if (r.delay > 0) return;
-  if (spawnHand()) { r.left--; r.delay = 1.8; } else r.left = 0;
+  if (spawnHand()) { r.left--; r.delay = 1.8; r.tries = 0; } else if ((r.tries = (r.tries || 0) + 1) < 12) r.delay = 0.5; else r.left = 0;   // no free brick yet: wait for the row to build and try again
   if (r.left <= 0) S.raid = null;
 }
 function fleeAllHands() { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && (HANDS[i].state === "arrive" || HANDS[i].state === "grip")) fleeHand(HANDS[i]); }
@@ -5398,7 +5437,7 @@ function updateMist(dt) {
   var lvl = (S.started && CAM.mode !== "title") ? S.mistLevel : 0, lan = LANTERN_MULT[S.tier.lantern];
   var want = lvl === 0 ? 0 : lvl === 1 ? 3 : 6;
   if (want) want = Math.max(1, Math.ceil(want * lan));
-  var wantOp = (lvl === 0 ? 0 : lvl === 1 ? 0.45 : 0.66) * (0.45 + 0.55 * lan);
+  var wantOp = (lvl === 0 ? 0 : lvl === 1 ? 0.45 : 0.56) * (0.45 + 0.55 * lan);
   W3.mistOp = damp(W3.mistOp, wantOp, 1.6, dt);
   W3.mistMat.opacity = W3.mistOp;
   var wy = workY(), j = 0;
@@ -6025,27 +6064,27 @@ var BEATS = {
   c35: "The silhouettes are waving their arms now. Not cheering — warning. You still can't make out the words.",
   c40: "Clouds are gathering around the hole, curling into a slow ring. They drift down toward your crane. Something up there doesn't want you to see.",
   c45: "The cloud ring tightens and rolls straight through your work site. You'll be dropping bricks half-blind. Trust the rhythm.",
-  c48: "Two courses to go. The silhouettes have stopped moving. They're standing at the rim, hands pressed to its edge, watching you.",
+  c48: "Two rows to go. The silhouettes have stopped moving. They're standing at the rim, hands pressed to its edge, watching you.",
   c50a: "Your last brick touches the rim of the hole. For one second, the entire world is silent. Then the town below ERUPTS. You did it.",
   c50b: "But the light behind the hole is wrong. The silhouettes aren't cheering — they're beating on the edge of the sky with both fists. Now you can hear them: “NOT YET. HIGHER.”",
-  c50c: "The hole isn't a door. It's a tear in the underside of the sky — and through it you can see what's above: a second wall, a hundred courses tall, standing unfinished in the dark. The silhouettes are its builders. The hands are the sky's way of tearing it all back down.",
-  c50d: "Your wall is the other half. Reach course 100 and the two walls meet, and a KEYSTONE can lock them together. Stop now and the tear seals — with them on the wrong side. Fifty was never the end. Build higher.",
+  c50c: "The hole isn't a door. It's a tear in the underside of the sky — and through it you can see what's above: a second wall, a hundred rows tall, standing unfinished in the dark. The silhouettes are its builders. The hands are the sky's way of tearing it all back down.",
+  c50d: "Your wall is the other half. Reach row 100 and the two walls meet, and a KEYSTONE can lock them together. Stop now and the tear seals — with them on the wrong side. Fifty was never the end. Build higher.",
   c55: "The hands come in pairs now. The sky has noticed you aren't stopping.",
   c60: "The other wall is close enough to read. Its bricks are scratched with tally marks — thousands of them. They have been building down toward you for a very long time.",
-  c65: "The wall begins to hum. Something enormous is shifting on the far side of the sky, and every course you lay trembles with it. Your drop zone will sway — follow it.",
+  c65: "The wall begins to hum. Something enormous is shifting on the far side of the sky, and every row you lay trembles with it. Your drop zone will sway — follow it.",
   c70: "Seventy. The air is thin and the stars are out in broad daylight. Their wall glows faintly from within — glass, you realize. They build in glass.",
   c75: "Voices call down your name now. They know you. They've watched every brick since the first.",
   c80: "A new brick comes out of the kiln, clear as ice and light as breath. SKY GLASS — what their wall is made of. It's fragile, and it pays like treasure.",
   c85: "Fifteen to go. Hands in threes, clouds like a second wall, the ground shuddering under you. The sky is throwing everything it has left.",
-  c90: "Ten courses. You can see the keystone now: one great block of white light hanging in the middle of the hole on a chain, waiting.",
+  c90: "Ten rows. You can see the keystone now: one great block of white light hanging in the middle of the hole on a chain, waiting.",
   c95: "Five. The whole town is on its rooftops. Nobody is cheering. Nobody is breathing.",
-  c100a: "The last course closes. The keystone swings down on its chain and drops into place with a note like a bell the size of the sky.",
+  c100a: "The last row closes. The keystone swings down on its chain and drops into place with a note like a bell the size of the sky.",
   c100b: "Light runs the whole length of the wall — yours and theirs — and the two halves are one. The tear doesn't seal. It opens. And the hands unclench, and let go.",
   c100c: "The silhouettes step through. They aren't giants, and they aren't gods. They're people — builders, like you — and down in the town, nobody is pointing anymore."
 };
-var KICKERS = { start: "MORNING", mold: "MORNING", row1: "ROW ONE", c5a: "ROW FIVE · THE TOWN ASKS", c5b: "ROW FIVE · THE TOWN ASKS", c10a: "THE TOWER IS FIVE HIGH", c10b: "HOW TALL IS ENOUGH?", c25: "COURSE 25 · THE HANDS", c30: "COURSE 30", c35: "COURSE 35", c40: "COURSE 40 · THE CLOUDS", c45: "COURSE 45", c48: "COURSE 48",
-  c50a: "COURSE 50", c50b: "COURSE 50", c50c: "COURSE 50 · THE TRUTH", c50d: "COURSE 50 · NOT THE END", c55: "COURSE 55", c60: "COURSE 60", c65: "COURSE 65 · THE TREMORS", c70: "COURSE 70", c75: "COURSE 75",
-  c80: "COURSE 80 · SKY GLASS", c85: "COURSE 85", c90: "COURSE 90", c95: "COURSE 95", c100a: "COURSE 100", c100b: "COURSE 100", c100c: "COURSE 100" };
+var KICKERS = { start: "MORNING", mold: "MORNING", row1: "ROW ONE", c5a: "ROW FIVE · THE TOWN ASKS", c5b: "ROW FIVE · THE TOWN ASKS", c10a: "THE TOWER IS FIVE HIGH", c10b: "HOW TALL IS ENOUGH?", c25: "ROW 25 · THE HANDS", c30: "ROW 30", c35: "ROW 35", c40: "ROW 40 · THE CLOUDS", c45: "ROW 45", c48: "ROW 48",
+  c50a: "ROW 50", c50b: "ROW 50", c50c: "ROW 50 · THE TRUTH", c50d: "ROW 50 · NOT THE END", c55: "ROW 55", c60: "ROW 60", c65: "ROW 65 · THE TREMORS", c70: "ROW 70", c75: "ROW 75",
+  c80: "ROW 80 · SKY GLASS", c85: "ROW 85", c90: "ROW 90", c95: "ROW 95", c100a: "ROW 100", c100b: "ROW 100", c100c: "ROW 100" };
 var CTAS = { c10b: "FIFTY IT IS", row1: "BACK TO WORK", c5b: "TAKE THE JOB", c50d: "BUILD HIGHER", c100c: "STEP THROUGH" };
 var BEAT_END = { c10b: revealGoal, c5b: function () { startTower(); }, c50d: function () { finishRim(); }, c100c: function () { showVictory(); } };
 var ICO_HAND = '<svg viewBox="0 0 64 46" width="66" height="46"><g fill="#f1d0b4" stroke="#221407" stroke-width="3" stroke-linejoin="round"><rect x="10" y="24" width="44" height="16" rx="6"/><rect x="12" y="8" width="8" height="22" rx="4"/><rect x="23" y="3" width="8" height="27" rx="4"/><rect x="34" y="5" width="8" height="25" rx="4"/><rect x="45" y="11" width="8" height="19" rx="4"/></g></svg>';
@@ -6055,7 +6094,7 @@ var ICO_SORT = '<svg viewBox="0 0 64 46" width="66" height="46"><g stroke="#2214
 var REVEALS = {
   prices: { cls: "gold", icon: "<b>$↑</b>", title: "UPGRADES GET DEARER", text: "Every upgrade you own makes the <b>next one dearer</b>, so the price on each card climbs as you buy. Pick the ones that pay you back fastest, and build while you save." },
   hot: { cls: "hot", title: "THE KILN RUNS HOT", text: "Some bricks now come out glowing. Drop a hot brick before it cools — it's worth <b>×2</b>. Let it burn out and it's a miss." },
-  lead: { cls: "lead", title: "LEAD BRICKS", text: "Dark lead bricks now come out of the kiln. They swing <b>40% faster</b> — land one and it's worth <b>×" + TYPE_MULT.lead + "</b>, and every lead brick in a finished row adds <b>+" + ROW_ADD.lead + "× rate</b> to that row's payout." },
+  lead: { cls: "lead", title: "LEAD BRICKS", text: "Dark lead bricks now come out of the kiln. They swing <b>26% faster</b> — land one and it's worth <b>×" + TYPE_MULT.lead + "</b>, and every lead brick in a finished row adds <b>+" + ROW_ADD.lead + "× rate</b> to that row's payout." },
   silver: { cls: "silver", title: "SILVER BRICKS", text: "Gleaming silver bricks now turn up in the kiln. Land one and it's worth <b>×" + TYPE_MULT.silver + "</b>, and each one in a finished row adds <b>+" + ROW_ADD.silver + "× rate</b>. Several in a row earn little bumps." },
   gold: { cls: "gold", title: "GOLD BRICKS", text: "Real gold bricks now turn up in the kiln. Land one and it's worth <b>×" + TYPE_MULT.gold + "</b>, and each one in a finished row adds <b>+" + ROW_ADD.gold + "× rate</b>. Gilded Clay makes them more common." },
   sorter: { cls: "icon", icon: ICO_SORT, title: "BRICK SORTER", text: "Bricks are now <b>sorted into a warehouse per type</b>. <b>Tap a warehouse</b> under STORAGE to choose what the crane — and your apprentices — build with. Stockpile gold, then lay a <b>whole row of one metal</b> for a pure-row bonus." },
@@ -6641,7 +6680,7 @@ var CARDS_HOT = [
 var CARDS_LEAD = [
   { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "THE SMITH'S NEW STOCK", text: "\u201cHeavy, isn't it? That's lead. Dark and dense, and it swings like a church bell. Mind your toes.\u201d" },
   { who: "EDGAR", pic: "edgar_shrug", kicker: "THE SMITH'S NEW STOCK", text: "\u201cSo it's heavier. Does heavier pay?\u201d" },
-  { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "LEAD BRICKS", text: "\u201cIt does. They swing <b>40% faster</b>, land one and it's worth <b>\u00d7" + TYPE_MULT.lead + "</b>, and every lead brick in a finished row adds <b>+" + ROW_ADD.lead + "\u00d7 rate</b> to that row's payout.\u201d", cta: "NICE AND HEAVY" }
+  { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "LEAD BRICKS", text: "\u201cIt does. They swing <b>26% faster</b>, land one and it's worth <b>\u00d7" + TYPE_MULT.lead + "</b>, and every lead brick in a finished row adds <b>+" + ROW_ADD.lead + "\u00d7 rate</b> to that row's payout.\u201d", cta: "NICE AND HEAVY" }
 ];
 var CARDS_SILVER = [
   { who: "SKARRA", tag: "griffin", pic: "skarra_hoard", kicker: "A GRIFFIN IN THE RAFTERS", text: "\u201cSilver. Pale and shiny. Griffins hoard the stuff, and I know a good thing when it comes out of a kiln.\u201d" },
@@ -6838,7 +6877,7 @@ function showVictory() {
 }
 $("btn-endless").addEventListener("click", function () {
   S.endless = true; CAM.mode = "play"; hidePanel(el.ovVictory, 300, pumpMsg); updateHazards();
-  toast("Endless building. Every 10 courses still raises your rate.", 3600); snd.pop(); renderHUD();
+  toast("Endless building. Every 10 rows still raises your rate.", 3600); snd.pop(); renderHUD();
 });
 
 /* ---------------- shop / settings ---------------- */
@@ -8207,7 +8246,8 @@ boot();
     o = o || {};
     var size = (o.size || 64) * U, sc = o.scale == null ? 1 : o.scale, al = o.alpha == null ? 1 : o.alpha;
     if (al <= 0 || sc <= 0) return;
-    g.save(); g.globalAlpha = al; g.translate(x, y); if (o.rot) g.rotate(o.rot); g.scale(sc, sc);
+    g.font = FONTW + size + "px " + FONT; var tw = g.measureText(str).width, fit = tw * sc > W * 0.92 ? W * 0.92 / (tw * sc) : 1;   // a line wider than the frame shrinks to fit (narrow phones)
+    g.save(); g.globalAlpha = al; g.translate(x, y); if (o.rot) g.rotate(o.rot); g.scale(sc * fit, sc * fit);
     g.font = FONTW + size + "px " + FONT; g.textAlign = o.align || "center"; g.textBaseline = "middle"; g.lineJoin = "round"; g.miterLimit = 2;
     if (o.shadow !== false) { g.fillStyle = "rgba(0,0,0,.35)"; g.fillText(str, 0, size * 0.09); }
     g.strokeStyle = o.outline || "#221407"; g.lineWidth = o.outlineW ? o.outlineW * U : size * 0.22; g.strokeText(str, 0, 0);
@@ -8261,7 +8301,7 @@ boot();
     var Rpx = r * H, tanT = (Rpx / (H / 2)) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), dist = 110;
     _hv.set(h.x, h.y, 0.5).unproject(camera).sub(camera.position).normalize();
     W3.hole.position.copy(camera.position).addScaledVector(_hv, dist);
-    W3.hole.quaternion.copy(camera.quaternion);
+    W3.hole.up.set(0, 1, 0); W3.hole.lookAt(camera.position);
     W3.hole.scale.setScalar(Math.max(0.01, tanT * dist / 10) * (1 + Math.sin(W3.t * 1.3) * 0.015));
     W3.hole.visible = true;
     CN.holeScr = { x: (h.x * 0.5 + 0.5) * W, y: (-h.y * 0.5 + 0.5) * H, r: Rpx };
@@ -8450,13 +8490,13 @@ boot();
         s.userData.arms = [];
         [-1, 1].forEach(function (sd) {
           var a = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 2.6, 8), W3.silMat); a.geometry.translate(0, 1.3, 0);
-          a.position.set(sd * 1.35, 1.0, 0); a.renderOrder = -6; s.add(a); s.userData.arms.push({ m: a, sd: sd });
+          a.position.set(sd * 1.35, 1.0, 0); a.renderOrder = 2; s.add(a); s.userData.arms.push({ m: a, sd: sd });
         });
         s.userData.baseY = s.position.y; s.scale.setScalar(1.5);
       }
       var ph = (T * 2.2 + i * 0.37) % 1, hit = on ? (ph < 0.22 ? ph / 0.22 : 1 - (ph - 0.22) / 0.78) : 0;
       s.userData.arms.forEach(function (a) { a.m.visible = on; a.m.rotation.z = -a.sd * lerp(0.5, 2.3, hit); });
-      s.position.y = s.userData.baseY + (on ? hit * 0.7 : 0); s.position.x = (i - 3) * 2.9 + Math.sin(T * 0.8 + s.userData.ph) * 0.3;
+      s.position.y = s.userData.baseY + (on ? hit * 0.7 : 0); s.position.x = (i - 3) * 1.5 + Math.sin(T * 0.8 + s.userData.ph) * 0.3;
     });
   }
   SCN.rim = {
@@ -8546,7 +8586,7 @@ boot();
       if (i === 5) bubble({ t0: 14.55, t1: 15.95, x: e.x, y: e.y, text: "\u2026They want MORE?", size: 48 });
       if (i === 6) bubble({ t0: 16.1, t1: 17.55, x: l.x, y: l.y, text: "Fifty was never the end.", size: 46 });
       cap({ t0: 18.3, t1: 19.9, text: "A second wall.", size: 74, y: 0.8, fill: "#fff3c8", fill2: "#c9b8ff" });
-      cap({ t0: 20.0, t1: 21.8, text: "A hundred courses tall.", size: 64, y: 0.8, fill: "#fff3c8", fill2: "#c9b8ff" });
+      cap({ t0: 20.0, t1: 21.8, text: "A hundred rows tall.", size: 64, y: 0.8, fill: "#fff3c8", fill2: "#c9b8ff" });
       if (i === 8) bubble({ t0: 22.1, t1: 24.75, x: l.x, y: l.y, text: "Reach a hundred and the walls meet. Stop, and the tear seals.", size: 40, maxW: 640 });
       if (i === 9) bubble({ t0: 24.95, t1: 26.85, x: e.x, y: e.y, text: "Higher. Got it.", size: 54 });
       var bh = seg(T, 26.9, 27.5);
@@ -8676,7 +8716,7 @@ boot();
         cap({ t0: 13.8, t1: 15.1, text: "They\u2019re people.", size: 66, y: 0.2 });
       }
       var e = scr(ED.x, ED.hy + 0.75, ED.z), l = scr(EL.x, EL.hy + 1.05, EL.z);
-      cap({ t0: 0.9, t1: 3.3, text: "The last course closes.", size: 58, y: 0.8, fill: "#fff3c8", fill2: "#e6c27a" });
+      cap({ t0: 0.9, t1: 3.3, text: "The last row closes.", size: 58, y: 0.8, fill: "#fff3c8", fill2: "#e6c27a" });
       cap({ t0: 5.4, t1: 8.9, text: "The two walls are one.", size: 70, y: 0.8 });
       cap({ t0: 9.3, t1: 11.5, text: "The hands let go.", size: 70, y: 0.8 });
       if (i === 5) bubble({ t0: 15.35, t1: 16.75, x: e.x, y: e.y, text: "\u2026Hi?", size: 62 });
@@ -8770,6 +8810,7 @@ boot();
   function applyPose(P, fit) {
     var a = W / H, m = 1 + Math.max(0, 1.78 / a - 1) * (fit == null ? 0.5 : fit); m = Math.min(m, 2.6);
     var x = P.l[0] + (P.p[0] - P.l[0]) * m, y = P.l[1] + (P.p[1] - P.l[1]) * m, z = P.l[2] + (P.p[2] - P.l[2]) * m;
+    y = Math.max(y, 0.6);   // a wide shot on a narrow screen stretches the pose: never let the lens dip under the ground
     var tr = CN.trauma || 0, k = tr * tr, sx = (Math.random() * 2 - 1) * k * 0.4, sy = (Math.random() * 2 - 1) * k * 0.3;
     camera.position.set(x + sx, y + sy, z); camera.lookAt(P.l[0] + sx * 0.4, P.l[1] + sy * 0.4, P.l[2]);
     camera.rotation.z += (P.roll || 0) + (Math.random() * 2 - 1) * k * 0.03;
