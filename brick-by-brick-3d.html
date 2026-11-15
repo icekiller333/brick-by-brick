@@ -676,6 +676,22 @@
       .nd-detail{ position:sticky; bottom:0; z-index:6; padding-top:10px; background:linear-gradient(180deg, transparent, var(--paper) 14px); }
       .nd-detail .upg-row{ margin-bottom:6px; }
       .nd-detail.empty{ text-align:center; font-size:12px; font-weight:700; color:var(--muted); padding:12px 0 8px; }
+      .nd-detail .nd-card{ display:block; margin:0; padding:13px 14px 14px; border-left:8px solid var(--cat, var(--line)); }
+      .nd-detail .nd-card.locked{ opacity:1; border-style:solid; box-shadow:var(--shadow-s); }
+      .nd-detail .nd-top{ display:flex; align-items:center; gap:12px; }
+      .nd-detail .nd-top .upg-ico{ width:46px; height:46px; }
+      .nd-detail .nd-top .upg-ico svg{ width:28px; height:28px; }
+      .nd-title{ flex:1; min-width:0; }
+      .nd-title .upg-name{ font-size:16.5px; line-height:1.2; }
+      .nd-title .pips{ margin-left:6px; }
+      .nd-tab{ margin-top:4px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+      .nd-detail .nd-desc{ margin:12px 0 0; font-size:14.5px; font-weight:700; line-height:1.45; color:var(--ink); }
+      .nd-detail .upg-now{ margin-top:9px; font-size:12.5px; line-height:1.4; }
+      .nd-lock{ margin-top:9px; font-size:12.5px; font-weight:800; line-height:1.4; color:var(--bad); }
+      .nd-detail .up-bar.big{ margin:12px 0 0; }
+      .nd-foot{ display:flex; align-items:center; gap:12px; margin-top:12px; }
+      .nd-note{ flex:1; min-width:0; font-size:11px; font-weight:700; line-height:1.3; color:var(--muted); }
+      .nd-foot .buy-btn{ min-width:118px; padding:10px 12px; font-size:15px; }
       .tnode{ position:relative; }
       .tkids{ margin-left:10px; }
       .tkids > .tnode{ padding-left:18px; }
@@ -1074,7 +1090,7 @@ function multCap() { return CAP[S.tier.crowd]; }
 function streakMult(n) { return Math.min(multCap(), 1 + STREAK_STEP * Math.max(0, n - 1)); }
 function fmtMult(m) { return String(Math.round(m * 100) / 100); }
 function fmtPay(n) { n = Math.round(n * 100) / 100; return n % 1 === 0 ? String(n) : n.toFixed(2); }   // $4 or $1.05
-function fmtMoney(n) { return fmt(Math.floor(n + 1e-6)); }                                          // HUD shows whole dollars only
+function fmtCash(n) { var s = (Math.max(0, Math.round(n * 100)) / 100).toFixed(2).split("."); return fmt(+s[0]) + "." + s[1]; }                                          // money with cents, e.g. $1,234.56
 function coinsFor(amount) { return amount <= 12 ? Math.max(1, Math.round(amount)) : Math.min(24, 12 + Math.round(Math.sqrt(amount - 12))); }   // one coin per $1, then thinning out
 function brickPay(mult, type, perfect) { if (rate() <= BASE_PAY) return BASE_PAY; var p = rate() * mult * typeMult(type); if (perfect) p *= PERF_PAY[S.tier.perfect] || 1; return Math.max(rate(), Math.round(p * POUCH[S.tier.coinPouch] * 100) / 100); }
 function payable(row) { return row >= PAY_FROM_ROW || S.best >= PAY_FROM_ROW || S.tower; }   // the tower is a paid job from the first side
@@ -1097,10 +1113,10 @@ function goldChance() { return S.tier.gold >= 1 ? 0.05 + GILD_PCT[S.tier.gilded]
 function glassChance() { return 0; }   // plain bricks are glass now, so there is no separate rare glass roll
 function swayAmp() { return S.swayOn ? Math.min(0.06, 0.03 + 0.0008 * Math.max(0, S.courses - TREMOR_COURSE)) * LEVEL_MULT[S.tier.level] : 0; }
 function swayOff() { var a = swayAmp(); return a ? a * Math.sin(S.time * 2.1 + 1.3) : 0; }
-/* WARM-UP: the very first upgrade. $4, and it doubles as the workshop tutorial (see renderStarterTut).
+/* WARM-UP: the very first upgrade. $3, and it doubles as the workshop tutorial (see renderStarterTut).
    It shaves 0.2s off the kiln's opening speed (4.5s → 4.3s) — a small step in the gap before Hotter Kiln (3.8s). It only applies while Hotter Kiln is
    unbought: the first Hotter Kiln tier replaces it, so no other upgrade's numbers had to change. */
-var STARTER_COST = 4, STARTER_SHAVE = 0.2;
+var STARTER_COST = 3, STARTER_SHAVE = 0.2;
 function fmtSec(x) { return String(Math.round(x * 100) / 100); }
 function kilnBase(t) { return BAKE_TIMES[t] - (t === 0 && S.tier.starter >= 1 ? STARTER_SHAVE : 0); }
 function starterTut() { return !!S.flags.starterTut && !S.tier.starter; }              // true while the guided first-upgrade lesson is on
@@ -4336,7 +4352,7 @@ function tickFalling(dt) {
 }
 function credit(amount) {
   if (!(amount > 0)) return;
-  S.money = Math.round((S.money + amount) * 100) / 100; S.earned += amount; DRAIN.pend = Math.round((DRAIN.pend + amount) * 100) / 100;
+  S.money = Math.round((S.money + amount) * 100) / 100; S.earned += amount; DRAIN.pend += amount;
   if (!S.flags.moneyShown && S.started) { S.flags.moneyShown = true; revealEl($("hud-money")); }
   var firstPay = false;
   if (!S.workshopShown && S.started) {
@@ -4348,7 +4364,7 @@ function credit(amount) {
   }
   if (!firstPay) starterCheck();
 }
-// The moment the player first holds $4 (if the first payday was smaller): point them at the workshop.
+// The moment the player first holds $3 (if the first payday was smaller): point them at the workshop.
 function starterCheck() {
   if (!starterTut() || S.flags.starterNudged || S.shopOpen || S.money < STARTER_COST) return;
   S.flags.starterNudged = true;
@@ -5383,12 +5399,12 @@ var PEND = { amt: 0 };                                  // the pay the next burs
 var PLUS = { el: null, amt: 0, until: 0, anim: null, timer: 0 };
 // Pay is credited straight away, but the total only counts up as the green "+$" drains into it.
 var DRAIN = { pend: 0 };
-function drainPend(dt) {
+function drainPend(dt) {                               // the green +$ and the total move by the same amount each frame, so the green is always exactly what is still to count
   if (DRAIN.pend <= 0) return;
-  var step = DRAIN.pend * Math.min(1, dt * 2.2);
-  DRAIN.pend = Math.max(0, Math.round((DRAIN.pend - step) * 100) / 100);
-  if (DRAIN.pend < 0.01) DRAIN.pend = 0;
-  if (PLUS.el && DRAIN.pend > 0) PLUS.el.textContent = "+$" + fmtPay(DRAIN.pend);
+  var step = Math.min(DRAIN.pend, Math.max(DRAIN.pend * Math.min(1, dt * 2.2), dt * 2));   // eases out, but a small amount never crawls
+  DRAIN.pend -= step; UI.moneyShown += step;
+  if (DRAIN.pend < 0.005) { UI.moneyShown += DRAIN.pend; DRAIN.pend = 0; }
+  if (PLUS.el && DRAIN.pend > 0) PLUS.el.textContent = "+$" + fmtCash(DRAIN.pend);
 }
 function moneyFloat(amount) {                           // no text where the brick lands any more: the coins carry the pay and it turns into a + on the total
   snd.coin(); popEl(el.hudMoney);
@@ -5399,7 +5415,7 @@ function plusAdd(amount) {                              // a "+$N" under the mon
   var P = PLUS, now = performance.now();
   if (!P.el) { P.el = document.createElement("div"); P.el.className = "plus-badge"; el.fx.appendChild(P.el); }
   P.amt = DRAIN.pend > 0 ? DRAIN.pend : amount; P.until = now + 1700;
-  P.el.textContent = "+$" + fmtPay(P.amt);
+  P.el.textContent = "+$" + fmtCash(P.amt);
   var r = el.hudMoney.getBoundingClientRect();
   P.el.style.left = (r.left + r.width / 2) + "px"; P.el.style.top = (r.bottom + 3) + "px";
   if (P.anim) P.anim.cancel();
@@ -5680,7 +5696,7 @@ function upCard(l, state, forceOpen) {
   return h;
 }
 function guideHTML(ready, saving, locked) {
-  var h = '<div class="sg-wallet"><span>YOUR COINS</span><b>$' + fmtMoney(S.money) + "</b></div>";
+  var h = '<div class="sg-wallet"><span>YOUR COINS</span><b>$' + fmtCash(S.money) + "</b></div>";
   if (ready.length) {
     var l = ready[0], t = S.tier[l.id];
     h += '<div class="sg-card ready"><div class="sg-k">★ BEST BUY RIGHT NOW</div><div class="sg-row"><div class="upg-ico">' + ICON[l.icon] + '</div><div class="sg-t"><b>' + l.name + '</b><small>' + l.next(t) + '</small></div><button class="buy-btn" data-upg="' + l.id + '">BUY $' + fmt(costOf(l)) + "</button></div></div>";
@@ -5700,7 +5716,7 @@ function renderStarterTut() {
   UI.tutSig = sig; UI.shopSig = ""; UI.guideHtml = "";
   var l = lineById("starter"), pct = Math.min(100, S.money / STARTER_COST * 100).toFixed(0);
   $("tree-tabs").classList.add("hidden"); $("tree-tabs").innerHTML = "";
-  $("shop-guide").innerHTML = '<div class="sg-wallet"><span>YOUR COINS</span><b>$' + fmtMoney(S.money) + "</b></div>";
+  $("shop-guide").innerHTML = '<div class="sg-wallet"><span>YOUR COINS</span><b>$' + fmtCash(S.money) + "</b></div>";
   var h = '<div class="st-kicker">YOUR FIRST UPGRADE</div>';
   h += '<div class="upg-row up-card st-card ' + (can ? "afford" : "saving") + '" id="upg-starter" data-cost="' + STARTER_COST + '" data-tab="kiln" style="--cat:' + CAT_COL.kiln + '">';
   h += '<div class="up-top"><div class="upg-ico">' + ICON.kiln + '</div><div class="up-main"><div class="upg-name">' + l.name + '</div><div class="up-sum">' + l.next(0) + "</div></div>";
@@ -5759,7 +5775,21 @@ function ndSection(tabId, items, cols, showHead) {
 function ndDetail(list) {
   var l = null; if (UI.sel) list.forEach(function (x) { if (x.id === UI.sel) l = x; });
   if (!l) return '<div class="nd-detail empty">Tap a node to see what it does.</div>';
-  return '<div class="nd-detail">' + upCard(l, ndState(l), true).replace(' data-toggle="' + l.id + '"', "") + "</div>";
+  var st = ndState(l), t = S.tier[l.id], maxed = st === "maxed", cost = maxed ? 0 : costOf(l);
+  var pips = '<span class="pips">'; for (var p = 0; p < l.costs.length && l.costs.length <= 6; p++) pips += '<i class="' + (p < t ? "on" : "") + '"></i>'; pips += "</span>";
+  var tier = l.costs.length > 6 ? '<span class="up-tier">LV ' + t + "/" + l.costs.length + "</span>" : "";
+  var h = '<div class="nd-detail"><div class="upg-row up-card nd-card ' + st + '" id="upg-' + l.id + '" data-cost="' + cost + '" data-tab="' + l.tab + '" style="--cat:' + CAT_COL[l.tab] + '">';
+  h += '<div class="nd-top"><div class="upg-ico">' + (st === "locked" ? "🔒" : ICON[l.icon]) + "</div>";
+  h += '<div class="nd-title"><div class="upg-name">' + l.name + pips + tier + (UI.shopNew[l.id] ? '<span class="upg-new">NEW</span>' : "") + "</div>";
+  h += '<div class="nd-tab">' + tabName(l.tab) + " tab</div></div></div>";
+  h += '<p class="nd-desc">' + (maxed ? l.effect(t) : l.next(t)) + "</p>";
+  if (st === "locked") { h += '<div class="nd-lock">' + lockReason(l) + "</div></div></div>"; return h; }
+  if (!maxed && t > 0 && !l.noNow) h += '<div class="upg-now">Right now: ' + l.effect(t) + "</div>";
+  if (st === "saving") h += '<div class="up-bar big"><i style="width:' + Math.min(100, S.money / cost * 100).toFixed(0) + '%"></i></div>';
+  var note = maxed ? "" : st === "saving" ? "Need $" + fmt(Math.max(1, Math.ceil(cost - S.money))) + " more" : (upgOwned() >= 3 ? "Prices rise as you own more upgrades" : "");
+  var btn = maxed ? '<div class="buy-btn maxed">✓ MAX</div>' : st === "afford" ? '<button class="buy-btn" data-upg="' + l.id + '">BUY $' + fmt(cost) + "</button>" : '<div class="buy-btn cant">$' + fmt(cost) + "</div>";
+  h += '<div class="nd-foot"><div class="nd-note">' + note + "</div>" + btn + "</div></div></div>";
+  return h;
 }
 function nodesHTML(list, cols) {
   var byTab = {}, h = "";
@@ -5804,7 +5834,7 @@ function renderShop() {
   for (var q = 0; q < tbs.length; q++) { var id = tbs[q].getAttribute("data-tab"), c = id === "all" ? allReady : (counts[id] || 0), bn = tbs[q].querySelector("b"); if (bn.textContent !== (c ? String(c) : "")) bn.textContent = c ? String(c) : ""; }
   var bars = el.upgList.querySelectorAll(".up-card.saving");
   for (var j = 0; j < bars.length; j++) { var cst = parseFloat(bars[j].getAttribute("data-cost")), bi = bars[j].querySelector(".up-bar i"); if (bi) bi.style.width = Math.min(100, S.money / cst * 100).toFixed(0) + "%"; }
-  var wb = $("shop-guide").querySelector(".sg-wallet b"); if (wb) wb.textContent = "$" + fmtMoney(S.money);
+  var wb = $("shop-guide").querySelector(".sg-wallet b"); if (wb) wb.textContent = "$" + fmtCash(S.money);
 }
 $("tree-tabs").addEventListener("click", function (e) { var b = e.target.closest("[data-tab]"); if (!b) return; UI.tab = b.getAttribute("data-tab"); UI.shopSig = ""; renderShop(); snd.pop(); });
 el.upgList.addEventListener("click", function (e) {
@@ -5819,12 +5849,11 @@ $("shop-guide").addEventListener("click", function (e) { var b = e.target.closes
 function uiFrame(rdt) {
   updateBubbles();
   drainPend(rdt);
-  var shownTarget = Math.round((S.money - DRAIN.pend) * 100) / 100;
-  var diff = shownTarget - UI.moneyShown;
-  if (diff !== 0) {
-    UI.moneyShown = Math.abs(diff) < 0.5 ? shownTarget : UI.moneyShown + diff * Math.min(1, rdt * 12);
-    el.moneyNum.textContent = fmtMoney(UI.moneyShown);
-  }
+  var shownTarget = S.money - DRAIN.pend;               // what the total should read once the green has drained in
+  var diff = shownTarget - UI.moneyShown;               // only a spend (money dropping) makes this non-zero
+  if (Math.abs(diff) > 1e-9) UI.moneyShown = Math.abs(diff) < 0.005 ? shownTarget : UI.moneyShown + diff * Math.min(1, rdt * 12);
+  var mTxt = fmtCash(UI.moneyShown);
+  if (mTxt !== UI.moneyTxt) { UI.moneyTxt = mTxt; el.moneyNum.textContent = mTxt; }
   el.kilnRing.style.strokeDashoffset = (119.4 * (1 - clamp(S.moldT, 0, 1))).toFixed(1);
   el.kilnSub.textContent = S.kilnWait ? "WAITING" : S.held ? "STOKING!" : "HOLD";
   el.kiln.classList.toggle("holding", !!S.kilnWait);
@@ -6721,7 +6750,7 @@ function showVictory() {
   $("st-laid").textContent = fmt(S.laid); $("st-time").textContent = fmtTime(S.playTime);
   $("st-streak").textContent = S.bestStreak; $("st-perfect").textContent = S.perfects;
   $("st-acc").textContent = (S.drops ? Math.round(S.hits / S.drops * 100) : 100) + "%";
-  $("st-money").textContent = "$" + fmtMoney(S.earned);
+  $("st-money").textContent = "$" + fmtCash(S.earned);
   $("st-smash").textContent = S.smashed; $("st-stolen").textContent = S.lost;
   releaseKiln(); showPanel(el.ovVictory); snd.fanfare();
 }
