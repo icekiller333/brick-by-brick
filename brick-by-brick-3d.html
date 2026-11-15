@@ -74,6 +74,8 @@
       #btn-shop{ position:relative; background:var(--gold); color:#221407; border:3px solid var(--line); box-shadow:var(--shadow-s);
         font-family:'Archivo Black',sans-serif; font-size:14px; letter-spacing:.05em; padding:7px 12px; }
       #btn-shop.shop-pulse{ animation:shopPulse 1.1s ease-in-out infinite; }
+      #btn-shop.shop-nudge{ animation:shopNudge 1.1s ease-out 1; }
+      @keyframes shopNudge{ 0%{ transform:scale(1) } 25%{ transform:scale(1.14) rotate(-2deg) } 50%{ transform:scale(.97) rotate(1deg) } 75%{ transform:scale(1.06) } 100%{ transform:scale(1) } }
       @keyframes shopPulse{ 0%,100%{ box-shadow:3px 3px 0 var(--shadowc), 0 0 0 0 rgba(245,185,33,0) } 50%{ box-shadow:3px 3px 0 var(--shadowc), 0 0 0 7px rgba(245,185,33,.85) } }
       .badge{ position:absolute; top:-10px; right:-9px; min-width:19px; height:19px; padding:0 4px; border-radius:10px; border:2px solid var(--line);
         font-family:'Archivo',sans-serif; font-weight:800; font-size:10px; line-height:15px; text-align:center; color:#fff; }
@@ -2497,8 +2499,9 @@ function groundOutOfView(prev) {            // the patch of ground in front of t
 }
 // Ground-level people (villagers and walkers) are hidden and skipped while the ground they stand on is off-screen.
 // Critters are not touched: they fly in the sky and cost little.
+function climbersOut() { if (!W3.crowd) return false; for (var i = 0; i < W3.crowd.length; i++) if (W3.crowd[i].climb || W3.crowd[i].fall) return true; return false; }
 function setGroundCrowdShown(show) {
-  var crowd = show || floaterCount() > 0; W3.floatShown = floaterCount() > 0;      // the floating villagers are drawn from the same meshes: keep them while anyone floats
+  var crowd = show || floaterCount() > 0 || climbersOut(); W3.floatShown = floaterCount() > 0;      // the floating villagers are drawn from the same meshes: keep them while anyone floats
   (W3.cParts || []).forEach(function (ip) { if (ip.fill) ip.fill.visible = crowd; if (ip.out) ip.out.visible = crowd; });
   if (W3.cAura) W3.cAura.visible = crowd;
   (W3.walkers || []).forEach(function (w) { if (w.g) w.g.visible = show && w.state !== "off"; });
@@ -2611,7 +2614,16 @@ function camNearVillager(d) {
   if (d.nearCam) { if (dd > 9) d.nearCam = false; } else if (dd < 7) d.nearCam = true;
   return !!d.nearCam;
 }
-var CLIMB_COURSE = 10, CLIMB_MAX = 2, climbT = 0;
+var CLIMB_COURSE = 10, CLIMB_MAX = 2, climbT = 0, CLIMB_RATE = 7;      // a climber rises 7 units a second
+// The first height, going down the tower, that is below the bottom of the screen: a climber starts there and comes up into view.
+function climbStartY(sx, sz, top) {
+  var H = window.innerHeight;
+  for (var k = 0; k <= 160; k++) {
+    var y = top - k * 0.5; if (y < 0) break;
+    var sp = toScreenW(sx, y, sz); if (sp.behind || sp.y > H + 10) return y;
+  }
+  return Math.max(0, top - 8);
+}
 function updateClimbers(dt) {                  // after row 10 a villager now and then starts crawling up the tower face
   if (!S.tower || !S.started || S.courses < CLIMB_COURSE || !W3.crowd) return;
   var n = 0, i, d;
@@ -2619,11 +2631,18 @@ function updateClimbers(dt) {                  // after row 10 a villager now an
   climbT -= dt;
   if (climbT > 0 || n >= CLIMB_MAX) return;
   climbT = rand(4, 9);
-  var cands = [];
-  for (i = 0; i < W3.crowd.length; i++) { d = W3.crowd[i]; if (d.on && d.s > 0.9 && !d.climb && !d.fall && !d.fx && (d.hy || 0) < 0.05) cands.push(i); }
+  var cands = [], away = !!W3.groundAway;      // with the ground out of view, a hidden villager can start from off screen
+  for (i = 0; i < W3.crowd.length; i++) {
+    d = W3.crowd[i]; if (d.climb || d.fall || d.fx || (d.hy || 0) >= 0.05) continue;
+    if (d.on && d.s > 0.9) cands.push(i); else if (away && i >= floaterCount()) cands.push(i);
+  }
   if (!cands.length) return;
   d = W3.crowd[cands[Math.floor(Math.random() * cands.length)]];
-  d.climb = { ang: Math.atan2(d.x, d.z + TH), from: { x: d.x, z: d.z }, t: 0, y: 0, yTop: rowY(S.courses) + BH / 2 };
+  var yTop = rowY(S.courses) + BH / 2;
+  if (!d.on || !(d.s > 0.9)) { d.on = true; d.s = 1; d.vs = 0; d.jump = 0; }      // brought back to full size (out of sight)
+  d.climb = { ang: Math.atan2(d.x, d.z + TH), from: { x: d.x, z: d.z }, t: 0, y: 0, yTop: yTop, y0: 0 };
+  var c0 = d.climb, R0 = TW / 2 + 0.35;
+  c0.y0 = climbStartY(Math.sin(c0.ang) * R0, -TH + Math.cos(c0.ang) * R0, yTop);
 }
 function climbStep(d, dt) {                    // one villager's climb, jump-off or thrown-off fall
   if (!d.on) { d.climb = null; d.fall = null; return; }
@@ -2635,11 +2654,12 @@ function climbStep(d, dt) {                    // one villager's climb, jump-off
   }
   var c = d.climb; c.t += dt;
   var R = TW / 2 + 0.35, sx = Math.sin(c.ang) * R, sz = -TH + Math.cos(c.ang) * R;
-  if (c.t < 0.6) { var k = c.t / 0.6; d.x = lerp(c.from.x, sx, k); d.z = lerp(c.from.z, sz, k); d.y = 0; d.ry = Math.atan2(-Math.sin(c.ang), -Math.cos(c.ang)); return; }
-  c.y = Math.min(c.yTop, (c.t - 0.6) * c.yTop / 14);
+  if (c.t < 0.6) { var k = c.t / 0.6; d.x = lerp(c.from.x, sx, k); d.z = lerp(c.from.z, sz, k); d.y = lerp(0, c.y0, k * k); d.ry = Math.atan2(-Math.sin(c.ang), -Math.cos(c.ang)); return; }
+  c.y = Math.min(c.yTop, c.y0 + (c.t - 0.6) * CLIMB_RATE);
   d.x = sx; d.z = sz; d.y = c.y; d.ry = Math.atan2(-Math.sin(c.ang), -Math.cos(c.ang));
   d.arm = -1.5 + Math.sin(d.ph * 4) * 0.9; d.lat = 0; d.tilt = 0;
-  if (c.y >= c.yTop) { d.climb = null; d.fall = { vy: 3.0, vx: Math.sin(c.ang) * 2.2, vz: Math.cos(c.ang) * 2.2, ry: c.ang }; }
+  if (c.y >= c.yTop) c.top = (c.top || 0) + dt;     // they stand on the top of the wall for a moment before stepping off
+  if (c.top > 1.2) { d.climb = null; d.fall = { vy: 3.0, vx: Math.sin(c.ang) * 2.2, vz: Math.cos(c.ang) * 2.2, ry: c.ang }; }
 }
 function climberTap(px, py) {                  // tap a climber: it is thrown off the tower and you get $1
   if (!W3.crowd || !S.started) return false;
@@ -2661,17 +2681,18 @@ function climberTap(px, py) {                  // tap a climber: it is thrown of
 function updateCrowd(dt) {
   var want = crowdTarget(); laneUpdate();
   W3.flOn = S.tower && S.started && CAM.mode !== "title" && groundOutOfView(W3.flOn);
-  var away = S.started && CAM.mode !== "title" && groundOutOfView(W3.groundAway);
+  var away = S.best >= 25 && S.started && CAM.mode !== "title" && groundOutOfView(W3.groundAway);      // the ground people stay on show until row 25
   if (away !== W3.groundAway) { W3.groundAway = away; setGroundCrowdShown(!away); }
   var fc = floaterCount();
   if (away && (fc > 0) !== !!W3.floatShown) setGroundCrowdShown(false);        // the first floater arrived (or the last left) while the ground was away
-  if (away && fc === 0) return;
   updateClimbers(dt);
+  if (away && fc === 0 && !climbersOut()) return;      // nobody on the ground needs drawing; a climber still does
   for (var i = 0; i < W3.crowd.length; i++) {
     var d = W3.crowd[i];
-    if (away && i >= fc && d.gz) continue;                    // a ground villager already shrunk away: nothing to redraw
+    if (away && i >= fc && d.gz && !d.climb && !d.fall) continue;                    // a ground villager already shrunk away: nothing to redraw
     d.ph += dt * 3;
-    var wantI = i < want && !camNearVillager(d) && !(away && i >= fc);
+    var inAir = !!(d.climb || d.fall);
+    var wantI = inAir || (i < want && !camNearVillager(d) && !(away && i >= fc));      // a climber or a faller is always drawn
     if (d.s === undefined) { d.s = 0; d.vs = 0; d.on = false; d.flipA = 0; }
     if (wantI && !d.on && dt > 0) {
       d.on = true; d.jump = Math.max(d.jump, 0.7);
@@ -2835,7 +2856,7 @@ function markSprite(kind) {
 function addMark(i, kind, off) {
   var b = BRICKS[i], wc = wallChunkFor(i); if (!b || !wc || !wc.fill || !wc.fill.parent) return;
   var sp = markSprite(kind); sp.userData.off = off; wc.fill.parent.add(sp);
-  b.markSp = (b.markSp || []).concat([sp]); placeMarks(i);
+  b.markSp = (b.markSp || []).concat([sp]); if (kind === "horseshoe") b.shoe = sp; placeMarks(i);
 }
 function placeMarks(i) {
   var b = BRICKS[i]; if (!b || !b.markSp) return;
@@ -2932,10 +2953,26 @@ function updateBrickAnims(dt) {
       setBrickMatrix(a.i, Math.sin(u * Math.PI) * 0.22, 1 + Math.sin(u * Math.PI) * 0.06);
     } else if (a.kind === "cool") {
       var b = BRICKS[a.i]; var h = clayHSL(b.seed);
-      _c.set(0xff7a2a).lerp(_c2.setHSL(h[0], h[1], h[2]), u);
+      _c.set(0xff7a2a).lerp(_c2.setHSL(h[0], 0.2, 0.13 + h[2] * 0.08), u);
       wallSetColor(a.i, _c);
     }
     if (u >= 1) { if (a.kind !== "cool") setBrickMatrix(a.i); ANIMS.splice(k, 1); }
+  }
+}
+// Lucky bricks glimmer every ten seconds while they are on screen: a sparkle of light, and the horseshoe shines.
+function updateLuckyGlints(dt) {
+  for (var i = 0; i < BRICKS.length; i++) {
+    var b = BRICKS[i]; if (!b.lucky || b.wx === undefined) continue;
+    if (b.glT === undefined) b.glT = Math.random() * 6;          // out of step with its neighbours
+    if (b.glFx > 0) b.glFx -= dt;
+    if (b.shoe) { var k = b.glFx > 0 ? Math.sin((1 - b.glFx / 0.5) * Math.PI) : 0, s = 0.2 * (1 + 0.6 * k); b.shoe.scale.set(s, s, 1); }
+    var p = toScreenW(b.wx, b.wy, b.wz);
+    if (p.behind || p.x < -30 || p.y < -30 || p.x > window.innerWidth + 30 || p.y > window.innerHeight + 30) continue;   // the timer only runs while it is in view
+    b.glT += dt;
+    if (b.glT >= 10) {
+      b.glT = 0; b.glFx = 0.5;
+      EMIT_WORLD = true; emitGlow(b.wx, b.wy + 0.15, b.wz + BD / 2 + 0.1, 10, 0xfff6c8, 1.4, 0.6, 0.09, -0.6); EMIT_WORLD = false;
+    }
   }
 }
 function rowWave(row) {
@@ -3052,7 +3089,7 @@ function buildHole() {
   ring.renderOrder = -7; g.add(ring);
   // silhouettes peering down — sharper as you approach
   W3.sils = [];
-  var silMat = new THREE.MeshBasicMaterial({ color: 0x181230, transparent: true, opacity: 0.4, fog: false, depthWrite: false });
+  var silMat = new THREE.MeshBasicMaterial({ color: 0x05020c, transparent: true, opacity: 0.92, fog: false, depthWrite: false });
   for (var i = 0; i < 7; i++) {
     var s = new THREE.Group();
     var body = new THREE.Mesh(new THREE.CircleGeometry(1.5, 20, 0, Math.PI), silMat); body.scale.y = 1.4; s.add(body);
@@ -3721,6 +3758,7 @@ function updateWorld(dt, rt) {
   EMIT_WORLD = false;
   updateWalkers(dt);
   updateBrickAnims(dt);
+  updateLuckyGlints(dt);
   updateParticles(dt);
 }
 function updateHole(dt, prog) {
@@ -3745,7 +3783,7 @@ function updateHole(dt, prog) {
   W3.holeShow = W3.holeShow == null ? hWant : damp(W3.holeShow, hWant, 0.7, dt);       // row 1: nothing. Row 2: a pinprick opens
   W3.hole.visible = W3.holeShow > 0.02;
   W3.hole.scale.setScalar(sc * (1 + Math.sin(W3.t * 1.3) * 0.02) * clamp(W3.holeShow, 0, 1));
-  W3.silMat.opacity = lerp(0.35, 0.9, p1);
+  W3.silMat.opacity = lerp(0.92, 1, p1);
   for (var i = 0; i < W3.sils.length; i++) {
     var s = W3.sils[i]; s.position.x = -6 + i * 2 + Math.sin(W3.t * 0.8 + s.userData.ph) * 0.5; s.visible = i < silCount(S.courses);
     s.rotation.z = Math.sin(W3.t * 0.6 + s.userData.ph) * 0.06;
@@ -4070,7 +4108,7 @@ function placeBrick(item, fromAuto, outcome, f, from) {
   var land = function () {
     if (gen !== G.gen) return;          // a collapse reset the wall while this brick was in flight
     var idx = wallAdd(row, slot, per, item.type, item.seed, face, ci);
-    if (idx >= 0) { animBrick(idx, "land", 0, 0.32); checkHandSmash(BRICKS[idx]); if (item.type === "hot") addMark(idx, "flame", -0.2); if (item.lucky) addMark(idx, "horseshoe", 0.2); }
+    if (idx >= 0) { animBrick(idx, "land", 0, 0.32); checkHandSmash(BRICKS[idx]); checkClimberKnock(BRICKS[idx]); if (item.type === "hot") addMark(idx, "flame", -0.2); if (item.lucky) { BRICKS[idx].lucky = true; addMark(idx, "horseshoe", 0.2); } }
     landFx(item, row, slot, per, pay, mult, prevMult, outcome, fromAuto, streakNow, bump, runN);
   };
   // the visible fall (or the apprentice's pop-up)
@@ -4178,7 +4216,7 @@ function villagerSay(idx, text, fixed) {
   while (SAYQ.length > 3) SAYQ.shift();                       // never a backlog: only the freshest few lines
 }
 // A bubble waits its turn while any tutorial hint, story card, reveal or panel is up — so it can never cover a "tap this" prompt.
-function bubblesBlocked() { return !S.started || (!!W3.groundAway && floaterCount() === 0) || !!activeMsg || panelsBusy() || S.shopOpen || CAM.mode !== "play" || !!(el.story && !el.story.classList.contains("hidden")); }
+function bubblesBlocked() { return !S.started || !!activeMsg || panelsBusy() || S.shopOpen || CAM.mode !== "play" || !!(el.story && !el.story.classList.contains("hidden")); }
 function dropBubble() { if (curBubble) { if (curBubble.el.parentNode) curBubble.el.parentNode.removeChild(curBubble.el); curBubble = null; } }
 function updateBubbles() {
   var now = performance.now();
@@ -4191,7 +4229,7 @@ function updateBubbles() {
     }
     if (d) {
       var b = document.createElement("div"); b.className = "vbubble"; b.textContent = q.text; b.style.opacity = "0"; el.fx.appendChild(b);
-      curBubble = { el: b, idx: q.idx, born: now, life: 1500 + q.text.length * 42 };
+      curBubble = { el: b, idx: q.idx, born: now, life: 1500 + q.text.length * 42, yell: !!q.yell };
       snd.pop();
     }
   }
@@ -4548,7 +4586,7 @@ function sideDone() {
   fleeAllHands();
   var side = curFace() + 1, row = workRow(), clean = S.rowMisses === 0;
   var tb = rowTypeBonus(row), bonus = (payable(row) ? rowBonus(clean) : 0) + tb.bonus;     // each side is a row of its own: it pays its own row + metal bonuses
-  S.rowMisses = 0; S.scUsed = 0; S.rowT = freshRowT();                                  // ...and gets its own clean-row check, Second Chance and metal ledger
+  S.rowMisses = 0; S.rowT = freshRowT();                                  // ...and gets its own clean-row check and metal ledger (Second Chance resets per row, in completeCourse)
   credit(bonus); sideReact();
   whenLanded(function () { snd.whoosh(); faceFx(row, bonus, clean); typeRowFx(tb); });
   saveGame();
@@ -5218,13 +5256,12 @@ function fleeHand(h) {
   untintBrick(h); h.state = "flee"; h.t = 0; h.mark.visible = h.markFill.visible = h.arrow.visible = false; h.carry.visible = false;
 }
 function dropHand(h) { h.active = false; h.state = "off"; h.g.visible = false; h.mark.visible = h.markFill.visible = h.arrow.visible = false; }
-// A hand clamps on both sides of its fingers. One brick squeezes one side; a brick on the other side makes it let go (smashed).
+// A hand is smashed by the first brick that lands on its fingers.
 function squeezeSide(h, side) {
   h.sides = h.sides || {};
   if (h.sides[side]) return;
-  h.sides[side] = true; snd.clink(); camShake(0.12);
-  if (h.sides[-1] && h.sides[1]) { smashHand(h); return; }
-  poseHand(h, h.grip || 0);
+  h.sides[side] = true;
+  smashHand(h);                 // one brick is enough: the first one that lands on its fingers knocks it off the wall
 }
 function checkHandSmash(b) {
   for (var i = 0; i < HANDS.length; i++) {
@@ -5233,6 +5270,21 @@ function checkHandSmash(b) {
     if (h.round) { if (b.round && Math.abs(angDiff(b.ang, h.ang)) < 0.72 * 2 * Math.PI / b.n) squeezeSide(h, angDiff(b.ang, h.ang) >= 0 ? 1 : -1); continue; }
     if ((h.face || 0) !== (b.face || 0)) continue;
     if (Math.abs(b.x - h.x) < 0.72 * (b.sx + GAP)) squeezeSide(h, b.x < h.x ? -1 : 1);
+  }
+}
+var _knockV = new THREE.Vector3();
+// A brick set down right where a climber stands at the top of the wall knocks them off: they yell and fall.
+function checkClimberKnock(b) {
+  if (!W3.crowd || !b) return;
+  brickPose(b, 0, 0, 0, _knockV);                        // the brick's centre in the world
+  for (var i = 0; i < W3.crowd.length; i++) {
+    var d = W3.crowd[i]; if (!d.climb || !d.on) continue;
+    if (d.climb.y < d.climb.yTop - 0.6) continue;        // only a climber standing on the top of the wall
+    var dx = d.x - _knockV.x, dz = d.z - _knockV.z;
+    if (Math.sqrt(dx * dx + dz * dz) > b.sx * 0.5 + 0.7) continue;
+    var ang = d.climb.ang; d.climb = null;
+    d.fall = { vy: 3.5, vx: Math.sin(ang) * 2.8, vz: Math.cos(ang) * 2.8, ry: ang };
+    villagerSay(i, "AAAH!", true); SAYQ[SAYQ.length - 1].yell = true;     // a yell is still heard while the ground is out of view
   }
 }
 function smashHand(h) {
@@ -5675,11 +5727,24 @@ function renderStreak(pop) {
   } else if (!st.classList.contains("break")) st.classList.add("hidden");
 }
 function currentVis() { return LINES.filter(function (l) { return l.gate(); }).map(function (l) { return l.id; }).join(","); }
+// With three or more upgrades you can afford, the SHOP button gives a little nudge every 30 seconds.
+var SHOP_NUDGE = { ready: false, t: 0 };
+function nudgeShop() {
+  var b = $("btn-shop"); if (!b) return;
+  b.classList.remove("shop-nudge"); void b.offsetWidth; b.classList.add("shop-nudge");
+  setTimeout(function () { b.classList.remove("shop-nudge"); }, 1200);
+}
+setInterval(function () {
+  if (!SHOP_NUDGE.ready || !S.started || S.shopOpen) { SHOP_NUDGE.t = 0; return; }
+  if (++SHOP_NUDGE.t >= 30) { SHOP_NUDGE.t = 0; nudgeShop(); }
+}, 1000);
 function renderShopBadge() {
+  SHOP_NUDGE.ready = false;
   if (!S.workshopShown) return;
   var vis = currentVis(), afford = 0;
   LINES.forEach(function (l) { var t = S.tier[l.id]; if (l.gate() && t < l.costs.length && S.money >= costOf(l)) afford++; });
-  if (starterTut()) afford = S.money >= STARTER_COST ? 1 : 0;          // during the lesson only the Warm-Up is on offer
+  if (starterTut()) afford = S.money >= STARTER_COST ? 1 : 0;
+  SHOP_NUDGE.ready = afford >= 3 && !S.shopOpen;          // during the lesson only the Warm-Up is on offer
   if (S.shopOpen || S.seenVis === null) { S.seenVis = vis; el.shopNew.classList.add("hidden"); }
   else el.shopNew.classList.toggle("hidden", vis === S.seenVis);
   var show = el.shopNew.classList.contains("hidden") && afford > 0 && !S.shopOpen;
