@@ -5961,7 +5961,7 @@ function panelsBusy() {
 }
 function storyActive() { return !!(activeMsg && activeMsg.kind === "story"); }
 function modalPaused() {
-  return !el.settings.classList.contains("hidden") || storyActive() || cardsActive() || !!(activeMsg && activeMsg.kind === "reveal") || !el.ovVictory.classList.contains("hidden");
+  return (window.CINE && CINE.on) || !el.settings.classList.contains("hidden") || storyActive() || cardsActive() || !!(activeMsg && activeMsg.kind === "reveal") || !el.ovVictory.classList.contains("hidden");
 }
 function actionFrozen() { return modalPaused() || S.shopOpen || CAM.mode === "victory" || CAM.mode === "rim" || CAM.mode === "tower"; }
 function setStoryContent(m) {
@@ -6872,6 +6872,7 @@ function simStep(rdt, now) {
     updateCraneVisual(dt, now / 1000);
     updateWorld(dt, now / 1000);
     updateCamera(rdt, now / 1000);
+    if (window.CINE_TICK) CINE_TICK(rdt);
   }
   uiFrame(rdt);
 }
@@ -7062,7 +7063,7 @@ function musicSwitch(m, now) {
 function musicTick() {
   if (!AC || !BUS) return;
   if (!MUS.bus) { MUS.bus = AC.createGain(); MUS.bus.gain.value = 0; MUS.bus.connect(BUS); }
-  var on = !S.muted && S.musicOn && S.started && !document.hidden, now = AC.currentTime;
+  var on = !S.muted && S.musicOn && S.started && !document.hidden && !(window.CINE && CINE.on), now = AC.currentTime;
   if (on !== MUS.on) { MUS.on = on; MUS.bus.gain.setTargetAtTime(on ? MUSIC_VOL : 0, now, on ? 0.6 : 0.25); if (on) MUS.next = now + 0.1; }
   if (!on) return;
   var want = moodFor(S.best);
@@ -8014,6 +8015,720 @@ buildGriffin = function () {
 };
 
 boot();
+
+    </script>
+    <script id="cutscenes">
+/* =====================================================================
+   CUT SCENES — the opening, the rim (course 50) and the finale (course 100).
+   Same filming language as the trailer: establishing wide -> close-up -> insert / B-roll,
+   dialogue as shot / reverse-shot, slow eased camera moves, bold captions, comic speech
+   bubbles, letterbox bars. The real game world is the set: the camera is taken over for
+   the length of the scene and handed back smoothly afterwards.
+   Skip button (or Esc) on every scene. Nothing here touches the player's progress.
+   ===================================================================== */
+(function () {
+  "use strict";
+  var CN = window.CINE = { on: false, T: 0 };
+  var DPR = Math.min(2, window.devicePixelRatio || 1);
+  var cv, g, skipBtn, appEl, W = 800, H = 600, U = 1, BAR = 0, FONTW = "";
+  var FONT = '"Archivo Black","Trebuchet MS","Segoe UI",Verdana,sans-serif';
+  var FONT2 = 'Archivo,"Trebuchet MS","Segoe UI",Verdana,sans-serif';
+  var gpP = new THREE.Vector3(), gpQ = new THREE.Quaternion(), gpFov = 40;       // the game's own camera, kept for the hand-off
+  var lastP = new THREE.Vector3(), lastQ = new THREE.Quaternion(), lastFov = 40;
+  var _hv = new THREE.Vector3();
+  var props = {}, bricks = {}, SCN = {};
+  var HAND_DUR = 0.9;
+
+  /* ---------- small helpers ---------- */
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, k) { return a + (b - a) * k; }
+  function ease(k) { k = clamp(k, 0, 1); return k * k * (3 - 2 * k); }
+  function easeOutBack(k) { k = clamp(k, 0, 1); var c = 1.70158; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); }
+  function seg(t, a, b) { return clamp((t - a) / (b - a), 0, 1); }
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function mix(a, b, u) {
+    u = ease(u);
+    return { p: [lerp(a.p[0], b.p[0], u), lerp(a.p[1], b.p[1], u), lerp(a.p[2], b.p[2], u)],
+             l: [lerp(a.l[0], b.l[0], u), lerp(a.l[1], b.l[1], u), lerp(a.l[2], b.l[2], u)],
+             fov: lerp(a.fov, b.fov, u), roll: lerp(a.roll || 0, b.roll || 0, u) };
+  }
+  function lin(a, b, u) {
+    u = clamp(u, 0, 1);
+    return { p: [lerp(a.p[0], b.p[0], u), lerp(a.p[1], b.p[1], u), lerp(a.p[2], b.p[2], u)],
+             l: [lerp(a.l[0], b.l[0], u), lerp(a.l[1], b.l[1], u), lerp(a.l[2], b.l[2], u)],
+             fov: lerp(a.fov, b.fov, u), roll: lerp(a.roll || 0, b.roll || 0, u) };
+  }
+  // tight framing on a character's face. ch = {x, z, ry, hy}; o = {d, side, up, aim, fov}
+  function face(ch, o) {
+    var fx = Math.sin(ch.ry), fz = Math.cos(ch.ry), rx = fz, rz = -fx, d = o.d == null ? 3.2 : o.d, s = o.side || 0;
+    return { p: [ch.x + fx * d + rx * s, ch.hy + (o.up || 0), ch.z + fz * d + rz * s], l: [ch.x, ch.hy + (o.aim == null ? 0.15 : o.aim), ch.z], fov: o.fov || 30, roll: o.roll || 0 };
+  }
+  function shotAt(T, cuts) { var i = 0; while (i < cuts.length && T >= cuts[i]) i++; return i; }
+  function shotU(T, cuts, i) { var a = i ? cuts[i - 1] : 0, b = i < cuts.length ? cuts[i] : (CN.def ? CN.def.dur : a + 1); return seg(T, a, b); }
+
+  /* ---------- the stage: Edgar, the Elder, brick props ---------- */
+  function prop(key) {
+    if (!props[key]) {
+      var o = null;
+      try { o = key === "edgar" ? buildGnoll({ mouth: "grin" }) : buildSatyr({}); } catch (e) { console.error(e); }
+      if (!o) o = { group: new THREE.Group() }; else if (!o.group) o = { group: o };
+      o.group.visible = false; scene.add(o.group); props[key] = o;
+    }
+    return props[key];
+  }
+  function place(key, x, z, ry, sc) { var o = prop(key); o.group.visible = true; o.group.position.set(x, 0, z); o.group.rotation.set(0, ry, 0); o.group.scale.setScalar(sc || 0.95); return o; }
+  function talk(o, on, t) { if (!o) return; o.group.position.y = on ? Math.abs(Math.sin(t * 9)) * 0.035 : 0; if (o.head) o.head.rotation.x = on ? Math.sin(t * 7) * 0.05 : 0; }
+  function arms(o, r, l) { if (o.aR) o.aR.rotation.x = r; if (o.aL) o.aL.rotation.x = l; }
+  function hideProps() { for (var k in props) props[k].group.visible = false; }
+  function brick(key, color, sx, sy, sz) {
+    if (!bricks[key]) {
+      var m = new THREE.Mesh(W3.brickGeo, toon(color, { emissive: 0x000000 })); outline(m, OUTLINE); m.visible = false; scene.add(m); bricks[key] = m;
+    }
+    var b = bricks[key]; b.scale.set(sx, sy || 1, sz || 1); return b;
+  }
+  function hideBricks() { for (var k in bricks) bricks[k].visible = false; if (CN.chain) CN.chain.visible = false; }
+  function world(fn) { var w = EMIT_WORLD; EMIT_WORLD = true; try { fn(); } finally { EMIT_WORLD = w; } }
+  function shake(a) { if (typeof REDUCED !== "undefined" && REDUCED) return; if (S.shakeOn === false) return; CN.trauma = Math.min(1, (CN.trauma || 0) + a); }
+  function kilnMouth() { var v = new THREE.Vector3(0, 0.3, 1.08); W3.kiln.updateMatrixWorld(true); W3.kiln.localToWorld(v); return v; }
+
+  /* ---------- 2D overlay: captions, bubbles, light ---------- */
+  function text(str, x, y, o) {
+    o = o || {};
+    var size = (o.size || 64) * U, sc = o.scale == null ? 1 : o.scale, al = o.alpha == null ? 1 : o.alpha;
+    if (al <= 0 || sc <= 0) return;
+    g.save(); g.globalAlpha = al; g.translate(x, y); if (o.rot) g.rotate(o.rot); g.scale(sc, sc);
+    g.font = FONTW + size + "px " + FONT; g.textAlign = o.align || "center"; g.textBaseline = "middle"; g.lineJoin = "round"; g.miterLimit = 2;
+    if (o.shadow !== false) { g.fillStyle = "rgba(0,0,0,.35)"; g.fillText(str, 0, size * 0.09); }
+    g.strokeStyle = o.outline || "#221407"; g.lineWidth = o.outlineW ? o.outlineW * U : size * 0.22; g.strokeText(str, 0, 0);
+    var f = o.fill || "#ffd23a";
+    if (o.fill2) { var gr = g.createLinearGradient(0, -size / 2, 0, size / 2); gr.addColorStop(0, f); gr.addColorStop(1, o.fill2); f = gr; }
+    g.fillStyle = f; g.fillText(str, 0, 0); g.restore();
+  }
+  function wrap(str, maxW, font) {
+    g.font = font; var words = str.split(" "), lines = [], line = "";
+    words.forEach(function (w) { var t = line ? line + " " + w : w; if (g.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; });
+    if (line) lines.push(line); return lines;
+  }
+  // bright game-style caption: pops in with a little overshoot, fades at the end. o.y is a fraction of the screen height.
+  function cap(o) {
+    var T = CN.T, a = o.t0, b = o.t1; if (T < a || T > b) return;
+    var k = easeOutBack(seg(T, a, a + 0.28)), fade = 1 - seg(T, b - 0.25, b);
+    var size = o.size || 62, lines = wrap(o.text, Math.min(W * 0.9, (o.maxW || 1060) * U), FONTW + size * U + "px " + FONT), y = H * (o.y || 0.8);
+    lines.forEach(function (ln, i) {
+      text(ln, W / 2, y + (i - (lines.length - 1) / 2) * size * U * 1.12, { size: size, scale: k, alpha: fade, fill: o.fill || "#ffe45c", fill2: o.fill2 || "#ff9a1f", rot: o.rot == null ? -0.012 : o.rot });
+    });
+  }
+  // comic speech bubble; (o.x, o.y) is where the tail points, in screen pixels
+  function bubble(o) {
+    var T = CN.T, a = o.t0, b = o.t1; if (T < a || T > b) return;
+    var k = easeOutBack(seg(T, a, a + 0.22)), fade = 1 - seg(T, b - 0.2, b), size = (o.size || 46) * U, maxW = Math.min(W * 0.88, (o.maxW || 560) * U);
+    var font = "800 " + size + "px " + FONT2, lines = wrap(o.text, maxW, font), lh = size * 1.2, bw = 0, bh = lines.length * lh + 36 * U;
+    g.font = font; lines.forEach(function (l) { bw = Math.max(bw, g.measureText(l).width); }); bw += 56 * U;
+    var tip = 26 * U, y = clamp(o.y, BAR + 16 + tip + bh, H - BAR - 14);
+    var x = clamp(o.x, bw / 2 + 14, W - bw / 2 - 14), tw = clamp(o.x - x, -(bw / 2 - 50 * U), bw / 2 - 50 * U);
+    g.save(); g.globalAlpha = fade; g.translate(x, y); g.translate(tw, 0); g.scale(k, k); g.translate(-tw, 0);
+    g.fillStyle = o.bg || "#fffaf0"; g.strokeStyle = "#221407"; g.lineWidth = 6 * U; g.lineJoin = "round";
+    var r = 26 * U, l = -bw / 2, yb = -tip, t = yb - bh;
+    g.beginPath(); g.moveTo(l + r, t); g.arcTo(l + bw, t, l + bw, yb, r); g.arcTo(l + bw, yb, l, yb, r);
+    g.lineTo(tw + 26 * U, yb); g.lineTo(tw, 0); g.lineTo(tw - 14 * U, yb); g.lineTo(l + r, yb); g.arcTo(l, yb, l, t, r); g.arcTo(l, t, l + bw, t, r); g.closePath();
+    g.fill(); g.stroke();
+    g.fillStyle = "#221407"; g.font = font; g.textAlign = "center"; g.textBaseline = "middle";
+    lines.forEach(function (ln, i) { g.fillText(ln, 0, t + 18 * U + lh * (i + 0.5)); });
+    g.restore();
+  }
+  function scr(x, y, z) { _hv.set(x, y, z).project(camera); return { x: (_hv.x * 0.5 + 0.5) * W, y: (-_hv.y * 0.5 + 0.5) * H }; }
+  function vignetteFx(a) {
+    var gr = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
+    gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0," + a + ")"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  }
+  function tint(rgba) { g.fillStyle = rgba; g.fillRect(0, 0, W, H); }
+
+  /* hole placement: x/y are screen NDC, r is the radius as a share of the screen height */
+  function holeAt(h) {
+    if (!h) { W3.hole.visible = false; return; }
+    var r = Math.min(h.r, 0.47 * W / H);
+    var Rpx = r * H, tanT = (Rpx / (H / 2)) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), dist = 110;
+    _hv.set(h.x, h.y, 0.5).unproject(camera).sub(camera.position).normalize();
+    W3.hole.position.copy(camera.position).addScaledVector(_hv, dist);
+    W3.hole.quaternion.copy(camera.quaternion);
+    W3.hole.scale.setScalar(Math.max(0.01, tanT * dist / 10) * (1 + Math.sin(W3.t * 1.3) * 0.015));
+    W3.hole.visible = true;
+    CN.holeScr = { x: (h.x * 0.5 + 0.5) * W, y: (-h.y * 0.5 + 0.5) * H, r: Rpx };
+  }
+
+  /* ---------- audio: a small event scheduler on its own bus (so a skip can cut it cleanly) ---------- */
+  var nbuf = null;
+  function audioOK() { return !!(window.AC && window.BUS && !S.muted); }
+  function playEv(e, when) {
+    var gn = AC.createGain(), v = e.v == null ? 0.12 : e.v, d = e.d || 0.2, o;
+    gn.gain.setValueAtTime(0.0001, when); gn.gain.linearRampToValueAtTime(v, when + Math.min(e.att || 0.02, d / 3));
+    gn.gain.exponentialRampToValueAtTime(0.0001, when + d); gn.connect(CN.bus);
+    if (e.n) {
+      if (!nbuf) { var len = AC.sampleRate, ch; nbuf = AC.createBuffer(1, len, AC.sampleRate); ch = nbuf.getChannelData(0); for (var i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1; }
+      o = AC.createBufferSource(); o.buffer = nbuf; var f = AC.createBiquadFilter(); f.type = e.n; f.frequency.value = e.f || 1200; o.connect(f); f.connect(gn);
+      o.start(when, Math.random() * 0.4); o.stop(when + d + 0.05);
+    } else {
+      o = AC.createOscillator(); o.type = e.w || "triangle"; o.frequency.setValueAtTime(e.f, when);
+      if (e.s) o.frequency.exponentialRampToValueAtTime(e.s, when + d);
+      o.connect(gn); o.start(when); o.stop(when + d + 0.05);
+    }
+  }
+  function sfx(t, e) { e.t = t; CN.evs.push(e); }
+  function at(t, fn) { CN.acts.push({ t: t, fn: fn }); }
+  function blips(t0, t1, f0) { for (var t = t0; t < t1; t += 0.085) sfx(t, { f: (f0 || 520) + ((t * 977) % 5) * 40, d: 0.05, w: "square", v: 0.016 }); }
+  function pad(t, d, freqs, v, w) { freqs.forEach(function (f) { sfx(t, { f: f, d: d, w: w || "triangle", v: v == null ? 0.04 : v, att: Math.min(0.6, d / 3) }); }); }
+  var CHORDS = [[261.6, 329.6, 392], [220, 261.6, 329.6], [174.6, 220, 261.6], [196, 246.9, 293.7]];
+  function arpeggio(t0, t1, v) {
+    for (var t = t0, n = 0; t < t1; t += 0.5, n++) {
+      var ch = CHORDS[Math.floor(n / 4) % 4], k = [0, 1, 2, 1][n % 4];
+      sfx(t, { f: ch[k] * (n % 8 === 7 ? 2 : 1), d: 0.55, w: "triangle", v: v || 0.05 });
+      if (n % 4 === 0) sfx(t, { f: ch[0] / 2, d: 1.2, w: "sine", v: (v || 0.05) * 1.2 });
+    }
+  }
+  function thud(t, v) { sfx(t, { f: 95, s: 38, d: 0.45, w: "sine", v: v || 0.2 }); sfx(t, { d: 0.25, n: "lowpass", f: 500, v: (v || 0.2) * 0.5 }); }
+  function bell(t, base, v) { [1, 2, 3.01, 4.2].forEach(function (m, i) { sfx(t, { f: base * m, d: 3.2 - i * 0.5, w: "sine", v: (v || 0.1) / (1 + i * 0.8), att: 0.004 }); }); }
+
+  /* ---------- 2D art: the sky's hand, little builders, the second wall ---------- */
+  function drawHand(cx, cy, size, open, alpha) {
+    g.save(); g.translate(cx, cy); g.globalAlpha = alpha; g.lineJoin = "round"; g.lineWidth = size * 0.035; g.strokeStyle = "#221407"; g.fillStyle = "#f1d0b4";
+    function rr(x, y, w, h, r) { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fill(); g.stroke(); }
+    var pw = size * 0.52, ph = size * 0.42;
+    for (var i = 0; i < 4; i++) {                                                     // fingers: curled into the palm, then spread open
+      var bx = (i - 1.5) * pw * 0.27, ang = (i - 1.5) * 0.2 * open, len = size * (0.16 + 0.26 * open) + (i === 1 || i === 2 ? size * 0.04 * open : 0);
+      g.save(); g.translate(bx, -ph / 2 + size * 0.03); g.rotate(ang); rr(-size * 0.055, -len, size * 0.11, len + size * 0.05, size * 0.05); g.restore();
+    }
+    g.save(); g.translate(-pw / 2 + size * 0.02, size * 0.04); g.rotate(-0.9 - 0.5 * open); rr(-size * 0.055, -size * (0.16 + 0.14 * open), size * 0.11, size * (0.2 + 0.14 * open), size * 0.05); g.restore();
+    rr(-pw / 2, -ph / 2, pw, ph, size * 0.1);
+    g.restore();
+  }
+  function drawBuilder(x, y, s, col, lit, t) {
+    var sil = "#181230", hat = "#f5b921", skin = "#f1d0b4";
+    function pick(c) { return lit >= 0.5 ? c : sil; }
+    g.save(); g.translate(x, y); g.scale(s, s); g.lineJoin = "round"; g.lineWidth = 3.5; g.strokeStyle = lit > 0.3 ? "#221407" : sil;
+    var step = Math.sin(t * 9) * 0.35;
+    g.fillStyle = pick("#3b2a1a");                                                   // legs
+    g.save(); g.translate(-7, 28); g.rotate(step); g.fillRect(-5, 0, 10, 26); g.strokeRect(-5, 0, 10, 26); g.restore();
+    g.save(); g.translate(7, 28); g.rotate(-step); g.fillRect(-5, 0, 10, 26); g.strokeRect(-5, 0, 10, 26); g.restore();
+    g.fillStyle = pick(col);                                                         // body
+    g.beginPath(); if (g.roundRect) g.roundRect(-17, -6, 34, 40, 10); else g.rect(-17, -6, 34, 40); g.fill(); g.stroke();
+    g.save(); g.translate(-18, 0); g.rotate(-0.5 - step * 0.6); g.fillRect(-4, 0, 8, 26); g.strokeRect(-4, 0, 8, 26); g.restore();   // arms
+    g.save(); g.translate(18, 0); g.rotate(0.5 + step * 0.6); g.fillRect(-4, 0, 8, 26); g.strokeRect(-4, 0, 8, 26); g.restore();
+    g.fillStyle = pick(skin); g.beginPath(); g.arc(0, -22, 16, 0, 7); g.fill(); g.stroke();   // head
+    g.fillStyle = pick(hat); g.beginPath(); g.arc(0, -26, 17, Math.PI, 0); g.closePath(); g.fill(); g.stroke();  // hard hat
+    g.fillRect(-20, -27, 40, 5);
+    if (lit >= 0.5) { g.fillStyle = "#221407"; g.beginPath(); g.arc(-6, -20, 2.4, 0, 7); g.arc(6, -20, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(0, -15, 6, 0.15, Math.PI - 0.15); g.stroke(); }
+    g.restore();
+  }
+  // the world above the tear: a second wall, a hundred courses tall, unfinished in the dark. p = reveal 0..1
+  function drawSecondWall(cx, cy, R, p, T) {
+    g.save(); g.beginPath(); g.arc(cx, cy, R, 0, 7); g.clip();
+    var gr = g.createLinearGradient(0, cy - R, 0, cy + R); gr.addColorStop(0, "#0b0620"); gr.addColorStop(0.6, "#25124a"); gr.addColorStop(1, "#3a1d5c");
+    g.fillStyle = gr; g.fillRect(cx - R, cy - R, R * 2, R * 2);
+    for (var s = 0; s < 26; s++) { g.fillStyle = "rgba(255,244,214," + (0.25 + 0.4 * ((s * 7) % 5) / 5) + ")"; g.fillRect(cx - R + ((s * 83) % 200) / 200 * R * 2, cy - R + ((s * 47) % 100) / 100 * R * 0.9, 2.5, 2.5); }
+    var off = (1 - ease(p)) * R * 1.5, ww = R * 0.62, top = cy - R * 0.55 + off, bot = cy + R * 1.1 + off, bh = R * 0.085;
+    g.fillStyle = "#1a0f33"; g.fillRect(cx - ww / 2, top, ww, bot - top);
+    for (var r = 0; top + r * bh < bot; r++) {                                       // courses: running bond, ragged unfinished top
+      var y = top + r * bh, n = 6, bw = ww / n, sh = (r % 2) * bw / 2, miss = r < 3 ? (r * 2 + 1) % 3 : 0;
+      for (var i = 0; i < n + 1; i++) {
+        if (r < 3 && ((i + r) % 3 === miss)) continue;
+        var bx = cx - ww / 2 + i * bw - sh; if (bx < cx - ww / 2 - 1 || bx + bw > cx + ww / 2 + 1) continue;
+        g.fillStyle = ((i + r) % 3 === 0) ? "#5b3a8a" : ((i + r) % 3 === 1) ? "#4a2f78" : "#6a45a0"; g.fillRect(bx + 1, y + 1, bw - 2, bh - 2);
+      }
+    }
+    g.strokeStyle = "#8a6cc0"; g.lineWidth = 2; g.beginPath();                        // scaffold + a crane arm
+    g.moveTo(cx + ww / 2 + 6, top - R * 0.1); g.lineTo(cx + ww / 2 + 6, top + R * 0.7); g.moveTo(cx - ww / 2 - 6, top - R * 0.05); g.lineTo(cx - ww / 2 - 6, top + R * 0.7);
+    g.moveTo(cx - R * 0.1, top - R * 0.26); g.lineTo(cx + R * 0.55, top - R * 0.26); g.moveTo(cx + R * 0.1, top - R * 0.26); g.lineTo(cx + R * 0.1, top - R * 0.02); g.stroke();
+    for (var f = 0; f < 5; f++) {                                                     // the builders, tiny and busy
+      var fx = cx - ww / 2 + 8 + ((f * 61) % 100) / 100 * (ww - 16), fy = top - 2 - (f % 2) * 0; var bob = Math.abs(Math.sin(T * 3 + f)) * 3;
+      g.fillStyle = "#0b0620"; g.beginPath(); g.arc(fx, fy - 14 - bob, 4, 0, 7); g.fill(); g.fillRect(fx - 3.5, fy - 10 - bob, 7, 10);
+    }
+    var gl = g.createRadialGradient(cx, cy + R, R * 0.1, cx, cy + R, R * 1.4); gl.addColorStop(0, "rgba(255,170,90,.38)"); gl.addColorStop(1, "rgba(255,170,90,0)");
+    g.fillStyle = gl; g.fillRect(cx - R, cy - R, R * 2, R * 2.4);
+    g.restore();
+    g.save(); g.strokeStyle = "#221407"; g.lineWidth = 9 * U; g.beginPath(); g.arc(cx, cy, R, 0, 7); g.stroke(); g.restore();
+  }
+
+  /* =====================================================================
+     SCENE 1 — THE OPENING  (~21 s)
+     B-roll descent -> Edgar close-up -> kiln B-roll -> BAKE / SWING / DROP -> wide pull-back
+     ===================================================================== */
+  var INTRO_CUTS = [3.0, 6.0, 9.0, 11.6, 14.1, 16.8];
+  SCN.intro = {
+    id: "intro", dur: 21.4, fadeIn: 0.7, vig: 0.3, fit: [0.7, 0.2, 0.5, 0.35, 0.6, 0.35, 0.7],
+    setup: function (c) {
+      c.K = kilnMouth(); c.kd = [Math.sin(0.6), Math.cos(0.6)]; c.kr = [Math.cos(0.6), -Math.sin(0.6)];
+      c.wy = rowY(1); c.slotX = -0.9; c.dropped = false; c.landed = false; c.popped = false;
+      arpeggio(0.3, 21.2, 0.05);
+      [0.4, 0.7, 1.4, 1.7, 2.3, 7.0, 7.6, 17.4, 18.3].forEach(function (t, i) { sfx(t, { f: 2400 + (i % 3) * 300, s: 3300 + (i % 2) * 400, d: 0.09, w: "sine", v: 0.03 }); });
+      sfx(3.0, { d: 1.0, n: "lowpass", f: 300, v: 0.04 });
+      sfx(9.1, { d: 1.6, n: "highpass", f: 5200, v: 0.045 });                      // the kiln hiss
+      sfx(9.1, { d: 1.4, n: "lowpass", f: 260, v: 0.08 });
+      at(10.35, function () { snd.bake(); });
+      sfx(10.35, { f: 880, d: 0.18, w: "sine", v: 0.08 }); sfx(10.45, { f: 1320, d: 0.25, w: "sine", v: 0.07 });
+      at(11.7, function () { snd.load(); });
+      sfx(11.9, { d: 0.7, n: "bandpass", f: 600, v: 0.04 });
+      at(14.95, function () { snd.drop(); });
+      at(15.3, function () { snd.place(); shake(0.12); crowdCheer(1.6); snd.cheer(false); world(function () { emitPuffs(c.slotX, 0.3, 0.4, 8, 0xe9dcc2, 0.5, 0.7, 0.9); emitGlow(c.slotX, 0.5, 0.3, 14, 0xffe27a, 2.2, 0.6, 0.12, 0, 1); }); });
+      [0, 0.09, 0.18, 0.27].forEach(function (d, i) { sfx(15.3 + d, { f: 1047 * Math.pow(1.26, i), d: 0.22, w: "sine", v: 0.07 }); });
+      blips(3.4, 4.8, 520); blips(4.9, 5.9, 440);
+    },
+    update: function (c, T, dt) {
+      var ed = place("edgar", -4.6, 1.4, 0.55, 0.95);
+      var cheer = T > 15.3 && T < 18.6;
+      if (cheer) arms(ed, -2.7 + Math.sin(T * 12) * 0.25, -2.7 + Math.cos(T * 12) * 0.25); else arms(ed, -0.9 + Math.sin(T * 4) * 0.2, 0);
+      talk(ed, (T > 3.4 && T < 4.8) || (T > 4.9 && T < 5.9), T); if (cheer) ed.group.position.y = Math.abs(Math.sin(T * 8)) * 0.12;
+      var K = c.K, bk = brick("intro", 0xc2502c, 0.545, 1, 1), tr = W3.trolley;
+      // BAKE: the brick slides out of the kiln mouth, then hops away
+      if (T > 9.6 && T < 11.5) {
+        var u = seg(T, 9.9, 10.5), v = Math.max(0, T - 10.8);
+        if (v <= 0) { bk.position.set(K.x + c.kd[0] * lerp(0.2, 1.1, ease(u)), lerp(0.28, 0.52, ease(u)), K.z + c.kd[1] * lerp(0.2, 1.1, ease(u))); bk.rotation.set(0, 0.6, 0); }
+        else { bk.position.set(K.x + c.kd[0] * 1.1 + 3.4 * v, 0.52 + 6.5 * v - 9 * v * v + 2.2 * v, K.z + c.kd[1] * 1.1 + 1.3 * v); bk.rotation.set(v * 4, 0.6, v * 3); }
+        bk.visible = T > 9.9; bk.scale.set(0.545 * (0.4 + 0.6 * ease(seg(T, 9.9, 10.15))), 0.4 + 0.6 * ease(seg(T, 9.9, 10.15)), 1);
+        if (T > 9.3 && T < 10.7 && Math.random() < dt * 22) world(function () { emitGlow(K.x + rnd(-0.3, 0.3), 0.45, K.z + rnd(-0.2, 0.2), 1, 0xffa22e, 1.2, 0.8, 0.12, 2.2); });
+      }
+      // SWING: it rides the crane across the frame, then lines up on its slot
+      else if (T >= 11.6 && T < 16.8) {
+        var hx, by = c.wy + 1.05;
+        if (T < 13.0) hx = lerp(-2.3, 2.3, seg(T, 11.6, 13.0));
+        else hx = lerp(2.3, c.slotX, ease(seg(T, 13.0, 14.9)));
+        if (T < 14.95) { bk.position.set(hx, by, 0); bk.rotation.set(0, 0, Math.sin(T * 5) * 0.05 * (T < 13 ? 1 : 0.4)); bk.scale.set(0.545, 1, 1); }
+        else {
+          var f = T - 14.95, y = by - 0.5 * 16 * f * f;
+          if (y <= c.wy) { y = c.wy; var s = seg(T, 15.3, 15.5); bk.scale.set(0.545 * (1 + 0.12 * (1 - s)), 1 - 0.14 * (1 - s) * (T < 15.5 ? 1 : 0), 1); }
+          bk.position.set(c.slotX, y, 0); bk.rotation.set(0, 0, 0);
+        }
+        bk.visible = true; tr.position.x = T < 14.95 ? hx : tr.position.x;
+      } else bk.visible = false;
+      if (T >= 11.6 && T < 14.95) tr.position.x = bk.position.x;
+    },
+    cam: function (c, T) {
+      var i = shotAt(T, INTRO_CUTS), u = shotU(T, INTRO_CUTS, i), K = c.K;
+      if (i === 0) return mix({ p: [3.5, 28, 36], l: [-1.5, 6, 0], fov: 40 }, { p: [-1.2, 3.4, 16], l: [-3.4, 1.7, 0.6], fov: 38 }, u);
+      if (i === 1) return face({ x: -4.6, z: 1.4, ry: 0.55, hy: 1.6 }, { d: lerp(3.6, 2.9, ease(u)), side: -0.9, up: 0.1, aim: 0.15, fov: 30 });
+      if (i === 2) return mix({ p: [K.x - 1.6, 0.9, K.z + 5.2], l: [K.x, 1.5, K.z], fov: 34 }, { p: [-3.0, 1.3, 7.2], l: [-4.4, 1.7, 1.4], fov: 34 }, u);
+      if (i === 3) { var d = lerp(2.5, 2.1, ease(u)); return { p: [K.x + c.kd[0] * d - c.kr[0] * 0.9, 0.55, K.z + c.kd[1] * d - c.kr[1] * 0.9], l: [K.x + 0.25, 0.55, K.z + 0.2], fov: 32 }; }
+      if (i === 4) return mix({ p: [0.9, 1.25, 8.2], l: [0, 1.5, 0], fov: 36 }, { p: [0.4, 1.3, 7.4], l: [-0.2, 1.5, 0], fov: 36 }, u);
+      if (i === 5) return mix({ p: [c.slotX + 2.2, 1.0, 7.0], l: [c.slotX, 0.85, 0], fov: 30 }, { p: [c.slotX + 1.8, 0.8, 6.0], l: [c.slotX, 0.6, 0], fov: 30 }, u);
+      return mix({ p: [0.8, 1.0, 9.5], l: [0, 1.6, -1.2], fov: 44 }, { p: [1.2, 7.5, 24], l: [0, 5.5, -1.5], fov: 40 }, u);
+    },
+    hole: function () { return null; },
+    draw: function (c, T) {
+      cap({ t0: 0.7, t1: 2.8, text: "A sleepy little village.", size: 50, y: 0.8, fill: "#fff3c8", fill2: "#e6c27a" });
+      cap({ t0: 3.15, t1: 4.7, text: "Meet Edgar.", size: 70 });
+      cap({ t0: 4.75, t1: 5.95, text: "(That\u2019s you.)", size: 52, fill: "#fff3c8", fill2: "#ffd27a" });
+      cap({ t0: 6.2, t1: 8.8, text: "Edgar loves walls.", size: 66 });
+      cap({ t0: 9.2, t1: 11.4, text: "Bake.", size: 92, y: 0.78 });
+      cap({ t0: 11.8, t1: 13.9, text: "Swing.", size: 92, y: 0.78 });
+      cap({ t0: 14.3, t1: 16.5, text: "Drop.", size: 92, y: 0.78 });
+      cap({ t0: 17.0, t1: 19.6, text: "Tall ones. Straight ones. Ones with personality.", size: 44 });
+      cap({ t0: 19.8, t1: 21.3, text: "Today, the town needs a wall.", size: 50, fill: "#fff3c8", fill2: "#ffd27a" });
+    },
+    end: function (c) { }
+  };
+
+  /* =====================================================================
+     SCENE 2 — COURSE 50: THE RIM  (~25 s)
+     The hush -> eruption -> reactions -> the sky goes wrong -> NOT YET. HIGHER. -> the second wall -> resolve
+     ===================================================================== */
+  var RIM_CUTS = [3.0, 6.0, 8.5, 11.1, 14.4, 16.0, 17.6, 22.0, 24.8];
+  var ED = { x: -4.3, z: 1.6, ry: 0.6, hy: 1.55 }, EL = { x: 4.3, z: 1.6, ry: -0.6, hy: 2.35 };
+  function pounders(on, T) {                                           // the silhouettes beat on the rim of the sky with both fists
+    if (!W3.sils) return;
+    W3.sils.forEach(function (s, i) {
+      if (!s.userData.arms) {
+        s.userData.arms = [];
+        [-1, 1].forEach(function (sd) {
+          var a = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 2.6, 8), W3.silMat); a.geometry.translate(0, 1.3, 0);
+          a.position.set(sd * 1.35, 1.0, 0); a.renderOrder = -6; s.add(a); s.userData.arms.push({ m: a, sd: sd });
+        });
+        s.userData.baseY = s.position.y; s.scale.setScalar(1.5);
+      }
+      var ph = (T * 2.2 + i * 0.37) % 1, hit = on ? (ph < 0.22 ? ph / 0.22 : 1 - (ph - 0.22) / 0.78) : 0;
+      s.userData.arms.forEach(function (a) { a.m.visible = on; a.m.rotation.z = -a.sd * lerp(0.5, 2.3, hit); });
+      s.position.y = s.userData.baseY + (on ? hit * 0.7 : 0); s.position.x = (i - 3) * 2.9 + Math.sin(T * 0.8 + s.userData.ph) * 0.3;
+    });
+  }
+  SCN.rim = {
+    id: "rim", dur: 28.6, fadeIn: 0.0, vig: 0.3, fit: [0.5, 0.7, 0.2, 0.2, 0.7, 0.2, 0.2, 0.8, 0.2, 0.2],
+    setup: function (c) {
+      c.wy = workY(); c.top = rowY(S.courses) + BH / 2; c.lx = 0.6; c.dark = 0;
+      W3.silMat.depthTest = false; W3.silMat.opacity = 1; W3.silMat.needsUpdate = true;      // the silhouettes read over any cloud
+      var b = BRICKS[BRICKS.length - 1]; if (b) { var o = new THREE.Vector3(); try { brickPose(b, 0, 0, 0, o); c.lx = o.x; } catch (e) { } }
+      // 0-3: the hush — one low drone and a held breath
+      sfx(0.0, { f: 55, d: 3.2, w: "sine", v: 0.1, att: 1.2 }); sfx(0.6, { d: 2.4, n: "lowpass", f: 180, v: 0.035 });
+      sfx(2.5, { f: 1760, d: 0.9, w: "sine", v: 0.03 });
+      // 3: ERUPTION
+      at(3.0, function () { snd.fanfare(); setTimeout(snd.fanfare, 380); snd.cheer(true); crowdCheer(7); flashScreen(0.55, 0.5); });
+      [0, 0.12, 0.24].forEach(function (d, i) { sfx(3.0 + d, { f: 523.3 * Math.pow(1.26, i), d: 0.5, w: "triangle", v: 0.08 }); });
+      pad(3.0, 3.0, [261.6, 329.6, 392, 523.3], 0.05);
+      for (var k = 0; k < 6; k++) (function (k) { at(3.2 + k * 0.42, function () { world(function () { firework(rnd(-9, 9), c.wy + rnd(3, 12), rnd(-7, 1)); }); snd.boom(); }); })(k);
+      at(3.1, function () { world(function () { emitConfetti(0, c.wy + 3, 3, 120, 7); }); });
+      at(6.4, function () { world(function () { emitConfetti(ED.x, 3.5, ED.z, 40, 1.5); }); });
+      blips(6.5, 8.2, 560);
+      // 8.5-11: the Elder — delighted, then not
+      blips(8.7, 10.3, 200); blips(10.4, 11.0, 190);
+      sfx(10.4, { f: 220, s: 160, d: 0.9, w: "sawtooth", v: 0.05 });
+      at(10.6, function () { snd.rumble(); shake(0.45); });
+      // 11-14: NOT YET. HIGHER.  — fists on the sky
+      for (var q = 0; q < 6; q++) { var tt = 11.3 + q * 0.45; thud(tt, 0.2); at(tt, function () { shake(0.32); }); }
+      sfx(11.2, { f: 98, d: 3.0, w: "sawtooth", v: 0.045, att: 0.8 }); sfx(11.2, { f: 103.8, d: 3.0, w: "sawtooth", v: 0.04, att: 0.8 });
+      at(11.7, function () { flashScreen(0.2, 0.3); });
+      // 14.4-17.6: they want more
+      blips(14.6, 15.9, 520); blips(16.2, 17.5, 210);
+      pad(14.4, 3.2, [146.8, 174.6, 220], 0.04, "sine");
+      // 17.6-22: the tear
+      sfx(17.6, { f: 55, s: 110, d: 4.2, w: "sawtooth", v: 0.055, att: 2.0 });
+      pad(17.8, 4.0, [196, 233.1, 293.7], 0.04, "triangle");
+      at(18.1, function () { snd.rumble(); shake(0.35); });
+      at(21.0, function () { snd.rumble(); shake(0.35); });
+      // 22-28: resolve
+      blips(22.2, 24.7, 210); blips(25.0, 26.6, 520);
+      [196, 261.6, 329.6, 392].forEach(function (f, i) { sfx(25.2 + i * 0.22, { f: f, d: 1.4, w: "triangle", v: 0.06 }); });
+      at(26.9, function () { snd.fanfare(); flashScreen(0.55, 0.7); });
+      sfx(26.9, { f: 130.8, d: 1.8, w: "sawtooth", v: 0.05 }); sfx(26.9, { f: 196, d: 1.8, w: "sawtooth", v: 0.04 });
+    },
+    update: function (c, T, dt) {
+      var ed = place("edgar", ED.x, ED.z, ED.ry, 0.95), el = place("elder", EL.x, EL.z, -0.6, 0.95);
+      var cheer = T > 3.0 && T < 9.6;
+      if (cheer) { arms(ed, -2.7 + Math.sin(T * 12) * 0.25, -2.7 + Math.cos(T * 12) * 0.25); ed.group.position.y = Math.abs(Math.sin(T * 8)) * 0.14; }
+      else { arms(ed, 0, 0); talk(ed, (T > 14.6 && T < 15.9) || (T > 25.0 && T < 26.6), T); }
+      if (T > 3.2 && T < 8.9) { arms(el, -1.2 + Math.sin(T * 10) * 0.2, -1.2 + Math.cos(T * 10) * 0.2); el.group.position.y = Math.abs(Math.sin(T * 7)) * 0.06; }
+      else { arms(el, 0, 0); talk(el, (T > 8.7 && T < 11.0) || (T > 16.2 && T < 17.5) || (T > 22.2 && T < 24.7), T); }
+      c.dark = T < 10.4 ? 0 : T < 11.6 ? seg(T, 10.4, 11.6) * 0.5 : T < 22 ? 0.5 + 0.3 * seg(T, 11.6, 18) : 0.8 - 0.4 * seg(T, 22, 26.5);
+      pounders(T > 11.0 && T < 14.6 || (T > 17.6 && T < 21.5 && (T * 2.2 % 1) < 0.5), T);
+    },
+    cam: function (c, T) {
+      var i = shotAt(T, RIM_CUTS), u = shotU(T, RIM_CUTS, i), wy = c.wy, top = c.top, lx = c.lx;
+      if (i === 0) return mix({ p: [lx + 2.4, top - 0.1, 5.4], l: [lx, top - 0.35, 0.3], fov: 26 }, { p: [lx + 1.9, top + 0.05, 4.2], l: [lx, top - 0.3, 0.3], fov: 26 }, u);
+      if (i === 1) return mix({ p: [-1, 1.0, 14], l: [0, wy * 0.35, 0], fov: 52 }, { p: [1.5, 9, 24], l: [0, wy * 0.55, 0], fov: 52 }, u);
+      if (i === 2) { var f = face(ED, { d: lerp(2.9, 2.6, ease(u)), side: -1.0, up: -0.45, aim: 0.45, fov: 30 }); f.roll = Math.sin(T * 1.2) * 0.04; return f; }
+      if (i === 3) return face(EL, { d: lerp(3.4, 3.0, ease(u)), side: 1.0, up: -0.1, aim: -0.35, fov: 30 });
+      if (i === 4) return mix({ p: [0.5, wy + 2.2, 5.2], l: [0, wy + 12, -2.4], fov: 52 }, { p: [0.3, wy + 2.6, 4.2], l: [0, wy + 17, -2.4], fov: 48 }, u);
+      if (i === 5) return face(ED, { d: lerp(2.8, 2.5, ease(u)), side: -0.8, up: -0.1, aim: 0.3, fov: 28 });
+      if (i === 6) return face(EL, { d: lerp(3.0, 2.7, ease(u)), side: 0.7, up: -0.3, aim: -0.4, fov: 28 });
+      if (i === 7) return mix({ p: [0.3, wy + 3, 4.0], l: [0, wy + 16, -2.4], fov: 52 }, { p: [0.2, wy + 9, 2.2], l: [0, wy + 24, -2.4], fov: 60 }, u);
+      if (i === 8) return face(EL, { d: lerp(3.0, 2.7, ease(u)), side: 0.9, up: -0.2, aim: -0.35, fov: 28 });
+      return face(ED, { d: lerp(2.9, 2.5, ease(u)), side: -0.8, up: -0.1, aim: 0.3, fov: 28 });
+    },
+    hole: function (c, T) {
+      var i = shotAt(T, RIM_CUTS), u = shotU(T, RIM_CUTS, i);
+      if (i === 1) return { x: 0.1, y: 0.62, r: 0.2 };
+      if (i === 4) return { x: 0, y: lerp(0.5, 0.55, u), r: lerp(0.36, 0.42, u) };
+      if (i === 7) return { x: 0, y: 0.5, r: lerp(0.5, 0.62, u) };
+      return null;
+    },
+    draw: function (c, T) {
+      var i = shotAt(T, RIM_CUTS), u = shotU(T, RIM_CUTS, i);
+      if (c.dark > 0) tint("rgba(14,6,34," + c.dark * 0.55 + ")");
+      if (i === 7 && CN.holeScr) drawSecondWall(CN.holeScr.x, CN.holeScr.y, CN.holeScr.r, seg(T, 17.8, 22.0), T);
+      // captions
+      cap({ t0: 0.6, t1: 2.9, text: "Row fifty.", size: 54, fill: "#fff3c8", fill2: "#e6c27a" });
+      cap({ t0: 3.35, t1: 5.9, text: "YOU DID IT!", size: 104, y: 0.8, rot: -0.03 });
+      var e = scr(ED.x, ED.hy + 0.75, ED.z), l = scr(EL.x, EL.hy + 1.05, EL.z);
+      if (i === 2) bubble({ t0: 6.15, t1: 8.4, x: e.x, y: e.y, text: "FIFTY! We did FIFTY!", size: 46 });
+      if (i === 3) { bubble({ t0: 8.6, t1: 10.35, x: l.x, y: l.y, text: "Splendid. Absolutely splendid.", size: 44 }); bubble({ t0: 10.45, t1: 11.05, x: l.x, y: l.y, text: "\u2026What\u2019s that noise?", size: 44, maxW: 500 }); }
+      if (i === 4) {
+        var sh = Math.sin(T * 60) * 3 * U;
+        text("NOT YET.", W / 2 + sh, H * 0.74, { size: 96, scale: easeOutBack(seg(T, 11.9, 12.2)), alpha: seg(T, 11.9, 12.1) * (1 - seg(T, 13.1, 13.4)), fill: "#ffffff", fill2: "#c9b8ff", outline: "#1a0b3a", rot: -0.03 });
+        text("HIGHER.", W / 2 - sh, H * 0.74, { size: 110, scale: easeOutBack(seg(T, 13.5, 13.8)), alpha: seg(T, 13.5, 13.7) * (1 - seg(T, 14.1, 14.4)), fill: "#ffffff", fill2: "#ff9ab0", outline: "#1a0b3a", rot: 0.025 });
+      }
+      if (i === 5) bubble({ t0: 14.55, t1: 15.95, x: e.x, y: e.y, text: "\u2026They want MORE?", size: 48 });
+      if (i === 6) bubble({ t0: 16.1, t1: 17.55, x: l.x, y: l.y, text: "Fifty was never the end.", size: 46 });
+      cap({ t0: 18.3, t1: 19.9, text: "A second wall.", size: 74, y: 0.8, fill: "#fff3c8", fill2: "#c9b8ff" });
+      cap({ t0: 20.0, t1: 21.8, text: "A hundred courses tall.", size: 64, y: 0.8, fill: "#fff3c8", fill2: "#c9b8ff" });
+      if (i === 8) bubble({ t0: 22.1, t1: 24.75, x: l.x, y: l.y, text: "Reach a hundred and the walls meet. Stop, and the tear seals.", size: 40, maxW: 640 });
+      if (i === 9) bubble({ t0: 24.95, t1: 26.85, x: e.x, y: e.y, text: "Higher. Got it.", size: 54 });
+      var bh = seg(T, 26.9, 27.5);
+      if (bh > 0) text("BUILD HIGHER", W / 2, H * 0.5, { size: 104, scale: easeOutBack(bh), alpha: 1 - seg(T, 28.0, 28.5), fill: "#ffe45c", fill2: "#ff7a1f", rot: -0.02 });
+    },
+    end: function (c) { pounders(false, 0); W3.silMat.depthTest = true; W3.silMat.needsUpdate = true; if (W3.sils) W3.sils.forEach(function (s) { s.scale.setScalar(1); if (s.userData.baseY != null) s.position.y = s.userData.baseY; }); }
+  };
+
+  /* =====================================================================
+     SCENE 3 — COURSE 100: THE KEYSTONE  (~24 s)
+     Keystone lowered on its chain -> the drop -> light runs the walls -> the hands let go
+     -> the silhouettes step through -> reactions -> the town, and the title
+     ===================================================================== */
+  var FIN_CUTS = [3.4, 5.2, 9.0, 11.8, 15.2, 16.8, 18.4];
+  var PEOPLE = ["#e8672f", "#2f8f9a", "#f5b921", "#9b59b6", "#3e8e4f", "#d42a1e"];
+  SCN.finale = {
+    id: "finale", dur: 25.4, fadeIn: 0.0, vig: 0.3, fit: [0.6, 0.3, 0.7, 0.6, 0.8, 0.2, 0.2, 0.7],
+    setup: function (c) {
+      c.wy = workY(); c.top = rowY(S.courses) + BH / 2; c.landed = false;
+      if (!CN.chain) { CN.chain = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1, 6), toon(0x4a4a58)); CN.chain.visible = false; scene.add(CN.chain); }
+      // the keystone is lowered slowly, hangs, then lets go
+      sfx(0.0, { f: 82, d: 3.4, w: "sine", v: 0.08, att: 1.4 }); sfx(0.4, { d: 3.0, n: "lowpass", f: 220, v: 0.03 });
+      for (var k = 0; k < 7; k++) sfx(1.0 + k * 0.33, { f: 1400 + (k % 2) * 90, d: 0.05, w: "square", v: 0.012 });         // chain links
+      at(3.45, function () { snd.creak(); });
+      at(3.97, function () {
+        c.landed = true; flashScreen(0.9, 0.7); shake(0.8); snd.crash(); snd.fanfare();
+        world(function () { emitConfetti(0, c.top + 2, 2, 120, 4); emitGlow(0, c.top + 0.6, 0.4, 50, 0xffd94d, 6, 1.2, 0.2, -2, 2); emitPuffs(0, c.top + 0.2, 0.5, 10, 0xe9dcc2, 1.4, 1.0, 1.4); });
+      });
+      bell(3.97, 196, 0.16); bell(3.97, 392, 0.1);
+      thud(3.97, 0.25);
+      // 5-9: light runs the length of the wall
+      pad(4.6, 4.6, [261.6, 329.6, 392, 523.3], 0.055); pad(6.6, 3.0, [392, 493.9, 587.3, 784], 0.05);
+      for (var j = 0; j < 8; j++) sfx(5.2 + j * 0.5, { f: 523.3 * Math.pow(1.122, j * 1.0), d: 0.5, w: "sine", v: 0.05 });
+      // 9-12: the hands let go
+      sfx(9.4, { d: 1.6, n: "bandpass", f: 700, v: 0.04 }); sfx(9.7, { f: 392, s: 261.6, d: 1.4, w: "sine", v: 0.05 });
+      for (var h = 0; h < 6; h++) sfx(10.6 + h * 0.12, { f: 1320 + h * 220, d: 0.4, w: "sine", v: 0.04 });
+      // 12-15: the silhouettes step through
+      pad(11.8, 3.6, [293.7, 370, 440, 587.3], 0.05);
+      for (var q = 0; q < 6; q++) sfx(12.3 + q * 0.4, { f: 880 + q * 110, d: 0.3, w: "sine", v: 0.04 });
+      at(12.0, function () { snd.cheer(true); crowdCheer(8); });
+      // 15-18: reactions
+      blips(15.4, 16.6, 520); blips(16.9, 18.2, 200);
+      // 18.4-25: the town, the title
+      at(18.5, function () { crowdCheer(9); snd.cheer(true); });
+      [4.2, 5.6, 7.0, 8.4, 9.8, 11.2].forEach(function (t, i) { at(11.0 + t * 0.9 + i * 0.1, function () { world(function () { firework(rnd(-9, 9), c.top + rnd(3, 12), rnd(-7, 1)); }); snd.boom(); }); });
+      [261.6, 329.6, 392, 523.3, 392, 523.3, 659.3, 784].forEach(function (f, i) { sfx(18.6 + i * 0.5, { f: f, d: 0.6, w: "triangle", v: 0.06 }); });
+      sfx(20.1, { f: 90, s: 36, d: 0.8, w: "sine", v: 0.22 }); sfx(20.1, { d: 0.5, n: "lowpass", f: 900, v: 0.12 });
+      at(20.1, function () { shake(0.5); snd.fanfare(); });
+      for (var b = 0; b < 9; b++) sfx(20.5 + b * 0.1, { f: 520 + (b % 3) * 120, d: 0.08, w: "square", v: 0.02 });
+      pad(21.5, 3.4, [261.6, 329.6, 392, 523.3], 0.05);
+      at(11.0, function () { world(function () { emitConfetti(0, c.top + 3, 2, 80, 6); }); });
+      at(18.4, function () { world(function () { emitConfetti(0, 6, 8, 120, 9); }); });
+    },
+    update: function (c, T, dt) {
+      var ed = place("edgar", ED.x, ED.z, ED.ry, 0.95), el = place("elder", EL.x, EL.z, -0.6, 0.95);
+      if (T > 11.8) { arms(ed, -2.7 + Math.sin(T * 12) * 0.25, -2.7 + Math.cos(T * 12) * 0.25); ed.group.position.y = Math.abs(Math.sin(T * 8)) * 0.12; if (T > 15.4 && T < 16.8) { arms(ed, 0, -1.4 + Math.sin(T * 6) * 0.3); ed.group.position.y = 0; talk(ed, true, T); } }
+      else arms(ed, 0, 0);
+      if (T > 11.8) { arms(el, -1.2 + Math.sin(T * 10) * 0.2, -1.2 + Math.cos(T * 10) * 0.2); el.group.position.y = Math.abs(Math.sin(T * 7)) * 0.06; if (T > 16.9 && T < 18.2) { arms(el, 0, 0); el.group.position.y = 0; talk(el, true, T); } }
+      else arms(el, 0, 0);
+      // the keystone and its chain
+      var ks = brick("keystone", 0xf5b921, 3.0, 2.0, 2.0), land = c.top + 0.44, y, hang = land + 1.1, high = c.top + 24;
+      if (T < 3.4) y = lerp(high, hang, ease(seg(T, 0.4, 3.2)));
+      else if (T < 3.736) y = hang;
+      else y = Math.max(land, hang - 0.5 * 40 * (T - 3.736) * (T - 3.736));
+      if (T >= 3.97) { var s = seg(T, 3.97, 4.15); ks.scale.set(3.0 * (1 + 0.1 * (1 - s)), 2.0 * (1 - 0.12 * (1 - s)), 2.0); }
+      ks.position.set(0, y, 0); ks.rotation.set(0, 0, T < 3.736 ? Math.sin(T * 1.7) * 0.03 : 0);
+      ks.material.emissive.setRGB(0.9, 0.55, 0.05); ks.material.emissiveIntensity = T < 3.97 ? 0.15 : 0.35 + 0.2 * Math.sin(T * 4);
+      ks.visible = T > 0.2;
+      var ch = CN.chain, chTop = c.top + 70;
+      if (T < 3.74) { ch.visible = true; var len = chTop - (y + 1.0); ch.scale.set(1, Math.max(0.1, len), 1); ch.position.set(0, y + 1.0 + len / 2, 0); } else ch.visible = false;
+      if (T > 3.97 && Math.random() < dt * 14) world(function () { emitGlow(rnd(-1.4, 1.4), c.top + 1.0, rnd(-0.4, 0.4), 1, 0xffd94d, 1.6, 0.9, 0.14, -0.5, 1.4); });
+    },
+    cam: function (c, T) {
+      var i = shotAt(T, FIN_CUTS), u = shotU(T, FIN_CUTS, i), wy = c.wy, top = c.top;
+      if (i === 0) return mix({ p: [1.6, top + 1.8, 6.5], l: [0, top + 9, -1], fov: 50 }, { p: [1.2, top + 2.6, 5.6], l: [0, top + 6, -1], fov: 50 }, u);
+      if (i === 1) return mix({ p: [4.2, top + 1.6, 8.0], l: [0, top + 1.6, 0], fov: 34 }, { p: [3.6, top + 1.3, 7.0], l: [0, top + 0.9, 0], fov: 34 }, u);
+      if (i === 2) return mix({ p: [2.5, 0.8, 10], l: [0, top * 0.12, 0], fov: 46 }, { p: [1.5, top + 3, 15], l: [0, top + 3, -2], fov: 46 }, u);
+      if (i === 3) return mix({ p: [0, top + 3, 9], l: [0, top + 12, -2], fov: 48 }, { p: [0, top + 3.6, 8], l: [0, top + 13, -2], fov: 46 }, u);
+      if (i === 4) return mix({ p: [0.5, 1.2, 15], l: [0, top * 0.55, -2.4], fov: 62 }, { p: [0.4, 2.2, 12.5], l: [0, top * 0.55, -2.4], fov: 62 }, u);
+      if (i === 5) return face(ED, { d: lerp(2.9, 2.6, ease(u)), side: -0.9, up: -0.1, aim: 0.3, fov: 28 });
+      if (i === 6) return face(EL, { d: lerp(3.1, 2.8, ease(u)), side: 0.8, up: -0.25, aim: -0.4, fov: 28 });
+      return mix({ p: [0, 1.2, 10], l: [0, 3, -1], fov: 46 }, { p: [0, 12, 31], l: [0, top * 0.42, -1], fov: 46 }, u);
+    },
+    hole: function (c, T) {
+      var i = shotAt(T, FIN_CUTS);
+      if (i === 0) return { x: 0, y: 0.55, r: 0.34 };
+      if (i === 3) return { x: 0, y: 0.58, r: 0.3 };
+      if (i === 4) return { x: 0, y: 0.5, r: 0.38 };
+      return null;
+    },
+    draw: function (c, T) {
+      var i = shotAt(T, FIN_CUTS), u = shotU(T, FIN_CUTS, i), top = c.top;
+      // light runs up the tower
+      if (T > 4.0 && T < 9.6) {
+        var run = seg(T, 5.2, 9.0), yL = lerp(0, top + 4, ease(run)), p0 = scr(0, Math.max(0, yL - 14), 0), p1 = scr(0, yL, 0), wdt = Math.max(90 * U, Math.abs(scr(2.6, yL, 0).x - scr(-2.6, yL, 0).x));
+        g.save(); g.globalCompositeOperation = "lighter";
+        if (i >= 2 && i <= 3 || (T > 5.2 && T < 9.6)) {
+          var gr = g.createLinearGradient(0, p0.y, 0, p1.y); gr.addColorStop(0, "rgba(255,200,90,0)"); gr.addColorStop(1, "rgba(255,226,140,.5)");
+          g.fillStyle = gr; g.fillRect(p1.x - wdt * 0.8, Math.min(p1.y, p0.y), wdt * 1.6, Math.abs(p0.y - p1.y));
+          var rg = g.createRadialGradient(p1.x, p1.y, 4, p1.x, p1.y, wdt * 1.4); rg.addColorStop(0, "rgba(255,240,180,.75)"); rg.addColorStop(1, "rgba(255,200,90,0)");
+          g.fillStyle = rg; g.fillRect(p1.x - wdt * 1.4, p1.y - wdt * 1.4, wdt * 2.8, wdt * 2.8);
+        }
+        g.restore();
+      }
+      if (i === 1 || (T > 3.9 && T < 4.6)) { var ring = seg(T, 3.97, 4.9); if (ring > 0 && ring < 1) { var k = scr(0, top + 0.5, 0); g.save(); g.strokeStyle = "rgba(255,240,170," + (1 - ring) + ")"; g.lineWidth = 14 * U * (1 - ring); g.beginPath(); g.arc(k.x, k.y, ring * Math.max(W, H) * 0.7, 0, 7); g.stroke(); g.restore(); } }
+      // the sky's hands let go
+      if (i === 3) {
+        var open = ease(seg(T, 9.7, 10.9)), fa = 1 - seg(T, 11.0, 11.7), hc = CN.holeScr ? CN.holeScr : { x: W / 2, y: H * 0.3, r: H * 0.2 };
+        var hs = Math.min(W * 1.1, H * 0.78);
+        drawHand(W / 2 + Math.sin(T * 1.4) * 4 * U, H * 0.5 + 10 * U * (1 - open), hs, open, fa * seg(T, 9.1, 9.5));
+        if (T > 10.8) { for (var b = 0; b < 16; b++) { var pr = (T - 10.8 + b * 0.04) % 1.4, bx = W * (0.15 + (b * 0.053) % 0.7), by = H * 0.55 - pr * H * 0.35 - (b % 3) * 12; g.save(); g.globalAlpha = Math.max(0, 1 - pr / 1.4); g.translate(bx, by); g.rotate(pr * 3 + b); g.fillStyle = b % 2 ? "#e8672f" : "#f5b921"; g.strokeStyle = "#221407"; g.lineWidth = 3 * U; g.fillRect(-14 * U, -8 * U, 28 * U, 16 * U); g.strokeRect(-14 * U, -8 * U, 28 * U, 16 * U); g.restore(); } }
+      }
+      // they step down the light
+      if (i === 4 && CN.holeScr) {
+        var hs2 = CN.holeScr, a = seg(T, 11.9, 12.6), tipY = H * 0.95;
+        g.save(); g.globalCompositeOperation = "lighter"; g.globalAlpha = a * 0.55;
+        var cg = g.createLinearGradient(0, hs2.y, 0, tipY); cg.addColorStop(0, "rgba(255,236,170,.7)"); cg.addColorStop(1, "rgba(255,200,110,0)");
+        g.fillStyle = cg; g.beginPath(); g.moveTo(hs2.x - hs2.r * 0.55, hs2.y); g.lineTo(hs2.x + hs2.r * 0.55, hs2.y); g.lineTo(hs2.x + W * 0.42, tipY); g.lineTo(hs2.x - W * 0.42, tipY); g.closePath(); g.fill();
+        g.restore();
+        for (var f = 0; f < PEOPLE.length; f++) {
+          var t0 = 12.3 + f * 0.42, pr2 = seg(T, t0, t0 + 2.6); if (pr2 <= 0) continue;
+          var side = (f % 2 ? 1 : -1), tx = hs2.x + side * (0.1 + 0.11 * f) * W, ty = H * (0.78 + (f % 3) * 0.04), e2 = ease(pr2);
+          var px = lerp(hs2.x + side * hs2.r * 0.1, tx, e2), py = lerp(hs2.y + hs2.r * 0.35, ty, e2), sz = lerp(0.18, 0.62, e2) * U * 1.3;
+          drawBuilder(px, py, sz, PEOPLE[f], seg(T, t0 + 0.4, t0 + 1.6), T + f);
+        }
+        cap({ t0: 12.3, t1: 13.7, text: "They aren\u2019t giants.", size: 56, y: 0.2, fill: "#fff3c8", fill2: "#ffd27a" });
+        cap({ t0: 13.8, t1: 15.1, text: "They\u2019re people.", size: 66, y: 0.2 });
+      }
+      var e = scr(ED.x, ED.hy + 0.75, ED.z), l = scr(EL.x, EL.hy + 1.05, EL.z);
+      cap({ t0: 0.9, t1: 3.3, text: "The last course closes.", size: 58, y: 0.8, fill: "#fff3c8", fill2: "#e6c27a" });
+      cap({ t0: 5.4, t1: 8.9, text: "The two walls are one.", size: 70, y: 0.8 });
+      cap({ t0: 9.3, t1: 11.5, text: "The hands let go.", size: 70, y: 0.8 });
+      if (i === 5) bubble({ t0: 15.35, t1: 16.75, x: e.x, y: e.y, text: "\u2026Hi?", size: 62 });
+      if (i === 6) bubble({ t0: 16.9, t1: 18.35, x: l.x, y: l.y, text: "More mouths to feed.", size: 46 });
+      if (i === 7) {
+        tint("rgba(255,196,110," + 0.1 * seg(T, 18.4, 20) + ")");
+        var q = T - 20.1;
+        if (q > 0) {
+          var sh = q < 0.5 ? (1 - q / 0.5) * 14 * U : 0, ox = Math.sin(q * 90) * sh, oy = Math.cos(q * 70) * sh, s1 = easeOutBack(q / 0.3), s2 = easeOutBack((q - 0.18) / 0.3);
+          tint("rgba(16,8,40," + 0.38 * seg(q, 0, 0.5) + ")");
+          text("BRICK", W / 2 + ox, H * 0.3 + oy, { size: 160, scale: s1, fill: "#ffb347", fill2: "#e8501f", outline: "#2a1408", rot: -0.02 });
+          if (q > 0.18) text("BY BRICK", W / 2 + ox, H * 0.46 + oy, { size: 160, scale: s2, fill: "#ffb347", fill2: "#e8501f", outline: "#2a1408", rot: 0.015 });
+          for (var n = 0; n < 9; n++) {
+            var tb = 0.45 + n * 0.1, p = clamp((q - tb) / 0.38, 0, 1); if (q < tb) continue;
+            var by2 = H * 0.6 - (1 - p) * (1 - p) * H * 0.7, bounce = p >= 1 ? Math.abs(Math.sin((q - tb - 0.38) * 14)) * 10 * U * Math.max(0, 1 - (q - tb - 0.38) * 2.5) : 0;
+            g.save(); g.translate(W / 2 + (n - 4) * 76 * U, by2 - bounce); g.rotate((1 - p) * (n % 2 ? 0.6 : -0.6));
+            g.fillStyle = n % 3 === 0 ? "#e8672f" : n % 3 === 1 ? "#f07a3a" : "#d9561f"; g.strokeStyle = "#2a1408"; g.lineWidth = 6 * U; g.beginPath();
+            if (g.roundRect) g.roundRect(-34 * U, -19 * U, 68 * U, 38 * U, 7 * U); else g.rect(-34 * U, -19 * U, 68 * U, 38 * U); g.fill(); g.stroke(); g.restore();
+          }
+          cap({ t0: 22.2, t1: 25.3, text: "Thank you for building.", size: 50, y: 0.76, fill: "#fff3c8", fill2: "#ffd27a" });
+        }
+      }
+    },
+    end: function (c) { hideBricks(); }
+  };
+
+  SCN.intro.cuts = INTRO_CUTS; SCN.rim.cuts = RIM_CUTS; SCN.finale.cuts = FIN_CUTS;
+
+  /* =====================================================================
+     the engine
+     ===================================================================== */
+  function ensureDom() {
+    if (cv) return;
+    appEl = document.getElementById("app");
+    var st = document.createElement("style");
+    st.textContent = "#cine{position:absolute;inset:0;width:100%;height:100%;z-index:60;touch-action:none;display:block}#cine.hidden{display:none}" +
+      "#cine-skip{position:absolute;z-index:61;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.08em;" +
+      "padding:9px 14px;background:#f5b921;color:#221407;border:3px solid #221407;box-shadow:3px 3px 0 #000;opacity:0;pointer-events:none;transition:opacity .4s ease}#cine-skip.show{opacity:1;pointer-events:auto}#cine-skip:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}" +
+      "#cine-skip.hidden{display:none}" +
+      "#app.cine-on #hud,#app.cine-on #chips,#app.cine-on #streak,#app.cine-on #prompt,#app.cine-on #dock,#app.cine-on #hintwrap,#app.cine-on #toast,#app.cine-on #banner,#app.cine-on #fx,#app.cine-on #btn-settings,#app.cine-on #vignette{visibility:hidden !important}";
+    document.head.appendChild(st);
+    try { document.fonts.load('20px "Archivo Black"'); document.fonts.load('800 20px Archivo'); } catch (e) { }
+    cv = document.createElement("canvas"); cv.id = "cine"; cv.className = "hidden"; appEl.appendChild(cv); g = cv.getContext("2d");
+    ["pointerdown", "pointerup", "click", "touchstart"].forEach(function (n) { cv.addEventListener(n, function (e) { e.stopPropagation(); }); });
+    skipBtn = document.createElement("button"); skipBtn.id = "cine-skip"; skipBtn.className = "hidden"; skipBtn.textContent = "SKIP \u25B8\u25B8"; appEl.appendChild(skipBtn);
+    skipBtn.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+    skipBtn.addEventListener("click", function (e) { e.stopPropagation(); skip(); });
+    document.addEventListener("keydown", function (e) { if (CN.on && (e.key === "Escape" || e.key === "Enter")) { e.preventDefault(); e.stopPropagation(); skip(); } }, true);
+  }
+  function resize() {
+    var w = window.innerWidth, h = window.innerHeight;
+    if (w !== W || h !== H || cv.width !== Math.round(w * DPR)) { W = w; H = h; cv.width = Math.round(w * DPR); cv.height = Math.round(h * DPR); }
+    U = clamp(Math.min(W / 820, H / 720), 0.42, 1.6);
+    var arch = false; try { document.fonts.forEach(function (f) { if (f.family.replace(/["']/g, "") === "Archivo Black" && f.status === "loaded") arch = true; }); } catch (e) { }
+    FONTW = arch ? "" : "900 ";
+  }
+  function play(def, done) {
+    if (CN.on) return false;
+    try {
+      ensureDom(); resize();
+      CN.on = true; CN.def = def; CN.T = 0; CN.acts = []; CN.evs = []; CN.ai = 0; CN.ei = 0; CN.done = done; CN.phase = "play"; CN.H = 0; CN.trauma = 0; CN.holeScr = null;
+      if (audioOK()) { CN.bus = AC.createGain(); CN.bus.gain.value = 1; CN.bus.connect(BUS); } else CN.bus = null;
+      appEl.classList.add("cine-on"); cv.classList.remove("hidden"); skipBtn.classList.remove("hidden"); skipBtn.classList.remove("show");
+      g.setTransform(DPR, 0, 0, DPR, 0, 0); g.fillStyle = "#000"; g.fillRect(0, 0, W, H);
+      prop("edgar"); if (def !== SCN.intro) prop("elder");
+      def.setup(CN);
+      CN.acts.sort(function (a, b) { return a.t - b.t; }); CN.evs.sort(function (a, b) { return a.t - b.t; });
+      camera.getWorldPosition(lastP); lastQ.copy(camera.quaternion); lastFov = camera.fov;
+      return true;
+    } catch (e) { console.error(e); CN.on = false; try { cleanup(); } catch (e2) { } return false; }
+  }
+  function cleanup() {
+    var def = CN.def;
+    try { if (def && def.end) def.end(CN); } catch (e) { console.error(e); }
+    hideProps(); hideBricks();
+    if (CN.bus) { var b = CN.bus; try { b.gain.setTargetAtTime(0, AC.currentTime, 0.12); } catch (e) { } setTimeout(function () { try { b.disconnect(); } catch (e) { } }, 900); CN.bus = null; }
+    if (appEl) appEl.classList.remove("cine-on");
+    if (cv) cv.classList.add("hidden"); if (skipBtn) { skipBtn.classList.add("hidden"); skipBtn.classList.remove("show"); }
+  }
+  function finish() {
+    if (!CN.on) return;
+    var done = CN.done; CN.on = false; CN.done = null;
+    cleanup();
+    if (done) { try { done(); } catch (e) { console.error(e); } }
+  }
+  function skip() {
+    if (!CN.on || CN.phase !== "play") return;
+    CN.phase = "hand"; CN.H = 0; CN.handDur = 0.4; CN.acts.length = 0; CN.evs.length = 0; skipBtn.classList.remove("show");
+    if (CN.bus) { try { CN.bus.gain.setTargetAtTime(0, AC.currentTime, 0.08); } catch (e) { } }
+  }
+  function applyPose(P, fit) {
+    var a = W / H, m = 1 + Math.max(0, 1.78 / a - 1) * (fit == null ? 0.5 : fit); m = Math.min(m, 2.6);
+    var x = P.l[0] + (P.p[0] - P.l[0]) * m, y = P.l[1] + (P.p[1] - P.l[1]) * m, z = P.l[2] + (P.p[2] - P.l[2]) * m;
+    var tr = CN.trauma || 0, k = tr * tr, sx = (Math.random() * 2 - 1) * k * 0.4, sy = (Math.random() * 2 - 1) * k * 0.3;
+    camera.position.set(x + sx, y + sy, z); camera.lookAt(P.l[0] + sx * 0.4, P.l[1] + sy * 0.4, P.l[2]);
+    camera.rotation.z += (P.roll || 0) + (Math.random() * 2 - 1) * k * 0.03;
+    if (Math.abs(camera.fov - P.fov) > 0.01) { camera.fov = P.fov; camera.updateProjectionMatrix(); }
+    camera.updateMatrixWorld(true);
+  }
+  function drawOverlay(def, T, barK, fadeA, fadeCol) {
+    g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H);
+    BAR = H * 0.075 * ease(barK);
+    try { def.draw(CN, T); } catch (e) { console.error(e); }
+    vignetteFx(def.vig == null ? 0.3 : def.vig);
+    g.fillStyle = "#000"; g.fillRect(0, 0, W, BAR); g.fillRect(0, H - BAR, W, BAR);
+    if (fadeA > 0) { g.globalAlpha = clamp(fadeA, 0, 1); g.fillStyle = fadeCol || "#000"; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
+  }
+  function tick(rdt) {
+    if (!CN.on) return;
+    try {
+      var def = CN.def, dt = Math.min(rdt, 0.05);
+      gpP.copy(camera.position); gpQ.copy(camera.quaternion); gpFov = camera.fov;                       // the game's own camera for this frame
+      resize();
+      CN.trauma = Math.max(0, (CN.trauma || 0) - dt * 1.6);
+      if (CN.phase === "play") {
+        CN.T += dt; var T = CN.T;
+        if (T > 0.8 && skipBtn && !skipBtn.classList.contains("show")) skipBtn.classList.add("show");
+        while (CN.ai < CN.acts.length && CN.acts[CN.ai].t <= T) { try { CN.acts[CN.ai].fn(); } catch (e) { console.error(e); } CN.ai++; }
+        if (CN.bus) while (CN.ei < CN.evs.length && CN.evs[CN.ei].t <= T + 0.15) { var ev = CN.evs[CN.ei++]; try { playEv(ev, AC.currentTime + Math.max(0, ev.t - T)); } catch (e) { } }
+        def.update(CN, T, dt);
+        var P = def.cam(CN, T), i = shotAt(T, def.cuts);
+        applyPose(P, def.fit && def.fit[i] != null ? def.fit[i] : 0.5);
+        holeAt(def.hole(CN, T));
+        lastP.copy(camera.position); lastQ.copy(camera.quaternion); lastFov = camera.fov;
+        var fa = def.fadeIn ? 1 - T / def.fadeIn : 0;
+        drawOverlay(def, T, seg(T, 0, 0.6), fa, "#000");
+        if (T >= def.dur) { CN.phase = "hand"; CN.H = 0; CN.handDur = HAND_DUR; if (CN.bus) { try { CN.bus.gain.setTargetAtTime(0, AC.currentTime + 0.3, 0.3); } catch (e) { } } }
+      } else {
+        CN.H += dt; var hd = CN.handDur || HAND_DUR, k = clamp(CN.H / hd, 0, 1), e = ease(k);
+        def.update(CN, CN.T, dt);
+        camera.position.lerpVectors(lastP, gpP, e); camera.quaternion.copy(lastQ).slerp(gpQ, e); camera.fov = lerp(lastFov, gpFov, e); camera.updateProjectionMatrix(); camera.updateMatrixWorld(true);
+        W3.hole.visible = W3.holeShow > 0.02;
+        drawOverlay(def, CN.T, 1 - k, 0, "#000");
+        if (k >= 1) finish();
+      }
+    } catch (err) { console.error(err); finish(); }
+  }
+  window.CINE_TICK = tick;
+
+  /* ---------- hooks into the game ---------- */
+  var _enqueueCards = window.enqueueCards;
+  window.enqueueCards = function (id, seq, done) {
+    if (id === "intro") {
+      openingPending = false; CAM.mode = "cine"; releaseKiln();
+      if (play(SCN.intro, function () { finishOpening(); })) return;
+      CAM.mode = "title"; openingPending = true;
+    }
+    return _enqueueCards(id, seq, done);
+  };
+  window.startRim = function () {
+    S.flags.rimStarted = true; CAM.mode = "rim"; releaseKiln(); clearHands();
+    S.beats.c50a = S.beats.c50b = S.beats.c50c = S.beats.c50d = true;
+    if (!play(SCN.rim, function () { finishRim(); })) { setTimeout(function () { finishRim(); }, 400); }
+  };
+  window.startVictory = function () {
+    CAM.mode = "victory"; CAM.victory = 0; clearHands();
+    S.beats.c100a = S.beats.c100b = S.beats.c100c = true;
+    if (!play(SCN.finale, function () { showVictory(); })) { setTimeout(function () { showVictory(); }, 400); }
+  };
+  // handy for testing: __bb.cine.rim() etc. (the rim and the finale need a tall tower; the opening works on a fresh page)
+  window.CINE_API = { intro: function () { CAM.mode = "cine"; play(SCN.intro, function () { CAM.mode = "play"; }); }, rim: function () { play(SCN.rim, null); }, finale: function () { play(SCN.finale, null); }, skip: skip };
+  if (window.__bb) window.__bb.cine = window.CINE_API;
+})();
 
     </script>
   </body>
