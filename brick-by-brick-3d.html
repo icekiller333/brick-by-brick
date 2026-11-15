@@ -692,6 +692,14 @@
       .nd-foot{ display:flex; align-items:center; gap:12px; margin-top:12px; }
       .nd-note{ flex:1; min-width:0; font-size:11px; font-weight:700; line-height:1.3; color:var(--muted); }
       .nd-foot .buy-btn{ min-width:118px; padding:10px 12px; font-size:15px; }
+      .nd-detail .nd-card{ position:relative; }
+      .nd-detail .nd-top{ padding-right:34px; }
+      .nd-x{ position:absolute; top:8px; right:8px; z-index:2; width:32px; height:32px; padding:0; display:grid; place-items:center; font-family:'Archivo Black',sans-serif; font-size:18px; line-height:1; background:var(--panel); color:var(--ink); border:2px solid var(--line); box-shadow:2px 2px 0 var(--shadowc); }
+      .nd-x:active{ transform:translate(1px,1px); box-shadow:none; }
+      .nd-detail .nd-desc{ margin:12px 0 0; font-size:15.5px; font-weight:700; line-height:1.5; color:var(--ink); }
+      .nd-detail .upg-now{ margin-top:10px; padding:8px 10px; background:var(--panel2); border:2px solid var(--line); font-size:13px; font-weight:700; line-height:1.4; color:var(--good); }
+      .nd-foot .buy-btn{ min-width:0; padding:8px 14px; font-size:14px; }
+      .hr-brick b{ font-family:'Archivo Black',sans-serif; font-size:20px; color:#221407; }
       .tnode{ position:relative; }
       .tkids{ margin-left:10px; }
       .tkids > .tnode{ padding-left:18px; }
@@ -1322,7 +1330,7 @@ LINES.forEach(function (l) { var T = TREE[l.id]; l.tab = T.tab; l.parent = T.par
    Tune UPG_SCALE to change how fast the tree gets expensive. The starter Warm-Up is unaffected (you own nothing before it). */
 var UPG_SCALE = 3;
 function upgOwned() { var n = 0; for (var i = 0; i < LINES.length; i++) n += S.tier[LINES[i].id] || 0; return n; }
-function costOf(l) { var n = upgOwned(); return Math.round(l.costs[S.tier[l.id]] * (1 + 0.03 * n + 0.0012 * n * n)); }   // the price climbs faster the more you own
+function costOf(l) { if (l.id === "starter") return STARTER_COST; var n = upgOwned(); return Math.round(l.costs[S.tier[l.id]] * (1 + 0.03 * n + 0.0012 * n * n)); }   // the price climbs faster the more you own
 
 /* ----- helpers ----- */
 function $(id) { return document.getElementById(id); }
@@ -2328,7 +2336,7 @@ function buildWalkers() {
   W3.walkers = [];
   var cols = [0x3fa7d6, 0x79a84e, 0xd05a35, 0xf5b921, 0x8a5a33, 0x6b4a8a], skins = [0xeec39a, 0xc68863, 0x8d5a3b, 0xf3d2b3, 0x5c3a25, 0xeec39a];
   for (var n = 0; n < 6; n++) {
-    var g = makeFolk(cols[n], skins[n], HAIR_COLS[(n * 3) % HAIR_COLS.length], n % 2 === 0 ? [0x5b3fa0, 0x2f5fb0, 0x9a3a7a][n % 3] : null); g.visible = false; scene.add(g);
+    var g = makeFolk(cols[n], skins[n], HAIR_COLS[(n * 3) % HAIR_COLS.length], n % 2 === 0 ? [0x5b3fa0, 0x2f5fb0, 0x9a3a7a][n % 3] : null, { tail: n >= 1 && n <= 4 ? [0x8a5a33, 0x6b3f1f, 0xb4532a, 0x1d1712][n - 1] : null, horns: n % 2 === 1 }); g.visible = false; scene.add(g);
     g.scale.setScalar(0.72);
     W3.walkers.push({ g: g, state: "off", wait: rand(1.5, 5), t: 0, x: 0, z: 0, tx: 0, tz: 0, h: null });
   }
@@ -2386,7 +2394,7 @@ function villagerGeo() {
     robe: robe, belt: new THREE.CylinderGeometry(0.2, 0.205, 0.05, 12), head: new THREE.SphereGeometry(0.16, 12, 9),
     hair: new THREE.SphereGeometry(0.172, 11, 5, 0, Math.PI * 2, 0, Math.PI * 0.52), dot: new THREE.SphereGeometry(1, 6, 4),
     smile: smile, arm: arm, hand: new THREE.SphereGeometry(0.05, 6, 4), boot: new THREE.SphereGeometry(1, 7, 4),
-    hat: hat, brim: new THREE.CylinderGeometry(0.25, 0.25, 0.025, 12), band: new THREE.CylinderGeometry(0.158, 0.162, 0.045, 10)
+    tail: new THREE.ConeGeometry(0.035, 0.36, 6).translate(0, 0.18, 0), horn: new THREE.ConeGeometry(0.05, 0.22, 6), hat: hat, brim: new THREE.CylinderGeometry(0.25, 0.25, 0.025, 12), band: new THREE.CylinderGeometry(0.158, 0.162, 0.045, 10)
   };
   for (var vk in VG) VG[vk].userData.shared = true;           // the crowd keeps using these after a townsperson is baked
   return VG;
@@ -2395,7 +2403,7 @@ var HAIR_COLS = [0x3a2416, 0x6b3f1f, 0xe0b45a, 0xb4532a, 0x1d1712, 0xd8d2c8, 0x8
 // Face parts, as [x, y, z, sx, sy, sz] relative to the villager's feet (front is +z).
 var FACE = { eyeL: [-0.058, 0.8, 0.146, 0.026, 0.036, 0.016], eyeR: [0.058, 0.8, 0.146, 0.026, 0.036, 0.016], chL: [-0.097, 0.748, 0.124, 0.036, 0.022, 0.012], chR: [0.097, 0.748, 0.124, 0.036, 0.022, 0.012], nose: [0, 0.768, 0.158, 0.03, 0.028, 0.026] };
 // One townsperson as ordinary meshes (used by the walkers).
-function makeFolk(shirt, skin, hairC, hatC) {
+function makeFolk(shirt, skin, hairC, hatC, extras) {
   var G = villagerGeo(), g = new THREE.Group(), T = toon;
   add(g, G.robe, T(shirt), 0, 0.3, 0, 0.03); add(g, G.belt, T(0x4a2f1a), 0, 0.27, 0, 0.015);
   add(g, G.head, T(skin), 0, 0.78, 0, 0.03);
@@ -2412,6 +2420,8 @@ function makeFolk(shirt, skin, hairC, hatC) {
     arms.push(a);
   });
   if (hatC != null) { add(g, G.brim, T(hatC), 0, 0.9, 0, 0.02); add(g, G.band, T(0xf5b921), 0, 0.935, 0, 0.012); var h = add(g, G.hat, T(hatC), 0, 1.13, 0, 0.025); h.rotation.y = 0.6; }
+  if (extras && extras.tail) add(g, G.tail, T(extras.tail), 0, 0.28, -0.2, 0.02).rotation.x = -1.0;
+  if (extras && extras.horns) [-1, 1].forEach(function (sx) { add(g, G.horn, T(0xf3ead2), sx * 0.1, 0.96, 0, 0.012).rotation.z = -sx * 0.5; });
   arms.forEach(function (a) { a.userData.keep = true; }); bake(g, { noAO: true, solid: true, cast: true });
   arms.forEach(function (a) { a.userData.keep = false; bake(a, { noAO: true, solid: true, cast: true }); });
   g.userData.arms = arms;
@@ -2441,7 +2451,8 @@ function buildCrowd() {
   W3.cBrim = instPart(VGk.brim, N, 0.02);
   W3.cHorn = instPart(new THREE.ConeGeometry(0.05, 0.22, 6), N * 2, 0.02);
   W3.cHoof = instPart(new THREE.BoxGeometry(0.1, 0.09, 0.13), N * 2, 0.02);
-  W3.cParts = [W3.cBody, W3.cHead, W3.cArm, W3.cHand, W3.cBelt, W3.cHair, W3.cBoot, W3.cNose, W3.cEye, W3.cCheek, W3.cMouth, W3.cHat, W3.cBrim, W3.cBand, W3.cHorn, W3.cHoof];
+  W3.cTail = instPart(new THREE.ConeGeometry(0.035, 0.36, 6).translate(0, 0.18, 0), N, 0.018);
+  W3.cParts = [W3.cBody, W3.cHead, W3.cArm, W3.cHand, W3.cBelt, W3.cHair, W3.cBoot, W3.cNose, W3.cEye, W3.cCheek, W3.cMouth, W3.cHat, W3.cBrim, W3.cBand, W3.cHorn, W3.cHoof, W3.cTail];
   W3.cParts.forEach(function (ip) { if (ip.out) ip.out.material = OUT_MAT; });   // villagers stay solid; only buildings and scenery fade
   W3.cAura = new THREE.InstancedMesh(new THREE.SphereGeometry(0.46, 12, 9), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false }), N);
   W3.cAura.frustumCulled = false; W3.cAura.instanceMatrix.setUsage(THREE.DynamicDrawUsage); W3.cAura.setColorAt(0, _c.set(0xffffff)); W3.cAura.renderOrder = 5; scene.add(W3.cAura);
@@ -2458,13 +2469,14 @@ function buildCrowd() {
     W3.cHair.fill.setColorAt(i, _c.set(HAIR_COLS[(i * 5) % HAIR_COLS.length]));
     W3.cBoot.fill.setColorAt(i * 2, _c.set(0x3a2618)); W3.cBoot.fill.setColorAt(i * 2 + 1, _c);
     W3.cBand.fill.setColorAt(i, _c.set([0xf5b921, 0xffe9a0, 0xe0704a][i % 3]));
-    var r1 = hash01(i * 5.3 + 1), r2 = hash01(i * 9.1 + 2), r3 = hash01(i * 3.7 + 3), r4 = hash01(i * 6.9 + 4);
-    var mg = { hat: r1 < 0.5 ? 6 + Math.floor(r1 * 30) : 999, aura: r2 < 0.4 ? 14 + Math.floor(r2 * 50) : 999, horn: r3 < 0.35 ? 18 + Math.floor(r3 * 55) : 999, hoof: r4 < 0.3 ? 24 + Math.floor(r4 * 60) : 999, a: { hat: 0, aura: 0, horn: 0, hoof: 0 } };
+    var r1 = hash01(i * 5.3 + 1), r2 = hash01(i * 9.1 + 2), r3 = hash01(i * 3.7 + 3), r4 = hash01(i * 6.9 + 4), r5 = hash01(i * 8.3 + 5);
+    var mg = { hat: r1 < 0.5 ? 6 + Math.floor(r1 * 30) : 999, aura: r2 < 0.4 ? 14 + Math.floor(r2 * 50) : 999, horn: r3 < 0.6 ? 2 + Math.floor(r3 * 8) : 999, tail: r5 < 0.6 ? 1 + Math.floor(r5 * 6) : 999, hoof: r4 < 0.3 ? 24 + Math.floor(r4 * 60) : 999, a: { hat: 0, aura: 0, horn: 0, hoof: 0, tail: 0 } };
     if (mg.hoof < 999) mg.horn = Math.min(mg.horn, mg.hoof);                 // satyrs always have their horns
     W3.cHat.fill.setColorAt(i, _c.set(hatCols[i % hatCols.length])); W3.cBrim.fill.setColorAt(i, _c.set(hatCols[i % hatCols.length]));
     W3.cAura.setColorAt(i, _c.set(auraCols[(i * 3) % auraCols.length]));
     W3.cHorn.fill.setColorAt(i * 2, _c.set(hornCols[i % 3])); W3.cHorn.fill.setColorAt(i * 2 + 1, _c.set(hornCols[i % 3]));
     W3.cHoof.fill.setColorAt(i * 2, _c.set(0x2a1a10)); W3.cHoof.fill.setColorAt(i * 2 + 1, _c.set(0x2a1a10));
+    W3.cTail.fill.setColorAt(i, _c.set([0x8a5a33, 0x6b3f1f, 0xb4532a, 0x1d1712, 0xe0b45a][i % 5]));
     W3.crowd.push({ x: x, z: z, ry: Math.atan2(-x * 0.6, 6 - z), y: 0, ph: Math.random() * 6.28, jump: 0, arm: -0.5, mg: mg, shirt: shirts[i % shirts.length], fur: false });
   }
   W3.cParts.forEach(function (ip) { if (ip.fill.instanceColor) ip.fill.instanceColor.needsUpdate = true; }); W3.cAura.instanceColor.needsUpdate = true;
@@ -2552,10 +2564,14 @@ function vPart(ip, idx, x, y, z, sx, sy, sz, rx) {          // a face/costume pa
   _vpE.set(rx || 0, 0, 0); _vpQ.setFromEuler(_vpE); _vpV.set(x, y, z); _vpS.set(sx || 1e-4, sy || 1e-4, sz || 1e-4);
   _vpM.compose(_vpV, _vpQ, _vpS); _mw.multiplyMatrices(_mp, _vpM); setInst(ip, idx, _mw);
 }
+function mgPlaceX(ip, idx, mp, x, y, z, rx, k) {       // like mgPlace, but tilted about x (the tail swings back and up)
+  _mgE.set(rx || 0, 0, 0); _mgQ.setFromEuler(_mgE); _mgV.set(x, y, z); _mgO.set(k, k, k);
+  _mgS.compose(_mgV, _mgQ, _mgO); _mw.multiplyMatrices(mp, _mgS); setInst(ip, idx, _mw);
+}
 function crowdMagic(d, i, dt, sc) {
   var mg = d.mg, b = S.best, kk = Math.min(1, dt * 5), on = d.on ? 1 : 0, was, k;
-  var keys = ["hat", "aura", "horn", "hoof"], tgt;
-  for (var q = 0; q < 4; q++) {
+  var keys = ["hat", "aura", "horn", "hoof", "tail"], tgt;
+  for (var q = 0; q < 5; q++) {
     var key = keys[q]; tgt = (on && b >= mg[key]) ? 1 : 0; was = mg.a[key];
     mg.a[key] = dt > 0 ? lerp(was, tgt, Math.max(kk, 0.0001)) : tgt;
     if (was < 0.05 && mg.a[key] >= 0.05 && tgt && dt > 0) {           // the moment a villager turns a little magical: a puff of sparkles
@@ -2567,6 +2583,7 @@ function crowdMagic(d, i, dt, sc) {
   k = mg.a.hat * g; mgPlace(W3.cHat, i, _mp, 0, 1.12, 0, 0.12, k); mgPlace(W3.cBrim, i, _mp, 0, 0.9, 0, 0.12, k); mgPlace(W3.cBand, i, _mp, 0.004, 0.932, 0, 0.12, k);
   k = (1 - mg.a.hoof) * g; vPart(W3.cBoot, i * 2, -0.08, 0.035, 0.04, 0.07 * k, 0.05 * k, 0.1 * k); vPart(W3.cBoot, i * 2 + 1, 0.08, 0.035, 0.04, 0.07 * k, 0.05 * k, 0.1 * k);
   k = mg.a.horn * g; mgPlace(W3.cHorn, i * 2, _mp, -0.1, 0.96, 0, 0.5, k); mgPlace(W3.cHorn, i * 2 + 1, _mp, 0.1, 0.96, 0, -0.5, k);
+  mgPlaceX(W3.cTail, i, _mp, 0, 0.28, -0.2, -1.0, mg.a.tail * g);
   k = mg.a.hoof * g; mgPlace(W3.cHoof, i * 2, _mp, -0.1, 0.04, 0.12, 0, k); mgPlace(W3.cHoof, i * 2 + 1, _mp, 0.1, 0.04, 0.12, 0, k);
   k = mg.a.aura * g * (1.0 + Math.sin(W3.t * 2.4 + i) * 0.08); _mgE.set(0, 0, 0); _mgQ.setFromEuler(_mgE);
   _mgV.set(0, 0.6, 0); _mgO.set(k, k * 1.25, k); _mgS.compose(_mgV, _mgQ, _mgO); _mw.multiplyMatrices(_mp, _mgS); W3.cAura.setMatrixAt(i, _mw);
@@ -4352,7 +4369,7 @@ function tickFalling(dt) {
 }
 function credit(amount) {
   if (!(amount > 0)) return;
-  S.money = Math.round((S.money + amount) * 100) / 100; S.earned += amount; DRAIN.pend += amount;
+  S.money = Math.round((S.money + amount) * 100) / 100; S.earned += amount;
   if (!S.flags.moneyShown && S.started) { S.flags.moneyShown = true; revealEl($("hud-money")); }
   var firstPay = false;
   if (!S.workshopShown && S.started) {
@@ -4786,8 +4803,8 @@ function buyLine(id) {
   var cost = costOf(l), row = $("upg-" + id);
   if (S.money < cost) { snd.err(); if (row) { row.classList.remove("shake"); void row.offsetWidth; row.classList.add("shake"); } return; }
   if (row) { var bb = row.querySelector(".buy-btn"); if (bb) { var r = bb.getBoundingClientRect(); domBurst(r.left + r.width / 2, r.top + r.height / 2); popText("TIER " + (S.tier[id] + 1) + "!", r.left + r.width / 2, r.top - 12, { cls: "gold", size: 18, rise: 30 }); } }
-  S.money = Math.round((S.money - cost) * 100) / 100; S.tier[id]++;
-  if (upgOwned() === 3 && !S.flags.scaleTaught) { S.flags.scaleTaught = true; toast("Workshop prices climb: every upgrade you own makes the next one dearer. It shows on each card.", 4200); }
+  S.money = Math.max(0, Math.round((S.money - cost) * 100) / 100); S.tier[id]++;
+  if (upgOwned() === 3 && !S.flags.scaleTaught) { S.flags.scaleTaught = true; enqueueReveal("prices"); }
   snd.buy(); haptic(15); forgeStrike(); forgeBubble();
   if (id === "hotMortar") {
     if (S.tower) toast("Hot mortar! From the next course, tower sides take " + towerPerFace() + " bricks.", 3400);
@@ -5228,7 +5245,7 @@ function smashHand(h) {
   emitGlow(hx, h.topY + 0.2, hz + 0.2, 24, 0xfff2a8, 3.4, 0.7, 0.16, -2);
   emitPuffs(hx, h.topY, hz, 6, 0xe9dcc2, 0.7);
   popText("SMASHED!", sp.x, sp.y - 44, { cls: "gold", size: 26, rot: -5, dur: 1100 });
-  popText("+$" + fmt(bonus), sp.x, sp.y - 14, { cls: "green", size: 20, dur: 1000, delay: 120 });
+  popText("+$" + fmtPay(bonus), sp.x, sp.y - 14, { cls: "green", size: 20, dur: 1000, delay: 120 });
   moneyFloat(bonus, null); spawnCoins(coinsFor(bonus), sp);
   crowdCheer(1.6); snd.cheer(true);
 }
@@ -5414,7 +5431,7 @@ function plusAdd(amount) {                              // a "+$N" under the mon
   if (!(amount > 0) || el.hudMoney.classList.contains("hidden")) return;
   var P = PLUS, now = performance.now();
   if (!P.el) { P.el = document.createElement("div"); P.el.className = "plus-badge"; el.fx.appendChild(P.el); }
-  P.amt = DRAIN.pend > 0 ? DRAIN.pend : amount; P.until = now + 1700;
+  P.amt = P.until > now ? P.amt + amount : amount; P.until = now + 1700;
   P.el.textContent = "+$" + fmtCash(P.amt);
   var r = el.hudMoney.getBoundingClientRect();
   P.el.style.left = (r.left + r.width / 2) + "px"; P.el.style.top = (r.bottom + 3) + "px";
@@ -5779,6 +5796,7 @@ function ndDetail(list) {
   var pips = '<span class="pips">'; for (var p = 0; p < l.costs.length && l.costs.length <= 6; p++) pips += '<i class="' + (p < t ? "on" : "") + '"></i>'; pips += "</span>";
   var tier = l.costs.length > 6 ? '<span class="up-tier">LV ' + t + "/" + l.costs.length + "</span>" : "";
   var h = '<div class="nd-detail"><div class="upg-row up-card nd-card ' + st + '" id="upg-' + l.id + '" data-cost="' + cost + '" data-tab="' + l.tab + '" style="--cat:' + CAT_COL[l.tab] + '">';
+  h += '<button class="nd-x" data-nd-close aria-label="Close">×</button>';
   h += '<div class="nd-top"><div class="upg-ico">' + (st === "locked" ? "🔒" : ICON[l.icon]) + "</div>";
   h += '<div class="nd-title"><div class="upg-name">' + l.name + pips + tier + (UI.shopNew[l.id] ? '<span class="upg-new">NEW</span>' : "") + "</div>";
   h += '<div class="nd-tab">' + tabName(l.tab) + " tab</div></div></div>";
@@ -5838,6 +5856,7 @@ function renderShop() {
 }
 $("tree-tabs").addEventListener("click", function (e) { var b = e.target.closest("[data-tab]"); if (!b) return; UI.tab = b.getAttribute("data-tab"); UI.shopSig = ""; renderShop(); snd.pop(); });
 el.upgList.addEventListener("click", function (e) {
+  if (e.target.closest("[data-nd-close]")) { UI.sel = null; UI.shopSig = ""; renderShop(); snd.pop(); return; }
   var nd = e.target.closest("[data-node]"); if (nd) { UI.sel = nd.getAttribute("data-node"); UI.shopSig = ""; renderShop(); snd.tick(); return; }
   var b = e.target.closest("[data-upg]"); if (b) { buyLine(b.getAttribute("data-upg")); return; }
   var sc = e.target.closest("[data-sec]"); if (sc) { var k = sc.getAttribute("data-sec"); UI.secOpen[k] = !UI.secOpen[k]; UI.shopSig = ""; renderShop(); snd.pop(); return; }
@@ -5848,10 +5867,7 @@ $("shop-guide").addEventListener("click", function (e) { var b = e.target.closes
 // Per-frame UI: money roll, kiln ring, fuses, prompt, wind chip.
 function uiFrame(rdt) {
   updateBubbles();
-  drainPend(rdt);
-  var shownTarget = S.money - DRAIN.pend;               // what the total should read once the green has drained in
-  var diff = shownTarget - UI.moneyShown;               // only a spend (money dropping) makes this non-zero
-  if (Math.abs(diff) > 1e-9) UI.moneyShown = Math.abs(diff) < 0.005 ? shownTarget : UI.moneyShown + diff * Math.min(1, rdt * 12);
+  UI.moneyShown = S.money;   // the total always reads the real balance; pay shows as a + badge instead
   var mTxt = fmtCash(UI.moneyShown);
   if (mTxt !== UI.moneyTxt) { UI.moneyTxt = mTxt; el.moneyNum.textContent = mTxt; }
   el.kilnRing.style.strokeDashoffset = (119.4 * (1 - clamp(S.moldT, 0, 1))).toFixed(1);
@@ -5972,6 +5988,7 @@ var ICO_CLOUD = '<svg viewBox="0 0 64 46" width="66" height="46"><path d="M16 38
 var ICO_TREMOR = '<svg viewBox="0 0 64 46" width="66" height="46"><rect x="16" y="14" width="32" height="18" fill="#c2502c" stroke="#221407" stroke-width="3"/><path d="M6 10l-3 8 5 5-3 9M58 10l3 8-5 5 3 9" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var ICO_SORT = '<svg viewBox="0 0 64 46" width="66" height="46"><g stroke="#221407" stroke-width="3" stroke-linejoin="round"><path d="M4 42V20l12-10 12 10v22z" fill="#9aa5b0"/><path d="M28 42V20l12-10 12 10v22z" fill="#f5b921"/><path d="M52 42V26l8-7v23z" fill="#33363f"/></g></svg>';
 var REVEALS = {
+  prices: { cls: "gold", icon: "<b>$↑</b>", title: "UPGRADES GET DEARER", text: "Every upgrade you own makes the <b>next one dearer</b>, so the price on each card climbs as you buy. Pick the ones that pay you back fastest, and build while you save." },
   hot: { cls: "hot", title: "THE KILN RUNS HOT", text: "Some bricks now come out glowing. Drop a hot brick before it cools — it's worth <b>×2</b>. Let it burn out and it's a miss." },
   lead: { cls: "lead", title: "LEAD BRICKS", text: "Dark lead bricks now come out of the kiln. They swing <b>40% faster</b> — land one and it's worth <b>×" + TYPE_MULT.lead + "</b>, and every lead brick in a finished row adds <b>+" + ROW_ADD.lead + "× rate</b> to that row's payout." },
   silver: { cls: "silver", title: "SILVER BRICKS", text: "Gleaming silver bricks now turn up in the kiln. Land one and it's worth <b>×" + TYPE_MULT.silver + "</b>, and each one in a finished row adds <b>+" + ROW_ADD.silver + "× rate</b>. Several in a row earn little bumps." },
