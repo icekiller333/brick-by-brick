@@ -6,8 +6,8 @@ A cozy idle game. You're the local wall maker, building a wall — and then a to
 
 - `index.html` — the landing page: the latest 3D version up top, and a "See versions" browser with every stage of the game.
 - `brick-by-brick-2d.html` — the 2D original, fastest to load.
-- `brick-by-brick-3d.html` — the latest version, 3D (v51.13).
-- `versions/` — every playable stage of the game, one file per version (2D original, v10, improvements build, v2.0, v3.2, v7.3, v8.0, v11.1, v14.2, v16.3, v17.4, v18.5, v19.1, v28.3, v29.4, v32.5, v41.10, v46.11, v47.12, v51.13). Pick a version on the landing page to see what changed in it and play that exact build.
+- `brick-by-brick-3d.html` — the latest version, 3D (v52.0).
+- `versions/` — every playable stage of the game, one file per version (2D original, v10, improvements build, v2.0, v3.2, v7.3, v8.0, v11.1, v14.2, v16.3, v17.4, v18.5, v19.1, v28.3, v29.4, v32.5, v41.10, v46.11, v47.12, v51.13, v52.0). Pick a version on the landing page to see what changed in it and play that exact build.
 
 ## How to play
 
@@ -59,6 +59,11 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - Villager speech bubbles now pop up below their heads, so they don't cover the top layer of bricks.
 - First payday highlighted with a popup card and a coin shower.
 - Costs rebalanced for the slower cash flow (re-priced for the 6-wide wall and 24-brick tower).
+
+### 3D v52.0 — Nov 15, 2026 (upgraded art — model pass)
+
+- Model pass: higher-detail versions of the character and creature models (Edgar the gnoll, the satyr elder, the Minotaur woman, the smith, the mole, and the sky fliers and critters — swallow, finch, kite, imp, bug, eye, peeper, limb, wisp). Same function names, options and return values as before, so the story portraits, sky fliers and critter animation keep working. Same look: toon shading, ink outlines.
+- Round 14 is not in this version — the cut scenes (intro, row 50, end of game) are still to come.
 
 ### 3D v51.13 — Nov 14, 2026 (round 13 feedback, actioned — gold version)
 
@@ -223,4 +228,4 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 
 ### Repo — Nov 9, 2026
 
-- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again; v28.3 published Nov 14, replacing the 3D file again; v29.4 published Nov 14, replacing the 3D file again; v32.5 published Nov 14, replacing the 3D file again; v41.10 published Nov 14, replacing the 3D file again; v46.11 published Nov 14, replacing the 3D file again; v47.12 published Nov 14, replacing the 3D file again; v51.13 published Nov 14, replacing the 3D file again.
+- 2D original published as `index.html`; 3D improvements build published as `brick-by-brick-3d.html`; v2.0 published the same day, replacing the 3D file; v3.2 published later the same day, replacing the 3D file again; v7.3 published later still, replacing the 3D file again; landing page published later still as the new `index.html`, with the 2D original moved to `brick-by-brick-2d.html`; v8.0 published later still, replacing the 3D file again; v11.1 published Nov 10, replacing the 3D file again; v14.2 published Nov 11, replacing the 3D file again; v16.3 published Nov 11, replacing the 3D file again; v17.4 published Nov 11, replacing the 3D file again; v18.5 published Nov 11, replacing the 3D file again; v19.1 published Nov 14, replacing the 3D file again; v28.3 published Nov 14, replacing the 3D file again; v29.4 published Nov 14, replacing the 3D file again; v32.5 published Nov 14, replacing the 3D file again; v41.10 published Nov 14, replacing the 3D file again; v46.11 published Nov 14, replacing the 3D file again; v47.12 published Nov 14, replacing the 3D file again; v51.13 published Nov 14, replacing the 3D file again; v52.0 published Nov 15, replacing the 3D file again.
