@@ -3106,115 +3106,9 @@ function wingsV(g, mat, len, wid) {             // two swept, tapering wings (a 
   pl.position.x = -0.05; pr.position.x = 0.05; g.add(pl); g.add(pr);
   g.userData.pl = pl; g.userData.pr = pr; g.userData.wm = [a, b];
 }
-function mkSwallow() {
-  var g = new THREE.Group(), ink = cbasic(INK);
-  cpart(g, CG.sph, ink, [0.2, 0.085, 0.085], 0, 0, 0); cpart(g, CG.sph, ink, [0.08, 0.075, 0.075], 0.17, 0.02, 0);
-  cpart(g, CG.beak, ink, [0.7, 0.7, 0.7], 0.26, 0.02, 0);
-  var tl = new THREE.Shape(); tl.moveTo(0, 0.03); tl.lineTo(-0.34, 0.09); tl.lineTo(-0.18, 0); tl.lineTo(-0.34, -0.09); tl.lineTo(0, -0.03); tl.closePath();   // the forked tail
-  var t = new THREE.Mesh(new THREE.ShapeGeometry(tl), ink); t.position.x = -0.16; g.add(t);
-  wingsV(g, ink, 0.62, 0.17); return g;
-}
-function mkFinch() {
-  var g = new THREE.Group(), c = cmat(0x3fa7d6);
-  g.userData.tint = [cpart(g, CG.sph, c, [0.19, 0.14, 0.14], 0, 0, 0, 0.1)];
-  g.userData.tint.push(cpart(g, CG.sph, c, [0.1, 0.1, 0.1], 0.17, 0.07, 0, 0.1));
-  cpart(g, CG.sph, cmat(0xfff2dc), [0.13, 0.09, 0.11], 0.05, -0.05, 0);                       // pale belly
-  [-1, 1].forEach(function (sz) { cpart(g, CG.sph, cbasic(0xffffff), [0.032, 0.035, 0.02], 0.22, 0.1, sz * 0.075); cpart(g, CG.sph, cbasic(INK), [0.02, 0.024, 0.015], 0.232, 0.1, sz * 0.085); });
-  cpart(g, CG.beak, cmat(0xf5b921), [1, 1, 1], 0.28, 0.06, 0, 0.1);
-  var tf = new THREE.Shape(); tf.moveTo(0, 0.03); tf.lineTo(-0.24, 0.1); tf.quadraticCurveTo(-0.28, 0, -0.24, -0.08); tf.lineTo(0, -0.03); tf.closePath();
-  var tail = new THREE.Mesh(new THREE.ShapeGeometry(tf), c); tail.position.x = -0.15; g.add(tail); g.userData.tint.push(tail);
-  wingsV(g, c, 0.42, 0.2); g.userData.tint.push(g.userData.wm[0], g.userData.wm[1]);
-  return g;
-}
 function kiteTri(pts, col) {
   var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]); sh.lineTo(pts[1][0], pts[1][1]); sh.lineTo(pts[2][0], pts[2][1]); sh.closePath();
   return new THREE.Mesh(new THREE.ShapeGeometry(sh), cbasic(col));
-}
-function mkKite() {
-  var root = new THREE.Group(), body = new THREE.Group(); root.add(body);
-  var T0 = [0, 1.0], R = [0.62, 0], B = [0, -1.05], L = [-0.62, 0], C = [0, 0];
-  body.add(kiteTri([C, T0, R], 0xe0704a)); body.add(kiteTri([C, R, B], 0xf5b921)); body.add(kiteTri([C, B, L], 0xe0704a)); body.add(kiteTri([C, L, T0], 0xf5b921));
-  var pts = [new THREE.Vector3(T0[0], T0[1], 0.01), new THREE.Vector3(R[0], R[1], 0.01), new THREE.Vector3(B[0], B[1], 0.01), new THREE.Vector3(L[0], L[1], 0.01)];
-  body.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: INK })));
-  var tail = []; for (var i = 0; i < 7; i++) { var bow = cpart(body, CG.box, cbasic(i % 2 ? 0x3fa7d6 : 0xe0704a), [0.22, 0.1, 0.02], 0, -1.2 - i * 0.38, 0); tail.push(bow); }
-  var string = new THREE.Mesh(CG.cyl, cbasic(INK)); root.add(string);
-  root.userData.body = body; root.userData.tail = tail; root.userData.string = string; return root;
-}
-function mkBug() {
-  var g = new THREE.Group();
-  var halo = new THREE.Mesh(CG.sph, cbasic(0xd7ff4a, { transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending, fog: false })); halo.scale.setScalar(0.4); g.add(halo);
-  cpart(g, CG.sph, cbasic(0xf4ffa0, { fog: false }), [0.1, 0.1, 0.1], 0, 0, 0);
-  var w1 = cpart(g, CG.plane, cbasic(0xffffff, { transparent: true, opacity: 0.6 }), [0.16, 0.08, 1], -0.09, 0.07, 0), w2 = cpart(g, CG.plane, cbasic(0xffffff, { transparent: true, opacity: 0.6 }), [0.16, 0.08, 1], 0.09, 0.07, 0);
-  g.userData.halo = halo; g.userData.w = [w1, w2]; return g;
-}
-function mkEye() {
-  var root = new THREE.Group(), eb = new THREE.Group(); root.add(eb);
-  cpart(eb, CG.sph, cmat(0xf4f0e6), [1.1, 1.1, 1.1], 0, 0, 0, 0.06);
-  var iris = cpart(eb, CG.circle, cbasic(0xe8c21a), [0.6, 0.6, 1], 0, 0, 1.08);
-  cpart(eb, CG.circle, cbasic(0x120a14), [0.2, 0.45, 1], 0, 0, 1.09);
-  cpart(eb, CG.circle, cbasic(0xffffff), [0.12, 0.12, 1], 0.22, 0.25, 1.1);
-  var nerve = []; for (var i = 0; i < 5; i++) nerve.push(cpart(root, CG.sph, cmat(0xd98a9a), [0.3 - i * 0.04, 0.3 - i * 0.04, 0.3 - i * 0.04], 0, 0, 0, 0.1));
-  root.userData.eb = eb; root.userData.iris = iris; root.userData.nerve = nerve; return root;
-}
-function mkPeeper() {
-  var root = new THREE.Group(), face = new THREE.Group(); root.add(face);
-  cpart(root, CG.sph, cmat(0x2b1a45), [0.7, 0.55, 0.5], 0, 0, 0);
-  var eyes = [];
-  [[-0.28, 0.1], [0.28, 0.1], [0, -0.05]].forEach(function (p, i) {
-    var e = new THREE.Group(); e.position.set(p[0], p[1], 0.42); face.add(e);
-    cpart(e, CG.sph, cbasic(0xffe14a, { fog: false }), [0.15, 0.1, 0.05], 0, 0, 0);
-    cpart(e, CG.circle, cbasic(0x120a14), [0.025, 0.085, 1], 0, 0, 0.06);
-    eyes.push(e);
-  });
-  root.userData.face = face; root.userData.eyes = eyes; return root;
-}
-function mkLimb(kind) {
-  var g = new THREE.Group(), skin = cmat(0xc8c3e8), A = new THREE.Group(), B = new THREE.Group(); g.add(A);
-  A.position.y = -1.2;                        // pivot near the middle so it tumbles in place
-  if (kind === 0) {                           // arm + open hand
-    cpart(A, CG.sph, skin, [0.22, 0.22, 0.22], 0, 0, 0, 0.08);
-    cpart(A, CG.cyl, skin, [0.22, 0.55, 0.22], 0, 0.55, 0, 0.08);
-    cpart(A, CG.sph, skin, [0.24, 0.24, 0.24], 0, 1.1, 0, 0.08);
-    B.position.y = 1.1; B.rotation.z = -0.5; A.add(B);
-    cpart(B, CG.cyl, skin, [0.19, 0.5, 0.19], 0, 0.5, 0, 0.08);
-    cpart(B, CG.box, skin, [0.46, 0.4, 0.14], 0, 1.2, 0, 0.08);
-    for (var f = 0; f < 4; f++) cpart(B, CG.cyl, skin, [0.055, 0.22, 0.055], -0.17 + f * 0.113, 1.62, 0, 0.1);
-    cpart(B, CG.cyl, skin, [0.06, 0.18, 0.06], 0.32, 1.25, 0).rotation.z = -0.9;
-  } else {                                    // leg + foot
-    cpart(A, CG.sph, skin, [0.28, 0.28, 0.28], 0, 0, 0, 0.08);
-    cpart(A, CG.cyl, skin, [0.28, 0.6, 0.28], 0, 0.6, 0, 0.08);
-    cpart(A, CG.sph, skin, [0.3, 0.3, 0.3], 0, 1.2, 0, 0.08);
-    B.position.y = 1.2; B.rotation.z = 0.6; A.add(B);
-    cpart(B, CG.cyl, skin, [0.22, 0.55, 0.22], 0, 0.55, 0, 0.08);
-    cpart(B, CG.box, skin, [0.6, 0.2, 0.32], 0.2, 1.2, 0, 0.08);
-  }
-  return g;
-}
-function mkImp() {
-  var g = new THREE.Group(), pur = cmat(0x5a3a8c);
-  cpart(g, CG.sph, pur, [0.42, 0.4, 0.4], 0, 0, 0, 0.08);
-  var eb = new THREE.Group(); g.add(eb);
-  cpart(eb, CG.sph, cbasic(0xf4f0e6), [0.2, 0.2, 0.12], 0, 0.04, 0.36);
-  cpart(eb, CG.circle, cbasic(0xd42a1e), [0.11, 0.11, 1], 0, 0.04, 0.485);
-  cpart(eb, CG.circle, cbasic(0x120a14), [0.035, 0.09, 1], 0, 0.04, 0.49);
-  cpart(g, CG.hornGeo, pur, [1, 1, 1], -0.2, 0.36, 0, 0.1); cpart(g, CG.hornGeo, pur, [1, 1, 1], 0.2, 0.36, 0, 0.1);
-  var pl = new THREE.Group(), pr = new THREE.Group(); g.add(pl); g.add(pr);
-  var wl = new THREE.Mesh(CG.bat, cmat(0x3b2562)); wl.scale.set(-1.3, 1.3, 1); pl.add(wl); pl.position.x = -0.25;
-  var wr = new THREE.Mesh(CG.bat, cmat(0x3b2562)); wr.scale.set(1.3, 1.3, 1); pr.add(wr); pr.position.x = 0.25;
-  cpart(g, CG.sph, cmat(0x7a5aa8), [0.26, 0.22, 0.2], 0, -0.12, 0.2);                                             // paler belly
-  var tl = new THREE.Mesh(taperTube([V3(-0.3, -0.2), V3(-0.55, -0.35), V3(-0.75, -0.2), V3(-0.85, 0.05)], function (t) { return 0.05 * (1 - t) + 0.012; }, { tub: 10, rad: 6 }), pur); g.add(tl);
-  cpart(g, CG.hornGeo, cmat(0xd42a1e), [1.1, 0.8, 0.5], -0.88, 0.12, 0).rotation.z = 0.5;                           // the arrow tip
-  [-1, 1].forEach(function (s) { cpart(g, CG.sph, pur, [0.07, 0.05, 0.08], s * 0.14, -0.4, 0.05, 0.05); cpart(g, CG.hornGeo, cbasic(0xffffff), [0.3, 0.35, 0.3], s * 0.07, -0.19, 0.37).rotation.x = Math.PI; });
-  g.userData.pl = pl; g.userData.pr = pr; g.userData.eb = eb; return g;
-}
-function mkWisp() {
-  var g = new THREE.Group(), glass = { transparent: true, opacity: 0.55, depthWrite: false, fog: false };
-  var dome = new THREE.Mesh(CG.dome, cbasic(0xcfeeff, glass)); dome.scale.set(0.8, 0.7, 0.8); g.add(dome);
-  var face = new THREE.Group(); g.add(face);
-  cpart(face, CG.sph, cbasic(0x120a14), [0.1, 0.16, 0.05], -0.25, 0.2, 0.55); cpart(face, CG.sph, cbasic(0x120a14), [0.1, 0.16, 0.05], 0.25, 0.2, 0.55);
-  cpart(face, CG.sph, cbasic(0x120a14), [0.09, 0.12, 0.05], 0, -0.02, 0.6);
-  var ten = []; for (var i = 0; i < 5; i++) { var t = cpart(g, CG.cyl, cbasic(0xcfeeff, glass), [0.045, 0.7, 0.045], -0.5 + i * 0.25, -0.65, 0); t.userData.px = -0.5 + i * 0.25; ten.push(t); }
-  g.userData.dome = dome; g.userData.face = face; g.userData.ten = ten; return g;
 }
 var CRIT_TYPES = [
   { id: "swallow", nice: true, from: 10, cap: 3, rate: 0.22, mk: mkSwallow, v: [1.7, 2.7], z: [-16, -6], dy: [0.35, 0.9], flip: true },
@@ -6249,73 +6143,6 @@ function coinProp(par, x, y, z, r) {
 }
 
 /* ---------- Edgar: a D&D-style gnoll, hyena head, in a builder's cap ---------- */
-function buildGnoll(o) {
-  o = o || {};
-  var g = new THREE.Group(), fur = 0xd2a55f, furL = 0xeed39a, dk = 0x5b3a22, spot = 0x7d5128, tun = 0x2f8f9a;
-  [-1, 1].forEach(function (sx) {
-    pmesh(g, new THREE.CylinderGeometry(0.15, 0.12, 0.62, 10), fur, sx * 0.2, 0.42, 0);
-    pmesh(g, new THREE.BoxGeometry(0.27, 0.12, 0.42), dk, sx * 0.2, 0.06, 0.07);
-    pmesh(g, new THREE.SphereGeometry(0.04, 6, 5), spot, sx * 0.2, 0.5, 0.13, { ol: 0 });
-    pmesh(g, new THREE.SphereGeometry(0.035, 6, 5), spot, sx * 0.17, 0.32, 0.1, { ol: 0 });
-  });
-  pmesh(g, new THREE.LatheGeometry([V2(0.001, -0.43), V2(0.47, -0.43), V2(0.49, -0.38), V2(0.44, -0.1), V2(0.4, 0.15), V2(0.37, 0.35), V2(0.3, 0.43), V2(0.001, 0.44)], 20), tun, 0, 1.1, 0);
-  pmesh(g, new THREE.TorusGeometry(0.22, 0.06, 8, 18), 0x25707a, 0, 1.53, 0, { r: [Math.PI / 2, 0, 0], ol: 0.012 });
-  pmesh(g, new THREE.BoxGeometry(0.04, 0.3, 0.02), 0x25707a, 0, 1.33, 0.38, { ol: 0, r: [-0.15, 0, 0] });
-  [-1, 1].forEach(function (sx) { pmesh(g, new THREE.SphereGeometry(0.025, 6, 5), 0xf5b921, 0.05 * sx, 1.36, 0.385, { ol: 0 }); });
-  pmesh(g, new THREE.CylinderGeometry(0.47, 0.47, 0.09, 14), 0x4a2f1a, 0, 0.78, 0, { ol: 0.012 });
-  pmesh(g, new THREE.BoxGeometry(0.16, 0.12, 0.03), 0xf5b921, 0, 0.78, 0.47, { ol: 0.012 });
-  pmesh(g, new THREE.BoxGeometry(0.18, 0.26, 0.05), 0x4a2f1a, -0.3, 0.62, 0.38, { ol: 0.01, r: [0, 0.5, 0] });     // tool pouch
-  pmesh(g, new THREE.ConeGeometry(0.11, 0.55, 8), fur, 0, 0.6, -0.5, { r: [-2.0, 0, 0] });                          // tail
-  function arm(sx, rz, rx) {
-    var a = new THREE.Group(); a.position.set(sx * 0.45, 1.46, 0); a.rotation.set(rx || 0, 0, rz); g.add(a);
-    pmesh(a, new THREE.CylinderGeometry(0.1, 0.085, 0.62, 10), fur, 0, -0.31, 0);
-    pmesh(a, new THREE.CylinderGeometry(0.115, 0.115, 0.1, 12), tun, 0, -0.08, 0, { ol: 0.012 });
-    pmesh(a, new THREE.SphereGeometry(0.115, 10, 8), furL, 0, -0.66, 0);
-    for (var fg = -1; fg <= 1; fg++) pmesh(a, new THREE.SphereGeometry(0.04, 6, 5), furL, fg * 0.055, -0.76, 0.04, { ol: 0.008, s: [1, 1.3, 1] });
-    pmesh(a, new THREE.SphereGeometry(0.03, 6, 5), spot, 0.05, -0.2, 0.07, { ol: 0 });
-    return a;
-  }
-  var aR = arm(1, o.armR == null ? 0.25 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.25 : o.armL, o.armLx || 0);
-  var h = new THREE.Group(); h.position.set(0, 1.88, 0.02); h.rotation.z = o.tilt || 0; h.rotation.y = o.turn || 0; g.add(h);
-  pmesh(h, new THREE.SphereGeometry(0.34, 18, 14), fur, 0, 0, 0, { ol: 0.026 });
-  pmesh(h, new THREE.CylinderGeometry(0.13, 0.2, 0.5, 12), furL, 0, -0.08, 0.4, { r: [Math.PI / 2, 0, 0] });
-  pmesh(h, new THREE.BoxGeometry(0.14, 0.07, 0.46), dk, 0, 0.07, 0.4, { ol: 0 });
-  pmesh(h, new THREE.SphereGeometry(0.075, 10, 8), 0x1a1008, 0, 0.02, 0.66, { ol: 0.012 });
-  var mouth = o.mouth || "smile";
-  if (mouth === "grin") {
-    pmesh(h, new THREE.BoxGeometry(0.22, 0.05, 0.42), 0x3a0f10, 0, -0.19, 0.4, { ol: 0 });
-    pmesh(h, new THREE.BoxGeometry(0.2, 0.06, 0.4), furL, 0, -0.25, 0.37, { ol: 0.012, r: [0.18, 0, 0] });
-    pmesh(h, new THREE.SphereGeometry(0.07, 8, 6), 0xe87a8a, 0, -0.205, 0.46, { ol: 0, s: [1.2, 0.5, 1.6] });
-    [-0.07, 0.07].forEach(function (tx) {
-      pmesh(h, new THREE.ConeGeometry(0.028, 0.08, 5), 0xffffff, tx, -0.165, 0.58, { ol: 0, r: [Math.PI, 0, 0] });
-      pmesh(h, new THREE.ConeGeometry(0.026, 0.07, 5), 0xffffff, tx, -0.225, 0.56, { ol: 0 });
-    });
-  } else if (mouth === "open") {
-    pmesh(h, new THREE.BoxGeometry(0.2, 0.08, 0.34), 0x3a0f10, 0, -0.2, 0.4, { ol: 0 });
-    pmesh(h, new THREE.BoxGeometry(0.19, 0.05, 0.34), furL, 0, -0.27, 0.36, { ol: 0.01, r: [0.28, 0, 0] });
-  } else {
-    pmesh(h, new THREE.BoxGeometry(0.2, 0.025, 0.4), 0x3a0f10, 0, -0.17, 0.4, { ol: 0 });
-    pmesh(h, new THREE.ConeGeometry(0.026, 0.07, 5), 0xffffff, 0.08, -0.205, 0.56, { ol: 0, r: [Math.PI, 0, 0] });
-  }
-  [-1, 1].forEach(function (sx) {
-    pmesh(h, new THREE.SphereGeometry(0.085, 10, 8), 0xffffff, sx * 0.16, 0.09, 0.27, { ol: 0.012, s: [1, 1.1, 0.6] });
-    pmesh(h, new THREE.SphereGeometry(0.056, 10, 8), 0xf2c200, sx * 0.17, 0.09, 0.31, { ol: 0, s: [1, 1.1, 0.6] });
-    pmesh(h, new THREE.SphereGeometry(0.03, 8, 6), 0x111111, sx * 0.175 + (o.look || 0) * 0.015, 0.09, 0.33, { ol: 0, s: [0.8, 1.4, 0.6] });
-    var br = o.brow == null ? 0.1 : o.brow;
-    pmesh(h, new THREE.BoxGeometry(0.15, 0.04, 0.04), dk, sx * 0.16, 0.21 + (o.browUp || 0), 0.29, { ol: 0, r: [0, 0, sx * br] });
-    pmesh(h, new THREE.SphereGeometry(0.15, 10, 8), fur, sx * 0.3, 0.37, -0.03, { ol: 0.02, s: [0.6, 1.2, 0.5], r: [0, 0, -sx * 0.3] });
-    pmesh(h, new THREE.SphereGeometry(0.09, 8, 6), 0xe58a8a, sx * 0.31, 0.36, 0.0, { ol: 0, s: [0.5, 1, 0.4], r: [0, 0, -sx * 0.3] });
-    pmesh(h, new THREE.SphereGeometry(0.03, 6, 5), spot, sx * 0.24, -0.02, 0.22, { ol: 0 });
-    pmesh(h, new THREE.SphereGeometry(0.025, 6, 5), spot, sx * 0.2, 0.0, 0.26, { ol: 0 });
-  });
-  for (var k = 0; k < 7; k++) pmesh(h, new THREE.ConeGeometry(0.07 - k * 0.004, 0.3 - k * 0.012, 6), dk, 0, 0.3 - k * 0.12, -0.27 - k * 0.015, { ol: 0.012, r: [-2.3 + k * 0.05, 0, 0] });
-  if (!o.nocap) {
-    pmesh(h, new THREE.CylinderGeometry(0.22, 0.25, 0.13, 14), 0xc2502c, 0, 0.3, 0.0, { ol: 0.018 });
-    pmesh(h, new THREE.SphereGeometry(0.2, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0xd0603a, 0, 0.33, 0, { ol: 0.018 });
-    pmesh(h, new THREE.BoxGeometry(0.3, 0.03, 0.2), 0x8f2f1a, 0, 0.27, 0.27, { ol: 0.012, r: [0.15, 0, 0] });
-  }
-  return { group: g, head: h, aR: aR, aL: aL };
-}
 
 /* ---------- The Elder: a little old satyr — enormous scarf, enormous horns ---------- */
 function hornChain(par, sign, y0, long) {
@@ -6331,115 +6158,8 @@ function hornChain(par, sign, y0, long) {
     seg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
   }
 }
-function buildSatyr(o) {
-  o = o || {};
-  var g = new THREE.Group(), fur = 0x9a7b58, furD = 0x6d5238, skin = 0xe3b88e, robe = 0x6f4d8f, trim = 0xe0b040;
-  [-1, 1].forEach(function (sx) {
-    pmesh(g, new THREE.CylinderGeometry(0.14, 0.1, 0.55, 9), fur, sx * 0.17, 0.78, 0.02, { r: [-0.55, 0, 0] });
-    pmesh(g, new THREE.CylinderGeometry(0.085, 0.07, 0.55, 9), fur, sx * 0.17, 0.36, -0.1, { r: [0.5, 0, 0] });
-    pmesh(g, new THREE.BoxGeometry(0.15, 0.1, 0.2), 0x2a1a10, sx * 0.17, 0.05, 0.02, { ol: 0.014 });
-  });
-  var tor = new THREE.Group(); tor.rotation.x = 0.2; tor.position.set(0, 0.95, 0); g.add(tor);
-  pmesh(tor, new THREE.CylinderGeometry(0.31, 0.42, 0.9, 12), robe, 0, 0.45, 0);
-  pmesh(tor, new THREE.CylinderGeometry(0.43, 0.43, 0.07, 12), trim, 0, 0.1, 0, { ol: 0.01 });
-  pmesh(tor, new THREE.CylinderGeometry(0.34, 0.34, 0.06, 12), trim, 0, 0.88, 0, { ol: 0.01 });
-  var scarf = new THREE.Group(); scarf.position.set(0, 0.95, 0.02); tor.add(scarf);
-  var sc = [0xd0452a, 0xf2b630, 0xd0452a, 0xf2b630];
-  for (var k = 0; k < 4; k++) pmesh(scarf, new THREE.TorusGeometry(0.3 + (k % 2) * 0.02, 0.1, 8, 18), sc[k], 0, 0.05 - k * 0.07, 0, { r: [Math.PI / 2, 0, 0], ol: 0.012 });
-  pmesh(scarf, new THREE.BoxGeometry(0.2, 0.95, 0.07), 0xd0452a, 0.2, -0.45, 0.28, { ol: 0.014, r: [0, 0, 0.12] });
-  pmesh(scarf, new THREE.BoxGeometry(0.2, 0.05, 0.075), 0xf2b630, 0.22, -0.8, 0.28, { ol: 0.01, r: [0, 0, 0.12] });
-  pmesh(scarf, new THREE.BoxGeometry(0.18, 0.7, 0.07), 0xf2b630, -0.28, -0.3, 0.2, { ol: 0.014, r: [0, 0.3, -0.2] });
-  function arm(sx, rz, rx) {
-    var a = new THREE.Group(); a.position.set(sx * 0.4, 0.82, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
-    pmesh(a, new THREE.CylinderGeometry(0.1, 0.12, 0.6, 9), robe, 0, -0.3, 0);
-    pmesh(a, new THREE.SphereGeometry(0.095, 8, 6), skin, 0, -0.64, 0);
-    return a;
-  }
-  var aR = arm(1, o.armR == null ? 0.35 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.35 : o.armL, o.armLx || 0);
-  var h = new THREE.Group(); h.position.set(0, 1.0, 0.1); tor.add(h);
-  pmesh(h, new THREE.SphereGeometry(0.27, 16, 12), skin, 0, 0, 0, { ol: 0.024 });
-  pmesh(h, new THREE.SphereGeometry(0.08, 10, 8), 0xd9a07a, 0, -0.03, 0.27, { ol: 0.014 });
-  [-1, 1].forEach(function (sx) {
-    pmesh(h, new THREE.BoxGeometry(0.1, 0.022, 0.03), 0x3a2a1a, sx * 0.1, 0.045, 0.245, { ol: 0, r: [0, 0, -sx * 0.15] });
-    pmesh(h, new THREE.ConeGeometry(0.07, 0.24, 6), 0xffffff, sx * 0.11, 0.115, 0.23, { ol: 0.01, r: [0, 0, -sx * 1.35] });
-    pmesh(h, new THREE.ConeGeometry(0.075, 0.4, 6), skin, sx * 0.34, 0.06, -0.02, { ol: 0.014, r: [0, 0, -sx * 1.45] });
-    pmesh(h, new THREE.SphereGeometry(0.075, 8, 6), 0xf0a0a0, sx * 0.16, -0.06, 0.2, { ol: 0, s: [1, 0.7, 0.5] });
-    hornChain(h, sx, 0.15, o.horns || 1);
-  });
-  pmesh(h, new THREE.ConeGeometry(0.22, 0.95, 9), 0xf7f3ea, 0, -0.62, 0.12, { ol: 0.02, r: [Math.PI, 0, 0] });
-  pmesh(h, new THREE.SphereGeometry(0.18, 10, 8), 0xf7f3ea, 0, -0.12, 0.13, { ol: 0.016, s: [1.25, 0.8, 0.8] });
-  pmesh(h, new THREE.BoxGeometry(0.32, 0.07, 0.08), 0xffffff, 0, -0.09, 0.28, { ol: 0.01 });
-  if (o.mouth) pmesh(h, new THREE.BoxGeometry(0.09, 0.05, 0.04), 0x5a2a2a, 0, -0.17, 0.29, { ol: 0 });
-  // staff with a glowing crystal
-  var st = new THREE.Group(); st.position.set(0.62, 0, 0.1); st.rotation.z = -0.08; g.add(st);
-  pmesh(st, new THREE.CylinderGeometry(0.04, 0.055, 1.95, 8), 0x6b4a2a, 0, 0.97, 0);
-  pmesh(st, new THREE.OctahedronGeometry(0.17, 0), 0x9afcff, 0, 2.08, 0, { basic: true });
-  pmesh(st, new THREE.SphereGeometry(0.3, 12, 8), 0x9afcff, 0, 2.08, 0, { basic: true, alpha: 0.25 });
-  pmesh(st, new THREE.TorusGeometry(0.17, 0.035, 6, 12), 0x6b4a2a, 0, 1.93, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });
-  if (o.pouch) {
-    var pg = new THREE.Group(); pg.position.set(0, -0.66, 0.08); aR.add(pg);
-    pmesh(pg, new THREE.SphereGeometry(0.2, 12, 9), 0x8a5a33, 0, 0, 0, { s: [1, 1.1, 1] });
-    pmesh(pg, new THREE.CylinderGeometry(0.1, 0.14, 0.1, 10), 0x6b4423, 0, 0.2, 0);
-    coinProp(pg, 0.0, 0.3, 0.05, 0.09); coinProp(pg, 0.12, 0.34, -0.02, 0.07);
-  }
-  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
-}
 
 /* ---------- the Minotaur woman: a crowd member with bright teal lipstick, who carries a sheaf of grain ---------- */
-function buildMinotaur(o) {
-  o = o || {};
-  var g = new THREE.Group(), fur = 0x8a5a3c, furL = 0xb98a66, furD = 0x5e3b27, dress = 0xd9803a, apron = 0xf4e6c8, TEAL = 0x19e6d4;
-  [-1, 1].forEach(function (sx) {                                  // hooved legs
-    pmesh(g, new THREE.CylinderGeometry(0.14, 0.1, 0.55, 9), fur, sx * 0.17, 0.78, 0.02, { r: [-0.5, 0, 0] });
-    pmesh(g, new THREE.CylinderGeometry(0.085, 0.07, 0.55, 9), fur, sx * 0.17, 0.36, -0.1, { r: [0.5, 0, 0] });
-    pmesh(g, new THREE.BoxGeometry(0.15, 0.1, 0.2), 0x2a1a10, sx * 0.17, 0.05, 0.02, { ol: 0.014 });
-  });
-  var tor = new THREE.Group(); tor.rotation.x = 0.12; tor.position.set(0, 0.95, 0); g.add(tor);
-  pmesh(tor, new THREE.CylinderGeometry(0.3, 0.44, 0.9, 12), dress, 0, 0.45, 0);                // a swishy dress
-  pmesh(tor, new THREE.CylinderGeometry(0.45, 0.45, 0.07, 12), 0xf5b921, 0, 0.1, 0, { ol: 0.01 });
-  pmesh(tor, new THREE.BoxGeometry(0.34, 0.66, 0.06), apron, 0, 0.42, 0.33, { ol: 0.012 });       // and a farm apron
-  pmesh(tor, new THREE.BoxGeometry(0.36, 0.05, 0.065), 0xd0452a, 0, 0.72, 0.335, { ol: 0.01 });
-  function arm(sx, rz, rx) {
-    var a = new THREE.Group(); a.position.set(sx * 0.36, 0.8, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
-    pmesh(a, new THREE.CylinderGeometry(0.095, 0.115, 0.6, 9), dress, 0, -0.3, 0);
-    pmesh(a, new THREE.SphereGeometry(0.1, 8, 6), fur, 0, -0.64, 0);
-    return a;
-  }
-  var aR = arm(1, o.armR == null ? 0.35 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.35 : o.armL, o.armLx || 0);
-  var h = new THREE.Group(); h.position.set(0, 1.02, 0.08); tor.add(h);
-  pmesh(h, new THREE.SphereGeometry(0.27, 16, 12), fur, 0, 0, 0, { ol: 0.024, s: [1.02, 1.04, 1] });          // broad bull head
-  pmesh(h, new THREE.SphereGeometry(0.17, 14, 10), furL, 0, -0.1, 0.2, { ol: 0.02, s: [1.2, 0.9, 1.3] });     // the muzzle
-  [-1, 1].forEach(function (sx) {
-    pmesh(h, new THREE.SphereGeometry(0.026, 8, 6), 0x2a1a14, sx * 0.06, -0.075, 0.405, { ol: 0, s: [1, 0.7, 0.6] });      // nostrils
-    pmesh(h, new THREE.SphereGeometry(0.052, 10, 8), 0xffffff, sx * 0.12, 0.06, 0.226, { ol: 0.008, s: [1, 1.1, 0.6] });   // eyes
-    pmesh(h, new THREE.SphereGeometry(0.03, 8, 6), 0x111111, sx * 0.12 + (o.look || 0) * 0.012, 0.058, 0.256, { ol: 0, s: [0.9, 1.2, 0.6] });
-    pmesh(h, new THREE.BoxGeometry(0.1, 0.02, 0.03), 0x1a0f0a, sx * 0.13, 0.118, 0.23, { ol: 0, r: [0, 0, -sx * 0.25] });  // lashes
-    pmesh(h, new THREE.BoxGeometry(0.05, 0.016, 0.026), 0x1a0f0a, sx * 0.19, 0.138, 0.2, { ol: 0, r: [0, 0, -sx * 0.7] });
-    pmesh(h, new THREE.ConeGeometry(0.075, 0.24, 7), fur, sx * 0.31, 0.07, -0.02, { ol: 0.014, r: [0, 0, -sx * 1.45] });    // floppy ears
-    pmesh(h, new THREE.SphereGeometry(0.05, 8, 6), 0xf0a0a0, sx * 0.3, 0.06, 0.02, { ol: 0, s: [0.7, 1.2, 0.5] });
-    pmesh(h, new THREE.CylinderGeometry(0.042, 0.07, 0.3, 9), 0xf3ead2, sx * 0.2 + sx * 0.12, 0.215 + 0.08, 0, { ol: 0.014, r: [0, 0, -sx * 1.0] });   // horns: out...
-    pmesh(h, new THREE.ConeGeometry(0.042, 0.28, 9), 0xf3ead2, sx * (0.2 + 0.252 + 0.03), 0.2 + 0.162 + 0.14, 0, { ol: 0.014, r: [0, 0, -sx * 0.25] });  // ...and up
-    pmesh(h, new THREE.SphereGeometry(0.1, 8, 6), furD, sx * 0.24, -0.02, -0.04, { ol: 0, s: [0.5, 1.3, 0.7] });            // hair at the sides
-  });
-  pmesh(h, new THREE.SphereGeometry(0.28, 14, 8), furD, 0, 0.1, -0.03, { ol: 0.01, s: [1.0, 0.5, 1.0] });       // fringe
-  pmesh(h, new THREE.TorusGeometry(0.03, 0.008, 6, 12), 0xf5b921, 0, -0.1, 0.43, { ol: 0 });                 // nose ring
-  // the teal lipstick: bold, glossy, impossible to miss
-  var open = o.mouth === "open";
-  pmesh(h, new THREE.SphereGeometry(0.08, 14, 10), TEAL, 0, open ? -0.152 : -0.165, 0.392, { ol: 0.012, s: [1.55, 0.5, 0.8] });
-  pmesh(h, new THREE.SphereGeometry(0.086, 14, 10), TEAL, 0, open ? -0.225 : -0.2, 0.384, { ol: 0.012, s: [1.45, 0.55, 0.8] });
-  if (open) pmesh(h, new THREE.BoxGeometry(0.11, 0.04, 0.03), 0x3a1a2a, 0, -0.19, 0.425, { ol: 0 });
-  pmesh(h, new THREE.SphereGeometry(0.018, 6, 5), 0xffffff, -0.04, open ? -0.232 : -0.205, 0.44, { basic: true, alpha: 0.9 });   // a gloss glint
-  // a sheaf of grain: chunky stalks that fan out a little and bend the way the wind blows
-  var sh = new THREE.Group(); sh.position.set(-0.82, 0, 0.16); g.add(sh);
-  var ln = o.lean || 0.1;
-  for (var k = 0; k < 7; k++) {
-    var q = (k - 3) * 0.08 + ln * 0.8, sx0 = (k - 3) * 0.02;
-    pmesh(sh, new THREE.CylinderGeometry(0.02, 0.026, 1.25, 6), 0xd8b24a, sx0 + Math.sin(q) * 0.62, 0.62, (k % 2) * 0.03, { ol: 0.008, r: [0, 0, -q] });
-    pmesh(sh, new THREE.SphereGeometry(0.05, 8, 6), 0xf0c24a, sx0 + Math.sin(q) * 1.28, 1.3, (k % 2) * 0.03, { ol: 0.008, s: [0.75, 2.6, 0.75], r: [0, 0, -q - 0.1] });
-  }
-  pmesh(sh, new THREE.TorusGeometry(0.1, 0.034, 6, 14), 0xd0452a, Math.sin(ln * 0.8) * 0.3, 0.5, 0, { ol: 0.01, r: [Math.PI / 2, 0, 0] });
-  return { group: g, head: h, aR: aR, aL: aL, torso: tor, sheaf: sh };
-}
 
 /* ---------- sky creatures ---------- */
 // A tube that follows a curve with a radius that changes along it (body, neck, tail), optionally painted per vertex.
@@ -6639,65 +6359,8 @@ function buildGriffin() {
 }
 
 /* ---------- Bram: a stocky smith and glassblower, leather apron, soot-black cap and a bristling copper beard ---------- */
-function buildSmith(o) {
-  o = o || {};
-  var g = new THREE.Group(), skin = 0xe0a878, beard = 0xb8642e, cloth = 0x3f6e8a, apron = 0x6b4a2a, boots = 0x2a1a10, cap = 0x4a2f1a;
-  [-1, 1].forEach(function (sx) {
-    pmesh(g, new THREE.CylinderGeometry(0.15, 0.13, 0.5, 9), cloth, sx * 0.19, 0.25, 0);
-    pmesh(g, new THREE.BoxGeometry(0.2, 0.12, 0.3), boots, sx * 0.19, 0.06, 0.05, { ol: 0.014 });
-  });
-  var tor = new THREE.Group(); tor.position.set(0, 0.5, 0); g.add(tor);
-  pmesh(tor, new THREE.CylinderGeometry(0.4, 0.34, 0.8, 12), cloth, 0, 0.4, 0);
-  pmesh(tor, new THREE.BoxGeometry(0.46, 0.6, 0.06), apron, 0, 0.32, 0.36, { ol: 0.014 });
-  pmesh(tor, new THREE.CylinderGeometry(0.41, 0.41, 0.07, 12), apron, 0, 0.1, 0, { ol: 0.01 });
-  function arm(sx, rx, rz) {
-    var a = new THREE.Group(); a.position.set(sx * 0.4, 0.72, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
-    pmesh(a, new THREE.CylinderGeometry(0.12, 0.1, 0.6, 9), cloth, 0, -0.3, 0);
-    pmesh(a, new THREE.SphereGeometry(0.12, 8, 6), skin, 0, -0.66, 0);
-    return a;
-  }
-  var aR = arm(1, o.armRx, o.armR == null ? 0.35 : o.armR), aL = arm(-1, o.armLx, o.armL == null ? -0.35 : o.armL);
-  if (o.prop === "ingot") pmesh(tor, new THREE.BoxGeometry(0.46, 0.2, 0.26), 0x4b505a, 0, 0.66, 0.42, { ol: 0.014 });
-  if (o.prop === "glass") {
-    pmesh(aR, new THREE.CylinderGeometry(0.035, 0.035, 1.1, 8), 0x8a6a4a, 0, -0.9, 0.2, { ol: 0 });
-    pmesh(aR, new THREE.SphereGeometry(0.16, 10, 8), 0xcff6ff, 0, -1.5, 0.45, { basic: true, alpha: 0.7 });
-  }
-  var h = new THREE.Group(); h.position.set(0, 0.8, 0.02); tor.add(h);
-  pmesh(h, new THREE.SphereGeometry(0.27, 16, 12), skin, 0, 0, 0, { ol: 0.024 });
-  pmesh(h, new THREE.CylinderGeometry(0.3, 0.3, 0.1, 14), cap, 0, 0.22, 0, { ol: 0.014 });
-  pmesh(h, new THREE.ConeGeometry(0.26, 0.35, 12), beard, 0, -0.32, 0.08, { ol: 0.02, r: [Math.PI, 0, 0] });
-  pmesh(h, new THREE.BoxGeometry(0.2, 0.05, 0.05), beard, 0, -0.1, 0.26, { ol: 0 });
-  pmesh(h, new THREE.SphereGeometry(0.07, 8, 6), 0xf0b090, 0, -0.02, 0.27, { ol: 0.01 });
-  [-1, 1].forEach(function (sx) { pmesh(h, new THREE.SphereGeometry(0.035, 6, 5), 0x221407, sx * 0.1, 0.06, 0.25, { ol: 0, basic: true }); });
-  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
-}
 
 /* ---------- Nell: a mole miner in a yellow hard hat with a lamp, pink paws and a twitching snout ---------- */
-function buildMole(o) {
-  o = o || {};
-  var g = new THREE.Group(), fur = 0x7a5a48, furD = 0x4d3628, pink = 0xf0a0a0, helmet = 0xf5b921, lamp = 0xfff3a0;
-  [-1, 1].forEach(function (sx) {
-    pmesh(g, new THREE.CylinderGeometry(0.13, 0.11, 0.4, 9), furD, sx * 0.2, 0.2, 0.02);
-    pmesh(g, new THREE.SphereGeometry(0.15, 9, 7), pink, sx * 0.2, 0.02, 0.1, { ol: 0.014, s: [1, 0.6, 1.3] });
-  });
-  var tor = new THREE.Group(); tor.position.set(0, 0.42, 0); g.add(tor);
-  pmesh(tor, new THREE.SphereGeometry(0.42, 14, 10), fur, 0, 0.35, 0, { ol: 0.02, s: [1, 1.05, 0.9] });
-  function arm(sx, rx, rz) {
-    var a = new THREE.Group(); a.position.set(sx * 0.36, 0.5, 0.05); a.rotation.set(rx || 0, 0, rz); tor.add(a);
-    pmesh(a, new THREE.CylinderGeometry(0.1, 0.09, 0.5, 9), fur, 0, -0.25, 0);
-    pmesh(a, new THREE.SphereGeometry(0.13, 9, 7), pink, 0, -0.55, 0.04, { ol: 0.014, s: [1.2, 0.9, 1] });
-    return a;
-  }
-  var aR = arm(1, o.armRx, o.armR == null ? 0.4 : o.armR), aL = arm(-1, o.armLx, o.armL == null ? -0.4 : o.armL);
-  var h = new THREE.Group(); h.position.set(0, 0.95, 0.12); tor.add(h);
-  pmesh(h, new THREE.SphereGeometry(0.3, 16, 12), fur, 0, 0, 0, { ol: 0.024 });
-  pmesh(h, new THREE.ConeGeometry(0.11, 0.3, 10), pink, 0, -0.06, 0.3, { ol: 0.014, r: [Math.PI / 2, 0, 0] });
-  pmesh(h, new THREE.SphereGeometry(0.07, 8, 6), 0x2a1a10, 0, -0.03, 0.42, { ol: 0 });
-  [-1, 1].forEach(function (sx) { pmesh(h, new THREE.SphereGeometry(0.035, 6, 5), 0x221407, sx * 0.13, 0.08, 0.24, { ol: 0, basic: true }); });
-  pmesh(h, new THREE.SphereGeometry(0.33, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), helmet, 0, 0.1, 0, { ol: 0.02 });
-  pmesh(h, new THREE.SphereGeometry(0.08, 8, 6), lamp, 0, 0.42, 0.24, { basic: true });
-  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
-}
 
 /* Scale and centre a built object so it fills a portrait frame whatever its proportions. */
 function fitPortrait(obj, w, h, x, y, z) {
@@ -7533,6 +7196,823 @@ window.__bb = {
   grabNow: function () { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && HANDS[i].state === "grip") HANDS[i].timer = 0.01; },
   handNeed: handNeed, nearestHand: nearestHand, handCount: handCount
 };
+/* =====================================================================
+   MODEL PASS: higher-detail versions of the character and creature models.
+   Same function names, options and return values as before, so the story portraits,
+   the sky fliers and the critter animation keep working. Same look: toon shading, ink outlines.
+   ===================================================================== */
+function mpBone(par, a, b, r0, r1, col, o) {                      // a smooth limb segment between two points (r0 at a, r1 at b)
+  o = o || {};
+  var d = new THREE.Vector3().subVectors(b, a), L = d.length();
+  var m = pmesh(par, new THREE.CylinderGeometry(r1, r0, L, o.seg || 14), col, (a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2, { ol: o.ol == null ? 0.018 : o.ol, basic: o.basic });
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return m;
+}
+function mpRing(par, n, R, y, fn, a0) {                           // n copies round a circle; each lives in a group whose +z points outward
+  for (var i = 0; i < n; i++) { var grp = new THREE.Group(); grp.position.y = y; grp.rotation.y = (a0 || 0) + i / n * Math.PI * 2; par.add(grp); fn(grp, i, R); }
+}
+function mpEye(par, sx, x, y, z, o) {                              // sclera, iris, pupil and a highlight
+  o = o || {};
+  var R = o.r || 0.085, iris = o.iris == null ? 0xf2c200 : o.iris, look = (o.look || 0) * R * 0.18, slit = o.pupil === "slit";
+  pmesh(par, new THREE.SphereGeometry(R, 16, 12), o.white || 0xffffff, x, y, z, { ol: 0.012, s: [1, 1.1, 0.6] });
+  pmesh(par, new THREE.SphereGeometry(R * 0.7, 14, 10), iris, x + look, y, z + R * 0.3, { ol: 0, s: [1, 1.1, 0.5] });
+  pmesh(par, new THREE.SphereGeometry(R * 0.3, 10, 8), 0x111111, x + look, y, z + R * 0.55, { ol: 0, s: slit ? [0.4, 1.9, 0.4] : [0.95, 1.15, 0.4] });
+  pmesh(par, new THREE.SphereGeometry(R * 0.16, 8, 6), 0xffffff, x + look - sx * R * 0.1 - R * 0.12, y + R * 0.3, z + R * 0.72, { basic: true });
+}
+function mpFinger(par, x, y, z, len, rad, col, rotz, rotx) {       // a small rounded finger with a nail
+  var f = pmesh(par, new THREE.CapsuleGeometry(rad, len, 4, 8), col, x, y, z, { ol: 0.01, r: [rotx || 0, 0, rotz || 0] }); return f;
+}
+function mpHorn(par, sign, base, long, o) {                        // a ridged, curving horn built along a swept tube
+  o = o || {};
+  var n = 8, pts = [], i;
+  for (i = 0; i <= n; i++) { var t = i / n; pts.push(new THREE.Vector3(base.x + sign * (0.5 * Math.sin(t * 1.5) * long), base.y + t * long, base.z - 0.12 * t + 0.18 * Math.sin(t * 3.2) * long)); }
+  var R = function (t) { return (o.rad || 0.075) * (1 - t * 0.93) + 0.008; }, c0 = new THREE.Color(o.base || 0xb8a47c), c1 = new THREE.Color(o.tip || 0xf3ead2);
+  var geo = taperTube(pts, R, { tub: 30, rad: 10, color: function (t, nx, ny, nz, c) { c.copy(c0).lerp(c1, Math.min(1, t * 1.6)); } });
+  pmesh(par, geo, 0xffffff, 0, 0, 0, { vc: true, ol: 0.014 });
+  var cv = geo.userData.curve, P = new THREE.Vector3(), T = new THREE.Vector3(), up = new THREE.Vector3(0, 0, 1);
+  for (i = 1; i < (o.rings || 8); i++) {
+    var u = 0.08 + i * (0.8 / (o.rings || 8)); cv.getPointAt(u, P); cv.getTangentAt(u, T);
+    var ring = pmesh(par, new THREE.TorusGeometry(R(u) * 1.02, 0.011, 6, 12), o.ring || 0xcdbb92, P.x, P.y, P.z, { ol: 0 });
+    ring.quaternion.setFromUnitVectors(up, T.clone().normalize());
+  }
+  return geo;
+}
+
+/* ---------- Edgar: a gnoll (hyena head) in a builder's cap, tool belt and work boots ---------- */
+function buildGnoll(o) {
+  o = o || {};
+  var g = new THREE.Group(), fur = 0xd2a55f, furL = 0xeed39a, furD = 0x9a6b3a, dk = 0x5b3a22, spot = 0x7d5128, tun = 0x2f8f9a, tunL = 0x4fb3bd, tunD = 0x25707a,
+      leather = 0x6b4423, brass = 0xf5b921, steel = 0x9aa3b0, muzzleC = 0xe6bd7e;
+  var S = function (par, r, col, x, y, z, op) { return pmesh(par, new THREE.SphereGeometry(r, 14, 10), col, x, y, z, op); };
+  // legs and boots
+  [-1, 1].forEach(function (sx) {
+    S(g, 0.17, fur, sx * 0.2, 0.68, 0, { s: [1, 1.25, 1.05] });
+    pmesh(g, new THREE.CylinderGeometry(0.14, 0.115, 0.5, 16), fur, sx * 0.2, 0.43, 0);
+    pmesh(g, new THREE.CylinderGeometry(0.12, 0.105, 0.26, 16), furD, sx * 0.2, 0.25, 0, { ol: 0.02 });
+    S(g, 0.03, spot, sx * 0.2, 0.72, 0.15, { ol: 0, s: [1.2, 1, 0.5] }); S(g, 0.025, spot, sx * 0.14, 0.62, 0.14, { ol: 0, s: [1.2, 1, 0.5] }); S(g, 0.028, spot, sx * 0.25, 0.56, 0.12, { ol: 0, s: [1.2, 1, 0.5] });
+    pmesh(g, new THREE.CylinderGeometry(0.15, 0.158, 0.2, 16), leather, sx * 0.2, 0.15, 0, { ol: 0.016 });
+    S(g, 0.155, leather, sx * 0.2, 0.09, 0.1, { ol: 0.016, s: [1, 0.72, 1.5] });
+    pmesh(g, roundedBox(0.32, 0.05, 0.52, 0.02, 2), 0x2a1a10, sx * 0.2, 0.025, 0.08, { ol: 0.014 });
+    pmesh(g, new THREE.TorusGeometry(0.152, 0.028, 6, 18), 0x4a2f1a, sx * 0.2, 0.255, 0, { r: [Math.PI / 2, 0, 0], ol: 0.008 });
+    pmesh(g, new THREE.BoxGeometry(0.055, 0.055, 0.03), brass, sx * 0.2, 0.255, 0.158, { ol: 0.008 });
+    for (var l = 0; l < 3; l++) pmesh(g, new THREE.BoxGeometry(0.11, 0.016, 0.016), 0xf2e6c8, sx * 0.2, 0.1 + l * 0.04, 0.155 + (l === 0 ? 0.075 : l === 1 ? 0.03 : 0), { ol: 0 });
+  });
+  // tunic with trim, placket and buttons
+  pmesh(g, new THREE.LatheGeometry([V2(0.001, -0.43), V2(0.47, -0.43), V2(0.49, -0.38), V2(0.44, -0.1), V2(0.4, 0.15), V2(0.37, 0.35), V2(0.3, 0.43), V2(0.001, 0.44)], 28), tun, 0, 1.1, 0);
+  pmesh(g, new THREE.TorusGeometry(0.485, 0.03, 8, 28), tunL, 0, 0.7, 0, { r: [Math.PI / 2, 0, 0], ol: 0.008 });
+  pmesh(g, new THREE.BoxGeometry(0.07, 0.62, 0.02), tunD, 0, 1.2, 0.4, { ol: 0, r: [-0.1, 0, 0] });
+  [0, 1, 2].forEach(function (b) { S(g, 0.022, brass, 0, 1.4 - b * 0.15, 0.4 + b * 0.012, { ol: 0.006 }); });
+  pmesh(g, new THREE.TorusGeometry(0.235, 0.065, 10, 24), tunD, 0, 1.53, 0, { r: [Math.PI / 2, 0, 0], ol: 0.012 });
+  mpRing(g, 16, 0.25, 1.55, function (grp, i, R) { pmesh(grp, new THREE.ConeGeometry(0.052, 0.2, 5), i % 2 ? furL : 0xf6e2b0, 0, 0.04, R, { ol: 0.008, r: [0.85, 0, 0] }); });
+  // belt, buckle, hammer, pouch, plumb bob
+  pmesh(g, new THREE.CylinderGeometry(0.475, 0.475, 0.1, 24), 0x4a2f1a, 0, 0.78, 0, { ol: 0.012 });
+  pmesh(g, roundedBox(0.17, 0.13, 0.03, 0.01, 2), brass, 0, 0.78, 0.47, { ol: 0.01 });
+  pmesh(g, new THREE.BoxGeometry(0.09, 0.07, 0.035), 0x4a2f1a, 0, 0.78, 0.485, { ol: 0 });
+  var pouch = new THREE.Group(); pouch.position.set(-0.3, 0.62, 0.38); pouch.rotation.y = 0.5; g.add(pouch);
+  pmesh(pouch, roundedBox(0.2, 0.26, 0.08, 0.025, 2), leather, 0, 0, 0, { ol: 0.01 }); pmesh(pouch, roundedBox(0.2, 0.1, 0.09, 0.03, 2), 0x4a2f1a, 0, 0.09, 0.005, { ol: 0.008 }); S(pouch, 0.022, brass, 0, 0.07, 0.06, { ol: 0 });
+  var ham = new THREE.Group(); ham.position.set(0.4, 0.58, 0.2); ham.rotation.set(0.1, -0.5, 0.12); g.add(ham);
+  pmesh(ham, new THREE.CylinderGeometry(0.022, 0.026, 0.36, 8), 0xa8743a, 0, -0.1, 0, { ol: 0.008 });
+  pmesh(ham, roundedBox(0.16, 0.075, 0.075, 0.02, 2), steel, 0, 0.1, 0, { ol: 0.01 });
+  pmesh(g, new THREE.CylinderGeometry(0.004, 0.004, 0.16, 4), 0xf2e6c8, -0.08, 0.66, 0.46, { ol: 0, basic: true });
+  pmesh(g, new THREE.ConeGeometry(0.035, 0.1, 8), brass, -0.08, 0.52, 0.46, { ol: 0.006, r: [Math.PI, 0, 0] });
+  // bushy tail with a dark tip
+  var c0 = new THREE.Color(fur), c1 = new THREE.Color(0x4a2f1a);
+  pmesh(g, taperTube([V3(0, 0.78, -0.38), V3(0, 0.66, -0.66), V3(0, 0.42, -0.86), V3(0, 0.2, -0.9)], function (t) { return 0.07 + Math.sin(Math.min(1, t * 1.15) * Math.PI * 0.8) * 0.09; },
+    { tub: 20, rad: 10, color: function (t, nx, ny, nz, c) { c.copy(c0).lerp(c1, Math.max(0, (t - 0.72) / 0.22)); } }), 0xffffff, 0, 0, 0, { vc: true, ol: 0.014 });
+  // arms: rolled sleeve, furry forearm, wrap, paw with claws
+  function arm(sx, rz, rx) {
+    var a = new THREE.Group(); a.position.set(sx * 0.45, 1.46, 0); a.rotation.set(rx || 0, 0, rz); g.add(a);
+    pmesh(a, new THREE.CylinderGeometry(0.118, 0.125, 0.22, 16), tun, 0, -0.1, 0, { ol: 0.014 });
+    pmesh(a, new THREE.TorusGeometry(0.122, 0.03, 8, 16), tunL, 0, -0.22, 0, { r: [Math.PI / 2, 0, 0], ol: 0.008 });
+    pmesh(a, new THREE.CylinderGeometry(0.105, 0.088, 0.46, 14), fur, 0, -0.44, 0);
+    for (var w = 0; w < 3; w++) pmesh(a, new THREE.TorusGeometry(0.093 - w * 0.004, 0.015, 6, 14), 0xe9dcc0, 0, -0.5 - w * 0.05, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });
+    S(a, 0.03, spot, 0.06, -0.3, 0.08, { ol: 0, s: [1.2, 1, 0.5] });
+    S(a, 0.125, furL, 0, -0.69, 0.005, { s: [1, 1.05, 1.05] });
+    for (var fg = -1; fg <= 1; fg++) { S(a, 0.042, furL, fg * 0.06, -0.79, 0.045, { ol: 0.008, s: [1, 1.35, 1] }); pmesh(a, new THREE.ConeGeometry(0.014, 0.05, 5), 0x2a1a10, fg * 0.06, -0.865, 0.05, { ol: 0, r: [Math.PI, 0, 0] }); }
+    S(a, 0.045, furL, sx * -0.1, -0.7, 0.06, { ol: 0.008, s: [1, 1.3, 1] });
+    return a;
+  }
+  var aR = arm(1, o.armR == null ? 0.25 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.25 : o.armL, o.armLx || 0);
+  // head
+  var h = new THREE.Group(); h.position.set(0, 1.88, 0.02); h.rotation.z = o.tilt || 0; h.rotation.y = o.turn || 0; g.add(h);
+  S(h, 0.34, fur, 0, 0, 0, { ol: 0.026, s: [1.04, 1, 1] });
+  pmesh(h, new THREE.CylinderGeometry(0.115, 0.17, 0.46, 18), muzzleC, 0, -0.07, 0.4, { r: [Math.PI / 2, 0, 0], s: [1.05, 1, 0.92] });
+  pmesh(h, new THREE.BoxGeometry(0.12, 0.05, 0.4), dk, 0, 0.065, 0.4, { ol: 0, r: [0.04, 0, 0] });
+  S(h, 0.092, 0x1a1008, 0, 0.025, 0.655, { ol: 0.012, s: [1.25, 0.85, 0.95] }); S(h, 0.02, 0xffffff, -0.025, 0.05, 0.725, { basic: true, s: [1.4, 0.8, 0.6] });
+  [-1, 1].forEach(function (sx) { S(h, 0.018, 0x000000, sx * 0.04, 0.0, 0.735, { ol: 0, s: [0.7, 1.2, 0.5] }); });
+  var mouth = o.mouth || "smile", jawRot = mouth === "open" ? 0.42 : mouth === "grin" ? 0.2 : mouth === "flat" ? 0.02 : 0.05;
+  var jaw = new THREE.Group(); jaw.position.set(0, -0.19, 0.25); jaw.rotation.x = jawRot; h.add(jaw);
+  pmesh(h, new THREE.BoxGeometry(0.25, 0.05, 0.42), 0x3a0f10, 0, -0.185, 0.4, { ol: 0 });
+  pmesh(jaw, roundedBox(0.2, 0.07, 0.4, 0.03, 2), 0xf3dca8, 0, -0.04, 0.12, { ol: 0.012 });
+  if (mouth === "grin" || mouth === "open") {
+    S(jaw, 0.07, 0xe87a8a, 0, 0.0, 0.17, { ol: 0, s: [1.15, 0.5, 1.7] });
+    [-0.075, 0.075].forEach(function (tx) {
+      pmesh(h, new THREE.ConeGeometry(0.03, 0.095, 6), 0xffffff, tx, -0.17, 0.57, { ol: 0, r: [Math.PI, 0, 0] });
+      pmesh(jaw, new THREE.ConeGeometry(0.026, 0.08, 6), 0xffffff, tx * 0.9, 0.0, 0.3, { ol: 0 });
+    });
+    [-0.03, 0.03].forEach(function (tx) { pmesh(h, new THREE.BoxGeometry(0.03, 0.04, 0.02), 0xfff4dc, tx, -0.17, 0.605, { ol: 0 }); });
+  } else {
+    pmesh(h, new THREE.ConeGeometry(0.026, 0.07, 6), 0xffffff, 0.085, -0.205, 0.56, { ol: 0, r: [Math.PI, 0, 0] });
+  }
+  [-1, 1].forEach(function (sx) {
+    S(h, 0.075, dk, sx * 0.165, 0.095, 0.245, { ol: 0, s: [1.35, 1.5, 0.45] });                       // dark eye mask
+    mpEye(h, sx, sx * 0.165, 0.09, 0.265, { r: 0.082, iris: 0xf2c200, look: o.look || 0 });
+    var br = o.brow == null ? 0.1 : o.brow;
+    pmesh(h, roundedBox(0.17, 0.045, 0.06, 0.02, 2), dk, sx * 0.165, 0.2 + (o.browUp || 0), 0.285, { ol: 0, r: [0, 0, sx * br] });
+    S(h, 0.17, fur, sx * 0.3, 0.37, -0.02, { ol: 0.022, s: [0.62, 1.2, 0.55], r: [0, 0, -sx * 0.3] });                 // round hyena ears
+    S(h, 0.1, 0xe58a8a, sx * 0.31, 0.36, 0.0, { ol: 0, s: [0.5, 1, 0.4], r: [0, 0, -sx * 0.3] });
+    S(h, 0.17, dk, sx * 0.325, 0.4, -0.04, { ol: 0, s: [0.3, 1.15, 0.45], r: [0, 0, -sx * 0.3] });
+    for (var k = 0; k < 3; k++) pmesh(h, new THREE.ConeGeometry(0.05, 0.17 - k * 0.02, 5), furL, sx * (0.3 + k * 0.01), -0.08 - k * 0.07, 0.05 - k * 0.03, { ol: 0.008, r: [0.3, 0, sx * (1.6 + k * 0.1)] });   // cheek ruff
+    S(h, 0.03, spot, sx * 0.24, -0.02, 0.22, { ol: 0, s: [1, 1, 0.5] }); S(h, 0.024, spot, sx * 0.2, 0.0, 0.26, { ol: 0, s: [1, 1, 0.5] });
+    for (var w = 0; w < 3; w++) S(h, 0.013, dk, sx * (0.07 + w * 0.025), -0.03 - (w % 2) * 0.03, 0.56, { ol: 0, basic: true });
+  });
+  for (var m = 0; m < 9; m++) for (var q = -1; q <= 1; q++)
+    pmesh(h, new THREE.ConeGeometry(0.052 - m * 0.003, (0.27 - m * 0.012) * (q ? 0.78 : 1), 6), m % 2 ? dk : 0x3a2414, q * 0.045, 0.3 - m * 0.12, -0.26 - m * 0.018, { ol: 0.01, r: [-2.3 + m * 0.07, 0, q * 0.22] });
+  if (!o.nocap) {
+    pmesh(h, new THREE.CylinderGeometry(0.225, 0.255, 0.13, 22), 0xc2502c, 0, 0.3, 0, { ol: 0.018 });
+    pmesh(h, new THREE.SphereGeometry(0.205, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), 0xd0603a, 0, 0.33, 0, { ol: 0.018 });
+    for (var sm = 0; sm < 6; sm++) { var sg = new THREE.Group(); sg.position.set(0, 0.33, 0); sg.rotation.y = sm / 6 * Math.PI * 2; h.add(sg); pmesh(sg, new THREE.TorusGeometry(0.206, 0.007, 4, 14, Math.PI / 2), 0x8f2f1a, 0, 0, 0, { ol: 0, r: [0, Math.PI / 2, Math.PI / 2] }); }
+    S(h, 0.03, 0x8f2f1a, 0, 0.535, 0, { ol: 0.01 });
+    pmesh(h, new THREE.TorusGeometry(0.255, 0.014, 6, 24), 0x8f2f1a, 0, 0.27, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });
+    pmesh(h, roundedBox(0.34, 0.035, 0.23, 0.016, 2), 0x8f2f1a, 0, 0.27, 0.27, { ol: 0.014, r: [0.12, 0, 0] });
+    pmesh(h, roundedBox(0.12, 0.09, 0.02, 0.01, 2), brass, 0, 0.35, 0.235, { ol: 0.008 }); pmesh(h, new THREE.BoxGeometry(0.06, 0.035, 0.012), 0xc2502c, 0, 0.35, 0.248, { ol: 0 });
+    pmesh(h, new THREE.CylinderGeometry(0.012, 0.012, 0.22, 6), 0xf2c200, 0.2, 0.2, -0.04, { ol: 0.006, r: [0.3, 0, -0.6] });             // pencil behind the ear
+    pmesh(h, new THREE.ConeGeometry(0.014, 0.04, 6), 0x2a1a10, 0.285, 0.1, 0.02, { ol: 0, r: [0.3, 0, 2.5] });
+  }
+  return { group: g, head: h, aR: aR, aL: aL };
+}
+
+/* ---------- The Elder: a little old satyr with goat legs, ridged horns, a huge scarf and a glowing staff ---------- */
+function buildSatyr(o) {
+  o = o || {};
+  var g = new THREE.Group(), fur = 0xa88660, furD = 0x6d5238, furL = 0xcdb48c, skin = 0xe3b88e, robe = 0x6f4d8f, robeD = 0x593d75, trim = 0xe0b040, hoof = 0x2a1a10, white = 0xf7f3ea;
+  var S = function (par, r, col, x, y, z, op) { return pmesh(par, new THREE.SphereGeometry(r, 14, 10), col, x, y, z, op); };
+  // goat legs: thigh, knee, hock bending back, long cannon, cloven hooves
+  [-1, 1].forEach(function (sx) {
+    S(g, 0.18, fur, sx * 0.17, 0.86, 0, { s: [1, 1.3, 1.1] });
+    mpBone(g, V3(sx * 0.17, 0.82, 0), V3(sx * 0.17, 0.6, 0.12), 0.15, 0.1, fur); S(g, 0.1, fur, sx * 0.17, 0.6, 0.12, { ol: 0.016 });
+    mpBone(g, V3(sx * 0.17, 0.6, 0.12), V3(sx * 0.17, 0.3, -0.1), 0.1, 0.07, fur);
+    S(g, 0.075, furD, sx * 0.17, 0.3, -0.11, { ol: 0.014 });
+    mpBone(g, V3(sx * 0.17, 0.3, -0.1), V3(sx * 0.17, 0.09, 0.05), 0.062, 0.05, furD);
+    for (var k = 0; k < 4; k++) pmesh(g, new THREE.ConeGeometry(0.04, 0.16, 5), furL, sx * 0.17 + (k - 1.5) * 0.03, 0.32 - k * 0.012, -0.17 - (k % 2) * 0.02, { ol: 0.008, r: [-0.6, 0, 0] });
+    [-1, 1].forEach(function (hx) { pmesh(g, roundedBox(0.075, 0.1, 0.17, 0.028, 2), hoof, sx * 0.17 + hx * 0.042, 0.05, 0.08, { ol: 0.014 }); });
+  });
+  pmesh(g, taperTube([V3(0, 0.95, -0.28), V3(0, 0.88, -0.4), V3(0, 0.78, -0.44)], function (t) { return 0.06 - t * 0.03; }, { tub: 8, rad: 7 }), fur, 0, 0, 0, { ol: 0.012 });  // little goat tail
+  var tor = new THREE.Group(); tor.rotation.x = 0.2; tor.position.set(0, 0.95, 0); g.add(tor);
+  pmesh(tor, new THREE.LatheGeometry([V2(0.001, -0.38), V2(0.5, -0.38), V2(0.53, -0.33), V2(0.47, -0.05), V2(0.42, 0.3), V2(0.37, 0.62), V2(0.33, 0.82), V2(0.3, 0.92), V2(0.001, 0.95)], 28), robe, 0, 0, 0);
+  pmesh(tor, new THREE.TorusGeometry(0.515, 0.035, 8, 28), trim, 0, -0.33, 0, { r: [Math.PI / 2, 0, 0], ol: 0.01 });
+  pmesh(tor, new THREE.BoxGeometry(0.1, 0.8, 0.02), robeD, 0, 0.45, 0.39, { ol: 0, r: [-0.14, 0, 0] });
+  [0.2, 0.42, 0.64].forEach(function (y, i) { pmesh(tor, new THREE.OctahedronGeometry(0.035, 0), trim, 0, y, 0.42 - i * 0.045, { basic: true, s: [1, 1.4, 0.5] }); });
+  pmesh(tor, new THREE.TorusGeometry(0.385, 0.03, 8, 24), 0xb88a3a, 0, 0.55, 0, { r: [Math.PI / 2, 0, 0], ol: 0.008 });      // rope belt, knot, tassels
+  S(tor, 0.045, 0xb88a3a, 0.15, 0.55, 0.36, { ol: 0.008 });
+  [0, 1].forEach(function (t) { mpBone(tor, V3(0.15 + t * 0.03, 0.52, 0.36), V3(0.15 + t * 0.06, 0.32, 0.36 + t * 0.02), 0.012, 0.012, 0xb88a3a, { ol: 0, seg: 6 }); S(tor, 0.03, 0xe0b040, 0.15 + t * 0.06, 0.3, 0.36 + t * 0.02, { ol: 0.006, s: [1, 1.3, 1] }); });
+  var scarf = new THREE.Group(); scarf.position.set(0, 0.9, 0.02); tor.add(scarf);
+  var sc = [0xd0452a, 0xf2b630, 0xd0452a, 0xf2b630];
+  for (var k = 0; k < 4; k++) pmesh(scarf, new THREE.TorusGeometry(0.29 + (k % 2) * 0.025, 0.085, 10, 24), sc[k], 0, 0.04 - k * 0.07, 0, { r: [Math.PI / 2, 0, 0], ol: 0.012 });
+  pmesh(scarf, roundedBox(0.2, 0.95, 0.07, 0.025, 2), 0xd0452a, 0.2, -0.45, 0.28, { ol: 0.014, r: [0, 0, 0.12] });
+  pmesh(scarf, new THREE.BoxGeometry(0.2, 0.05, 0.075), 0xf2b630, 0.22, -0.8, 0.285, { ol: 0.01, r: [0, 0, 0.12] });
+  for (var fr = 0; fr < 5; fr++) pmesh(scarf, new THREE.CylinderGeometry(0.012, 0.012, 0.12, 5), 0xd0452a, 0.15 + fr * 0.045 + 0.02, -0.9, 0.285, { ol: 0, r: [0, 0, 0.12] });
+  function arm(sx, rz, rx) {
+    var a = new THREE.Group(); a.position.set(sx * 0.4, 0.82, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
+    pmesh(a, new THREE.CylinderGeometry(0.1, 0.14, 0.58, 16), robe, 0, -0.3, 0);
+    pmesh(a, new THREE.TorusGeometry(0.14, 0.032, 8, 18), trim, 0, -0.58, 0, { r: [Math.PI / 2, 0, 0], ol: 0.008 });
+    S(a, 0.095, skin, 0, -0.67, 0, { s: [1, 1.1, 1] });
+    for (var f = -1; f <= 1; f++) mpFinger(a, f * 0.04, -0.75, 0.03, 0.04, 0.026, skin, 0, 0);
+    mpFinger(a, sx * -0.08, -0.68, 0.04, 0.035, 0.028, skin, sx * 0.9, 0);
+    return a;
+  }
+  var aR = arm(1, o.armR == null ? 0.35 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.35 : o.armL, o.armLx || 0);
+  // head: wrinkly kind face, big nose, bushy brows, long moustache and beard, pointed goat ears
+  var h = new THREE.Group(); h.position.set(0, 1.2, 0.1); tor.add(h);
+  S(h, 0.27, skin, 0, 0, 0, { ol: 0.024, s: [1, 1.05, 1] });
+  S(h, 0.085, 0xd9a07a, 0, -0.03, 0.27, { ol: 0.014, s: [1, 0.95, 1.05] }); S(h, 0.05, 0xe0a888, 0, -0.045, 0.325, { ol: 0, s: [1.1, 0.8, 0.8] });
+  [-1, 1].forEach(function (sx) {
+    mpEye(h, sx, sx * 0.1, 0.045, 0.22, { r: 0.048, iris: 0x6a4a2a, look: o.look || 0 });
+    S(h, 0.055, skin, sx * 0.1, 0.075, 0.23, { ol: 0, s: [1.15, 0.55, 0.7] });                                  // heavy, kind eyelids
+    for (var b = 0; b < 3; b++) pmesh(h, new THREE.ConeGeometry(0.03, 0.12, 5), white, sx * (0.06 + b * 0.055), 0.11 + b * 0.012, 0.25, { ol: 0.008, r: [0, 0, -sx * (1.2 + b * 0.18)] });
+    pmesh(h, new THREE.ConeGeometry(0.07, 0.4, 8), skin, sx * 0.34, 0.06, -0.02, { ol: 0.014, r: [0, 0, -sx * 1.45] });
+    pmesh(h, new THREE.ConeGeometry(0.04, 0.26, 6), 0xf0a0a0, sx * 0.33, 0.06, 0.0, { ol: 0, r: [0, 0, -sx * 1.45] });
+    for (var t = 0; t < 3; t++) pmesh(h, new THREE.ConeGeometry(0.018, 0.1, 4), white, sx * (0.5 + t * 0.012), 0.03 + t * 0.03, -0.02, { ol: 0, r: [0, 0, -sx * (1.55 - t * 0.2)] });
+    S(h, 0.06, 0xf0a0a0, sx * 0.16, -0.07, 0.2, { ol: 0, s: [1, 0.7, 0.5] });
+    pmesh(h, taperTube([V3(sx * 0.02, -0.1, 0.28), V3(sx * 0.12, -0.15, 0.28), V3(sx * 0.22, -0.12, 0.23), V3(sx * 0.27, -0.04, 0.17)], function (t) { return 0.05 - t * 0.03; }, { tub: 12, rad: 7 }), white, 0, 0, 0, { ol: 0.01 });
+    mpHorn(h, sx, V3(sx * 0.13, 0.15, 0), o.horns || 1);
+    S(h, 0.09, white, sx * 0.25, 0.04, -0.08, { ol: 0.01, s: [0.6, 1.1, 0.8] });                               // wispy side hair
+  });
+  pmesh(h, taperTube([V3(0, -0.15, 0.22), V3(0, -0.4, 0.27), V3(0, -0.7, 0.28), V3(0, -0.88, 0.25)], function (t) { return 0.21 * (1 - t) * (1 - 0.3 * t) + 0.02; }, { tub: 16, rad: 12, squash: 0.7 }), white, 0, 0, 0, { ol: 0.018 });
+  S(h, 0.17, white, 0, -0.12, 0.16, { ol: 0.012, s: [1.25, 0.75, 0.75] });
+  if (o.mouth) pmesh(h, new THREE.BoxGeometry(0.1, 0.05, 0.03), 0x5a2a2a, 0, -0.17, 0.3, { ol: 0 });
+  S(h, 0.14, white, 0, 0.2, -0.1, { ol: 0.01, s: [1.4, 0.4, 0.9] });
+  // staff with a crystal held in a cradle of prongs
+  var st = new THREE.Group(); st.position.set(0.62, 0, 0.1); st.rotation.z = -0.08; g.add(st);
+  pmesh(st, new THREE.CylinderGeometry(0.04, 0.056, 1.95, 12), 0x6b4a2a, 0, 0.97, 0);
+  [0.3, 0.8, 1.4].forEach(function (y) { pmesh(st, new THREE.TorusGeometry(0.052, 0.014, 6, 12), trim, 0, y, 0, { r: [Math.PI / 2, 0, 0], ol: 0 }); });
+  for (var p = 0; p < 4; p++) { var a0 = p / 4 * Math.PI * 2, rr = 0.1, cx = Math.cos(a0), cz = Math.sin(a0);
+    pmesh(st, taperTube([V3(cx * 0.03, 1.9, cz * 0.03), V3(cx * rr, 2.0, cz * rr), V3(cx * rr * 1.1, 2.12, cz * rr * 1.1), V3(cx * 0.05, 2.26, cz * 0.05)], function (t) { return 0.03 - t * 0.018; }, { tub: 10, rad: 6 }), 0x6b4a2a, 0, 0, 0, { ol: 0.008 }); }
+  pmesh(st, new THREE.OctahedronGeometry(0.17, 0), 0x9afcff, 0, 2.08, 0, { basic: true, s: [0.8, 1.3, 0.8] });
+  pmesh(st, new THREE.SphereGeometry(0.3, 14, 10), 0x9afcff, 0, 2.08, 0, { basic: true, alpha: 0.25 });
+  if (o.pouch) {
+    var pg = new THREE.Group(); pg.position.set(0, -0.72, 0.08); aR.add(pg);
+    pmesh(pg, new THREE.SphereGeometry(0.2, 14, 10), 0x8a5a33, 0, 0, 0, { s: [1, 1.1, 1] });
+    pmesh(pg, new THREE.CylinderGeometry(0.1, 0.14, 0.1, 12), 0x6b4423, 0, 0.2, 0);
+    pmesh(pg, new THREE.TorusGeometry(0.11, 0.02, 6, 14), trim, 0, 0.24, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });
+    coinProp(pg, 0.0, 0.3, 0.05, 0.09); coinProp(pg, 0.12, 0.34, -0.02, 0.07);
+  }
+  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
+}
+
+/* ---------- the Minotaur woman: bull head, ridged horns, teal lipstick, polka-dot dress, farm apron and a sheaf of grain ---------- */
+function buildMinotaur(o) {
+  o = o || {};
+  var g = new THREE.Group(), fur = 0x8a5a3c, furL = 0xb98a66, furD = 0x5e3b27, dress = 0xd9803a, dressD = 0xb8602a, apron = 0xf4e6c8, TEAL = 0x19e6d4, hoof = 0x2a1a10, gold = 0xf5b921;
+  var S = function (par, r, col, x, y, z, op) { return pmesh(par, new THREE.SphereGeometry(r, 14, 10), col, x, y, z, op); };
+  [-1, 1].forEach(function (sx) {                                   // hooved legs: thigh, knee, back-bent shin, cloven hoof, fetlock tuft
+    S(g, 0.16, fur, sx * 0.17, 0.82, 0, { s: [1, 1.3, 1.1] });
+    mpBone(g, V3(sx * 0.17, 0.8, 0), V3(sx * 0.17, 0.58, 0.1), 0.14, 0.095, fur); S(g, 0.095, fur, sx * 0.17, 0.58, 0.1, { ol: 0.014 });
+    mpBone(g, V3(sx * 0.17, 0.58, 0.1), V3(sx * 0.17, 0.27, -0.06), 0.095, 0.07, fur); S(g, 0.07, furD, sx * 0.17, 0.27, -0.07, { ol: 0.012 });
+    mpBone(g, V3(sx * 0.17, 0.27, -0.06), V3(sx * 0.17, 0.09, 0.05), 0.065, 0.055, furD);
+    for (var k = 0; k < 3; k++) pmesh(g, new THREE.ConeGeometry(0.035, 0.13, 5), furD, sx * 0.17 + (k - 1) * 0.04, 0.1, 0.0 - 0.02 * (k % 2), { ol: 0.006, r: [0.5, 0, 0] });
+    [-1, 1].forEach(function (hx) { pmesh(g, roundedBox(0.07, 0.1, 0.17, 0.026, 2), hoof, sx * 0.17 + hx * 0.04, 0.05, 0.08, { ol: 0.014 }); });
+  });
+  pmesh(g, taperTube([V3(0, 0.98, -0.34), V3(0, 0.82, -0.52), V3(0, 0.55, -0.56), V3(0, 0.38, -0.5)], function (t) { return 0.045 - t * 0.015; }, { tub: 14, rad: 7 }), fur, 0, 0, 0, { ol: 0.012 });
+  [0, 1, 2].forEach(function (k) { S(g, 0.07 - k * 0.012, furD, (k - 1) * 0.025, 0.33 - k * 0.05, -0.5 - k * 0.012, { ol: 0.008, s: [0.8, 1.5, 0.8] }); });
+  var tor = new THREE.Group(); tor.rotation.x = 0.12; tor.position.set(0, 0.95, 0); g.add(tor);
+  pmesh(tor, new THREE.LatheGeometry([V2(0.001, 0), V2(0.45, 0), V2(0.46, 0.05), V2(0.42, 0.3), V2(0.37, 0.6), V2(0.32, 0.8), V2(0.3, 0.9), V2(0.001, 0.92)], 28), dress, 0, 0, 0);
+  mpRing(tor, 22, 0.455, 0.045, function (grp, i, R) { S(grp, 0.05, i % 2 ? gold : 0xffd966, 0, 0, R, { ol: 0.008 }); });
+  [[0.22, 0.4, 0.2], [0.35, 0.37, 0.8], [0.5, 0.34, 0.5], [0.66, 0.32, 0.1], [0.28, 0.4, 1.4], [0.55, 0.34, 1.1], [0.42, 0.36, 2.0], [0.2, 0.42, 2.6], [0.6, 0.33, 2.3]].forEach(function (d) {
+    [-1, 1].forEach(function (s2) { var a = d[2] * s2 + (s2 > 0 ? 0 : 0); var p = new THREE.Group(); p.rotation.y = a; tor.add(p); S(p, 0.026, 0xfff1d0, 0, d[0], d[1] + 0.0, { ol: 0, s: [1, 1, 0.4] }); });
+  });
+  pmesh(tor, roundedBox(0.34, 0.62, 0.05, 0.02, 2), apron, 0, 0.45, 0.4, { ol: 0.012, r: [-0.15, 0, 0] });                // farm apron
+  pmesh(tor, roundedBox(0.2, 0.2, 0.05, 0.02, 2), apron, 0, 0.8, 0.325, { ol: 0.01, r: [-0.15, 0, 0] });                  // bib
+  pmesh(tor, new THREE.BoxGeometry(0.38, 0.05, 0.065), 0xd0452a, 0, 0.72, 0.34, { ol: 0.01, r: [-0.15, 0, 0] });
+  pmesh(tor, roundedBox(0.16, 0.14, 0.04, 0.015, 2), 0xe9d6ae, 0, 0.3, 0.46, { ol: 0.01, r: [-0.15, 0, 0] });              // pocket with a stitched flower
+  [0, 1, 2, 3, 4].forEach(function (p) { var a = p / 5 * Math.PI * 2; S(tor, 0.02, p % 2 ? 0xff7a9a : 0xff9ab8, Math.cos(a) * 0.032, 0.52 + Math.sin(a) * 0.032, 0.435, { ol: 0, s: [1, 1, 0.5] }); });
+  S(tor, 0.018, 0xf5b921, 0, 0.52, 0.44, { ol: 0, s: [1, 1, 0.5] });
+  [-1, 1].forEach(function (sx) { mpBone(tor, V3(sx * 0.07, 0.9, 0.3), V3(sx * 0.17, 0.97, 0.12), 0.018, 0.018, 0xd0452a, { ol: 0.004, seg: 6 }); });
+  function arm(sx, rz, rx) {
+    var a = new THREE.Group(); a.position.set(sx * 0.36, 0.8, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
+    S(a, 0.13, dress, 0, -0.02, 0, { s: [1, 0.9, 1] });
+    pmesh(a, new THREE.CylinderGeometry(0.1, 0.12, 0.5, 14), dress, 0, -0.28, 0);
+    pmesh(a, new THREE.TorusGeometry(0.115, 0.03, 8, 16), 0xfff1d0, 0, -0.54, 0, { r: [Math.PI / 2, 0, 0], ol: 0.008 });
+    mpBone(a, V3(0, -0.54, 0), V3(0, -0.62, 0), 0.085, 0.08, fur);
+    S(a, 0.105, fur, 0, -0.69, 0, { s: [1, 1.05, 1] });
+    for (var f = -1; f <= 1; f++) mpFinger(a, f * 0.045, -0.77, 0.03, 0.035, 0.03, fur, 0, 0);
+    mpFinger(a, sx * -0.09, -0.7, 0.04, 0.03, 0.03, fur, sx * 0.9, 0);
+    return a;
+  }
+  var aR = arm(1, o.armR == null ? 0.35 : o.armR, o.armRx || 0), aL = arm(-1, o.armL == null ? -0.35 : o.armL, o.armLx || 0);
+  var h = new THREE.Group(); h.position.set(0, 1.05, 0.08); tor.add(h);
+  S(h, 0.27, fur, 0, 0, 0, { ol: 0.024, s: [1.04, 1.06, 1] });
+  S(h, 0.185, furL, 0, -0.1, 0.2, { ol: 0.02, s: [1.15, 0.92, 1.3] });
+  S(h, 0.1, 0xe8a8a0, 0, -0.085, 0.37, { ol: 0.014, s: [1.5, 0.95, 0.85] });                                                     // broad wet nose pad
+  [-1, 1].forEach(function (sx) {
+    S(h, 0.028, 0x4a2a24, sx * 0.065, -0.08, 0.435, { ol: 0, s: [1, 0.7, 0.6] });
+    mpEye(h, sx, sx * 0.125, 0.07, 0.225, { r: 0.056, iris: 0x4a2a1a, look: o.look || 0 });
+    for (var l = 0; l < 3; l++) pmesh(h, new THREE.BoxGeometry(0.06, 0.012, 0.02), 0x1a0f0a, sx * (0.125 + 0.05 + l * 0.012), 0.11 + l * 0.026, 0.215 - l * 0.012, { ol: 0, r: [0, 0, -sx * (0.5 + l * 0.35)] });
+    pmesh(h, new THREE.BoxGeometry(0.11, 0.02, 0.03), 0x1a0f0a, sx * 0.125, 0.122, 0.235, { ol: 0, r: [0, 0, -sx * 0.2] });
+    S(h, 0.1, fur, sx * 0.31, 0.06, 0.0, { ol: 0.016, s: [1.1, 0.5, 0.35], r: [0, 0, -sx * 0.25] });                              // floppy ears with pink inside and a gold hoop
+    S(h, 0.06, 0xf0a0a0, sx * 0.315, 0.058, 0.02, { ol: 0, s: [1.1, 0.5, 0.3], r: [0, 0, -sx * 0.25] });
+    pmesh(h, new THREE.TorusGeometry(0.032, 0.008, 6, 14), gold, sx * 0.4, -0.01, 0.0, { ol: 0, r: [0, Math.PI / 2, 0] });
+    var hp = [V3(sx * 0.17, 0.2, 0), V3(sx * 0.3, 0.24, 0.03), V3(sx * 0.39, 0.34, 0.08), V3(sx * 0.41, 0.48, 0.14), V3(sx * 0.37, 0.62, 0.19)];     // long curving horns
+    var c0 = new THREE.Color(0xf3ead2), c1 = new THREE.Color(0x6b5540);
+    pmesh(h, taperTube(hp, function (t) { return 0.056 * (1 - t * 0.9) + 0.008; }, { tub: 24, rad: 10, color: function (t, nx, ny, nz, c) { c.copy(c0).lerp(c1, Math.max(0, (t - 0.72) / 0.28)); } }), 0xffffff, 0, 0, 0, { vc: true, ol: 0.014 });
+    pmesh(h, new THREE.TorusGeometry(0.066, 0.016, 6, 14), 0xd8c8a0, sx * 0.19, 0.205, 0, { ol: 0, r: [0, 0, Math.PI / 2 - sx * 0.25] });
+    S(h, 0.1, furD, sx * 0.24, -0.02, -0.04, { ol: 0, s: [0.5, 1.3, 0.7] });
+    S(h, 0.022, 0xe9c9a0, sx * 0.05, -0.15, 0.4, { ol: 0, basic: true, s: [1, 0.6, 0.6] });
+  });
+  pmesh(h, new THREE.SphereGeometry(0.285, 16, 10), furD, 0, 0.1, -0.03, { ol: 0.01, s: [1.0, 0.5, 1.0] });
+  for (var c = -3; c <= 3; c++) S(h, 0.06, furD, c * 0.075, 0.2 - Math.abs(c) * 0.012, 0.22 - Math.abs(c) * 0.035, { ol: 0.008, s: [1, 1.15, 0.9] });   // curly fringe
+  S(h, 0.07, furD, 0, 0.34, -0.02, { ol: 0.01 });                                                                                   // topknot with a ribbon
+  pmesh(h, new THREE.ConeGeometry(0.06, 0.1, 6), 0xff7a9a, 0.07, 0.4, -0.02, { ol: 0.008, r: [0, 0, -1.3] }); pmesh(h, new THREE.ConeGeometry(0.06, 0.1, 6), 0xff7a9a, -0.07, 0.4, -0.02, { ol: 0.008, r: [0, 0, 1.3] });
+  pmesh(h, new THREE.TorusGeometry(0.036, 0.011, 6, 14), gold, 0, -0.1, 0.43, { ol: 0 });                                           // nose ring
+  var open = o.mouth === "open";
+  S(h, 0.082, TEAL, 0, open ? -0.152 : -0.165, 0.392, { ol: 0.012, s: [1.55, 0.5, 0.8] });
+  S(h, 0.088, TEAL, 0, open ? -0.225 : -0.2, 0.384, { ol: 0.012, s: [1.45, 0.55, 0.8] });
+  if (open) { pmesh(h, new THREE.BoxGeometry(0.11, 0.045, 0.03), 0x3a1a2a, 0, -0.19, 0.425, { ol: 0 }); S(h, 0.04, 0xe87a8a, 0, -0.2, 0.42, { ol: 0, s: [1.4, 0.5, 0.6] }); }
+  if (!open) pmesh(h, new THREE.BoxGeometry(0.1, 0.012, 0.02), 0x3a1a2a, 0, -0.182, 0.43, { ol: 0 });
+  S(h, 0.018, 0xffffff, -0.04, open ? -0.232 : -0.205, 0.44, { basic: true, alpha: 0.9 });
+  var sh = new THREE.Group(); sh.position.set(-0.82, 0, 0.16); g.add(sh);                                                           // sheaf of grain
+  var ln = o.lean || 0.1;
+  for (var k = 0; k < 9; k++) {
+    var q = (k - 4) * 0.07 + ln * 0.8, sx0 = (k - 4) * 0.02, tipx = sx0 + Math.sin(q) * 1.28, zz = (k % 3 - 1) * 0.035;
+    pmesh(sh, new THREE.CylinderGeometry(0.018, 0.024, 1.25, 7), 0xd8b24a, sx0 + Math.sin(q) * 0.62, 0.62, zz, { ol: 0.007, r: [0, 0, -q] });
+    var ear = new THREE.Group(); ear.position.set(tipx, 1.3, zz); ear.rotation.z = -q - 0.1; sh.add(ear);
+    pmesh(ear, new THREE.SphereGeometry(0.045, 8, 6), 0xf0c24a, 0, 0, 0, { ol: 0.007, s: [0.7, 2.6, 0.7] });
+    for (var kn = 0; kn < 5; kn++) [-1, 1].forEach(function (s2) { pmesh(ear, new THREE.SphereGeometry(0.02, 6, 5), 0xf6d46a, s2 * 0.032, -0.08 + kn * 0.055, 0, { ol: 0, s: [0.7, 1.5, 0.7], r: [0, 0, -s2 * 0.5] }); });
+    pmesh(ear, new THREE.CylinderGeometry(0.002, 0.004, 0.2, 3), 0xe8c050, 0, 0.22, 0, { ol: 0, basic: true });
+  }
+  pmesh(sh, new THREE.TorusGeometry(0.1, 0.034, 8, 16), 0xd0452a, Math.sin(ln * 0.8) * 0.3, 0.5, 0, { ol: 0.01, r: [Math.PI / 2, 0, 0] });
+  return { group: g, head: h, aR: aR, aL: aL, torso: tor, sheaf: sh };
+}
+
+/* ---------- Bram: a stocky smith and glassblower: soot-black cap with goggles, copper beard, leather apron, big gloves ---------- */
+function buildSmith(o) {
+  o = o || {};
+  var g = new THREE.Group(), skin = 0xe0a878, skinD = 0xc98a5a, beard = 0xb8642e, beardL = 0xd98a48, cloth = 0x3f6e8a, clothD = 0x2f566e, pants = 0x5a5048, apron = 0x6b4a2a, apronD = 0x4f351c, boots = 0x2a1a10, cap = 0x35302e, glove = 0x3a2a1c, brass = 0xe0b040, steel = 0x8a93a0;
+  var S = function (par, r, col, x, y, z, op) { return pmesh(par, new THREE.SphereGeometry(r, 14, 10), col, x, y, z, op); };
+  [-1, 1].forEach(function (sx) {
+    pmesh(g, new THREE.CylinderGeometry(0.16, 0.14, 0.52, 16), pants, sx * 0.19, 0.27, 0);
+    pmesh(g, roundedBox(0.12, 0.12, 0.03, 0.01, 2), 0x7a6a58, sx * 0.19, 0.3, 0.14, { ol: 0.006 });                           // a patch on the knee
+    S(g, 0.155, boots, sx * 0.19, 0.1, 0.09, { ol: 0.014, s: [1, 0.8, 1.5] });
+    pmesh(g, new THREE.CylinderGeometry(0.15, 0.16, 0.14, 16), boots, sx * 0.19, 0.17, 0, { ol: 0.014 });
+    pmesh(g, roundedBox(0.3, 0.05, 0.5, 0.02, 2), 0x120a06, sx * 0.19, 0.025, 0.07, { ol: 0.012 });
+    S(g, 0.07, steel, sx * 0.19, 0.075, 0.2, { ol: 0.006, s: [1.3, 0.7, 0.9] });                                                // steel toe cap
+  });
+  var tor = new THREE.Group(); tor.position.set(0, 0.5, 0); g.add(tor);
+  var prof = [V2(0.001, 0), V2(0.36, 0), V2(0.42, 0.15), V2(0.46, 0.45), V2(0.43, 0.7), V2(0.3, 0.82), V2(0.001, 0.84)];
+  pmesh(tor, new THREE.LatheGeometry(prof, 28), cloth, 0, 0, 0);
+  pmesh(tor, new THREE.CylinderGeometry(0.43, 0.43, 0.09, 24), 0x3a2a1c, 0, 0.1, 0, { ol: 0.01 });                               // belt
+  pmesh(tor, roundedBox(0.12, 0.1, 0.03, 0.01, 2), brass, 0, 0.1, 0.43, { ol: 0.008 });
+  pmesh(tor, roundedBox(0.34, 0.2, 0.05, 0.02, 2), apron, 0, 0.62, 0.43, { ol: 0.012, r: [-0.1, 0, 0] });                        // apron bib
+  pmesh(tor, roundedBox(0.52, 0.5, 0.055, 0.025, 2), apron, 0, 0.3, 0.46, { ol: 0.012, r: [-0.1, 0, 0] });                       // apron skirt
+  pmesh(tor, roundedBox(0.2, 0.15, 0.04, 0.015, 2), apronD, -0.12, 0.28, 0.5, { ol: 0.01, r: [-0.1, 0, 0] });                    // pockets with tools sticking out
+  pmesh(tor, roundedBox(0.2, 0.15, 0.04, 0.015, 2), apronD, 0.12, 0.28, 0.5, { ol: 0.01, r: [-0.1, 0, 0] });
+  mpBone(tor, V3(-0.15, 0.3, 0.5), V3(-0.19, 0.5, 0.5), 0.014, 0.014, steel, { ol: 0.004, seg: 6 }); mpBone(tor, V3(-0.1, 0.3, 0.5), V3(-0.08, 0.5, 0.5), 0.014, 0.014, steel, { ol: 0.004, seg: 6 });
+  mpBone(tor, V3(0.13, 0.3, 0.5), V3(0.15, 0.52, 0.5), 0.02, 0.02, 0xa8743a, { ol: 0.005, seg: 8 });
+  [-1, 1].forEach(function (sx) { mpBone(tor, V3(sx * 0.12, 0.72, 0.43), V3(sx * 0.2, 0.84, 0.15), 0.025, 0.025, apronD, { ol: 0.006, seg: 8 }); });   // strap over the shoulder
+  function arm(sx, rx, rz) {
+    var a = new THREE.Group(); a.position.set(sx * 0.42, 0.72, 0); a.rotation.set(rx || 0, 0, rz); tor.add(a);
+    S(a, 0.16, cloth, 0, -0.02, 0, { s: [1, 0.9, 1] });
+    pmesh(a, new THREE.CylinderGeometry(0.135, 0.14, 0.3, 16), cloth, 0, -0.2, 0);
+    pmesh(a, new THREE.TorusGeometry(0.14, 0.035, 8, 18), clothD, 0, -0.35, 0, { r: [Math.PI / 2, 0, 0], ol: 0.008 });
+    pmesh(a, new THREE.CylinderGeometry(0.125, 0.105, 0.2, 16), skin, 0, -0.46, 0);
+    S(a, 0.028, 0x3a2a1c, 0.05, -0.44, 0.1, { ol: 0, s: [1.2, 0.8, 0.5] });                                                     // an old burn mark
+    pmesh(a, new THREE.CylinderGeometry(0.115, 0.125, 0.12, 14), glove, 0, -0.58, 0, { ol: 0.012 });
+    S(a, 0.13, glove, 0, -0.69, 0, { s: [1, 1.05, 1] });
+    for (var f = -1; f <= 1; f++) mpFinger(a, f * 0.055, -0.8, 0.03, 0.04, 0.036, glove, 0, 0);
+    mpFinger(a, sx * -0.11, -0.7, 0.04, 0.03, 0.036, glove, sx * 0.9, 0);
+    return a;
+  }
+  var aR = arm(1, o.armRx, o.armR == null ? 0.35 : o.armR), aL = arm(-1, o.armLx, o.armL == null ? -0.35 : o.armL);
+  if (o.prop === "ingot") {
+    pmesh(tor, roundedBox(0.46, 0.18, 0.26, 0.04, 2), 0x4b505a, 0, 0.38, 0.52, { ol: 0.014 });
+    pmesh(tor, roundedBox(0.3, 0.02, 0.16, 0.01, 2), 0x8a93a0, 0, 0.475, 0.52, { ol: 0 });
+  }
+  if (o.prop === "hammer") {
+    mpBone(aR, V3(0, -0.72, 0.05), V3(0, -1.28, 0.05), 0.032, 0.03, 0xa8743a, { ol: 0.008, seg: 8 });
+    pmesh(aR, roundedBox(0.34, 0.2, 0.2, 0.04, 2), steel, 0, -1.3, 0.05, { ol: 0.014 }); pmesh(aR, roundedBox(0.04, 0.1, 0.24, 0.01, 2), 0x5a626e, 0.17, -1.3, 0.05, { ol: 0 });
+  }
+  if (o.prop === "glass") {
+    mpBone(aR, V3(0, -0.7, 0.05), V3(0, -1.55, 0.4), 0.03, 0.026, 0x6a6e76, { ol: 0.006, seg: 8 });
+    S(aR, 0.2, 0xcff6ff, 0, -1.65, 0.45, { basic: true, alpha: 0.55, ol: 0 }); S(aR, 0.1, 0xff9a3a, 0, -1.65, 0.45, { basic: true, alpha: 0.85, ol: 0 });
+  }
+  pmesh(tor, new THREE.CylinderGeometry(0.15, 0.18, 0.3, 16), skin, 0, 0.9, 0.02, { ol: 0.01 });
+  pmesh(tor, new THREE.TorusGeometry(0.2, 0.055, 8, 20), clothD, 0, 0.84, 0.02, { r: [Math.PI / 2, 0, 0], ol: 0.01 });
+  var h = new THREE.Group(); h.position.set(0, 1.06, 0.05); tor.add(h);
+  S(h, 0.28, skin, 0, 0, 0, { ol: 0.024, s: [1.07, 1, 1] });
+  [-1, 1].forEach(function (sx) {
+    S(h, 0.058, 0xf0a090, sx * 0.17, -0.06, 0.2, { ol: 0, s: [1.1, 0.8, 0.5] });
+    S(h, 0.055, skin, sx * 0.29, 0.0, 0.0, { ol: 0.012, s: [0.5, 1, 0.8] });
+    mpEye(h, sx, sx * 0.1, 0.055, 0.235, { r: 0.04, iris: 0x2a1a10, white: 0xfff8ea, look: o.look || 0 });
+    pmesh(h, roundedBox(0.13, 0.045, 0.05, 0.018, 2), beard, sx * 0.1, 0.125, 0.245, { ol: 0, r: [0, 0, -sx * 0.25] });
+    S(h, 0.06, beard, sx * 0.1, -0.1, 0.23, { ol: 0.008, s: [1.5, 0.6, 0.8], r: [0, 0, sx * 0.5] });
+  });
+  S(h, 0.08, 0xe6907a, 0, -0.01, 0.275, { ol: 0.012, s: [1, 0.95, 0.95] });
+  S(h, 0.035, 0x3a2a1c, 0.1, 0.08, 0.255, { ol: 0, s: [1.6, 0.7, 0.3] });                                                         // soot smudges
+  S(h, 0.03, 0x3a2a1c, -0.04, -0.03, 0.34, { ol: 0, s: [1.6, 0.6, 0.3] });
+  pmesh(h, taperTube([V3(0.0, -0.075, 0.27), V3(0.08, -0.09, 0.27), V3(0.17, -0.08, 0.22), V3(0.22, -0.02, 0.17)], function (t) { return 0.05 - t * 0.035; }, { tub: 10, rad: 7 }), beard, 0, 0, 0, { ol: 0.01 });
+  pmesh(h, taperTube([V3(0.0, -0.075, 0.27), V3(-0.08, -0.09, 0.27), V3(-0.17, -0.08, 0.22), V3(-0.22, -0.02, 0.17)], function (t) { return 0.05 - t * 0.035; }, { tub: 10, rad: 7 }), beard, 0, 0, 0, { ol: 0.01 });
+  S(h, 0.25, beard, 0, -0.2, 0.09, { ol: 0.02, s: [1.12, 1.15, 0.8] });                                                            // the great copper beard
+  S(h, 0.2, beardL, 0, -0.3, 0.17, { ol: 0.014, s: [1.0, 1.1, 0.7] });
+  [-1, 1].forEach(function (sx) {
+    for (var b = 0; b < 4; b++) S(h, 0.06 - b * 0.006, b % 2 ? beard : beardL, sx * (0.14 - b * 0.004), -0.36 - b * 0.09, 0.14, { ol: 0.01, s: [0.9, 1.1, 0.9] });
+    pmesh(h, new THREE.TorusGeometry(0.036, 0.011, 6, 12), brass, sx * 0.136, -0.67, 0.14, { ol: 0, r: [Math.PI / 2, 0, 0] });
+    pmesh(h, new THREE.ConeGeometry(0.03, 0.09, 6), beard, sx * 0.136, -0.72, 0.14, { ol: 0.006, r: [Math.PI, 0, 0] });
+  });
+  pmesh(h, new THREE.ConeGeometry(0.1, 0.3, 8), beard, 0, -0.6, 0.15, { ol: 0.012, r: [Math.PI, 0, 0], s: [1.2, 1, 0.7] });
+  pmesh(h, new THREE.CylinderGeometry(0.3, 0.31, 0.1, 22), cap, 0, 0.21, 0, { ol: 0.014 });                                           // soot-black cap
+  pmesh(h, new THREE.SphereGeometry(0.29, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), cap, 0, 0.23, 0, { ol: 0.016, s: [1, 0.8, 1] });
+  pmesh(h, roundedBox(0.4, 0.04, 0.2, 0.018, 2), 0x232020, 0, 0.19, 0.3, { ol: 0.012, r: [0.12, 0, 0] });
+  pmesh(h, new THREE.TorusGeometry(0.3, 0.02, 6, 24), 0x5a4a3a, 0, 0.26, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });                       // goggle strap and goggles pushed up on the cap
+  [-1, 1].forEach(function (sx) {
+    pmesh(h, new THREE.TorusGeometry(0.075, 0.022, 8, 18), brass, sx * 0.1, 0.34, 0.2, { ol: 0.008, r: [0.5, 0, 0] });
+    S(h, 0.068, 0xbfe9ff, sx * 0.1, 0.34, 0.205, { basic: true, alpha: 0.55, ol: 0, s: [1, 1, 0.3], r: [0.5, 0, 0] });
+  });
+  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
+}
+
+/* ---------- Nell: a mole miner: velvet fur, pink star-nosed snout, tiny bead eyes, huge pink digging paws, overalls and a hard hat with a lamp ---------- */
+function buildMole(o) {
+  o = o || {};
+  var g = new THREE.Group(), fur = 0x5e4a46, furL = 0x80696a, furD = 0x3d2f2c, pink = 0xf0a0a0, pinkD = 0xd98080, helmet = 0xf5b921, helmetD = 0xd99a06, lamp = 0xfff3a0, ov = 0x4a6a8a, ovD = 0x385570, claw = 0xf4ead2, brass = 0xe0b040;
+  var S = function (par, r, col, x, y, z, op) { return pmesh(par, new THREE.SphereGeometry(r, 16, 12), col, x, y, z, op); };
+  [-1, 1].forEach(function (sx) {
+    pmesh(g, new THREE.CylinderGeometry(0.13, 0.115, 0.34, 14), ov, sx * 0.2, 0.22, 0.02);
+    S(g, 0.16, pink, sx * 0.2, 0.05, 0.12, { ol: 0.016, s: [1.05, 0.55, 1.4] });
+    for (var c = -1; c <= 1; c++) pmesh(g, new THREE.ConeGeometry(0.018, 0.07, 5), claw, sx * 0.2 + c * 0.06, 0.04, 0.3 - Math.abs(c) * 0.02, { ol: 0, r: [Math.PI / 2 - 0.2, 0, 0] });
+  });
+  var tor = new THREE.Group(); tor.position.set(0, 0.42, 0); g.add(tor);
+  S(tor, 0.42, fur, 0, 0.35, 0, { ol: 0.02, s: [1, 1.05, 0.9] });
+  S(tor, 0.3, furL, 0, 0.36, 0.17, { ol: 0, s: [0.95, 1.1, 0.6] });
+  var pr = [V2(0.001, -0.06)]; for (var a = -70; a <= 12; a += 12) pr.push(V2(Math.max(0.04, Math.cos(a * Math.PI / 180) * 0.435), 0.35 + Math.sin(a * Math.PI / 180) * 0.46));
+  pmesh(tor, new THREE.LatheGeometry(pr, 26), ov, 0, 0, 0, { ol: 0, s: [1, 1.05, 0.9] });
+  pmesh(tor, new THREE.TorusGeometry(0.405, 0.03, 8, 26), ovD, 0, 0.45, 0, { r: [Math.PI / 2, 0, 0], ol: 0.008, s: [1, 1, 0.92] });
+  pmesh(tor, roundedBox(0.3, 0.22, 0.05, 0.025, 2), ov, 0, 0.64, 0.325, { ol: 0.012 });                                                  // bib
+  pmesh(tor, roundedBox(0.14, 0.1, 0.03, 0.012, 2), ovD, 0, 0.36, 0.38, { ol: 0.008 });
+  [-1, 1].forEach(function (sx) {
+    S(tor, 0.03, brass, sx * 0.12, 0.73, 0.35, { ol: 0.006 }); mpBone(tor, V3(sx * 0.12, 0.73, 0.34), V3(sx * 0.17, 0.9, 0.1), 0.028, 0.028, ov, { ol: 0.006, seg: 8 });
+  });
+  mpBone(tor, V3(-0.3, 0.1, -0.4), V3(0.34, 0.95, -0.44), 0.028, 0.028, 0xa8743a, { ol: 0.008, seg: 8 });                             // pickaxe slung on her back
+  pmesh(tor, taperTube([V3(0.05, 1.08, -0.45), V3(0.22, 1.02, -0.45), V3(0.38, 0.96, -0.45), V3(0.52, 0.82, -0.45), V3(0.57, 0.7, -0.45)], function (t) { return 0.055 - t * 0.035; }, { tub: 12, rad: 7 }), 0x8a93a0, 0, 0, 0, { ol: 0.01 });
+  pmesh(tor, taperTube([V3(0.05, 1.08, -0.45), V3(-0.12, 1.1, -0.45), V3(-0.28, 1.14, -0.45), V3(-0.37, 1.2, -0.45)], function (t) { return 0.055 - t * 0.04; }, { tub: 8, rad: 7 }), 0x8a93a0, 0, 0, 0, { ol: 0.01 });
+  function arm(sx, rx, rz) {
+    var a = new THREE.Group(); a.position.set(sx * 0.37, 0.5, 0.05); a.rotation.set(rx || 0, 0, rz); tor.add(a);
+    pmesh(a, new THREE.CylinderGeometry(0.115, 0.1, 0.4, 14), fur, 0, -0.2, 0);
+    pmesh(a, new THREE.TorusGeometry(0.1, 0.025, 6, 14), furL, 0, -0.38, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });
+    S(a, 0.2, pink, 0, -0.58, 0.05, { ol: 0.018, s: [1.15, 1.05, 0.42] });                                                              // the big spade paw
+    for (var f = -2; f <= 2; f++) { pmesh(a, new THREE.CylinderGeometry(0.01, 0.026, 0.13, 6), claw, f * 0.075, -0.72 - (2 - Math.abs(f)) * 0.012, 0.07, { ol: 0.008, r: [0.25, 0, f * 0.12] }); }
+    S(a, 0.05, pinkD, 0, -0.58, 0.1, { ol: 0, s: [1.5, 1, 0.4] });
+    return a;
+  }
+  var aR = arm(1, o.armRx, o.armR == null ? 0.4 : o.armR), aL = arm(-1, o.armLx, o.armL == null ? -0.4 : o.armL);
+  var h = new THREE.Group(); h.position.set(0, 0.95, 0.12); tor.add(h);
+  S(h, 0.3, fur, 0, 0, 0, { ol: 0.024 });
+  S(h, 0.17, furL, 0, -0.1, 0.18, { ol: 0, s: [1.15, 0.9, 1.1] });
+  pmesh(h, new THREE.ConeGeometry(0.14, 0.4, 14), pink, 0, -0.07, 0.34, { ol: 0.016, r: [Math.PI / 2, 0, 0], s: [1, 1, 0.85] });
+  S(h, 0.075, pinkD, 0, -0.065, 0.56, { ol: 0.012 });
+  mpRing(h, 9, 0.07, -0.065, function (grp) { pmesh(grp, new THREE.ConeGeometry(0.016, 0.075, 5), 0xff8aa0, 0, 0, 0.065, { ol: 0, r: [Math.PI / 2 + 0.25, 0, 0] }); }, 0.3);   // the star-nose
+  [-1, 1].forEach(function (sx) {
+    S(h, 0.014, 0x2a1a10, sx * 0.025, -0.06, 0.63, { ol: 0, basic: true, s: [0.8, 1.2, 0.6] });
+    S(h, 0.038, 0x150c0c, sx * 0.13, 0.08, 0.255, { ol: 0, s: [1, 1.1, 0.8] }); S(h, 0.013, 0xffffff, sx * 0.13 - 0.01, 0.095, 0.285, { basic: true });
+    S(h, 0.1, furD, sx * 0.17, 0.13, 0.19, { ol: 0, s: [1.2, 0.5, 0.5], r: [0, 0, -sx * 0.4] });
+    S(h, 0.05, furL, sx * 0.29, 0.12, -0.02, { ol: 0.01, s: [0.6, 1, 0.8] });
+    for (var w = 0; w < 3; w++) mpBone(h, V3(sx * 0.07, -0.05 - w * 0.025, 0.42), V3(sx * (0.3 + w * 0.02), -0.0 - w * 0.07, 0.38), 0.006, 0.002, 0xf2e8d8, { ol: 0, seg: 4, basic: true });
+  });
+  pmesh(h, new THREE.BoxGeometry(0.035, 0.05, 0.015), 0xffffff, -0.02, -0.2, 0.43, { ol: 0.004 }); pmesh(h, new THREE.BoxGeometry(0.035, 0.05, 0.015), 0xffffff, 0.02, -0.2, 0.43, { ol: 0.004 });
+  pmesh(h, new THREE.SphereGeometry(0.33, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), helmet, 0, 0.21, 0, { ol: 0.02 });                      // hard hat
+  pmesh(h, new THREE.CylinderGeometry(0.345, 0.36, 0.05, 22), helmetD, 0, 0.2, 0, { ol: 0.016 });
+  pmesh(h, roundedBox(0.36, 0.035, 0.2, 0.015, 2), helmetD, 0, 0.2, 0.3, { ol: 0.014, r: [0.1, 0, 0] });
+  pmesh(h, roundedBox(0.09, 0.06, 0.5, 0.025, 2), helmetD, 0, 0.53, 0, { ol: 0.012 });
+  pmesh(h, new THREE.TorusGeometry(0.335, 0.014, 6, 24), 0x6a4a1a, 0, 0.33, 0, { r: [Math.PI / 2, 0, 0], ol: 0 });
+  pmesh(h, new THREE.CylinderGeometry(0.08, 0.09, 0.1, 14), 0x5a626e, 0, 0.39, 0.3, { ol: 0.012, r: [Math.PI / 2, 0, 0] });
+  pmesh(h, new THREE.TorusGeometry(0.085, 0.014, 6, 16), brass, 0, 0.39, 0.355, { ol: 0 });
+  S(h, 0.065, lamp, 0, 0.39, 0.35, { basic: true, ol: 0 }); S(h, 0.17, lamp, 0, 0.39, 0.4, { basic: true, alpha: 0.22, ol: 0 });
+  return { group: g, head: h, aR: aR, aL: aL, torso: tor };
+}
+
+/* ---------- sky creatures: shared unit shapes and feather helpers ---------- */
+var MPC = {}, MU = null;
+function mu() {
+  if (!MU) MU = { sph: new THREE.SphereGeometry(1, 20, 14), cyl: new THREE.CylinderGeometry(1, 1, 1, 14), cone: new THREE.ConeGeometry(1, 1, 12), box: new THREE.BoxGeometry(1, 1, 1),
+    circle: new THREE.CircleGeometry(1, 24), dome: new THREE.SphereGeometry(1, 30, 14, 0, Math.PI * 2, 0, Math.PI / 2) };
+  return MU;
+}
+function cp(par, geo, mat, s, p, r, ol) {                          // a part from a shared unit shape: scale, position, rotation, outline
+  var m = new THREE.Mesh(typeof geo === "string" ? mu()[geo] : geo, mat);
+  m.scale.set(s[0], s[1], s[2]); m.position.set(p[0], p[1], p[2]); if (r) m.rotation.set(r[0], r[1], r[2]); par.add(m);
+  if (ol) outline(m, ol); return m;
+}
+function mpLeaf(L, W) {                                            // a flat feather pointing along +y
+  var k = "leaf" + L.toFixed(3) + "_" + W.toFixed(3); if (MPC[k]) return MPC[k];
+  var sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(W * 0.7, L * 0.22); sh.lineTo(W, L * 0.55); sh.lineTo(W * 0.6, L * 0.88); sh.lineTo(0, L); sh.lineTo(-W * 0.6, L * 0.88); sh.lineTo(-W, L * 0.55); sh.lineTo(-W * 0.7, L * 0.22); sh.closePath();
+  return MPC[k] = new THREE.ShapeGeometry(sh);
+}
+function mpFlat(pts) { var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]); for (var i = 1; i < pts.length; i++) sh.lineTo(pts[i][0], pts[i][1]); sh.closePath(); return new THREE.ShapeGeometry(sh); }
+function mpWingFan(sx, len, wid, mats, coverMat, tipMat, n, pushTo) {   // a wing of overlapping feathers, spread in the XY plane like the old blade
+  var g = new THREE.Group(), i;
+  for (i = 0; i < n; i++) {
+    var u = i / (n - 1), a = (14 - u * 66) * Math.PI / 180, L = len * (1 - 0.46 * u), dx = sx * Math.cos(a), dy = Math.sin(a), rot = Math.atan2(dy, dx) - Math.PI / 2;
+    var ink = new THREE.Mesh(mpLeaf(L * 1.06, wid * 0.34 * 1.3), cbasic(INK)); ink.rotation.z = rot; ink.position.set(0, wid * 0.1, -0.004); g.add(ink);
+    var f = new THREE.Mesh(mpLeaf(L, wid * 0.34), mats[i % mats.length]); f.rotation.z = rot; f.position.set(0, wid * 0.1, i * 0.0008); g.add(f); if (pushTo) pushTo.push(f);
+    if (tipMat) { var t = new THREE.Mesh(mpLeaf(L * 0.28, wid * 0.3), tipMat); t.rotation.z = rot; t.position.set(dx * L * 0.74, wid * 0.1 + dy * L * 0.74, 0.003 + i * 0.0008); g.add(t); }
+  }
+  for (i = 0; i < 4; i++) {
+    var v = i / 3, a2 = (30 - v * 80) * Math.PI / 180, L2 = len * (0.5 - 0.18 * v), dx2 = sx * Math.cos(a2), dy2 = Math.sin(a2);
+    var c = new THREE.Mesh(mpLeaf(L2, wid * 0.36), coverMat); c.rotation.z = Math.atan2(dy2, dx2) - Math.PI / 2; c.position.set(0, wid * 0.1, 0.01 + i * 0.0008); g.add(c); if (pushTo) pushTo.push(c);
+  }
+  return g;
+}
+function mpBirdWings(g, len, wid, mats, coverMat, tipMat, tint) {  // sets userData.pl / pr / wm exactly like wingsV did
+  var pl = new THREE.Group(), pr = new THREE.Group(), a = mpWingFan(-1, len, wid, mats, coverMat, tipMat, 7, tint), b = mpWingFan(1, len, wid, mats, coverMat, tipMat, 7, tint);
+  pl.add(a); pr.add(b); pl.position.x = -0.05; pr.position.x = 0.05; g.add(pl); g.add(pr);
+  g.userData.pl = pl; g.userData.pr = pr; g.userData.wm = [a, b];
+}
+
+function mkSwallow() {
+  var g = new THREE.Group(), navy = cmat(0x1f2f66), navy2 = cmat(0x2a3d80), navyD = cmat(0x141c3e), cream = cmat(0xf3e6c8), rust = cmat(0xc4572e), ink = cbasic(INK), white = cbasic(0xffffff);
+  cp(g, "sph", navy, [0.24, 0.085, 0.09], [0, 0, 0], null, 0.09);
+  cp(g, "sph", cream, [0.17, 0.05, 0.08], [0.03, -0.04, 0]);
+  cp(g, "sph", navy2, [0.085, 0.08, 0.08], [0.2, 0.022, 0], null, 0.09);
+  cp(g, "sph", rust, [0.05, 0.045, 0.07], [0.255, -0.005, 0]);
+  cp(g, "sph", rust, [0.03, 0.025, 0.06], [0.265, 0.05, 0]);
+  cp(g, "cone", ink, [0.02, 0.075, 0.02], [0.31, 0.02, 0], [0, 0, -Math.PI / 2]);
+  [-1, 1].forEach(function (sz) { cp(g, "sph", white, [0.02, 0.022, 0.012], [0.225, 0.045, sz * 0.068]); cp(g, "sph", ink, [0.012, 0.014, 0.01], [0.231, 0.045, sz * 0.077]); });
+  var tg = mpFlat([[0, 0.035], [-0.12, 0.055], [-0.52, 0.09], [-0.36, 0.01], [-0.52, -0.09], [-0.12, -0.055], [0, -0.035]]);       // long forked tail streamers
+  var tl = new THREE.Mesh(tg, navy); tl.position.set(-0.16, 0, 0); g.add(tl);
+  var tb = new THREE.Mesh(tg, ink); tb.position.set(-0.16, 0, -0.004); tb.scale.set(1.08, 1.2, 1); g.add(tb);
+  var tc = new THREE.Mesh(mpFlat([[0, 0.03], [-0.15, 0.04], [-0.15, -0.04], [0, -0.03]]), cream); tc.position.set(-0.17, -0.0, 0.006); g.add(tc);
+  mpBirdWings(g, 0.64, 0.19, [navy, navy2], navyD, cream, null);
+  return g;
+}
+function mkFinch() {
+  var g = new THREE.Group(), c = cmat(0x3fa7d6), cD = cmat(0x2a7fa8), tint = [], white = cbasic(0xffffff), ink = cbasic(INK);
+  tint.push(cp(g, "sph", c, [0.19, 0.14, 0.14], [0, 0, 0], null, 0.1));
+  tint.push(cp(g, "sph", c, [0.1, 0.1, 0.1], [0.17, 0.07, 0], null, 0.1));
+  cp(g, "sph", cmat(0xfff2dc), [0.14, 0.09, 0.12], [0.05, -0.05, 0]);                                           // pale belly
+  cp(g, "sph", cmat(0xff9a8a), [0.03, 0.025, 0.02], [0.2, 0.04, 0.1]); cp(g, "sph", cmat(0xff9a8a), [0.03, 0.025, 0.02], [0.2, 0.04, -0.1]);   // blush
+  [-1, 1].forEach(function (sz) {
+    cp(g, "sph", white, [0.034, 0.037, 0.02], [0.215, 0.1, sz * 0.078]); cp(g, "sph", ink, [0.022, 0.026, 0.016], [0.228, 0.1, sz * 0.088]); cp(g, "sph", white, [0.007, 0.007, 0.007], [0.236, 0.108, sz * 0.095]);
+    cp(g, "cyl", cbasic(0x7a5a3a), [0.008, 0.07, 0.008], [0.03 + sz * 0, -0.15, sz * 0.05]);                    // little legs
+    cp(g, "sph", cbasic(0x7a5a3a), [0.035, 0.012, 0.02], [0.05, -0.19, sz * 0.05]);
+  });
+  cp(g, "cone", cmat(0xf5b921), [0.04, 0.12, 0.04], [0.28, 0.06, 0], [0, 0, -Math.PI / 2], 0.1);
+  cp(g, "cone", cmat(0xd99a06), [0.03, 0.08, 0.03], [0.265, 0.04, 0], [0, 0, -Math.PI / 2 - 0.1]);
+  var tf = mpFlat([[0, 0.04], [-0.1, 0.09], [-0.26, 0.11], [-0.31, 0.04], [-0.27, 0], [-0.31, -0.05], [-0.26, -0.1], [-0.1, -0.07], [0, -0.04]]);       // notched tail fan
+  var tail = new THREE.Mesh(tf, c); tail.position.set(-0.15, 0, 0); g.add(tail); tint.push(tail);
+  var tb = new THREE.Mesh(tf, ink); tb.position.set(-0.15, 0, -0.004); tb.scale.set(1.07, 1.15, 1); g.add(tb);
+  mpBirdWings(g, 0.44, 0.22, [c, cD], c, cmat(0x1e3a6a), tint);
+  g.userData.tint = tint;
+  return g;
+}
+function mkKite() {
+  var root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  var T0 = [0, 1.0], R = [0.62, 0], B = [0, -1.05], L = [-0.62, 0], C = [0, 0];
+  function kiteTri(pts, col, z) { var m = new THREE.Mesh(mpFlat(pts), cbasic(col)); m.position.z = z || 0; body.add(m); return m; }
+  kiteTri([C, T0, R], 0xe0704a); kiteTri([C, R, B], 0xf5b921); kiteTri([C, B, L], 0xe0704a); kiteTri([C, L, T0], 0xf5b921);
+  kiteTri([[0, 0.45], [0, 0.95], [0.28, 0.4]], 0x3fa7d6, 0.004); kiteTri([[0, 0.45], [-0.28, 0.4], [0, 0.95]], 0x3fa7d6, 0.004);                 // patchwork patches in each corner
+  kiteTri([[0, -0.45], [0.28, -0.4], [0, -0.98]], 0x3fa7d6, 0.004); kiteTri([[0, -0.45], [0, -0.98], [-0.28, -0.4]], 0x3fa7d6, 0.004);
+  kiteTri([[0.3, 0.0], [0.58, 0.02], [0.3, 0.2]], 0xfff2dc, 0.004); kiteTri([[-0.3, 0.0], [-0.3, 0.2], [-0.58, 0.02]], 0xfff2dc, 0.004);
+  var pts = [new THREE.Vector3(T0[0], T0[1], 0.01), new THREE.Vector3(R[0], R[1], 0.01), new THREE.Vector3(B[0], B[1], 0.01), new THREE.Vector3(L[0], L[1], 0.01)];
+  body.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: INK })));
+  var wood = cbasic(0x5a3a1a);                                                                                                                      // spars, knot, bridle
+  cp(body, "cyl", wood, [0.016, 1.05, 0.016], [0, -0.025, 0.02]); cp(body, "cyl", wood, [0.016, 0.62, 0.016], [0, 0, 0.02], [0, 0, Math.PI / 2]);
+  cp(body, "sph", cbasic(0xd0452a), [0.06, 0.06, 0.04], [0, 0, 0.03], null, 0.1);
+  [[0, 1.0], [0, -1.05], [0.62, 0], [-0.62, 0]].forEach(function (p) { cp(body, "sph", wood, [0.03, 0.03, 0.03], [p[0], p[1], 0.02]); });
+  var tail = [];
+  for (var i = 0; i < 7; i++) {
+    var bow = new THREE.Group(), col = i % 2 ? 0x3fa7d6 : 0xe0704a;
+    var tri = function (pts2, c2) { var m = new THREE.Mesh(mpFlat(pts2), cbasic(c2)); m.position.z = 0.0; bow.add(m); };
+    tri([[0, 0], [0.19, 0.1], [0.19, -0.1]], col); tri([[0, 0], [-0.19, 0.1], [-0.19, -0.1]], col);
+    cp(bow, "sph", cbasic(INK), [0.04, 0.04, 0.03], [0, 0, 0.004]);
+    bow.position.set(0, -1.2 - i * 0.38, 0); body.add(bow); tail.push(bow);
+  }
+  var string = new THREE.Mesh(CG.cyl, cbasic(INK)); root.add(string);
+  root.userData.body = body; root.userData.tail = tail; root.userData.string = string; return root;
+}
+function mkBug() {
+  var g = new THREE.Group(), ink = cbasic(INK), dark = cmat(0x3a2a1c), darkB = cmat(0x241a12), red = cmat(0xe0502a), glow = cbasic(0xf4ffa0, { fog: false });
+  var halo = new THREE.Mesh(CG.sph, cbasic(0xd7ff4a, { transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending, fog: false })); halo.scale.setScalar(0.4); halo.position.set(-0.17, -0.02, 0); g.add(halo);
+  cp(g, "sph", dark, [0.15, 0.085, 0.09], [-0.07, 0.0, 0], null, 0.08);                                         // abdomen with its glowing lantern tip
+  cp(g, "sph", glow, [0.075, 0.07, 0.075], [-0.2, -0.015, 0]);
+  for (var s = 0; s < 3; s++) cp(g, "cyl", cbasic(0xc8d83a), [0.006, 0.1, 0.095], [-0.05 - s * 0.045, 0.0, 0], [0, 0, Math.PI / 2]);
+  cp(g, "sph", red, [0.1, 0.075, 0.085], [0.065, 0.015, 0], null, 0.08);                                        // red thorax shield with a dark stripe
+  cp(g, "box", darkB, [0.09, 0.012, 0.02], [0.065, 0.082, 0]);
+  cp(g, "sph", darkB, [0.065, 0.06, 0.065], [0.165, 0.0, 0], null, 0.08);                                       // head, eyes, antennae
+  [-1, 1].forEach(function (sz) {
+    cp(g, "sph", cbasic(0x120a14), [0.026, 0.03, 0.022], [0.19, 0.012, sz * 0.05]); cp(g, "sph", cbasic(0xffffff), [0.008, 0.008, 0.008], [0.2, 0.024, sz * 0.058]);
+    var an = cp(g, "cyl", ink, [0.004, 0.14, 0.004], [0.24, 0.07, sz * 0.025], [0, 0, -0.9 - sz * 0.0]); an.rotation.x = sz * 0.25;
+    cp(g, "sph", ink, [0.012, 0.012, 0.012], [0.3, 0.125, sz * 0.045]);
+    for (var l = 0; l < 3; l++) { var lg = cp(g, "cyl", ink, [0.006, 0.09, 0.006], [0.1 - l * 0.065, -0.1, sz * 0.05], [sz * 0.5, 0, 0.35 - l * 0.35]); }
+  });
+  var w1 = new THREE.Group(), w2 = new THREE.Group();
+  var wing = function (sx, grp) {
+    var geo = mpFlat([[0, 0.0], [sx * 0.1, 0.07], [sx * 0.24, 0.085], [sx * 0.33, 0.04], [sx * 0.24, -0.02], [sx * 0.08, -0.02]]);
+    var m = new THREE.Mesh(geo, cbasic(0xe8f4ff, { transparent: true, opacity: 0.55, depthWrite: false })); grp.add(m);
+    var vein = new THREE.Mesh(mpFlat([[0, 0.005], [sx * 0.3, 0.045], [sx * 0.3, 0.052], [0, 0.015]]), cbasic(0x3a2a1c)); vein.position.z = 0.002; grp.add(vein);
+  };
+  wing(-1, w1); wing(1, w2); w1.position.set(-0.03, 0.07, 0); w2.position.set(0.03, 0.07, 0); g.add(w1); g.add(w2);
+  g.userData.halo = halo; g.userData.w = [w1, w2]; return g;
+}
+
+function mpCap(r, polar) { var k = "cap" + r + "_" + polar; return MPC[k] || (MPC[k] = new THREE.SphereGeometry(r, 28, 12, 0, Math.PI * 2, 0, polar)); }
+function mpTube(pts, r0, r1, mat, par, ol, rad) {                  // a tapering tube for tentacles, necks, tails and limbs
+  var geo = taperTube(pts, function (t) { return r0 + (r1 - r0) * t; }, { tub: 16, rad: rad || 10 });
+  var m = new THREE.Mesh(geo, mat); par.add(m); if (ol) { var o = outlineN(m, ol); } return m;
+}
+function mkEye() {
+  var root = new THREE.Group(), eb = new THREE.Group(); root.add(eb);
+  cp(eb, "sph", cmat(0xf4efe4), [1.1, 1.1, 1.1], [0, 0, 0], null, 0.05);
+  var vein = cbasic(0xc83a3a);
+  for (var v = 0; v < 10; v++) {                                  // bloodshot veins creeping in from the edge
+    var phi = v / 10 * Math.PI * 2 + 0.3, pts = [];
+    for (var t = 0; t <= 4; t++) { var u = t / 4, th = 0.7 + u * 0.6, ph = phi + 0.18 * Math.sin(u * 5 + v); pts.push(new THREE.Vector3(1.115 * Math.sin(th) * Math.cos(ph), 1.115 * Math.sin(th) * Math.sin(ph), 1.115 * Math.cos(th))); }
+    var vm = new THREE.Mesh(taperTube(pts, function (q) { return 0.022 * (1 - q * 0.6) + 0.004; }, { tub: 8, rad: 4 }), vein); eb.add(vm);
+  }
+  cp(eb, "sph", cbasic(0x2a1a08), [0.7, 0.7, 0.17], [0, 0, 1.0]);
+  var iris = cp(eb, "sph", cbasic(0xe8c21a), [0.62, 0.62, 0.18], [0, 0, 1.0]);
+  cp(eb, "sph", cbasic(0x120a14), [0.17, 0.46, 0.12], [0, 0, 1.17]);
+  cp(eb, "sph", cbasic(0xffffff), [0.13, 0.13, 0.05], [0.2, 0.26, 1.2]); cp(eb, "sph", cbasic(0xffffff), [0.05, 0.05, 0.03], [-0.18, -0.2, 1.19]);
+  var lid = new THREE.Mesh(mpCap(1.17, 1.15), cmat(0x9a6a8e)); lid.rotation.x = -0.1; eb.add(lid); outline(lid, 0.03);        // a heavy, menacing upper lid
+  var low = new THREE.Mesh(mpCap(1.15, 0.5), cmat(0x9a6a8e)); low.rotation.set(Math.PI + 0.05, 0, 0); eb.add(low);
+  var nerve = []; for (var i = 0; i < 5; i++) nerve.push(cp(root, "sph", cmat(i % 2 ? 0xd98a9a : 0xe8a0b0), [0.3 - i * 0.04, 0.3 - i * 0.04, 0.3 - i * 0.04], [0, 0, 0], null, 0.1));
+  root.userData.eb = eb; root.userData.iris = iris; root.userData.nerve = nerve; return root;
+}
+function mkPeeper() {
+  var root = new THREE.Group(), face = new THREE.Group(); root.add(face);
+  var fur = cmat(0x2b1a45), furL = cmat(0x45306a);
+  cp(root, "sph", fur, [0.72, 0.58, 0.52], [0, 0, 0], null, 0.06);
+  for (var i = 0; i < 20; i++) { var a = (-30 + i * 12.6) * Math.PI / 180; cp(root, "cone", i % 2 ? furL : fur, [0.05, 0.17, 0.05], [Math.cos(a) * 0.72, Math.sin(a) * 0.58, 0.02 * (i % 3 - 1)], [0, 0, a - Math.PI / 2]); }
+  [-1, 1].forEach(function (sx) {                                  // little grabby hands gripping the ledge
+    cp(root, "sph", furL, [0.13, 0.1, 0.1], [sx * 0.5, -0.5, 0.12], null, 0.08);
+    for (var f = -1; f <= 1; f++) cp(root, "cyl", furL, [0.028, 0.11, 0.028], [sx * 0.5 + f * 0.07, -0.4, 0.14], [0, 0, f * 0.2], 0.1);
+  });
+  var eyes = [];
+  [[-0.28, 0.12], [0.28, 0.12], [0, -0.04]].forEach(function (p, i) {
+    var e = new THREE.Group(); e.position.set(p[0], p[1], 0.4); face.add(e);
+    cp(e, "sph", cbasic(0xffe14a, { fog: false }), [0.17, 0.125, 0.07], [0, 0, 0], null, 0.06);
+    cp(e, "sph", cbasic(0x120a14), [0.026, 0.1, 0.04], [0, 0, 0.055]); cp(e, "sph", cbasic(0xffffff), [0.03, 0.03, 0.02], [0.06, 0.05, 0.07]);
+    var lid = new THREE.Mesh(mpCap(0.18, 1.1), cmat(0x3a2560)); lid.scale.set(1, 0.72, 0.42); lid.rotation.x = Math.PI / 2 - 0.2; lid.position.set(0, 0.0, 0.0); e.add(lid);
+    eyes.push(e);
+  });
+  var mouth = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.028, 6, 24, Math.PI), cbasic(0x120a14)); mouth.rotation.z = Math.PI; mouth.position.set(0, -0.05, 0.42); face.add(mouth);
+  for (var k = 0; k < 7; k++) { var ta = (205 + k * 22) * Math.PI / 180; cp(face, "cone", cbasic(0xffffff), [0.02, 0.07, 0.02], [Math.cos(ta) * 0.29, -0.05 + Math.sin(ta) * 0.29 + 0.03, 0.43], [0, 0, ta + Math.PI / 2 + Math.PI]); }
+  root.userData.face = face; root.userData.eyes = eyes; return root;
+}
+function mpFing(par, x, y0, len, r, curl, mat, nail, tilt) {      // a three-jointed finger with knuckles and a dark nail
+  var seg = [0.46, 0.32, 0.22], g = par, y = y0, ang = tilt || 0;
+  for (var i = 0; i < 3; i++) {
+    var gp = new THREE.Group(); gp.position.set(i === 0 ? x : 0, i === 0 ? y0 : 0, 0); gp.rotation.z = ang + (i ? curl : 0); g.add(gp);
+    var L = len * seg[i], rr = r * (1 - i * 0.12);
+    cp(gp, "cyl", mat, [rr, L, rr], [0, L / 2, 0], null, 0.1); cp(gp, "sph", mat, [rr * 1.08, rr * 1.08, rr * 1.08], [0, L, 0], null, 0.08);
+    if (i === 2) cp(gp, "sph", nail, [rr * 0.7, L * 0.38, rr * 0.3], [0, L * 0.8, rr * 0.8]);
+    var nx = new THREE.Group(); nx.position.set(0, L, 0); gp.add(nx); g = nx;
+  }
+}
+function mkLimb(kind) {
+  var g = new THREE.Group(), skin = cmat(0x9a92d0), skinD = cmat(0x7f77b8), vein = cbasic(0x6a62a8), nail = cmat(0x4a3a6a), bone = cmat(0xf0e8d4), raw = cmat(0xd98aa8);
+  var A = new THREE.Group(), B = new THREE.Group(); g.add(A);
+  A.position.y = -1.2;
+  function stump(par, rad, y) { for (var j = 0; j < 9; j++) { var a = j / 9 * Math.PI * 2; cp(par, "cone", raw, [0.06, 0.13, 0.06], [Math.cos(a) * rad, y, Math.sin(a) * rad], [Math.sin(a) * 0.3, 0, -Math.cos(a) * 0.3 + Math.PI]); } cp(par, "cyl", bone, [rad * 0.38, 0.16, rad * 0.38], [0, y - 0.08, 0], null, 0.1); }
+  if (kind === 0) {                                                // an arm and an open hand
+    mpTube([V3(0, 0.0), V3(0, 0.5), V3(0, 1.1)], 0.2, 0.19, skin, A, 0.012, 14); cp(A, "sph", skin, [0.23, 0.2, 0.23], [0, 0.0, 0], null, 0.08); stump(A, 0.16, -0.08);
+    cp(A, "sph", skin, [0.25, 0.25, 0.25], [0, 1.1, 0], null, 0.08); cp(A, "sph", skinD, [0.08, 0.08, 0.04], [0, 1.1, 0.23]);
+    B.position.y = 1.1; B.rotation.z = -0.5; A.add(B);
+    mpTube([V3(0, 0.0), V3(0, 0.45), V3(0, 1.0)], 0.2, 0.13, skin, B, 0.012, 14);
+    for (var vv = -1; vv <= 1; vv++) mpTube([V3(vv * 0.07, 0.15, 0.17), V3(vv * 0.09, 0.5, 0.14), V3(vv * 0.05, 0.9, 0.12)], 0.012, 0.006, vein, B, 0, 4);
+    cp(B, "box", skin, [0.46, 0.42, 0.14], [0, 1.2, 0], null, 0.08); cp(B, "sph", skin, [0.23, 0.22, 0.09], [0, 1.2, 0], null, 0.06);
+    for (var f = 0; f < 4; f++) mpFing(B, -0.17 + f * 0.113, 1.38, 0.5 - (f === 0 || f === 3 ? 0.07 : 0) + (f === 1 || f === 2 ? 0.02 : 0), 0.055, 0.12 + (f - 1.5) * 0.04, skin, nail, 0);
+    var th = new THREE.Group(); th.position.set(0.22, 1.15, 0.0); th.rotation.z = -0.85; B.add(th); mpFing(th, 0, 0, 0.36, 0.062, 0.1, skin, nail, 0);
+    [-0.1, 0.1].forEach(function (x) { cp(B, "sph", skinD, [0.04, 0.03, 0.03], [x, 1.32, 0.08]); });
+  } else {                                                         // a leg and a foot
+    mpTube([V3(0, 0.0), V3(0, 0.6), V3(0, 1.2)], 0.27, 0.26, skin, A, 0.012, 14); cp(A, "sph", skin, [0.29, 0.25, 0.29], [0, 0.0, 0], null, 0.08); stump(A, 0.2, -0.1);
+    cp(A, "sph", skin, [0.3, 0.3, 0.3], [0, 1.2, 0], null, 0.08);
+    B.position.y = 1.2; B.rotation.z = 0.6; A.add(B);
+    mpTube([V3(0, 0.0), V3(0, 0.4), V3(0, 1.0)], 0.25, 0.16, skin, B, 0.012, 14);
+    for (var vq = -1; vq <= 1; vq += 2) mpTube([V3(vq * 0.08, 0.1, 0.22), V3(vq * 0.1, 0.5, 0.18), V3(vq * 0.06, 0.9, 0.14)], 0.012, 0.006, vein, B, 0, 4);
+    cp(B, "sph", skin, [0.2, 0.2, 0.2], [0, 1.0, 0], null, 0.08);
+    cp(B, "sph", skin, [0.34, 0.2, 0.26], [0.2, 1.08, 0], null, 0.08);
+    for (var t = 0; t < 5; t++) { cp(B, "sph", skin, [0.075 - t * 0.006, 0.07, 0.07], [0.46 + (t === 0 ? 0.04 : 0), 1.08 - 0.09 + t * 0.045, 0.0 + (t - 2) * 0.0], null, 0.08); cp(B, "sph", nail, [0.03, 0.04, 0.05], [0.5 + (t === 0 ? 0.04 : 0), 1.1 - 0.09 + t * 0.045, 0.05]); }
+    cp(B, "sph", skinD, [0.14, 0.1, 0.1], [0.0, 1.05, 0.2]);
+  }
+  return g;
+}
+function mkImp() {
+  var g = new THREE.Group(), pur = cmat(0x5a3a8c), purD = cmat(0x3b2562), purL = cmat(0x7a5aa8), ivory = cmat(0xf0e6c8), red = cmat(0xd42a1e), ink = cbasic(INK), white = cbasic(0xffffff);
+  cp(g, "sph", pur, [0.42, 0.4, 0.4], [0, 0, 0], null, 0.08);
+  cp(g, "sph", purL, [0.27, 0.23, 0.2], [0, -0.12, 0.2]);
+  var eb = new THREE.Group(); g.add(eb);
+  cp(eb, "sph", cbasic(0xf4f0e6), [0.21, 0.21, 0.12], [0, 0.04, 0.35], null, 0.08);
+  cp(eb, "circle", cbasic(0xd42a1e), [0.115, 0.115, 1], [0, 0.04, 0.472]); cp(eb, "circle", cbasic(0x120a14), [0.035, 0.095, 1], [0, 0.04, 0.476]); cp(eb, "circle", cbasic(0xffffff), [0.03, 0.03, 1], [0.04, 0.09, 0.48]);
+  var brow = cp(eb, "box", purD, [0.4, 0.06, 0.1], [0, 0.2, 0.36], [0, 0, 0.12]); outline(brow, 0.1);
+  var mouth = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.018, 6, 20, Math.PI), cbasic(0x120a14)); mouth.rotation.z = Math.PI; mouth.position.set(0, -0.12, 0.37); g.add(mouth);
+  [-0.11, -0.055, 0.055, 0.11].forEach(function (x, i) { cp(g, "cone", white, [0.016, 0.055 + (i === 0 || i === 3 ? 0.01 : 0), 0.016], [x, -0.157 + Math.abs(x) * 0.28, 0.375], [Math.PI, 0, 0]); });
+  [-1, 1].forEach(function (s) {
+    var hp = [V3(s * 0.2, 0.32), V3(s * 0.3, 0.46), V3(s * 0.3, 0.62), V3(s * 0.22, 0.72)], hm = new THREE.Mesh(taperTube(hp, function (t) { return 0.075 * (1 - t) + 0.01; }, { tub: 12, rad: 8 }), ivory); g.add(hm); outlineN(hm, 0.014);
+    var ear = cp(g, "cone", pur, [0.07, 0.26, 0.03], [s * 0.4, 0.14, 0], [0, 0, -s * 1.2], 0.1); cp(g, "cone", cmat(0xf0a0b0), [0.04, 0.17, 0.015], [s * 0.4, 0.14, 0.02], [0, 0, -s * 1.2]);
+    cp(g, "sph", pur, [0.07, 0.05, 0.08], [s * 0.14, -0.4, 0.05], null, 0.05);
+    for (var c = -1; c <= 1; c++) cp(g, "cone", white, [0.012, 0.05, 0.012], [s * 0.14 + c * 0.03, -0.44, 0.1], [Math.PI, 0, c * 0.2]);
+    cp(g, "sph", pur, [0.07, 0.09, 0.07], [s * 0.38, -0.12, 0.17], null, 0.07);                                // stubby arms with claws
+    for (var d = -1; d <= 1; d++) cp(g, "cone", white, [0.012, 0.05, 0.012], [s * 0.4 + d * 0.025, -0.2, 0.2], [Math.PI, 0, d * 0.25 + s * 0.2]);
+  });
+  function wing(sx, grp) {
+    var sh = new THREE.Shape(); sh.moveTo(0, 0.05); sh.lineTo(sx * 0.3, 0.42); sh.lineTo(sx * 0.62, 0.6);
+    sh.quadraticCurveTo(sx * 0.62, 0.3, sx * 0.9, 0.38); sh.quadraticCurveTo(sx * 0.78, 0.1, sx * 1.0, 0.0); sh.quadraticCurveTo(sx * 0.72, -0.04, sx * 0.76, -0.22);
+    sh.quadraticCurveTo(sx * 0.5, -0.08, sx * 0.4, -0.3); sh.quadraticCurveTo(sx * 0.22, -0.12, 0, -0.18); sh.closePath();
+    var geo = new THREE.ShapeGeometry(sh, 4);
+    var back = new THREE.Mesh(geo, ink); back.position.z = -0.004; back.scale.set(1.04, 1.06, 1); grp.add(back);
+    grp.add(new THREE.Mesh(geo, cmat(0x3b2562)));
+    [[0.3, 0.42], [0.62, 0.6], [0.9, 0.38], [1.0, 0.0]].forEach(function (p) { var a = new THREE.Vector3(0, 0.05, 0.004), b = new THREE.Vector3(sx * p[0], p[1], 0.004), d = new THREE.Vector3().subVectors(b, a);
+      var bm = cp(grp, "cyl", cmat(0x7a5aa8), [0.012, d.length(), 0.012], [(a.x + b.x) / 2, (a.y + b.y) / 2, 0.006]); bm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); });
+    cp(grp, "cone", white, [0.014, 0.06, 0.014], [sx * 0.3, 0.45, 0.01], [0, 0, -sx * 0.6]);
+  }
+  var pl = new THREE.Group(), pr = new THREE.Group(); g.add(pl); g.add(pr); wing(-1, pl); wing(1, pr); pl.position.x = -0.25; pr.position.x = 0.25;
+  var tl = new THREE.Mesh(taperTube([V3(-0.3, -0.2), V3(-0.55, -0.35), V3(-0.75, -0.2), V3(-0.85, 0.05)], function (t) { return 0.05 * (1 - t) + 0.012; }, { tub: 14, rad: 8 }), pur); g.add(tl); outlineN(tl, 0.012);
+  var sp = cp(g, "sph", red, [0.1, 0.13, 0.025], [-0.88, 0.14, 0], [0, 0, 0.5], 0.1); cp(g, "cone", red, [0.07, 0.12, 0.025], [-0.89, 0.24, 0], [0, 0, 0.5]);
+  g.userData.pl = pl; g.userData.pr = pr; g.userData.eb = eb; return g;
+}
+function mkWisp() {
+  var g = new THREE.Group(), glass = { transparent: true, opacity: 0.55, depthWrite: false, fog: false }, glassL = { transparent: true, opacity: 0.35, depthWrite: false, fog: false };
+  var dome = new THREE.Mesh(mu().dome, cbasic(0xcfeeff, glass)); dome.scale.set(0.8, 0.7, 0.8); g.add(dome);
+  var core = new THREE.Mesh(mu().sph, cbasic(0xffffff, { transparent: true, opacity: 0.45, depthWrite: false, fog: false })); core.scale.set(0.34, 0.3, 0.34); core.position.y = 0.2; g.add(core);
+  mpRing(g, 14, 0.8, 0.0, function (grp, i, R) { cp(grp, "cone", cbasic(i % 2 ? 0xbfe6ff : 0xdff4ff, glassL), [0.09, 0.2, 0.03], [0, -0.08, R], [Math.PI + 0.25, 0, 0]); });   // a frilly rim
+  var face = new THREE.Group(); g.add(face);
+  [-1, 1].forEach(function (sx) {
+    cp(face, "sph", cbasic(0x120a14), [0.11, 0.17, 0.05], [sx * 0.25, 0.2, 0.55]); cp(face, "sph", cbasic(0xffffff), [0.035, 0.045, 0.02], [sx * 0.25 + 0.03, 0.26, 0.595]); cp(face, "sph", cbasic(0xffffff), [0.015, 0.02, 0.02], [sx * 0.25 - 0.03, 0.14, 0.595]);
+    cp(face, "sph", cbasic(0xffb0c8, { transparent: true, opacity: 0.6 }), [0.07, 0.04, 0.03], [sx * 0.38, 0.06, 0.5]);
+  });
+  cp(face, "sph", cbasic(0x120a14), [0.08, 0.1, 0.05], [0, -0.02, 0.6]);
+  var ten = [];
+  for (var i = 0; i < 5; i++) {
+    var px = -0.5 + i * 0.25, pts = []; for (var t = 0; t <= 6; t++) { var y = 0.35 - t / 6 * 0.7; pts.push(new THREE.Vector3(Math.sin(t * 1.2 + i) * 0.05, y, 0)); }
+    var tm = new THREE.Mesh(taperTube(pts, function (q) { return 0.06 * (1 - q * 0.85) + 0.008; }, { tub: 14, rad: 7 }), cbasic(i % 2 ? 0xcfeeff : 0xe4f6ff, glass)); tm.position.set(px, -0.65, 0); g.add(tm); tm.userData.px = px; ten.push(tm);
+  }
+  [[-0.9, 0.5, 0.2], [0.95, 0.3, 0.1], [0.7, 0.85, -0.1], [-0.6, 0.95, 0.0], [0.1, 1.15, 0.2]].forEach(function (m, k) { cp(g, "sph", cbasic(0xffffff, { transparent: true, opacity: 0.8, fog: false }), [0.03 - k * 0.003, 0.03 - k * 0.003, 0.03 - k * 0.003], m); });
+  g.userData.dome = dome; g.userData.face = face; g.userData.ten = ten; return g;
+}
+
+/* ---------- the Hand: the game's hand with knuckles, tendons, nails, wrinkles, grime and a worn sleeve ---------- */
+var __mpMakeHand = makeHand;
+makeHand = function () {
+  var h = __mpMakeHand(), g = h.g, fx = [-0.33, -0.11, 0.11, 0.33], fl = [0.2, 0.26, 0.24, 0.18];
+  var S = function (par, r, col, x, y, z, op) { return pmesh(par, new THREE.SphereGeometry(r, 12, 9), col, x, y, z, op); };
+  var skinD = 0xd9ae8c, nailC = 0x6a5a4a, dirt = 0x8a6a4a;
+  fx.forEach(function (x, i) {
+    S(g, 0.085, 0xf1d0b4, x, 0.13, 0.26, { ol: 0.016 });                                                      // knuckle
+    pmesh(g, roundedBox(0.04, 0.03, 0.34, 0.012, 2), skinD, x, 0.155, 0.04, { ol: 0 });                       // tendon
+    var pv = h.fingers[i].pv, tip = h.fingers[i].tip;
+    pmesh(pv, new THREE.TorusGeometry(0.098, 0.011, 5, 12), skinD, 0, 0, fl[i] * 0.55 + 0.05, { ol: 0 });
+    pmesh(pv, new THREE.TorusGeometry(0.098, 0.011, 5, 12), skinD, 0, 0, fl[i] * 0.3 + 0.05, { ol: 0 });
+    pmesh(tip, new THREE.TorusGeometry(0.086, 0.01, 5, 12), skinD, 0, 0, 0.1, { ol: 0 });
+    S(tip, 0.05, nailC, 0, 0.055, 0.26, { ol: 0.01, s: [0.95, 0.38, 1.35] });
+    S(tip, 0.02, dirt, 0.0, 0.08, 0.3, { ol: 0, s: [1.2, 0.5, 1] });
+  });
+  S(h.thumb, 0.056, nailC, 0, 0.07, 0.44, { ol: 0.01, s: [0.95, 0.4, 1.3] });
+  pmesh(h.thumb, new THREE.TorusGeometry(0.1, 0.011, 5, 12), skinD, 0, 0, 0.2, { ol: 0 });
+  for (var k = 0; k < 14; k++) pmesh(g, new THREE.ConeGeometry(0.007, 0.06, 4), 0x6a4a2a, -0.35 + (k % 7) * 0.12, 0.16, -0.1 + Math.floor(k / 7) * 0.2 + ((k * 37) % 5) * 0.015, { ol: 0, r: [-0.4 + (k % 3) * 0.2, 0, (k % 4 - 1.5) * 0.15] });
+  S(g, 0.07, dirt, -0.2, 0.15, 0.05, { ol: 0, s: [1.4, 0.3, 1] }); S(g, 0.05, dirt, 0.25, 0.15, 0.15, { ol: 0, s: [1.2, 0.3, 1] });
+  S(g, 0.12, 0xe8c8ac, 0, 0.1, -0.2, { ol: 0, s: [2.2, 0.35, 1.1] });
+  var arm = h.arm;
+  [0.9, 2.2, 4.0].forEach(function (y) { pmesh(arm, new THREE.TorusGeometry(0.43, 0.025, 6, 14), 0x241d47, 0, y, 0, { ol: 0, r: [Math.PI / 2, 0, 0] }); });
+  mpRing(arm, 14, 0.5, 0.0, function (grp, i, R) { pmesh(grp, new THREE.ConeGeometry(0.035, 0.12 + (i % 3) * 0.04, 4), 0x6a5cc0, 0, -0.04, R, { ol: 0, r: [Math.PI, 0, 0] }); });
+  [-1, 1].forEach(function (s) { S(arm, 0.045, 0xe8d8a0, s * 0.18, 0.05, 0.5, { ol: 0.008 }); });
+  return h;
+};
+
+/* ---------- Cinder the dragon and Skarra the griffin: the existing flyers plus extra anatomy ---------- */
+function mpFindHead(body, x, y) { for (var i = 0; i < body.children.length; i++) { var c = body.children[i]; if (c.isGroup && Math.abs(c.position.x - x) < 0.02 && Math.abs(c.position.y - y) < 0.02) return c; } return null; }
+var __mpBuildDragon = buildDragon;
+buildDragon = function () {
+  var g = __mpBuildDragon(), body = g.children[0], green = 0x2fa878, greenD = 0x1f7f63, greenL = 0x45c28c, red = 0xd8456a, redD = 0x9a2a52, horn = 0xf4ead2;
+  var curve = body.children[0].geometry.userData.curve, P = new THREE.Vector3(), T = new THREE.Vector3();
+  var R = function (t) { return t < 0.62 ? 0.035 + 0.55 * Math.pow(t / 0.62, 1.25) : t < 0.86 ? 0.585 - (t - 0.62) / 0.24 * 0.29 : 0.295 + (t - 0.86) * 0.2; };
+  if (curve) for (var i = 0; i < 26; i++) {                         // overlapping scale plates down both flanks
+    var t = 0.1 + i * 0.03; if (t > 0.9) break; curve.getPointAt(t, P); var r = R(t);
+    [-1, 1].forEach(function (s) { [0.75, 1.25].forEach(function (a, k) {
+      var sc = pmesh(body, new THREE.SphereGeometry(1, 10, 7), (i + k) % 2 ? green : greenL, P.x, P.y + Math.cos(a) * r * 0.97, s * Math.sin(a) * r * 0.97, { ol: 0.012, s: [0.11 + r * 0.1, 0.035 + r * 0.025, 0.09 + r * 0.08] });
+      sc.lookAt(P.x, P.y, 0); sc.rotation.z += 0; }); });
+  }
+  var h = mpFindHead(body, 1.95, 1.08);
+  if (h) {
+    [-1, 1].forEach(function (sz) {
+      for (var k = 0; k < 6; k++) {                                  // fangs and rows of small teeth
+        pmesh(h, new THREE.ConeGeometry(0.018 + (k === 0 ? 0.012 : 0), 0.06 + (k === 0 ? 0.04 : 0), 5), 0xffffff, 0.34 + k * 0.075, -0.205, sz * 0.15, { ol: 0, r: [Math.PI, 0, 0] });
+        pmesh(h, new THREE.ConeGeometry(0.015, 0.05, 5), 0xfff4dc, 0.3 + k * 0.07, -0.245, sz * 0.14, { ol: 0, r: [0, 0, 0.1] });
+      }
+      pmesh(h, new THREE.TorusGeometry(0.045, 0.014, 6, 12), greenD, 0.74, 0.07, sz * 0.09, { ol: 0, r: [0, Math.PI / 2, 0] });             // nostril rims
+      var lid = pmesh(h, new THREE.SphereGeometry(0.14, 14, 8, 0, Math.PI * 2, 0, 1.2), green, 0.145, 0.12, sz * 0.27, { ol: 0.012, s: [0.85, 0.9, 0.6], r: [sz * 0.55 + (sz > 0 ? 0 : 0), 0, -0.1] });
+      mpBone(h, V3(0.48, -0.33, sz * 0.07), V3(0.3, -0.56, sz * 0.11), 0.018, 0.012, redD, { ol: 0.006, seg: 6 });
+      mpBone(h, V3(0.3, -0.56, sz * 0.11), V3(0.12, -0.66, sz * 0.15), 0.012, 0.008, redD, { ol: 0.004, seg: 6 }); pmesh(h, new THREE.SphereGeometry(0.03, 8, 6), red, 0.1, -0.67, sz * 0.15, { ol: 0.006 });   // chin whiskers
+      [0, 1, 2].forEach(function (f) { pmesh(h, new THREE.ConeGeometry(0.045, 0.24 - f * 0.04, 5), redD, -0.12 - f * 0.1, 0.08 + f * 0.04, sz * (0.22 - f * 0.01), { ol: 0.01, r: [sz * 0.9, 0, 1.75 + f * 0.1] }); });   // ear fins
+      for (var c = 0; c < 3; c++) pmesh(h, new THREE.SphereGeometry(0.06 - c * 0.008, 8, 6), c % 2 ? green : greenL, 0.0 - c * 0.12, -0.05 - c * 0.04, sz * (0.3 - c * 0.02), { ol: 0.01, s: [1.3, 0.8, 0.5] });   // cheek plates
+    });
+    pmesh(h, new THREE.SphereGeometry(1, 10, 6), 0xe0607a, 0.52, -0.222, 0, { ol: 0, s: [0.17, 0.018, 0.07] });                    // tongue
+    for (var b = 0; b < 4; b++) pmesh(h, new THREE.SphereGeometry(0.035 - b * 0.004, 8, 6), greenD, 0.5 + b * 0.07, 0.11 - b * 0.005, 0, { ol: 0.008, s: [1, 0.7, 1] });   // nose bumps
+    pmesh(h, new THREE.ConeGeometry(0.05, 0.15, 6), horn, 0.7, 0.14, 0, { ol: 0.01, r: [0, 0, -0.5] });
+    for (var cr = 0; cr < 4; cr++) pmesh(h, new THREE.ConeGeometry(0.05 - cr * 0.006, 0.17, 5), cr % 2 ? red : 0xe8607a, 0.05 - cr * 0.15, 0.36 - cr * 0.02, 0, { ol: 0.01, r: [0, 0, 0.9 + cr * 0.12] });   // crest
+  }
+  g.userData.wings.forEach(function (wg) {                           // knuckles, finger claws and ribs on the wings
+    var wp = wg.w.children[0], wrist = V3(0.12, 2.35), tips = [V3(-0.35, 3.55), V3(-1.15, 3.05), V3(-1.7, 2.1), V3(-1.85, 1.0)], back = V3(-1.4, -0.05), bone = 0x7a2a44;
+    tips.forEach(function (tp, k) {
+      var m = V3(wrist.x + (tp.x - wrist.x) * 0.55, wrist.y + (tp.y - wrist.y) * 0.55); pmesh(wp, new THREE.SphereGeometry(0.05, 8, 6), bone, m.x, m.y, 0, { ol: 0.008 });
+      var cl = pmesh(wp, new THREE.ConeGeometry(0.035, 0.14, 5), horn, tp.x, tp.y, 0, { ol: 0.006 }); cl.rotation.z = Math.atan2(tp.y - wrist.y, tp.x - wrist.x) - Math.PI / 2;
+    });
+    [[V3(0.3, 0.5), V3(-0.7, 1.0)], [V3(0.2, 0.2), V3(-0.9, 1.0)], [V3(0.0, 0.0), V3(-1.1, 0.8)]].forEach(function (rb) { mpBone(wp, rb[0], rb[1], 0.02, 0.012, bone, { ol: 0, seg: 5 }); });
+    mpBone(wp, back, V3(-1.0, 0.6), 0.025, 0.015, bone, { ol: 0, seg: 5 });
+  });
+  return g;
+};
+var __mpBuildGriffin = buildGriffin;
+buildGriffin = function () {
+  var g = __mpBuildGriffin(), body = g.children[0], cream = 0xf6efe2, creamD = 0xe2d5bd, gold = 0xd9a441, goldD = 0xb88330, brown = 0x8a5a33, brownD = 0x5e3b22, beak = 0xf2b630, talon = 0x2a1a10;
+  var bm = body.children[0], cg = bm.geometry.attributes.color, nr = bm.geometry.attributes.normal, tn = 30, rn = 14;   // soften the hard gold-to-cream bands into a gradient
+  if (cg && nr) { var gc = new THREE.Color(gold), gdc = new THREE.Color(goldD), cc = new THREE.Color(cream), tmp = new THREE.Color();
+    for (var qi = 0; qi <= tn; qi++) { var qt = qi / tn, mix = THREE.MathUtils.smoothstep(qt, 0.28, 0.66);
+      for (var qj = 0; qj <= rn; qj++) { var qk = qi * (rn + 1) + qj; tmp.copy(gc).lerp(cc, mix); if (nr.getY(qk) > 0.4) tmp.lerp(gdc, 0.4 * (1 - mix)); if (nr.getY(qk) < -0.3) tmp.lerp(cc, 0.55 * (1 - mix)); cg.setXYZ(qk, tmp.r, tmp.g, tmp.b); } }
+    cg.needsUpdate = true; }
+  var h = mpFindHead(body, 0.98, 0.72);
+  if (h) {
+    [-1, 1].forEach(function (sz) {
+      pmesh(h, new THREE.TorusGeometry(0.1, 0.02, 6, 14), 0xf0a020, 0.17, 0.07, sz * 0.23, { ol: 0, r: [0, sz * 0.5, 0] });                // gold eye ring
+      pmesh(h, new THREE.SphereGeometry(0.014, 6, 5), talon, 0.5, 0.0, sz * 0.045, { ol: 0, s: [1.4, 0.8, 0.8] });                           // nostril on the beak
+      for (var f = 0; f < 6; f++) pmesh(h, mpLeaf(0.17 - f * 0.012, 0.045), f % 2 ? cream : creamD, -0.02 - f * 0.065, 0.06 - f * 0.065, sz * 0.2, { ol: 0, dbl: true, r: [0, sz * 0.5, 0.9 + f * 0.1] });   // layered cheek feathers
+      pmesh(h, new THREE.ConeGeometry(0.03, 0.15, 5), cream, -0.05 - sz * 0.0, -0.3, sz * 0.12, { ol: 0.006, r: [0, 0, Math.PI + 0.25] });
+    });
+    for (var cr = 0; cr < 5; cr++) pmesh(h, mpLeaf(0.34 - cr * 0.02, 0.05), cr % 2 ? cream : brown, -0.2 - cr * 0.075, 0.2 - cr * 0.1, 0, { ol: 0, dbl: true, r: [0, 0, 1.2 + cr * 0.12] });   // swept crest feathers
+  }
+  for (var m = 0; m < 9; m++) pmesh(body, new THREE.ConeGeometry(0.07 - m * 0.003, 0.26, 5), m % 2 ? brownD : brown, 0.6 - m * 0.16, 0.5 - m * 0.015, 0, { ol: 0.01, r: [0, 0, 0.8 + m * 0.05] });      // a lion's mane ridge down the back
+  for (var rr = 0; rr < 3; rr++) for (var cc = 0; cc < 7; cc++) pmesh(body, new THREE.SphereGeometry(0.075, 8, 6), (rr + cc) % 2 ? cream : creamD, 0.52 - rr * 0.1, 0.32 - rr * 0.14, (cc - 3) * 0.1, { ol: 0.006, s: [0.5, 1.1, 0.8] });   // breast feathers
+  [-1, 1].forEach(function (sz) {
+    for (var k = 0; k < 3; k++) pmesh(body, new THREE.TorusGeometry(0.055, 0.012, 5, 10), goldD, 0.42 + 0.17 * Math.sin(0.9), -0.2 - 0.17 * Math.cos(0.9) - k * 0.04, sz * 0.2, { ol: 0, r: [Math.PI / 2, 0, 0] });
+    for (var t2 = 0; t2 < 4; t2++) pmesh(body, new THREE.ConeGeometry(0.03, 0.14 + (t2 % 2) * 0.03, 5), cream, 0.22 + t2 * 0.07, -0.18 - t2 * 0.01, sz * (0.2 + (t2 - 1.5) * 0.05), { ol: 0.006, r: [0, 0, Math.PI - 0.3] });   // thigh feathers
+    for (var pw = 0; pw < 4; pw++) { pmesh(body, new THREE.SphereGeometry(0.045, 8, 6), 0xe6c27a, -1.2 + pw * 0.0, -0.78 + 0.0, sz * (0.14 + pw * 0.06), { ol: 0.008, s: [1.3, 0.8, 1] }); pmesh(body, new THREE.ConeGeometry(0.014, 0.07, 5), talon, -1.15, -0.82, sz * (0.14 + pw * 0.06), { ol: 0, r: [0, 0, Math.PI / 2 + 0.3] }); }
+  });
+  for (var tu = 0; tu < 7; tu++) pmesh(body, new THREE.ConeGeometry(0.045, 0.2, 5), tu % 2 ? brown : brownD, -3.12 - Math.cos(tu * 0.9) * 0.05, 0.16 + Math.sin(tu * 1.3) * 0.1, Math.sin(tu * 2.1) * 0.1, { ol: 0.006, r: [Math.sin(tu * 2.1) * 0.8, 0, 0.9 + tu * 0.2] });   // a fuller tail tuft
+  g.userData.wings.forEach(function (wg) {                           // a wing claw at the wrist, and an alula tuft
+    var wp = wg.w.children[0];
+    pmesh(wp, new THREE.ConeGeometry(0.04, 0.2, 5), talon, 0.1, 1.28, 0, { ol: 0.008, r: [0, 0, -0.4] });
+    for (var a = 0; a < 3; a++) { var fe = new THREE.Mesh(mpLeaf(0.34 - a * 0.05, 0.05), new THREE.MeshToonMaterial({ color: a % 2 ? 0xe2d5bd : 0xf6efe2, gradientMap: GRAD, side: THREE.DoubleSide })); fe.position.set(0.14, 1.1 + a * 0.05, 0.02); fe.rotation.z = -0.3 + a * 0.35; wp.add(fe); }
+  });
+  return g;
+};
+
 boot();
 
     </script>
