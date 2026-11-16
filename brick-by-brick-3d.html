@@ -409,6 +409,8 @@
       #story-card.leave{ animation:storyOut .16s ease forwards; }
       @keyframes storyIn{ from{ transform:translateY(12px) scale(.98); opacity:0 } to{ transform:none; opacity:1 } }
       @keyframes storyOut{ to{ transform:translateY(-10px) scale(.98); opacity:0 } }
+      #story-art{ display:flex; justify-content:center; min-height:46px; margin:0 0 10px; }
+      #story-art svg{ width:112px; height:auto; }
       #story-kicker{ font-size:11px; font-weight:800; letter-spacing:.16em; color:var(--clay-d); margin:0 0 8px; min-height:13px; }
       @media (prefers-color-scheme: dark){ #story-kicker{ color:var(--clay-l); } }
       #story-text{ font-weight:700; font-size:16.5px; line-height:1.5; margin:0 0 18px; }
@@ -543,7 +545,8 @@
       #ov-start .t-brick{ display:inline-block; animation:tBob 2.4s ease-in-out infinite; text-shadow:5px 5px 0 #221407, 0 0 22px rgba(255,140,60,.8); }
       @keyframes tBob{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-5px) } }
       #btn-begin{ font-size:24px; padding:15px 54px; letter-spacing:.06em; }
-      #ov-victory{ background:radial-gradient(ellipse at 50% 40%, rgba(255,250,230,.35), rgba(20,12,4,.6)); justify-content:center; animation:fadeIn .5s ease; }
+      .v-art svg{ width:120px; height:auto; display:block; margin:0 auto 8px; }
+       #ov-victory{ background:radial-gradient(ellipse at 50% 40%, rgba(255,250,230,.35), rgba(20,12,4,.6)); justify-content:center; animation:fadeIn .5s ease; }
       .panel-box{ background:var(--panel); border:3px solid var(--line); box-shadow:var(--shadow); padding:20px; max-width:430px; width:100%; margin:auto 0; animation:victoryPop .6s .15s cubic-bezier(.2,.9,.3,1.3) both; }
       @keyframes victoryPop{ from{ transform:scale(.8) translateY(20px); opacity:0 } to{ transform:none; opacity:1 } }
       .v-title{ font-family:'Archivo Black',sans-serif; font-size:clamp(32px,9vw,46px); line-height:.98; margin:0 0 8px; }
@@ -928,7 +931,7 @@
 
       <div id="story" class="hidden" data-ui>
         <div id="story-card">
-          <div id="story-kicker"></div>
+          <div id="story-art" aria-hidden="true"></div><div id="story-kicker"></div>
           <p id="story-text"></p>
           <button class="cta-btn" id="story-next">CONTINUE</button>
           <div id="story-dots" aria-hidden="true"></div>
@@ -964,7 +967,7 @@
 
       <div class="overlay hidden" id="ov-victory" data-ui>
         <div class="panel-box">
-          <h1 class="v-title">THE KEYSTONE<br /><span class="t-brick">IS SET</span></h1>
+          <div class="v-art" aria-hidden="true"><svg viewBox="0 0 64 46" width="120" height="86" stroke="#221407" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M20 12h24l6 16-18 14-18-14z" fill="#f5b921"/><path d="M26 19l6-5 6 5" fill="none" stroke="#fff3c4" stroke-width="2.5"/></svg></div><h1 class="v-title">THE KEYSTONE<br /><span class="t-brick">IS SET</span></h1>
           <p class="v-tag">A hundred rows up. The two walls are one — and the silhouettes were people all along. Down in the town, nobody is pointing anymore.</p>
           <div class="stats-grid">
             <div class="stat-box"><span class="stat-num" id="st-laid">0</span><span class="stat-lab">BRICKS LAID</span></div>
@@ -1009,9 +1012,9 @@ var GRAB_TIME = 7;            // seconds a hand needs to rip a brick free (30% q
 
 /* ----- ECONOMY (rebalanced) -----
    Money is meant to be SCARCE and every upgrade a real choice.
-   - A plain brick pays BASE_PAY + 1 per 10 courses reached (the "pay raise").
+   - A plain brick pays BASE_PAY + 1 per 10 rows reached (the "pay raise").
    - A streak builds +5% per hit in a row. Combo Bonus caps it at ×2; Crowd Favor then lifts the ceiling to ×4, ×8 and finally ×10.
-   - Types: lead ×1.5, silver ×2, gold ×2.5, hot ×2, sky-glass ×5; a PERFECT drop pays more with Perfect Eye.
+   - Types: lead ×1.5, silver ×2, gold ×2.5, hot ×2, sky-glass ×2; a PERFECT drop pays more with Perfect Eye.
    - A finished row (on the tower: a finished SIDE) pays 2 × rate (doubled if clean). Smashing a hand pays 10 × rate.
    - METAL BONUSES: every lead / silver / gold brick in a finished row adds +2 / +2.5 / +3 × rate to that row's payout; a run of the
      same metal pays little bumps; a row that is ALL one metal pays a pure-row bonus on top (see ROW_ADD / RUN_ADD / PURE_ADD).
@@ -1021,7 +1024,7 @@ var GRAB_TIME = 7;            // seconds a hand needs to rip a brick free (30% q
      smoulder on its own once you've earned it. The apprentice pays flat rate.
    Pay now arrives every finished SIDE (4× as often on the tower), so the tree was re-priced against that faster income. */
 var TYPE_MULT = { normal: 1, lead: 1.5, silver: 2, gold: 2.5, hot: 2, glass: 2 };
-// plain bricks become glass (×2, half-width drop zone) once the sky-glass course is reached
+// plain bricks become glass (×2, half-width drop zone) once the sky-glass row is reached
 function typeMult(type) { return (type === "normal" && S.glassUnlocked) ? 2 : TYPE_MULT[type]; }
 var TYPE_NAME = { gold: "GOLD", silver: "SILVER", lead: "LEAD", hot: "HOT", glass: "GLASS" };
 var ROW_ADD = { lead: 1.25, silver: 1.75, gold: 2.25 }; // × rate: each metal brick in a finished row (side) adds this to that row's payout
@@ -1084,7 +1087,7 @@ var S = {
   workshopShown: false, shopOpen: false, seenVis: null
 };
 
-// "best" = highest course ever reached. Pay and unlocks follow it, so a hand
+// "best" = highest row ever reached. Pay and unlocks follow it, so a hand
 // tearing rows off the wall never takes your pay raise or your shop away.
 function hopperCap() { return HOPPER_CAP[S.tier.hopper || 0]; }
 function storeCap() { return STORE_CAP[S.tier.storage]; }
@@ -1112,7 +1115,7 @@ function hitTol() { return HIT_TOL * STEADY_MULT[S.tier.steady] * glassF(); }
 function almostTol() { return hitTol() * 2; }
 function perfectTol() { return S.tier.perfect >= 1 ? PERFECT_TOL * PLUMB_MULT[S.tier.plumb] * glassF() : 0; }   // no Perfect Eye, no perfects
 /* Difficulty climbs with the wall: the crane quickens (0.70 → 1.40 rows/s by
-   course 50, then more gently to 1.70 by course 100). */
+   row 50, then more gently to 1.70 by row 100). */
 function heightSpeed() { var c = S.courses; return c <= 50 ? 0.7 + 0.014 * c : 1.4 + 0.006 * (Math.min(c, 100) - 50); }
 function swingSpeed() { return heightSpeed(); }
 function windAmp() { return S.windOn ? Math.min(0.45, 0.15 + 0.01 * Math.max(0, S.courses - WIND_COURSE)) : 0; }
@@ -1121,7 +1124,7 @@ function leadChance() { return S.tier.lead >= 1 ? Math.min(0.12, 0.05 + 0.002 * 
 function silverChance() { return S.tier.silver >= 1 ? Math.min(0.10, 0.05 + 0.002 * Math.max(0, S.best - SILVER_ROW)) : 0; }
 function goldChance() { return S.tier.gold >= 1 ? 0.05 + GILD_PCT[S.tier.gilded] / 100 : 0; }
 function glassChance() { return 0; }   // plain bricks are glass now, so there is no separate rare glass roll
-function swayAmp() { return S.swayOn ? Math.min(0.06, 0.03 + 0.0008 * Math.max(0, S.courses - TREMOR_COURSE)) * LEVEL_MULT[S.tier.level] : 0; }
+function swayAmp() { return S.swayOn ? Math.min(0.066, 0.033 + 0.00088 * Math.max(0, S.courses - TREMOR_COURSE)) * LEVEL_MULT[S.tier.level] : 0; }
 function swayOff() { var a = swayAmp(); return a ? a * Math.sin(S.time * 2.1 + 1.3) : 0; }
 /* WARM-UP: the very first upgrade. $3, and it doubles as the workshop tutorial (see renderStarterTut).
    It shaves 0.2s off the kiln's opening speed (4.5s → 4.3s) — a small step in the gap before Hotter Kiln (3.8s). It only applies while Hotter Kiln is
@@ -1265,7 +1268,7 @@ var LINES = [
   { id: "discard", icon: "sorter", name: "Full Warehouse Discard", costs: [60], gate: function () { return true; },
     effect: function (t) { return "When a brick type's warehouse is full, new bricks of that type are thrown out, so the kiln keeps making the others."; },
     next: function (t) { return "Throw out bricks of a full warehouse automatically, so the kiln keeps making other types."; } },
-  { id: "sorter", icon: "sorter", name: "Brick Sorter", costs: [170],
+  { id: "sorter", icon: "sorter", name: "Brick Sorter", costs: [170], need: function () { return S.tier.lead >= 1 && S.tier.silver >= 1 && S.tier.gold >= 1; }, needText: "Unlock Lead, Silver and Gold bricks first",
     effect: function (t) { return "Bricks are sorted into a warehouse per type. Tap a warehouse to pick what the crane AND your apprentices build with. A whole row of one metal pays a pure-row bonus."; },
     next: function (t) { return "Sort lead, silver and gold into their own warehouses and choose which one you build from — stockpile gold, then lay a pure gold row for a big bonus."; } },
   { id: "placeSpeed", noNow: true, icon: "precision", name: "Swift Setting", costs: [12, 24, 40, 62, 90, 125, 165, 215, 270, 330], gate: function () { return true; },
@@ -1444,7 +1447,7 @@ function humStop() {
 var WALL_W = 5, PITCH = 0.5, BH = 0.44, BD = 0.62, GAP = 0.08, FOUND = 0.22, OUTLINE = 0.032;
 /* ----- TOWER (from the row-5 ask) -----
    The tower is a 6x6 footprint (same width as the wall) standing behind the middle of your wall. Face 0 is the front (in line with
-   the wall), then right, back, left. A course is a full ring: 4 sides x perFace bricks, and the camera
+   the wall), then right, back, left. A row is a full ring: 4 sides x perFace bricks, and the camera
    walks round to each side as you finish the one before. Gameplay code works in "face-local" space
    (x along the side, z out of it) inside W3.orbit; faceToWorld() places bricks on the real side. */
 var TW = 5, TH = TW / 2, TOWER_CUT = 4.6;
@@ -2077,7 +2080,7 @@ function buildWonders() {
 }
 var _wq = new THREE.Quaternion(), _wm = new THREE.Matrix4(), _wv = new THREE.Vector3(), _ws = new THREE.Vector3();
 // Butterfly flock size by row: was a flat 36 (14 on low quality). Now 3 on row 1, rising evenly to 29 on row 10 (about 20% under the old 36);
-// low quality goes 2 → 11. Row = highest course reached + 1, so a collapse never thins the meadow.
+// low quality goes 2 → 11. Row = highest row reached + 1, so a collapse never thins the meadow.
 var BF_MAX = { hi: 29, lo: 11 }, BF_MIN = { hi: 3, lo: 2 }, BF_FULL_ROW = 10;
 function bfTarget() {
   var k = WON.lo ? "lo" : "hi", row = (S.best || 0) + 1;
@@ -2489,7 +2492,7 @@ function buildCrowd() {
   updateCrowd(0);
 }
 var _mp = new THREE.Matrix4(), _ml = new THREE.Matrix4(), _mw = new THREE.Matrix4(), _ml2 = new THREE.Matrix4(), _mw2 = new THREE.Matrix4();
-var CROWD_BY = [0, 1, 2, 4, 6, 9, 12, 16, 20, 25, 30];    // villagers on site after each finished row (best course) — a slow trickle at first, a crowd by row 10
+var CROWD_BY = [0, 1, 2, 4, 6, 9, 12, 16, 20, 25, 30];    // villagers on site after each finished row (best row) — a slow trickle at first, a crowd by row 10
 function crowdTarget() { return S.started ? (S.best >= 10 ? 30 : CROWD_BY[S.best]) : 0; }
 var TOWER_LAT = [-2.6, 2.6, -1.4, 1.4, -3.6, 3.6];
 /* Floating crowd: once the tower is so tall that the ground (and everyone standing on it) has slid below the bottom of the screen,
@@ -3095,15 +3098,15 @@ function buildHole() {
   // silhouettes peering down — sharper as you approach
   W3.sils = [];
   var silMat = new THREE.MeshBasicMaterial({ color: 0x05020c, transparent: true, opacity: 0.5, fog: false, depthWrite: false });
+  var SIL_BUILD = [silBuilder, silElder, silBram, silNell, silMino, silSkarra, silCinder];
   for (var i = 0; i < 7; i++) {
     var s = new THREE.Group();
-    var body = new THREE.Mesh(new THREE.CircleGeometry(1.5, 20, 0, Math.PI), silMat); body.scale.y = 1.4; s.add(body);
-    var head = new THREE.Mesh(new THREE.CircleGeometry(1.0, 20), silMat); head.position.y = 2.6; s.add(head);
-    s.position.set(-4.5 + i * 1.5, -4 + (i % 2 ? 0.5 : 0), 0.1); s.visible = false; s.renderOrder = 2; body.renderOrder = 2; head.renderOrder = 2;
+    SIL_BUILD[i](s, silMat);
+    s.position.set(-4.5 + i * 1.5, -4 + (i % 2 ? 0.5 : 0), 0.1); s.visible = false; s.renderOrder = 2;
     s.userData.ph = i * 2.1; g.add(s); W3.sils.push(s);
   }
   W3.silMat = silMat;
-  // the keystone gate: appears at the rim (course 50) and swells toward course 100
+  // the keystone gate: appears at the rim (row 50) and swells toward row 100
   var gate = new THREE.Group(); gate.visible = false; gate.position.z = 0.05; g.add(gate); W3.gate = gate;
   W3.gateMat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, fog: false, blending: THREE.AdditiveBlending,
@@ -3117,6 +3120,56 @@ function buildHole() {
   // clip silhouettes to the disc with a stencil-free trick: they sit low
 }
 
+/* ---------- silhouettes: the main characters as black cut-outs ---------- */
+function silPoly(par, mat, pts) {
+  var sh = new THREE.Shape(); pts.forEach(function (p, i) { if (i) sh.lineTo(p[0], p[1]); else sh.moveTo(p[0], p[1]); });
+  sh.closePath(); var m = new THREE.Mesh(new THREE.ShapeGeometry(sh), mat); m.renderOrder = 2; par.add(m); return m;
+}
+function silEll(par, mat, rx, ry, x, y) {
+  var m = new THREE.Mesh(new THREE.CircleGeometry(1, 24), mat); m.scale.set(rx, ry, 1); m.position.set(x, y, 0); m.renderOrder = 2; par.add(m); return m;
+}
+function silMx(pts) { return pts.map(function (p) { return [-p[0], p[1]]; }); }
+function silBuilder(g, m) {                 // Edgar: a flat cap and a builder's shoulders
+  silEll(g, m, 1.2, 0.8, 0, 0.1); silEll(g, m, 0.7, 0.78, 0, 1.6);
+  silPoly(g, m, [[-0.85, 2.2], [0.85, 2.2], [0.7, 2.7], [-0.7, 2.7]]);
+  silPoly(g, m, [[-1.1, 2.15], [1.1, 2.15], [1.1, 2.32], [-1.1, 2.32]]);
+}
+function silElder(g, m) {                   // the Elder: a long beard and a staff
+  silEll(g, m, 1.25, 0.9, 0, -0.1); silEll(g, m, 0.72, 0.82, 0, 1.8);
+  silPoly(g, m, [[-0.5, 1.4], [0.5, 1.4], [0, -0.9]]);
+  silPoly(g, m, [[1.55, -1.5], [1.75, -1.5], [1.75, 2.9], [1.55, 2.9]]); silEll(g, m, 0.3, 0.3, 1.65, 3.05);
+}
+function silBram(g, m) {                    // Bram: broad, with a hammer up on one shoulder
+  silEll(g, m, 1.5, 0.95, 0, 0.1); silEll(g, m, 0.66, 0.7, 0, 1.75);
+  silPoly(g, m, [[0.5, 0.7], [1.2, 2.0], [1.45, 1.75], [0.8, 0.3]]);
+  silPoly(g, m, [[1.0, 2.3], [2.1, 2.75], [2.35, 2.35], [1.25, 1.9]]);
+}
+function silNell(g, m) {                    // Nell: round, with ears and a lamp held up
+  silEll(g, m, 1.1, 0.85, 0, -0.2); silEll(g, m, 0.85, 0.8, 0, 1.35);
+  silEll(g, m, 0.28, 0.28, -0.62, 2.0); silEll(g, m, 0.28, 0.28, 0.62, 2.0);
+  silEll(g, m, 0.42, 0.22, 0.7, 1.15);
+  silPoly(g, m, [[-1.25, 0.2], [-0.9, 0.2], [-1.45, 1.0], [-1.75, 0.95]]); silEll(g, m, 0.36, 0.36, -1.6, 1.15);
+}
+function silMino(g, m) {                    // the Minotaur: broad shoulders and two horns
+  silEll(g, m, 1.6, 1.0, 0, 0); silEll(g, m, 0.85, 0.9, 0, 1.9);
+  var horn = [[0.5, 2.4], [1.2, 3.3], [1.45, 3.05], [0.85, 2.15]];
+  silPoly(g, m, horn); silPoly(g, m, silMx(horn));
+}
+function silSkarra(g, m) {                  // Skarra the griffin: wings spread wide, a hooked beak
+  var wing = [[0.5, 0.9], [2.7, 2.4], [3.0, 1.6], [2.5, 1.1], [2.4, 0.4], [1.6, 0.2], [0.6, 0.0]];
+  silPoly(g, m, wing); silPoly(g, m, silMx(wing));
+  silEll(g, m, 1.0, 0.75, 0, 0.2); silEll(g, m, 0.62, 0.62, 0.3, 1.55);
+  silPoly(g, m, [[0.8, 1.7], [1.5, 1.45], [0.8, 1.25]]);
+  silPoly(g, m, [[-0.35, 2.0], [-0.5, 2.6], [0.05, 2.15]]); silPoly(g, m, [[0.1, 2.05], [0.2, 2.6], [0.5, 2.1]]);
+}
+function silCinder(g, m) {                  // Cinder the dragon: head raised over the rim, horns, a spiked wing
+  silPoly(g, m, [[-0.6, -0.6], [0.6, -0.6], [0.9, 0.6], [0.8, 1.6], [0.1, 2.2], [-0.5, 2.2], [-0.8, 1.2]]);
+  silEll(g, m, 1.0, 0.55, 0.6, 2.5);
+  silPoly(g, m, [[1.2, 2.45], [2.3, 2.2], [2.2, 2.55], [1.2, 2.75]]);
+  silPoly(g, m, [[-0.4, 2.7], [-0.9, 3.5], [0.1, 2.95]]);
+  silPoly(g, m, [[-0.7, 1.4], [-2.4, 2.6], [-2.1, 1.1], [-2.8, 0.8], [-1.0, 0.2]]);
+}
+
 /* ---------- clouds & birds ---------- */
 function buildClouds() {
   // Puffy toon clouds at every altitude — instanced (2 draw calls).
@@ -3124,7 +3177,7 @@ function buildClouds() {
   var geo = new THREE.SphereGeometry(1, 13, 9), gp = geo.attributes.position;
   for (var vi = 0; vi < gp.count; vi++) { var vy = gp.getY(vi); if (vy < -0.25) gp.setY(vi, -0.25 + (vy + 0.25) * 0.45); }   // flat-ish bottoms, like real cumulus
   geo.computeVertexNormals();
-  for (var i = 0; i < 22; i++) {
+  for (var i = 0; i < 19; i++) {
     var n = 4 + Math.floor(Math.random() * 3), puffs = [];
     for (var k = 0; k < n; k++) puffs.push({ ox: (k - n / 2) * 1.5 + rand(-0.3, 0.3), oy: rand(-0.2, 0.6) + (k === 1 ? 0.6 : 0), oz: rand(-0.4, 0.4), s: rand(1.1, 2.1) * (k === 1 ? 1.25 : 1) });
     var front = i % 5 === 0;
@@ -3145,7 +3198,7 @@ function updateClouds(dt) {
     cl.x += (cl.v * 0.6 + wa * 6) * dt;
     if (cl.x > 70) cl.x = -70; if (cl.x < -70) cl.x = 70;
     // decorative clouds that float in front of the wall shrink away from the work band —
-    // only the dedicated cloud banks (updateMist, from course 40) ever hide the crane
+    // only the dedicated cloud banks (updateMist, from row 40) ever hide the crane
     var fade = cl.z > 3 ? clamp((Math.abs(cl.y - wyc - 1) - 3) / 4, 0, 1) : 1;
     // …and any cloud the CAMERA itself has swung into (round the back of the tower the lens is inside the cloud layer) thins away too,
     // so a puff can never white-out the screen. Full size beyond 18 units, gone inside 10.
@@ -3193,7 +3246,7 @@ var CRIT_TYPES = [
   { id: "eye", nice: false, from: 51, cap: 2, rate: 0.12, mk: mkEye, v: [0.5, 0.9], z: [-20, -10], dy: [0.3, 0.85] },
   { id: "peeper", nice: false, from: 53, cap: 3, rate: 0.14, mk: mkPeeper, v: [0.3, 0.6], z: [-16, -8], dy: [0.2, 0.9] },
   { id: "limb", nice: false, from: 57, cap: 2, rate: 0.09, mk: mkLimb, v: [0.6, 1.0], z: [-18, -9], dy: [0.3, 0.85], variants: 2 },
-  { id: "imp", nice: false, from: 62, cap: 3, rate: 0.12, mk: mkImp, v: [1.6, 2.6], z: [-14, -7], dy: [0.3, 0.9], flip: true, flock: 2 },
+  { id: "imp", nice: false, from: 62, cap: 2, rate: 0.12, mk: mkImp, v: [1.6, 2.6], z: [-14, -7], dy: [0.3, 0.9], flip: true, flock: 2 },
   { id: "wisp", nice: false, from: 70, cap: 2, rate: 0.1, mk: mkWisp, v: [0.7, 1.1], z: [-16, -8], dy: [0.25, 0.9] }
 ];
 var FINCH_COLS = [0x3fa7d6, 0xe0704a, 0x79a84e, 0xf5b921];
@@ -3384,11 +3437,11 @@ function critSpawn(T) {
 function updateCritters(dt) {
   if (!CG) return;
   CRIT.t += dt;
-  var cz = CAM.D, hv = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), maxAct = S.quality === "lo" ? 4 : 8, act = 0, ly = CAM.ly, t = CRIT.t, i, k;
+  var cz = CAM.D, hv = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), maxAct = S.quality === "lo" ? 3 : 5, act = 0, ly = CAM.ly, t = CRIT.t, i, k;
   for (i = 0; i < CRIT.items.length; i++) if (CRIT.items[i].active) act++;
   // spawning
   for (i = 0; i < CRIT_TYPES.length; i++) {
-    var T = CRIT_TYPES[i]; if (!critAllowed(T) || act >= maxAct) continue;
+    var T = CRIT_TYPES[i]; if (!critAllowed(T) || act + (T.flock || 1) > maxAct) continue;
     var cnt = 0; for (k = 0; k < CRIT.items.length; k++) if (CRIT.items[k].T === T && CRIT.items[k].active) cnt++;
     if (cnt < critCap(T) && Math.random() < dt * T.rate) { critSpawn(T); act += T.flock || 1; }
   }
@@ -3800,8 +3853,8 @@ function updateWorld(dt, rt) {
 }
 function updateHole(dt, prog) {
   W3.holeMat.uniforms.uTime.value += dt; W3.gateMat.uniforms.uTime.value = W3.t;
-  // Size: a pinprick at course 0, swelling toward the rim at course 50 (eased so
-  // the later courses visibly widen it more than the early ones).
+  // Size: a pinprick at row 0, swelling toward the rim at row 50 (eased so
+  // the later rows visibly widen it more than the early ones).
   var p1 = clamp(S.courses / FIRST_GOAL, 0, 1);
   var f = lerp(0.045, 1, Math.pow(p1, 1.3));
   var ny = lerp(0.68, 0.52, p1), dist = lerp(150, 110, p1), boost = 0;
@@ -5038,10 +5091,10 @@ function updateCraneVisual(dt, rt) {
 
 /* =====================================================================
    HAZARD SCHEDULER — every mechanic, once introduced, keeps coming back.
-   Rows are the row being BUILT (courses + 1). Each story card lands one
-   course before its mechanic first switches on, so the card always leads.
+   Rows are the row being BUILT (rows + 1). Each story card lands one
+   row before its mechanic first switches on, so the card always leads.
      wind   rows 21-22, 27-28, 33-34 … (3 rows of every 6 from row 51)
-     hands  a raid after course 25, then every 3rd course (1 → 2 → 3 hands)
+     hands  a raid after row 25, then every 3rd row (1 → 2 → 3 hands)
      clouds light from row 41, heavy from row 46 (a lighter row every 4th)
      tremor rows 66-67, 70-71 … (3 rows of every 4 from row 86)
      glass  bricks join the kiln roll from row 81 on (random, like lead)
@@ -5062,7 +5115,7 @@ function announceReturn(kind) {
   if (kind === "sway") snd.rumble(); else snd.whoosh();
 }
 function updateHazards() {
-  if (S.flags.rimPending && !S.flags.rimDone) return;       // the course-50 reveal plays out first…
+  if (S.flags.rimPending && !S.flags.rimDone) return;       // the row-50 reveal plays out first…
   if (S.won && !S.endless) return;                          // …and so does the finale
   var h = hazardsFor(S.courses + 1);
   if (h.wind !== S.windOn) {
@@ -5100,14 +5153,14 @@ function milestone(n) {
   if (n === 10 && !S.flags.goalShown && !S.beats.c10cards) { S.beats.c10cards = true; enqueueCards("ten", CARDS_TEN, revealGoal); }
   if (STORY_AT[n]) enqueueStory(STORY_AT[n]);
   if (n === GLASS_COURSE && !S.glassUnlocked) { S.glassUnlocked = true; S.nextDemo = "glass"; enqueueCards("glass", CARDS_GLASS, null); }
-  if (n >= 30 || (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0)) queueRaid(n);
+  if (n >= HAND_COURSE && (n - HAND_COURSE) % 3 === 0) queueRaid(n);
   if (n % 10 === 0 && n !== FIRST_GOAL && n !== FINAL_GOAL) whenLanded(function () { banner("ROW " + n, perBrickOn() ? "PAY RAISE · BRICKS NOW PAY $" + rate() + " BASE" : "PAY RAISE · ROW BONUS NOW $" + rowBonus(true)); });
   else if (n === FIRST_GOAL - 1 || n === FINAL_GOAL - 1) toast("Row " + n + " — one more.", 3000);
   if (n === FIRST_GOAL && !S.flags.rimStarted) { S.flags.rimPending = true; whenLanded(startRim); }
   if (n >= FINAL_GOAL && !S.won) { S.won = true; whenLanded(startVictory); }
 }
 
-/* ---------- the rim (course 50) — not the end ---------- */
+/* ---------- the rim (row 50) — not the end ---------- */
 function startRim() {
   S.flags.rimStarted = true;
   CAM.mode = "rim"; releaseKiln(); clearHands();
@@ -5224,8 +5277,17 @@ function handNMax() {
   var feasible = inHand + Math.floor(grabTime() * 0.8 / perBrick);               // never ask the impossible
   return Math.max(1, Math.min(cap, feasible));
 }
+function handNear(R, slot, per) {          // is another hand already gripping a brick right beside this slot (same row, same face)?
+  for (var i = 0; i < HANDS.length; i++) {
+    var h = HANDS[i];
+    if (!h.active || (h.state !== "arrive" && h.state !== "grip") || h.row !== R || h.face !== curFace()) continue;
+    var d = Math.abs(h.iFirst - slot); if (h.round) d = Math.min(d, per - d);
+    if (d < 2) return true;
+  }
+  return false;
+}
 function angDiff(a, b) { return ((a - b + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; }
-function pickRoundHand(R, nMax) {          // round tower: the hand sits on a brick of the ring below, the red slot is the working slot that covers it
+function pickRoundHand(R, nMax, relax) {          // round tower: the hand sits on a brick of the ring below, the red slot is the working slot that covers it
   var per = perFace(), step = 2 * Math.PI / per, cs = curSlot(), cands = [];
   for (var i = BRICKS.length - 1; i >= 0; i--) {
     var b = BRICKS[i]; if (b.row < R) break;
@@ -5233,14 +5295,14 @@ function pickRoundHand(R, nMax) {          // round tower: the hand sits on a br
     var first = -1;
     for (var s = 0; s < per; s++) if (Math.abs(angDiff(ringAng(R + 1, s, per), b.ang)) < 0.72 * step) { first = s; break; }
     if (first < 0 || first < cs) continue;
-    var n = first - cs + 1; if (n < 1 || n > nMax) continue;
+    var n = first - cs + 1; if (n < 1 || n > nMax || (!relax && handNear(R, first, per))) continue;
     cands.push({ brick: b, i: first, bi: i, n: n });
   }
   return cands.length ? cands[Math.floor(Math.random() * cands.length)] : null;
 }
-function pickHandTarget(nMax) {
+function pickHandTarget(nMax, relax) {
   var R = S.courses; if (R < 1 || G.falls > 0 || S.fill > 0) return null;
-  if (roundOn()) return pickRoundHand(R, nMax);
+  if (roundOn()) return pickRoundHand(R, nMax, relax);
   var per = perFace(), w = FW() / per, cands = [], cs = curSlot(), cf = curFace();
   for (var i = BRICKS.length - 1; i >= 0; i--) {
     var b = BRICKS[i]; if (b.row < R) break;
@@ -5249,17 +5311,17 @@ function pickHandTarget(nMax) {
     for (var s = 0; s < per; s++) if (Math.abs(slotX(R + 1, s, per) - b.x) < 0.72 * w) { first = s; break; }
     if (first < 0 || first < cs) continue;
     var n = first - cs + 1;
-    if (n < 1 || n > nMax) continue;
+    if (n < 1 || n > nMax || (!relax && handNear(R, first, per))) continue;
     cands.push({ brick: b, i: first, bi: i, n: n });
   }
   return cands.length ? cands[Math.floor(Math.random() * cands.length)] : null;
 }
-function spawnHand() {
+function spawnHand(relax) {
   var h = null; for (var i = 0; i < HANDS.length; i++) if (!HANDS[i].active) { h = HANDS[i]; break; }
   if (!h) return false;
   var first = !S.flags.handDone;
-  var tgt = pickHandTarget(first ? 1 : handNMax());
-  if (!tgt && first) tgt = pickHandTarget(2);
+  var tgt = pickHandTarget(first ? 1 : handNMax(), relax);
+  if (!tgt && first) tgt = pickHandTarget(2, relax);
   if (!tgt) return false;
   S.flags.handDone = true;
   h.active = true; h.state = "arrive"; h.sides = {}; h.t = 0; h.brick = tgt.brick; h.bi = tgt.bi; h.row = tgt.brick.row; h.round = roundOn(); h.ang = h.round ? tgt.brick.ang : 0; h.x = h.round ? 0 : tgt.brick.x;
@@ -5279,13 +5341,14 @@ function spawnHand() {
   snd.whoosh(); setTimeout(snd.warn, 150); bigWord("HAND!"); camShake(0.12);
   return true;
 }
-function queueRaid(n) { S.raid = { left: n < 55 ? 1 : n < 80 ? 2 : 3, delay: 0.6 }; }
+function queueRaid(n) { var k = n < 55 ? 1 : n < 80 ? 2 : 3; S.raid = { left: k, size: k, delay: 0.6 }; }
 function tickRaid(dt) {
   var r = S.raid; if (!r) return;
   if (activeMsg || msgQ.length || G.falls > 0 || CAM.mode !== "play") return;
   if (!S.flags.handSeen) { S.flags.handSeen = true; enqueueCards("hand", CARDS_HAND, null); return; }
+  if (r.size >= 2 && !S.flags["multi" + r.size]) { S.flags["multi" + r.size] = true; enqueueCards("multi" + r.size, CARDS_MULTI[r.size], null); return; }
   r.delay -= dt; if (r.delay > 0) return;
-  if (spawnHand()) { r.left--; r.delay = 1.8; r.tries = 0; } else if ((r.tries = (r.tries || 0) + 1) < 12) r.delay = 0.5; else r.left = 0;   // no free brick yet: wait for the row to build and try again
+  if (spawnHand((r.tries || 0) >= 6)) { r.left--; r.delay = 1.8; r.tries = 0; } else if ((r.tries = (r.tries || 0) + 1) < 12) r.delay = 0.5; else r.left = 0;   // no free brick yet: wait for the row to build and try again
   if (r.left <= 0) S.raid = null;
 }
 function fleeAllHands() { for (var i = 0; i < HANDS.length; i++) if (HANDS[i].active && (HANDS[i].state === "arrive" || HANDS[i].state === "grip")) fleeHand(HANDS[i]); }
@@ -5465,7 +5528,7 @@ var el = {};
 ["hud-course-num", "hud-goal", "prog-fill", "money-num", "hud-money", "btn-shop", "shop-new", "shop-count", "chip-row", "row-num", "row-in",
  "chip-wind", "wind-arrow", "wind-str", "chip-sc", "chip-hand", "hand-t", "chip-sway", "streak", "streak-x", "streak-pay", "prompt", "dock", "kiln", "kiln-ring", "kiln-sub",
  "k-mini", "mini-ring", "tray", "tray-count", "tray-lab", "sheds", "tray-list", "fx", "hot-bar", "toast", "banner", "bn-big", "bn-small", "big-word", "reveal", "hr-brick", "hr-title", "hr-text",
- "workshop", "upg-list", "rate-chip", "settings", "story", "story-card", "story-text", "story-kicker", "story-dots", "story-next",
+ "workshop", "upg-list", "rate-chip", "settings", "story", "story-card", "story-text", "story-kicker", "story-art", "story-dots", "story-next",
  "hintwrap", "hint-dim", "hint-label", "hint-text", "vignette", "flash", "ov-loading", "ov-start", "ov-victory"].forEach(function (id) {
   el[id.replace(/-([a-z])/g, function (m, c) { return c.toUpperCase(); })] = $(id);
 });
@@ -5638,8 +5701,8 @@ function renderHUD() {
   var gk = !!(S.flags.goalShown || S.flags.rimStarted), hc = $("hud-course");
   if (gk && hc.classList.contains("hidden") && !UI.hgtOn) { UI.hgtOn = true; revealEl(hc); }      // the HEIGHT counter appears the moment the goal is revealed
   if (el.hudCourseNum.textContent !== String(S.courses)) { el.hudCourseNum.textContent = S.courses; if (UI.hgtOn) { hc.classList.remove("up"); void hc.offsetWidth; hc.classList.add("up"); } }
-  el.hudGoal.classList.toggle("hidden", !gk); el.progFill.parentNode.classList.toggle("hidden", !gk);
-  el.hudGoal.textContent = S.endless ? "· ENDLESS" : "/ " + S.goal;
+  el.hudGoal.classList.toggle("hidden", !gk || S.endless); el.progFill.parentNode.classList.toggle("hidden", !gk);
+  el.hudGoal.textContent = S.endless ? "" : "/ " + S.goal;
   el.progFill.style.width = (Math.min(1, S.courses / S.goal) * 100).toFixed(1) + "%";
   el.rowNum.textContent = workRow();
   el.rowIn.textContent = roundOn() ? "RING " + Math.min(S.inCourse, S.perCourse) + "/" + S.perCourse : S.tower ? "SIDE " + (curFace() + 1) + "/4 · " + Math.min(curSlot(), S.perFace) + "/" + S.perFace : Math.min(S.inCourse, S.perCourse) + "/" + S.perCourse;
@@ -6016,7 +6079,7 @@ function uiFrame(rdt) {
     else if (hh) { txt = "HAND! Land a brick on the red slot — " + handNeed(hh) + " to go"; urgent = hh.timer < 3; }
     else if (C.state === "swing" && C.item) {
       if (C.item.type === "lead") txt = "LEAD — heavy, fast, pays ×" + TYPE_MULT.lead;
-      else if (C.item.type === "glass") txt = "GLASS — fragile, tight window, pays ×5";
+      else if (C.item.type === "glass") txt = "GLASS — fragile, tight window, pays ×" + TYPE_MULT.glass;
       else if (S.swayOn) txt = "TREMOR — follow the sliding zone";
       else if (S.windOn) txt = "WIND " + (S.wind.dir > 0 ? "→" : "←") + " fast with it, slow against it";
       else if (S.courses < 2) txt = "Tap anywhere to drop";
@@ -6038,7 +6101,7 @@ function uiFrame(rdt) {
   var hn = handCount(), nh = nearestHand();
   if (hn > 0 && S.started) {
     if (el.chipHand.classList.contains("hidden")) revealEl(el.chipHand);
-    el.handT.textContent = (hn > 1 ? "×" + hn + " · " : "") + (nh.state === "arrive" ? "INCOMING" : Math.max(0, Math.ceil(nh.timer)) + "s");
+    el.handT.textContent = (nh.state === "arrive" ? "INCOMING" : Math.max(0, Math.ceil(nh.timer)) + "s");
     el.chipHand.classList.toggle("urgent", nh.timer < 3 && nh.state === "grip");
   } else if (!el.chipHand.classList.contains("hidden")) el.chipHand.classList.add("hidden");
   el.chipSway.classList.toggle("hidden", !(S.swayOn && S.started));
@@ -6091,6 +6154,25 @@ var ICO_HAND = '<svg viewBox="0 0 64 46" width="66" height="46"><g fill="#f1d0b4
 var ICO_CLOUD = '<svg viewBox="0 0 64 46" width="66" height="46"><path d="M16 38a10 10 0 0 1 2-19.800A14 14 0 0 1 45 15a11.5 11.500 0 0 1 3 23z" fill="#fff" stroke="#221407" stroke-width="3" stroke-linejoin="round"/></svg>';
 var ICO_TREMOR = '<svg viewBox="0 0 64 46" width="66" height="46"><rect x="16" y="14" width="32" height="18" fill="#c2502c" stroke="#221407" stroke-width="3"/><path d="M6 10l-3 8 5 5-3 9M58 10l3 8-5 5 3 9" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var ICO_SORT = '<svg viewBox="0 0 64 46" width="66" height="46"><g stroke="#221407" stroke-width="3" stroke-linejoin="round"><path d="M4 42V20l12-10 12 10v22z" fill="#9aa5b0"/><path d="M28 42V20l12-10 12 10v22z" fill="#f5b921"/><path d="M52 42V26l8-7v23z" fill="#33363f"/></g></svg>';
+var STORY_SVG = function (inner) { return '<svg viewBox="0 0 64 46" stroke="#221407" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">' + inner + '</svg>'; };
+var ST_VILLAGE = STORY_SVG('<path d="M6 40V24l9-8 9 8v16z" fill="#e0b48a"/><path d="M24 40V16l9-9 9 9v24z" fill="#c2502c"/><path d="M42 40V26l8-6 8 6v14z" fill="#f5b921"/>');
+var ST_TOWER = STORY_SVG('<rect x="20" y="31" width="24" height="10" fill="#c2502c"/><rect x="24" y="21" width="16" height="10" fill="#e0704a"/><rect x="28" y="11" width="8" height="10" fill="#f5b921"/>');
+var ST_KEYSTONE = STORY_SVG('<path d="M20 12h24l6 16-18 14-18-14z" fill="#f5b921"/><path d="M26 19l6-5 6 5" fill="none" stroke="#fff3c4" stroke-width="2.5"/>');
+var ST_STAR = STORY_SVG('<path d="M32 4l6 13 14 2-10 10 2 14-12-7-12 7 2-14-10-10 14-2z" fill="#f5b921"/>');
+var ST_SIL = STORY_SVG('<circle cx="32" cy="22" r="19" fill="#ffd9e0" stroke="none"/><circle cx="32" cy="15" r="6" fill="#05020c" stroke="none"/><path d="M20 42c0-11 5-15 12-15s12 4 12 15z" fill="#05020c" stroke="none"/><path d="M13 36l5-16M51 36l-5-16" stroke="#05020c" stroke-width="5" fill="none"/>');
+var ST_TALLY = STORY_SVG('<path d="M14 36V12M24 36V12M34 36V12M44 36V12" fill="none"/><path d="M10 30L48 16" stroke="#c2502c" stroke-width="3" fill="none"/>');
+var ST_SKY = STORY_SVG('<circle cx="50" cy="12" r="7" fill="#fff6c8"/><path d="M14 34l3-7 7-3-7-3-3-7-3 7-7 3 7 3z" fill="#fff" stroke-width="2"/><circle cx="30" cy="10" r="2" fill="#fff" stroke="none"/>');
+var ST_GLASS = STORY_SVG('<path d="M32 4L46 22 32 42 18 22z" fill="#e6fbff" stroke-width="2.5"/><path d="M32 4L36 22 32 42" fill="none" stroke="#8fd9f0" stroke-width="2"/>');
+var STORY_ART = {
+  start: STORY_SVG('<rect x="12" y="12" width="40" height="28" rx="5" fill="#c2502c"/><path d="M22 36q4-12 10-6q4-8 10 0q2 3 0 6z" fill="#f5b921" stroke-width="2"/>'),
+  mold: STORY_SVG('<rect x="12" y="12" width="40" height="28" rx="5" fill="#c2502c"/><path d="M22 36q4-12 10-6q4-8 10 0q2 3 0 6z" fill="#f5b921" stroke-width="2"/>'),
+  row1: ST_VILLAGE, c5a: ST_VILLAGE, c5b: ST_VILLAGE, c75: ST_VILLAGE, c95: ST_VILLAGE,
+  c10a: ST_TOWER, c10b: ST_TOWER, c90: ST_KEYSTONE, c50d: ST_KEYSTONE, c100a: ST_KEYSTONE, c100b: ST_KEYSTONE,
+  c25: ICO_HAND, c55: ICO_HAND, c85: ICO_HAND,
+  c30: ST_SIL, c35: ST_SIL, c48: ST_SIL, c50b: ST_SIL, c50c: ST_SIL, c100c: ST_SIL,
+  c40: ICO_CLOUD, c45: ICO_CLOUD, c65: ICO_TREMOR,
+  c50a: ST_STAR, c60: ST_TALLY, c70: ST_SKY, c80: ST_GLASS
+};
 var REVEALS = {
   prices: { cls: "gold", icon: "<b>$↑</b>", title: "UPGRADES GET DEARER", text: "Every upgrade you own makes the <b>next one dearer</b>, so the price on each card climbs as you buy. Pick the ones that pay you back fastest, and build while you save." },
   hot: { cls: "hot", title: "THE KILN RUNS HOT", text: "Some bricks now come out glowing. Drop a hot brick before it cools — it's worth <b>×2</b>. Let it burn out and it's a miss." },
@@ -6102,7 +6184,7 @@ var REVEALS = {
   hand: { cls: "icon", icon: ICO_HAND, title: "HANDS!", text: "A hand is clamping onto a brick. In <b>about 10 seconds</b> it rips it free — and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to make it let go. The red slot shows where." },
   mist: { cls: "icon", icon: ICO_CLOUD, title: "CLOUDS ROLL IN", text: "Clouds drift across the work site and hide the crane. <b>Judge by rhythm</b>, not by eye — they come and go, and thicken as you climb. A Sky Lantern thins them." },
   tremor: { cls: "icon tremor", icon: ICO_TREMOR, title: "TREMORS", text: "The wall shudders. The green drop zone now <b>slides side to side</b> — drop where it <b>is</b> when you tap, not where it was. A Spirit Level calms it." },
-  glass: { cls: "glass", title: "SKY GLASS", text: "Pale glass bricks now come out of the kiln. The drop window is <b>35% narrower</b> — but they're worth <b>×5</b>." }
+  glass: { cls: "glass", title: "SKY GLASS", text: "Pale glass bricks now come out of the kiln. The drop window is <b>35% narrower</b> — but they're worth <b>×" + TYPE_MULT.glass + "</b>." }
 };
 var msgQ = [], activeMsg = null, openingPending = false, storyBusy = false, storyClosing = false, hintShownAt = 0, revealTimer = null;
 function panelsBusy() {
@@ -6117,6 +6199,7 @@ function actionFrozen() { return modalPaused() || S.shopOpen || CAM.mode === "vi
 function setStoryContent(m) {
   el.storyText.textContent = m.text;
   el.storyKicker.textContent = KICKERS[m.id] || "";
+  el.storyArt.innerHTML = STORY_ART[m.id] || STORY_ART.row1;
   el.storyNext.textContent = CTAS[m.id] || "CONTINUE";
   var html = "";
   if (m.seqTotal > 1) for (var i = 1; i <= m.seqTotal; i++) html += '<i class="' + (i <= m.seqIdx ? "on" : "") + '"></i>';
@@ -6675,22 +6758,26 @@ var FALLBACK_EMO = { dragon: "\uD83D\uDC09", smith: "\uD83D\uDD28", griffin: "\u
 var CARDS_HOT = [
   { who: "CINDER", tag: "dragon", pic: "cinder_talk", kicker: "THE KILN RUNS HOT", text: "\u201cPsst! Down here. Yes, the big green lump with the smoke. Your kiln's been warm since I sneezed on it.\u201d" },
   { who: "EDGAR", pic: "edgar_shrug", kicker: "THE KILN RUNS HOT", text: "\u201cSneezed on it? Is that bad?\u201d" },
-  { who: "CINDER", tag: "dragon", pic: "cinder_talk", kicker: "HOT BRICKS", text: "\u201cSome bricks come out glowing. Drop one before it cools and it pays <b>\u00d7" + TYPE_MULT.hot + "</b>. Let it burn out and it's a miss.\u201d", cta: "HEAT IT UP" }
+  { who: "CINDER", tag: "dragon", pic: "cinder_talk", kicker: "HOT BRICKS \u00b7 HOW THEY PAY", text: "Some bricks come out <b>glowing</b>. Drop one <b>before it cools</b> and it pays <b>\u00d7" + TYPE_MULT.hot + "</b>. Let it burn out and it's a <b>miss</b>." },
+  { who: "CINDER", tag: "dragon", pic: "cinder_talk", kicker: "HOT BRICKS", text: "\u201cSneezing's just fire leaking out politely. I usually cover my mouth. Last Tuesday I sneezed on the mayor's hat. He's still wearing it. He says it's a good look.\u201d", cta: "HEAT IT UP" }
 ];
 var CARDS_LEAD = [
   { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "THE SMITH'S NEW STOCK", text: "\u201cHeavy, isn't it? That's lead. Dark and dense, and it swings like a church bell. Mind your toes.\u201d" },
   { who: "EDGAR", pic: "edgar_shrug", kicker: "THE SMITH'S NEW STOCK", text: "\u201cSo it's heavier. Does heavier pay?\u201d" },
-  { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "LEAD BRICKS", text: "\u201cIt does. They swing <b>26% faster</b>, land one and it's worth <b>\u00d7" + TYPE_MULT.lead + "</b>, and every lead brick in a finished row adds <b>+" + ROW_ADD.lead + "\u00d7 rate</b> to that row's payout.\u201d", cta: "NICE AND HEAVY" }
+  { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "LEAD BRICKS \u00b7 HOW THEY PAY", text: "Lead bricks pay <b>\u00d7" + TYPE_MULT.lead + "</b> when you land them and swing <b>26% faster</b>. Each one in a finished row adds <b>+" + ROW_ADD.lead + "\u00d7 rate</b> to that row. A row of nothing but lead adds <b>+" + PURE_ADD.lead + "\u00d7 rate</b> on top. Each step of a same-metal run adds <b>+" + RUN_ADD.lead + "\u00d7</b>, up to five steps." },
+  { who: "BRAM", tag: "smith", pic: "bram_lift", kicker: "BRAM'S ADVICE", text: "\u201cLead's the only metal that ever made me sit down mid-delivery. Dropped one on my foot last spring, and I've been humming to it ever since. Real professional, that is. Nell says the bruise has a face now.\u201d", cta: "NICE AND HEAVY" }
 ];
 var CARDS_SILVER = [
   { who: "SKARRA", tag: "griffin", pic: "skarra_hoard", kicker: "A GRIFFIN IN THE RAFTERS", text: "\u201cSilver. Pale and shiny. Griffins hoard the stuff, and I know a good thing when it comes out of a kiln.\u201d" },
   { who: "EDGAR", pic: "edgar_grin", kicker: "A GRIFFIN IN THE RAFTERS", text: "\u201cAre you going to take it?\u201d" },
-  { who: "SKARRA", tag: "griffin", pic: "skarra_hoard", kicker: "SILVER BRICKS", text: "\u201cNot a chance, I'm a griffin, not a bandit. But the kiln gives you silver now. Land one and it's worth <b>\u00d7" + TYPE_MULT.silver + "</b>, and each one in a finished row adds <b>+" + ROW_ADD.silver + "\u00d7 rate</b>. A few in a row earn little bumps.\u201d", cta: "HOARD IT" }
+  { who: "SKARRA", tag: "griffin", pic: "skarra_hoard", kicker: "SILVER BRICKS \u00b7 HOW THEY PAY", text: "Silver bricks pay <b>\u00d7" + TYPE_MULT.silver + "</b> when you land them. Each one in a finished row adds <b>+" + ROW_ADD.silver + "\u00d7 rate</b>. A row of nothing but silver adds <b>+" + PURE_ADD.silver + "\u00d7 rate</b> on top. Each step of a same-metal run adds <b>+" + RUN_ADD.silver + "\u00d7</b>, up to five steps." },
+  { who: "SKARRA", tag: "griffin", pic: "skarra_hoard", kicker: "SKARRA'S HOARD", text: "\u201cNot a chance. I'm a griffin, not a bandit. I'd never take one while you were looking. I'd wait until you'd gone for a sandwich, and even then I'd feel terrible about it.\u201d", cta: "HOARD IT" }
 ];
 var CARDS_GOLD = [
   { who: "THE MINOTAUR", tag: "mino", pic: "minotaur_coins", kicker: "THE MARKET WANTS GOLD", text: "\u201cGold, love! Real gold, coming out of that kiln of yours. I'm going to be insufferable about this.\u201d" },
   { who: "EDGAR", pic: "edgar_proud", kicker: "THE MARKET WANTS GOLD", text: "\u201cWhat does gold do for a brick?\u201d" },
-  { who: "THE MINOTAUR", tag: "mino", pic: "minotaur_coins", kicker: "GOLD BRICKS", text: "\u201cLand one and it's worth <b>\u00d7" + TYPE_MULT.gold + "</b>. Each one in a finished row adds <b>+" + ROW_ADD.gold + "\u00d7 rate</b>. Gilded Clay makes them more common, if you can stretch to it.\u201d", cta: "SHOW ME THE GOLD" }
+  { who: "THE MINOTAUR", tag: "mino", pic: "minotaur_coins", kicker: "GOLD BRICKS \u00b7 HOW THEY PAY", text: "Gold bricks pay <b>\u00d7" + TYPE_MULT.gold + "</b> when you land them. Each one in a finished row adds <b>+" + ROW_ADD.gold + "\u00d7 rate</b>. A row of nothing but gold adds <b>+" + PURE_ADD.gold + "\u00d7 rate</b> on top. Each step of a same-metal run adds <b>+" + RUN_ADD.gold + "\u00d7</b>, up to five steps. Gilded Clay makes gold more common." },
+  { who: "THE MINOTAUR", tag: "mino", pic: "minotaur_coins", kicker: "THE MINOTAUR'S HAGGLING", text: "\u201cI once tried to haggle a gold brick off a goat. Took three days and a lot of hay. The goat won. The goat always wins.\u201d", cta: "SHOW ME THE GOLD" }
 ];
 var CARDS_SORTER = [
   { who: "THE ELDER", pic: "elder_talk", kicker: "THE TOWN CLERK'S RULE", text: "\u201cNow the kiln sends three kinds of metal, Edgar, and a muddle is no good to anyone. Every type gets a warehouse of its own.\u201d" },
@@ -6702,22 +6789,35 @@ var CARDS_HAND = [
   { who: "EDGAR", pic: "edgar_proud", kicker: "SOMETHING IN THE RUBBLE", text: "\u201cA HAND? Why is there a hand?\u201d" },
   { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "HANDS!", text: "\u201cIt clamps onto a brick. About <b>10 seconds</b> later it rips it free, and <b>everything laid after it falls</b>. Land a brick <b>on top of the hand</b> to make it let go. The red slot shows where.\u201d", cta: "SMASH IT" }
 ];
+var CARDS_MULTI = {
+  2: [
+    { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "TWO HANDS!", text: "\u201cEdgar! Two of them now, coming up out of the rubble side by side. Each one wants a brick of its own. Two of them, one of you. Not great odds.\u201d" },
+    { who: "EDGAR", pic: "edgar_shrug", kicker: "TWO HANDS!", text: "\u201cCan't they take turns?\u201d" },
+    { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "TWO HANDS \u00b7 HOW THEY WORK", text: "Each hand clamps <b>its own brick</b>. A few seconds later it rips that brick free, and <b>everything laid after it falls</b>. The hands keep a brick <b>between</b> them where they can. Land a brick <b>on a hand</b> to smash it.", cta: "TWO IT IS" }
+  ],
+  3: [
+    { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "THREE HANDS!", text: "\u201cEdgar. THREE. Three hands in a row, all reaching for different bricks. I've lived under this rubble my whole life and I've never seen a sky this grabby.\u201d" },
+    { who: "EDGAR", pic: "edgar_wave", kicker: "THREE HANDS!", text: "\u201cWhy does the sky need three hands?\u201d" },
+    { who: "NELL", tag: "mole", pic: "nell_lamp", kicker: "THREE HANDS \u00b7 HOW THEY WORK", text: "Each hand grabs <b>its own brick</b>, and each one rips its brick free after a few seconds, dropping <b>everything laid after it</b>. The hands keep a brick <b>between</b> any two of them where they can. Land a brick <b>on a hand</b> to smash it. The red slots show where they are.", cta: "THREE IT IS" }
+  ]
+};
 var CARDS_MIST = [
   { who: "SKARRA", tag: "griffin", pic: "skarra_cloud", kicker: "CLOUDS ROLL IN", text: "\u201cYou're building in my sky, mate. The clouds drift over the site, and up here they get thick.\u201d" },
   { who: "EDGAR", pic: "edgar_shrug", kicker: "CLOUDS ROLL IN", text: "\u201cI can't see the crane! How do I judge the drop?\u201d" },
-  { who: "SKARRA", tag: "griffin", pic: "skarra_cloud", kicker: "CLOUDS ROLL IN", text: "\u201cJudge by rhythm, not by eye. They come and go, and thicken as you climb. A Sky Lantern thins them.\u201d", cta: "KEEP TIME" }
+  { who: "SKARRA", tag: "griffin", pic: "skarra_cloud", kicker: "CLOUDS \u00b7 HOW THEY WORK", text: "Clouds drift over the work site and <b>hide the crane</b> for seconds at a time. The crane keeps swinging while it's hidden, so <b>keep the rhythm</b>. Clouds thicken the higher you build. A <b>Sky Lantern</b> thins them." },
+  { who: "SKARRA", tag: "griffin", pic: "skarra_cloud", kicker: "CLOUDS \u00b7 THE GRIFFIN'S ADVICE", text: "\u201cJudge by rhythm, mate, not by eye. I've got wings, sharp eyes and the best view in the sky, and I still can't see a crane through a cloud. Sing to it. Works for the dragon. Usually.\u201d", cta: "KEEP TIME" }
 ];
 var CARDS_TREMOR = [
   { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "TREMORS", text: "\u201cOops. I rolled over in my sleep and forgot where my tail was. Hold on, the wall's going to shudder.\u201d" },
-  { who: "EDGAR", pic: "edgar_wave", kicker: "TREMORS", text: "\u201cYou're the reason the wall shakes?!\u201d" },
-  { who: "EDGAR", pic: "edgar_shrug", kicker: "TREMORS", text: "\u201cWait. Is the tail the only reason it sways?\u201d" },
-  { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "TREMORS", text: "\u201cWell no, but um anyway.\u201d" },
-  { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "THE WALL SHUDDERS", text: "\u201cNow the green drop zone <b>slides side to side</b>. Drop where it <b>is</b> when you tap, not where it was. A Spirit Level calms it.\u201d", cta: "STEADY ON" }
+  { who: "EDGAR", pic: "edgar_wave", kicker: "TREMORS", text: "\u201cYou're the reason the wall shakes?! Wait. Is the tail the only reason it sways?\u201d" },
+  { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "TREMORS \u00b7 HOW THEY WORK", text: "Tremors make the wall shudder and <b>slide the green drop zone</b> side to side. Drop where the zone <b>is</b> when you tap, not where it was. Tremors grow with every row you build. A <b>Spirit Level</b> shrinks them." },
+  { who: "CINDER", tag: "dragon", pic: "cinder_roll", kicker: "TREMORS \u00b7 THE CONFESSION", text: "\u201cWell, no. There's the snoring too. Last night I snored so hard the mayor's chimney walked three streets before anyone noticed. He's still asking for it back.\u201d", cta: "STEADY ON" }
 ];
 var CARDS_GLASS = [
   { who: "BRAM", tag: "smith", pic: "bram_glass", kicker: "SKY GLASS", text: "\u201cPale glass, blown from the high cloud-pools and thin as a promise. Brittle, though. Mind it, it's worth more than your boots.\u201d" },
   { who: "EDGAR", pic: "edgar_wave", kicker: "SKY GLASS", text: "\u201cHow do I place something that fragile?\u201d" },
-  { who: "BRAM", tag: "smith", pic: "bram_glass", kicker: "SKY GLASS", text: "\u201cThe drop window is <b>35% narrower</b>, but they're worth <b>\u00d7" + TYPE_MULT.glass + "</b>. Bring your steadiest hands.\u201d", cta: "STEADY HANDS" }
+  { who: "BRAM", tag: "smith", pic: "bram_glass", kicker: "SKY GLASS \u00b7 HOW IT PAYS", text: "Sky glass pays <b>\u00d7" + TYPE_MULT.glass + "</b> when you land it. The drop window is <b>35% narrower</b>, so the drop has to be exact." },
+  { who: "BRAM", tag: "smith", pic: "bram_glass", kicker: "SKY GLASS", text: "\u201cFragile? Glass doesn't break, it makes a scene. I dropped a pane in the forge once. It shattered, apologised to the floor, then nicked my apprentice's thumb on the way out. Steady hands, Edgar. Steady hands and a quiet conscience.\u201d", cta: "STEADY HANDS" }
 ];
 var CARDS = { seq: null, i: 0, m: null, drag: null, busy: false, lock: 0 };
 function cardsLocked() { return performance.now() < CARDS.lock; }
@@ -7329,7 +7429,7 @@ window.__bb = {
   S: S, BRICKS: BRICKS, HANDS: HANDS,
   clock: 0,
   step: function (dt, n) { for (var i = 0; i < (n || 1); i++) { this.clock += dt * 1000; simStep(dt, this.clock); } },
-  fast: function (n) {               // build the wall to n finished courses instantly (no events)
+  fast: function (n) {               // build the wall to n finished rows instantly (no events)
     while (S.courses < n) {
       var row = S.courses + 1, per = S.perCourse;
       if (S.tower) { for (var fz = 0; fz < 4; fz++) for (var s2 = 0; s2 < S.perFace; s2++) wallAdd(row, s2, S.perFace, "normal", (row * 31 + s2 * 7 + fz) % 997, fz, fz * S.perFace + s2); }
@@ -8169,7 +8269,7 @@ boot();
     </script>
     <script id="cutscenes">
 /* =====================================================================
-   CUT SCENES — the opening, the rim (course 50) and the finale (course 100).
+   CUT SCENES — the opening, the rim (row 50) and the finale (row 100).
    Same filming language as the trailer: establishing wide -> close-up -> insert / B-roll,
    dialogue as shot / reverse-shot, slow eased camera moves, bold captions, comic speech
    bubbles, letterbox bars. The real game world is the set: the camera is taken over for
@@ -8370,7 +8470,7 @@ boot();
     if (lit >= 0.5) { g.fillStyle = "#221407"; g.beginPath(); g.arc(-6, -20, 2.4, 0, 7); g.arc(6, -20, 2.4, 0, 7); g.fill(); g.beginPath(); g.arc(0, -15, 6, 0.15, Math.PI - 0.15); g.stroke(); }
     g.restore();
   }
-  // the world above the tear: a second wall, a hundred courses tall, unfinished in the dark. p = reveal 0..1
+  // the world above the tear: a second wall, a hundred rows tall, unfinished in the dark. p = reveal 0..1
   function drawSecondWall(cx, cy, R, p, T) {
     g.save(); g.beginPath(); g.arc(cx, cy, R, 0, 7); g.clip();
     var gr = g.createLinearGradient(0, cy - R, 0, cy + R); gr.addColorStop(0, "#0b0620"); gr.addColorStop(0.6, "#25124a"); gr.addColorStop(1, "#3a1d5c");
@@ -8378,7 +8478,7 @@ boot();
     for (var s = 0; s < 26; s++) { g.fillStyle = "rgba(255,244,214," + (0.25 + 0.4 * ((s * 7) % 5) / 5) + ")"; g.fillRect(cx - R + ((s * 83) % 200) / 200 * R * 2, cy - R + ((s * 47) % 100) / 100 * R * 0.9, 2.5, 2.5); }
     var off = (1 - ease(p)) * R * 1.5, ww = R * 0.62, top = cy - R * 0.55 + off, bot = cy + R * 1.1 + off, bh = R * 0.085;
     g.fillStyle = "#1a0f33"; g.fillRect(cx - ww / 2, top, ww, bot - top);
-    for (var r = 0; top + r * bh < bot; r++) {                                       // courses: running bond, ragged unfinished top
+    for (var r = 0; top + r * bh < bot; r++) {                                       // rows: running bond, ragged unfinished top
       var y = top + r * bh, n = 6, bw = ww / n, sh = (r % 2) * bw / 2, miss = r < 3 ? (r * 2 + 1) % 3 : 0;
       for (var i = 0; i < n + 1; i++) {
         if (r < 3 && ((i + r) % 3 === miss)) continue;
