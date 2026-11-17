@@ -5175,7 +5175,7 @@ function startRim() {
 function finishRim() {
   S.flags.rimDone = true; S.flags.rimPending = false; CAM.mode = "play"; S.goal = FINAL_GOAL;
   flashScreen(0.45, 0.6); snd.fanfare(); camPunch(3);
-  banner("THE GOAL MOVES", "50 WAS NEVER THE END · BUILD TO COURSE 100");
+  banner("THE GOAL MOVES", "50 WAS NEVER THE END · BUILD TO ROW 100");
   popEl($("hud-goal")); renderHUD();
   updateHazards();
 }
