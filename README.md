@@ -73,7 +73,7 @@ Built iteratively across several versions (Oct–Nov 2026), with AI assistance d
 - Silhouettes in the hole are black cut-outs of the main characters now: Edgar, the Elder, Bram, Nell, the Minotaur, Skarra, and Cinder.
 - In endless mode the "ENDLESS" label is gone, so it stops squishing the dollar amount.
 - The hands warning no longer shows a multiplier — it just says hands are incoming.
-- Still open: round 17's upgrade-cost multiplier is 5% per upgrade, not the 2% asked; round 16's drop bar sometimes missing on the first brick after you turn.
+- Still open: round 17's upgrade-cost multiplier is 5% per upgrade, not the 2% asked; round 16's drop bar sometimes missing on the first brick after you turn. (The "BUILD TO COURSE 100" banner was fixed to "BUILD TO ROW 100" in a same-version text patch.)
 
 ### 3D v59.5 — Nov 15, 2026 (round 17 feedback, 14 of 15 — tails & horns, rows not courses)
 
